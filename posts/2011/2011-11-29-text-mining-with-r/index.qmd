@@ -1,0 +1,141 @@
+---
+title: Text Mining With R
+subtitle: a number of NLP tasks in R
+desctiption: ""
+date: 2011-11-29
+categories:
+    - R
+    - NLP
+    - Text Mining
+---
+
+Computational Linguistics tasks:
+
+-   [x] create a corpus
+-   [x] clean it up
+-   [ ] create a vocabulary
+-   [ ] create a frequency list
+-   [x] create a term document matrix TDF
+-   [ ] list n-grams
+-   [ ] generate word clouds
+-   [ ] mine TDF it for collocations
+-   similarity
+    -   cosine similarity
+    -   TDIDF
+    -   Nearest neighbor word clustering
+-   embedding
+    -   [ ] word embedding
+    -   [ ] sentence embedding
+-   [ ] concordance
+    -   KWIC, keywords in context
+    -   KWOC, keywords out of context
+
+# Setup
+
+```{r setup}
+require_install <- function(libs) {
+
+    for (i in libs){
+        if( !is.element(i, .packages(all.available = TRUE)) ) {
+            install.packages(i)
+        }
+        library(i,character.only = TRUE)
+        }
+}
+
+require_install(libs=c('tm','SnowballC','tidytext','dplyr','wordcloud'))
+```
+
+# Corpus
+
+```{r tm-load}
+doc1 <- "drugs, hospitals, doctors"
+doc2 <- "smog, pollution, micro-plastics, environment."
+doc3 <- "doctors, hospitals, healthcare"
+doc4 <- "pollution, environment, water."
+doc5 <- "I love NLP with deep learning."
+doc6 <- "I love machine learning."
+doc7 <- "He said he was keeping the wolf from the door."
+doc8 <- "Time flies like an arrow, fruit flies like a banana."
+doc9 <- "pollution, greenhouse gasses, GHG, hydrofluorocarbons, ozone hole, global warming. Montreal Protocol."
+doc10 <- "greenhouse gasses, hydrofluorocarbons, perfluorocarbons, sulfur hexafluoride, carbon dioxide, carbon monoxide, CO2, hydrofluorocarbons, methane, nitrous oxide."
+corpus <- c(doc1, doc2, doc3, doc4,doc5, doc6,doc7,doc8,doc9,doc10)   # <1>
+tm_corpus <- Corpus(VectorSource(corpus))                       # <2>
+```
+
+1.  concat docs into corpus var
+2.  created a corpus of class Corpus from the corpus var
+
+Next, let's inspect the corpus
+
+```{r tm-inspect}
+inspect(tm_corpus) # <3>
+
+```
+
+3.  inspect the corpus
+
+## Text preprocessing
+
+```{r cleanup-tolower}
+tm_corpus <- tm_map(tm_corpus, tolower) # <4>
+inspect(tm_corpus)
+```
+
+4.  this makes all the tokens lowercase
+
+```{r cleanup-removePunctuation}
+tm_corpus <- tm_map(tm_corpus, content_transformer(removePunctuation)) # <5>
+inspect(tm_corpus)
+
+```
+
+5.  this removes punctuation tokens
+
+```{r cleanup-removeStopwords}
+tm_corpus <- tm_map(tm_corpus, removeWords, stopwords("english")) # <6>
+inspect(tm_corpus)
+
+```
+
+6.  this removes stop words
+
+```{r cleanup-removeNumbers}
+tm_corpus <- tm_map(tm_corpus, removeNumbers) # <7>
+inspect(tm_corpus)
+```
+
+7.  this removes numbers
+
+```{r cleanup-stemDocument}
+tm_corpus <- tm_map(tm_corpus, stemDocument, language="english") # <8>
+inspect(tm_corpus)
+```
+
+8.  this stems the words
+
+```{r cleanup-stripWhitespace}
+tm_corpus <- tm_map(tm_corpus, stripWhitespace) # <9>
+inspect(tm_corpus)
+```
+
+9.  Removing Whitespaces - a single white space or group of whitespaces may be considered to be a token within a corpus. This is how we remove these token
+
+```{r term-document-matrix}
+dtm <- DocumentTermMatrix(tm_corpus)
+inspect(dtm)
+```
+
+```{r query_dtm_by_frequency}
+findFreqTerms(dtm, 2)
+```
+
+```{r}
+findAssocs(dtm, "polution", 0.8)
+```
+
+```{r inspect-tdm}
+as.matrix(dtm)
+```
+
+load(url("https://cbail.github.io/Trump_Tweets.Rdata")) head(trumptweets\$text)

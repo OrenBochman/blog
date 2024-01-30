@@ -1,0 +1,175 @@
+---
+title: Text Mining With Python
+date: 2011-11-29
+categories:
+    - Python
+    - NLP
+    - Text Mining
+#jupyter: 
+#  kernelspec:
+#    name: "ipykernel"
+#    language: "python"
+#    display_name: "Python 3 (ipykernel)"
+lastmod: 2022-04-30
+---
+
+![](pexels-brett-jordan-8573113.jpg)
+
+```{python}
+import numpy as np                           # library for scientific computing and matrix 
+import matplotlib.pyplot as plt              # visualization library
+import string
+import re
+
+import nltk                                  # Python library for NLP
+from nltk.corpus import twitter_samples      # sample Twitter dataset from NLTK
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from nltk.tokenize import TweetTokenizer    
+
+nltk.download('twitter_samples')
+
+```
+
+```{python}
+
+nltk.download('stopwords') # <1>
+
+
+def process_tweet(tweet):
+    """Process tweet function.
+    Input:
+        tweet: a string containing a tweet
+    Output:
+        tweets_clean: a list of words containing the processed tweet
+    """
+    stemmer = PorterStemmer()
+    stopwords_english = stopwords.words('english') 
+    
+    tweet = re.sub(r'\$\w*', '', tweet) # <2>
+    tweet = re.sub(r'^RT[\s]+', '', tweet) # <3>
+    tweet = re.sub(r'https?:\/\/.*[\r\n]*', '', tweet)  # <4>
+    tweet = re.sub(r'#', '', tweet)             # <5>
+    tokenizer = TweetTokenizer(preserve_case=False, strip_handles=True, # <6>
+                               reduce_len=True) # <6>
+    tweet_tokens = tokenizer.tokenize(tweet)    # <6>
+    tweets_clean = []
+    for word in tweet_tokens:
+        if (word not in stopwords_english and  # <7>
+                word not in string.punctuation):  # <8>
+            # tweets_clean.append(word)
+            stem_word = stemmer.stem(word)  # <9>
+            tweets_clean.append(stem_word)
+
+    return tweets_clean
+```
+
+1.  download the stopwords
+2.  remove stock market tickers like \$GE
+3.  remove old style retweet text "RT"
+4.  remove hyperlinks
+5.  remove hashtags
+6.  tokenize tweets
+7.  remove stopwords
+8.  remove punctuation
+9.  stemming word
+
+```{python}
+
+def build_freqs(tweets, ys):
+    """Build frequencies.
+    Input:
+        tweets: a list of tweets
+        ys: an m x 1 array with the sentiment label of each tweet
+            (either 0 or 1)
+    Output:
+        freqs: a dictionary mapping each (word, sentiment) pair to its
+        frequency
+    """
+    # Convert np array to list since zip needs an iterable.
+    # The squeeze is necessary or the list ends up with one element.
+    # Also note that this is just a NOP if ys is already a list.
+    yslist = np.squeeze(ys).tolist()
+
+    # Start with an empty dictionary and populate it by looping over all tweets
+    # and over all processed words in each tweet.
+    freqs = defaultdict(int)
+    for y, tweet in zip(yslist, tweets):
+        for word in process_tweet(tweet):
+            pair = (word, y)
+            if pair in freqs:
+                freqs[pair] += 1
+            else:
+                freqs[pair] = 1
+
+    return freqs
+
+def build_vocab(freqs):
+    vocab = [k for k, v in freq.items() if (v > 1 and k != '\n')]
+    vocab.sort()
+    return vocab
+
+```
+
+processing unknown tokens
+
+```{python}
+def assign_unk(word):
+    """
+    Assign tokens to unknown words
+    """
+    
+    # Punctuation characters
+    # Try printing them out in a new cell!
+    punct = set(string.punctuation)
+    
+    # Suffixes
+    noun_suffix = ["action", "age", "ance", "cy", "dom", "ee", "ence", "er", "hood", "ion", "ism", "ist", "ity", "ling", "ment", "ness", "or", "ry", "scape", "ship", "ty"]
+    verb_suffix = ["ate", "ify", "ise", "ize"]
+    adj_suffix = ["able", "ese", "ful", "i", "ian", "ible", "ic", "ish", "ive", "less", "ly", "ous"]
+    adv_suffix = ["ward", "wards", "wise"]
+
+    # Loop the characters in the word, check if any is a digit
+    if any(char.isdigit() for char in word):
+        return "--unk_digit--"
+
+    # Loop the characters in the word, check if any is a punctuation character
+    elif any(char in punct for char in word):
+        return "--unk_punct--"
+
+    # Loop the characters in the word, check if any is an upper case character
+    elif any(char.isupper() for char in word):
+        return "--unk_upper--"
+
+    # Check if word ends with any noun suffix
+    elif any(word.endswith(suffix) for suffix in noun_suffix):
+        return "--unk_noun--"
+
+    # Check if word ends with any verb suffix
+    elif any(word.endswith(suffix) for suffix in verb_suffix):
+        return "--unk_verb--"
+
+    # Check if word ends with any adjective suffix
+    elif any(word.endswith(suffix) for suffix in adj_suffix):
+        return "--unk_adj--"
+
+    # Check if word ends with any adverb suffix
+    elif any(word.endswith(suffix) for suffix in adv_suffix):
+        return "--unk_adv--"
+    
+    # If none of the previous criteria is met, return plain unknown
+    return "--unk--"
+
+```
+
+```{python}
+# select the lists of positive and negative tweets
+all_positive_tweets = twitter_samples.strings('positive_tweets.json')
+all_negative_tweets = twitter_samples.strings('negative_tweets.json')
+
+# concatenate the lists, 1st part is the positive tweets followed by the negative
+tweets = all_positive_tweets + all_negative_tweets
+
+# let's see how many tweets we have
+print("Number of tweets: ", len(tweets))
+```

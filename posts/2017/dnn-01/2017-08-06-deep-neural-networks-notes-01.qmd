@@ -1,0 +1,496 @@
+---
+date: 2017-08-06
+title: Notes for Lesson 1 of Deep Neural Networks 
+subtitle: course by Geffory Hinton on Coursera
+description: Notes on  Deep leaning and ML from Neural Networks for Machine Learning by Geoffrey Hintonon on Coursera
+categories: [deep learning, neural networks, notes, coursera] 
+---
+
+
+{{< pdf lec1.pdf class="column-margin" >}}
+
+These is the first installment of notes to the course "Deep Neural Networks" by  [Geffory Hinton]() I took on Coursera
+
+
+This was one of the first course online on the subject.
+
+Hinton was one of the leading researchers on deep learning, his students are some of the most important reaserchers today.
+He introduced some algorithms and methods that were not published.
+
+This course is now outdated - it does not cover transformers and probably all the results have been beaten as this is a fast moving field.
+
+Still this is an interesting, if mathematicaly sophisticated introduction to deep learning.
+
+
+[{{{< video https://www.youtube.com/watch?v=2fRnHVVLf1Y
+    class=column-margin
+    title="Lecture 1" 
+    width="1024" 
+    height="720" >}}}]{.hidden}
+
+
+## Lecture 1a: Why do we need machine learning? 
+
+{{< video https://youtu.be/4w0_mJ_6QoI
+    class=column-margin
+    title="Lecture 1 : Why do we need machine learning? " 
+    width="1024" 
+    height="720" >}}
+
+
+### What is Machine Learning? 
+
+- It is very hard to write programs that solve problems like ==recognizing a 3d object== from a novel viewpoint in new lighting conditions in a cluttered scene.
+  - We don’t know what program to write because we don’t know how its done in our brain.
+  - Even if we had a good idea about how to do it, the program might be horrendously complicated. 
+- It is hard to write a program to compute the probability that a [credit card transaction is fraudulent]{.mark}.
+  - There may not be any rules that are both simple and reliable. We need to combine a very large number of weak rules.
+  - Fraud is a moving target. The program needs to keep changing. 
+
+### The Machine Learning Approach 
+
+- Instead of writing a program by hand for each specific task, we [collect lots of examples]{.mark} that specify the correct output for a given input.
+- A [machine learning algorithm then takes these examples and produces a program that does the job]{.mark}.
+  - The program produced by the learning algorithm may look very different from a typical hand-written program. It may contain millions of numbers.
+  - If we do it right, the program works for new cases as well as the ones we trained it on.
+  - If the data changes the program can change too by training on the new data.
+- Massive amounts of computation are now cheaper than paying someone to write a task-specific program. 
+
+
+### Some examples of tasks best solved by learning
+
+
+- Recognizing patterns:
+  - Objects in real scenes 
+  - Facial identities or facial expressions
+  - Spoken words 
+- Recognizing anomalies:
+  - Unusual sequences of credit card transactions
+  - Unusual patterns of sensor readings in a nuclear power plant
+- Prediction:
+  - Future stock prices or currency exchange rates
+  - Which movies will a person like?
+
+### A standard example of machine learning 
+
+- A lot of genetics is done on fruit flies.
+  - They are convenient because they breed fast.
+  - We already know a lot about them.
+- The MNIST database of hand-written digits is the the machine learning equivalent of fruit flies.
+  - They are publicly available and we can learn them quite fast in a moderate-sized neural net.
+  - We know a huge amount about how well various machine learning methods do on MNIST.
+- We will use MNIST as our standard task. 
+
+### Beyond MNIST: The ImageNet task
+
+- 1000 different object classes in 1.3 million high-resolution training images from the web.
+  - Best system in 2010 competition got 47% error for its first choice and 25% error for its top 5 choices.
+- [Jitendra Malik](https://en.wikipedia.org/wiki/Jitendra_Malik), an eminent neural net sceptic, said that this competition is a good test of whether deep neural networks work well for object recognition.
+- A very deep neural net @krizhevsky2012imagenet gets less that 40% error for its first choice and less than 20% for its top 5 choices.
+
+### The Speech Recognition Task
+
+- A speech recognition system has several stages:
+  - Pre-processing: Convert the sound wave into a vector of acoustic coefficients. Extract a new vector about every 10 mille seconds.
+  - The acoustic model: Use a few adjacent vectors of acoustic coefficients to place bets on which part of which phoneme is being spoken.
+  - Decoding: Find the sequence of bets that does the best job of fitting the acoustic data and also fitting a model of the kinds of things people say.
+- Deep neural networks pioneered by [George Dahl](https://scholar.google.com/citations?user=ghbWy-0AAAAJ) and [Abdel-rahman Mohamed](https://scholar.google.com/citations?user=tJ_PrzgAAAAJ&hl=en) are now replacing the previous machine learning method for the acoustic model.
+
+### Phone recognition on the TIMIT benchmark
+
+![Phone recognition](phone_recognition.png){.column-margin}
+He discusses work from from @mohamed2012acoustic 
+- After standard post-processing using a bi-phone model, a deep net with 8 layers gets 20.7% error rate.
+- The best previous speaker independent result on TIMIT was 24.4% and this required averaging several models.
+- Li Deng (at MSR) realized that this result could change the way speech recognition was done.
+
+
+## Lecture 1b: What are neural networks? 
+
+{{< video https://www.youtube.com/watch?v=0JrfYvn8zns
+    title="Lecture 1b: What are neural networks?"
+    width="1024" 
+    height="720" >}}
+
+Some tasks that are easy or humans, like vision, are hard for software, and vice versa (chess). 
+
+### Reasons to study neural computation
+
+- To understand how the brain actually works.
+  - Its very big and very complicated and made of stuff that dies when you poke it around. So we need to use computer simulations.
+- To understand a style of parallel computation inspired by neurons and their adaptive connections.
+  - Very different style from sequential computation.
+  - should be good for things that brains are good at (e.g. vision)
+  - Should be bad for things that brains are bad at (e.g. 23 x 71)
+- To solve practical problems by using novel learning algorithms inspired by the brain (this course)
+  - Learning algorithms can be very useful even if they are not how the brain actually works. 
+  
+  
+### A typical cortical neuron
+- Gross physical structure:
+  - There is one axon that branches
+  - There is a dendritic tree that collects input from other neurons.
+- Axons typically contact dendritic trees at synapses
+  - A spike of activity in the axon causes charge to be injected into the post-synaptic neuron.
+- Spike generation:
+  - There is an axon hillock that generates outgoing spikes whenever enough charge has flowed in at synapses to depolarize the cell membrane.
+
+### Synapses
+
+- When a spike of activity travels along an axon and arrives at a synapse it causes vesicles of transmitter chemical to be released.
+  - There are several kinds of transmitter.
+- The transmitter molecules diffuse across the synaptic cleft and bind to receptor molecules in the membrane of the post-synaptic neuron thus changing their shape.
+  - This opens up holes that allow specific ions in or out. 
+
+### How synapses adapt
+
+- The effectiveness of the synapse can be changed:
+  - vary the number of vesicles of transmitter.
+  - vary the number of receptor molecules.
+- Synapses are slow, but they have advantages over RAM
+  - They are very small and very low-power.
+  - They adapt using locally available signals
+    - But what rules do they use to decide how to change? 
+
+### How the brain works on one slide!
+
+- Each neuron receives inputs from other neurons
+  - A few neurons also connect to receptors.
+  - Cortical neurons use spikes to communicate.
+- The effect of each input line on the neuron is controlled  by a synaptic weight
+  - The weights can be positive or negative.
+- The synaptic weights adapt so that the whole network learns to perform useful computations
+  - Recognizing objects, understanding language, making plans,
+controlling the body.
+- You have about neurons each with about weights.
+  - A huge number of weights can affect the computation in a very short time. Much better bandwidth than a workstation.
+
+### Modularity and the brain
+
+- Different bits of the cortex do different things.
+  - Local damage to the brain has specific effects.
+  - Specific tasks increase the blood flow to specific regions.
+- But cortex looks pretty much the same all over.
+  - Early brain damage makes functions relocate.
+- Cortex is made of general purpose stuff that has the ability to turn into special purpose hardware in response to experience.
+  - This gives rapid parallel computation plus flexibility.
+  - Conventional computers get flexibility by having stored sequential programs, but this requires very fast central processors to perform long sequential computations. 
+
+## Lecture 1c: Some simple models of neurons 
+
+{{< video https://www.youtube.com/watch?v=z9lE4cowVFw
+    class=column-margin
+    title="Lecture 1c: Some simple models of neurons" 
+    width="1024" 
+    height="720" >}}
+
+
+### Idealized neurons
+
+- To model things we have to idealize them (e.g. atoms)
+  - Idealization removes complicated details that are not essential for understanding the main principles.
+  - It allows us to apply mathematics and to make analogies to other, familiar systems.
+  - Once we understand the basic principles, its easy to add complexity to make the model more faithful.
+- It is often worth understanding models that are known to be wrong (but we must not forget that they are wrong!)
+  - E.g. neurons that communicate real values rather than discrete spikes of activity. 
+
+### Linear neurons
+
+- These are simple but computationally limited
+  - If we can make them learn we *may* get insight into more complicated neurons. 
+
+$$
+y=b+\sum_i{ x_i \times w_i}
+$$
+
+where:
+
+- $y$ is the output        
+- $b$ is the **bias**
+- $i$ is the index over input connectinos         
+- $x_i$ is the i^th^ **input**
+- $w_i$ is the **weight** on i^th^ input
+
+**Bias** is often conveniently chosen to be 0 which is odd considering that it is the constraint on the activation. This is handled formally by a technique called **batch normalization**
+
+![linear activation function](2022-09-20-08-28-31.png){.column-margin}
+
+These are simple but computationally limited.
+
+- If we can make them learn we `may` get insight into more complicated neurons. 
+
+$$
+y=b+\sum_i{ x_i \times w_i}
+$$
+
+
+## Binary threshold units
+
+![binary activation function](2022-09-20-12-06-42.png){.column-margin}
+Binary threshold units are due to  [Warren McCulloch](http://en.wikipedia.org/wiki/Warren_McCulloch) and [Walter Pitts](http://en.wikipedia.org/wiki/Walter_Pitts) from their [@mcculloch1943logical](McCulloch.and.Pitts.pdf). They were in turn influenced by earlier work by [John Von Neumann](https://en.wikipedia.org/wiki/John_von_Neumann) the father of modern computer and game theory.
+
+
+| Warren Sturgis Mcculloch | Walter Pitts |Johnvon Neumann  |
+|--|--|--|
+|![Warren Sturgis Mcculloch](WarrenSturgisMcculloch.jpg)  | ![Walter Pitts](WalterPitts.jpg)   | ![John von Neumann](JohnvonNeumann.gif)   |
+
+- First compute a weighted sum of the inputs.
+- Then send out a fixed size spike of activity if the weighted sum exceeds a threshold.
+- McCulloch and Pitts thought that each spike is like the truth value of a proposition and each neuron combines truth values to compute the truth value of another proposition! 
+
+There are two ways to write these mathematicaly: 
+
+$$
+z = \sum_i{ x_i w_i}\\
+ \theta = -b \\
+ y = \left\{ 
+   \begin{array}{ll}
+       1 & \text{if} \space z \ge \theta \\
+       0 & \text{otherwise}
+   \end{array}
+    \right.
+$$ 
+
+using bias 
+
+$$
+z = b+ \sum_i{ x_i w_i}\\
+ y = \left\{ 
+   \begin{array}{ll}
+       1 & \text{if} \space z \ge 0 \\
+       0 & \text{otherwise}
+   \end{array}
+    \right.
+$$ 
+
+## RELU - REctified Linear Neurons AKA Linear Threshold neurons
+
+![RELU activation function](2022-09-20-12-05-29.png){.column-margin}
+
+- They compute a *linear* weighted sum of their inputs.
+- The output is a **non-linear** function of the total input.
+
+$$
+z = b + \sum _i x_iw_i \\ 
+$$
+
+$$
+y = \left\{ 
+   \begin{array}{ll}
+       z & \text{if} \space z \gt 0 \\
+       0 & \text{otherwise}
+   \end{array}
+   \right.
+$$
+
+## Sigmoid neurons
+
+![Sigmoid activation function](2022-09-20-12-05-05.png){.column-margin}
+
+- These give a real-valued output that is a smooth and bounded function of their total input. 
+- Typically they use the logistic function 
+- Have nice derivatives which make learning easy.
+
+
+$$
+z = b + \sum _i x_iw_i \\
+\space\\ 
+y = \frac{1}{1+e^{-z}}
+$$
+
+## Stochastic binary neurons 
+
+![binary activation function](2022-09-20-12-04-03.png){.column-margin}
+
+These use the same equations as logistic units. 
+- But they treat the output of the logistic as the probability of producing a spike in a short time window. 
+  
+We can do a similar trick for rectified linear units:
+
+- The output is treated as the Poisson rate for spikes.
+
+$$
+z = b + \sum _i x_iw_i \\
+\space\\ 
+p(s=1) = \frac{1}{1+e^{-z}}
+$$
+
+## Choosing an activation function
+
+First let us note that many other activation function exist, this [table](https://en.wikipedia.org/wiki/Activation_function#Table_of_activation_functions) list the following:
+
+![activation functions](2022-09-20-09-45-19.png){.column-margin}
+
+At this point in the course we do not go into how one should pick a preferred activation function for the given problem. Some ideas for this are mentioned during the course.
+If we look at this from an `engineering` perspective some units tend to work well with other units and there are some other constraints like the range of inputs.
+
+
+### Linear units  
+
+Their main benefit is that they help us write down the mathematically familiar linear model which is great for getting a basic insight into the problem. We can analyze this model in term of linear and or abstract algebra using concepts like spaces, subspace, solutions, eigenvectors, eigenvalues and so on.
+Unfortunately linear units they are not expressive enough to perform as a basis of an efficient [universal approximator](https://en.wikipedia.org/wiki/Universal_approximation_theorem). A linear model is equivalent to a large logistic regression as each variable will effect all other variables. So once we developed some intuition about our linear model we would want to switch to a non-liner units and make use of the full power of neural networks.
+
+
+### Binary threshold units 
+
+Their main benefit seem to be for modeling logical gates or logical circuits. 
+Cons: have only zero and infinite gradients so are unsuitable for use in networks that are trained using gradient descent. They are used however in Hopfield networks. 
+We will also consider later using a fully baysian approch to neural networks where we don't need stochastic gradient descent - instead using MCMC search. It would seem that is such a settings using binary threshold units would dramatically decrease the search space.
+
+
+### RELU 
+
+ This is the simplest non linear units - using it is essentially introducing constraints in the form of inequalities.
+It should only be used in a hidden layer. A classification will need to add a Softmax and a regression a linear function. 
+RELUs can die - so a Leaky RELU can be a better choice. 
+![](2022-09-20-12-02-43.png){.column-margin}
+
+### Sigmoid 
+
+ This is continuous and has a gradient between 0 and 1 
+- pros: sigmoid with weight initialized to  zero behave like a linear system. As the weights increase towards  they networks   
+- cons: saturate and kill gradients also when output is not centered about 0 then gradients tend to go to far to 0 or 1. 
+They converge slowly. 
+
+### TANH
+
+pros: very high values are similar (~1) and very low values are also similar (~1) 
+cons: sub optimal for a deep network, as gradient diminish in the deeper parts of the model. RMSProp will compensate for that, but still changing to RELU will improve convergence speed c.f. @SEuser2017Deep. It is better then sigmoid as it avoids the exploding gradient problem 
+
+## Lecture 1d: A simple example of learning
+
+
+{{< video https://www.youtube.com/watch?v=iryPlswgRSA
+    class=column-margin
+    title="Lecture 1c: Some simple models of neurons" 
+    width="1024" 
+    height="720" >}}
+
+
+Visualization of neural networks is one of the few methods to get some insights into what is going on inside the black box. 
+
+
+• Consider a neural network with two
+layers of neurons.
+– neurons in the top layer represent
+known shapes.
+– neurons in the bottom layer
+represent pixel intensities.
+• A pixel gets to vote if it has ink on it.
+– Each inked pixel can vote for several
+different shapes.
+• The shape that gets the most votes wins. 
+
+
+### How to display the weights 
+
+Give each output unit its own “map” of the input image and display the weight coming from each pixel in the location of that pixel in the map.
+
+Use a black or white blob with the area representing the magnitude of the weight and the color representing the sign. 
+
+### How to learn the weights
+
+Show the network an image and increment the weights from active pixels to the correct class.
+
+Then decrement the weights from active pixels to whatever class the network guesses
+
+
+### The learned weights 
+
+The details of the learning algorithm will be explained in future lectures. 
+
+### Why the simple learning algorithm is insufficient
+
+- A two layer network with a single winner in the top layer is equivalent to having a rigid template for each shape.
+- The winner is the template that has the biggest overlap with the ink.
+- The ways in which hand-written digits vary are much too complicated to be captured by simple template matches of
+whole shapes.
+- To capture all the allowable variations of a digit we need to learn the features that it is composed of.
+
+## Lecture 1e: Three types of learning 
+
+{{< video https://www.youtube.com/watch?v=7IUhZ_XOYeU
+    class=column-margin
+    title="Lecture 1d: A simple example of learning" 
+    width="1024" 
+    height="720" >}}
+
+The three main types of learning machine learning: 
+
+Supervised learning
+: Learn to predict an output given an input vector 
+
+Reinforcement learning
+: Learn to select an action to maximize payoff.  
+
+Unsupervised learning
+: Discover a good internal representation of the input.
+
+Semi supervised learning
+: Semi-supervised uses a small amount of supervised data and large amount of unsupervised elarning
+
+
+Few/one shot learning
+: Supervised learning with inference from one or a few examples
+
+Zero shot learning
+: Supervised learning with inference for inputs not seen in training - usually based on learned structrure
+
+Transfer learning
+: Learning something from one data set and use it on another
+
+## Two types of supervised learning 
+
+- Each training case consists of an input vector x and a target output t. 
+- Regression: The target output is a real number or a whole vector of real numbers.
+  - The price of a stock in 6 months time.
+  - The temperature at noon tomorrow.
+- Classification: The target output is a class label.
+  - The simplest case is a choice between 1 and 0.
+  - We can also have multiple alternative labels.
+
+## How supervised learning typically works 
+
+- We start by choosing a model-class:
+  - A model-class, f, is a way of using some numerical $y=f(x;W)$ parameters, W, to map each input vector, x, into a predicted output y.
+- Learning usually means adjusting the parameters to reduce the discrepancy between the target output, t, on each training case and the actual output, y, produced by the model.
+  - For regression, $\frac{1}{2}(y-t)^2$is often a sensible measure of the discrepancy.
+  - For classification there are other measures that are generally more sensible (they also work better). 
+  
+  
+  
+### Reinforcement learning
+
+- In reinforcement learning, the output is an action or sequence of actions and the only supervisory signal is an occasional scalar reward.
+  - The goal in selecting each action is to maximize the expected sum of the future rewards. 
+  - We usually use a discount factor for delayed rewards so that we don’t have to look too far into the future.
+- Reinforcement learning is difficult:
+  - The rewards are typically delayed so its hard to know where we went wrong (or right).
+  - A scalar reward does not supply much information.
+- This course cannot cover everything and reinforcement learning is one of the important topics we will not cover. 
+
+
+### Unsupervised learning
+
+- For about 40 years, unsupervised learning was largely ignored by the machine learning community 
+  - Some widely used definitions of machine learning actually excluded it.
+  - Many researchers thought that clustering was the only form of unsupervised learning.
+- It is hard to say what the aim of unsupervised learning is.
+  - One major aim is to create an internal representation of the input that is useful for subsequent supervised or reinforcement learning.
+  - You can compute the distance to a surface by using the disparity between two images. But you don’t want to learn to compute disparities by stubbing your toe thousands of times. 
+
+
+### Other goals for unsupervised learning
+
+
+- It provides a compact, low-dimensional representation of the input.
+  - High-dimensional inputs typically live on or near a lowdimensional manifold (or several such manifolds).
+  - Principal Component Analysis is a widely used linear method for finding a low-dimensional representation.
+- It provides an economical high-dimensional representation of the input in terms of learned features.
+  - Binary features are economical.
+  – So are real-valued features that are nearly all zero.
+- It finds sensible clusters in the input.
+  - This is an example of a *very* sparse code in which only one of the features is non-zero. 
+  
+  
+  

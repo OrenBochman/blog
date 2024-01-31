@@ -1,0 +1,130 @@
+---
+layout: post
+title: Deep Neural Networks - Notes From Hinton's Course 
+date: 2017-08-06 4:44
+categories: [] 
+author: Oren Bochman
+tags: []
+summary: 
+---
+Notes from Hinton's Coursera course 
+
+# Neural Networks for Machine Learning 
+## Lecture 8a A brief overview of “Hessian-Free” optimization
+How much can we reduce the error
+by moving in a given direction?
+- If we choose a direction to move in and we keep
+going in that direction, how much does the error
+decrease before it starts rising again? We assume
+the curvature is constant (i.e. it’s a quadratic error surface).
+   - Assume the magnitude of the gradient decreases as we
+move down the gradient (i.e. the error surface is convex
+upward).
+- The maximum error reduction depends on the ratio of the
+gradient to the curvature. So a good direction to move in is one
+with a high ratio of gradient to curvature, even if the gradient
+itself is small.
+  -  How can we find directions like these?
+
+# Newton’s method
+ - The basic problem with steepest descent on a quadratic error surface is that the gradient is not the direction we want to go in.
+   - If the error surface has circular cross-sections, the gradient is fine.
+   - So lets apply a linear transformation that turns ellipses into circles.
+ - Newton’s method multiplies the gradient vector by the inverse of the curvature matrix, H
+   $$\Delta w = − \epsilon H(w)^{-1}\frac{dE}{dw}
+dw $$
+   - On a real quadratic surface it jumps to the minimum in one step.
+   - Unfortunately, with only a million weights, the curvature matrix has
+a trillion terms and it is totally infeasible to invert it.
+## Curvature Matrices
+![](../assets/2017-08-06-deep-neural-networks-notes-08/2022-09-25-13-19-54.png)
+Each element in the curvature matrix
+specifies how the gradient in one
+direction changes as we move in
+some other direction.
+– The off-diagonal terms correspond
+to twists in the error surface.
+• The reason steepest descent goes
+wrong is that the gradient for one
+weight gets messed up by the
+simultaneous changes to all the other
+weights.
+– The curvature matrix determines
+the sizes of these interactions.
+
+### How to avoid inverting a huge matrix
+- The curvature matrix has too many terms to be of use in a big network.
+    - Maybe we can get some benefit from just using the terms along the leading diagonal (Le Cun). But the diagonal terms are only a tiny fraction of the interactions (they are the self-interactions).
+- The curvature matrix can be approximated in many different ways
+  - Hessian-free methods, LBFGS, …
+- In the HF method, we make an approximation to the curvature matrix and then, assuming that approximation is correct, we minimize the error using an efficient technique called conjugate gradient. Then we make
+another approximation to the curvature matrix and minimize again.
+  - For RNNs its important to add a penalty for changing any of the hidden activities too much.
+### Conjugate gradient
+- There is an alternative to going to the minimum in one step by multiplying by the inverse of the curvature matrix.
+  - Use a sequence of steps each of which finds the minimum along one direction.
+- Ensure that each new direction is “conjugate” to the previous directions so you do not mess up the minimization you already did.
+  - “conjugate” means that as you go in the new direction, you do not change the gradients in the previous directions.
+### A picture of conjugate gradient
+![](../assets/2017-08-06-deep-neural-networks-notes-08/2022-09-25-13-27-58.png)
+- The gradient in the direction of the first step is zero at all points on the green line.
+- So if we move along the green line we don’t mess up the minimization we already did in the first direction.
+### What does conjugate gradient achieve?
+- After N steps, conjugate gradient is guaranteed to find the minimum of an N-dimensional quadratic surface. Why?
+-  After many less than N steps it has typically got the error very close to the minimum value.
+  - Conjugate gradient can be applied directly to a non-quadratic error surface and it usually works quite well (non-linear conjugate grad.)
+  - The HF optimizer uses conjugate gradient for minimization on a genuinely quadratic surface where it excels.
+- The genuinely quadratic surface is the quadratic approximation
+to the true surface.
+## Lecture 8b Modeling character strings with multiplicative connections
+### Modeling text: Advantages of working with characters
+- The web is composed of character strings.
+Any learning method powerful enough to understand the world by
+reading the web ought to find it trivial to learn which strings make
+words (this turns out to be true, as we shall see).
+  - Pre-processing text to get words is a big hassle
+- What about morphemes (prefixes, suffixes etc)
+- What about subtle effects like “sn” words?
+- What about New York?
+- What about Finnish
+  - ymmartamattomyydellansakaan
+### An obvious recurrent neural net
+![](../assets/2017-08-06-deep-neural-networks-notes-08/2022-09-25-13-31-26.png)
+
+A sub-tree in the tree of all character strings
+![](../assets/2017-08-06-deep-neural-networks-notes-08/2022-09-25-13-31-53.png)
+- If the nodes are implemented as hidden states in an RNN, different nodes can share structure because they use distributed representations.
+- The next hidden representation needs to depend on the **conjunction** of the current character and the current hidden representation
+  
+### Multiplicative connections
+- Instead of using the inputs to the recurrent net to provide additive
+extra input to the hidden units, we could use the current input
+character to choose the whole hidden-to-hidden weight matrix.
+  -  But this requires 86x1500x1500 parameters
+  - This could make the net overfit.
+- Can we achieve the same kind of multiplicative interaction using fewer parameters?
+  - We want a different transition matrix for each of the 86
+characters, but we want these 86 character-specific weight
+matrices to share parameters (the characters 9 and 8 should
+have similar matrices).
+## Using factors to implement multiplicative interactions
+- We can get groups a and b to interact multiplicatively by using “factors”.
+  - Each factor first computes a weighted sum for each of its input groups.
+  - Then it sends the product of the weighted sums to its output group.
+![](../assets/2017-08-06-deep-neural-networks-notes-08/2022-09-25-13-38-53.png)
+ $$\begin{aligned} 
+  \pink{c_f} &= \red{(b^T w_f)}\green{(a^T a_f)} v_f  
+  \end{aligned}$$ 
+- pink - vector of inputs to group c
+- red - scalar input to f from group b
+- green - scalar input to f from group a
+## Using factors to implement a set of basis matrices
+- We can think about factors another way:
+  - Each factor defines a rank 1 transition matrix from a to c.
+   $$\begin{aligned} 
+  c_f &= (b^T w_f)(a^T a_f)v_f  \\
+  c_f &= \purple{(b^T w_f)}\pink{(u_fv_f^T)}a  \\
+  c &= \big(\sum_f(b^T w_f)(u_f v_f^T)\big)a 
+  \end{aligned}$$ 
+- purple - scaler coefficient
+- pink - outer product transition matrix with rank 1

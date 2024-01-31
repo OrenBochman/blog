@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2017-08-06">
+<meta name="description" content="Notes on Deep leaning and ML from Neural Networks for Machine Learning by Geoffrey Hintonon on Coursera">
+
+<title>Oren Bochman’s Blog - Notes for Lesson 1 of Deep Neural Networks</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/nutshell-1.0.0/nutshell.min.js"></script>
+<script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Notes for Lesson 1 of Deep Neural Networks">
+<meta name="twitter:description" content="Notes on Deep leaning and ML from Neural Networks for Machine Learning by Geoffrey Hintonon on Coursera">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/posts/2017/dnn-01/thumbnail_blog.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Notes for Lesson 1 of Deep Neural Networks</h1>
+            <p class="subtitle lead">course by Geffory Hinton on Coursera</p>
+                  <div>
+        <div class="description">
+          Notes on Deep leaning and ML from Neural Networks for Machine Learning by Geoffrey Hintonon on Coursera
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">deep learning</div>
+                <div class="quarto-category">neural networks</div>
+                <div class="quarto-category">notes</div>
+                <div class="quarto-category">coursera</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 6, 2017</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-1a-why-do-we-need-machine-learning" id="toc-lecture-1a-why-do-we-need-machine-learning" class="nav-link active" data-scroll-target="#lecture-1a-why-do-we-need-machine-learning">Lecture 1a: Why do we need machine learning?</a>
+  <ul class="collapse">
+  <li><a href="#what-is-machine-learning" id="toc-what-is-machine-learning" class="nav-link" data-scroll-target="#what-is-machine-learning">What is Machine Learning?</a></li>
+  <li><a href="#the-machine-learning-approach" id="toc-the-machine-learning-approach" class="nav-link" data-scroll-target="#the-machine-learning-approach">The Machine Learning Approach</a></li>
+  <li><a href="#some-examples-of-tasks-best-solved-by-learning" id="toc-some-examples-of-tasks-best-solved-by-learning" class="nav-link" data-scroll-target="#some-examples-of-tasks-best-solved-by-learning">Some examples of tasks best solved by learning</a></li>
+  <li><a href="#a-standard-example-of-machine-learning" id="toc-a-standard-example-of-machine-learning" class="nav-link" data-scroll-target="#a-standard-example-of-machine-learning">A standard example of machine learning</a></li>
+  <li><a href="#beyond-mnist-the-imagenet-task" id="toc-beyond-mnist-the-imagenet-task" class="nav-link" data-scroll-target="#beyond-mnist-the-imagenet-task">Beyond MNIST: The ImageNet task</a></li>
+  <li><a href="#the-speech-recognition-task" id="toc-the-speech-recognition-task" class="nav-link" data-scroll-target="#the-speech-recognition-task">The Speech Recognition Task</a></li>
+  <li><a href="#phone-recognition-on-the-timit-benchmark" id="toc-phone-recognition-on-the-timit-benchmark" class="nav-link" data-scroll-target="#phone-recognition-on-the-timit-benchmark">Phone recognition on the TIMIT benchmark</a></li>
+  </ul></li>
+  <li><a href="#lecture-1b-what-are-neural-networks" id="toc-lecture-1b-what-are-neural-networks" class="nav-link" data-scroll-target="#lecture-1b-what-are-neural-networks">Lecture 1b: What are neural networks?</a>
+  <ul class="collapse">
+  <li><a href="#reasons-to-study-neural-computation" id="toc-reasons-to-study-neural-computation" class="nav-link" data-scroll-target="#reasons-to-study-neural-computation">Reasons to study neural computation</a></li>
+  <li><a href="#a-typical-cortical-neuron" id="toc-a-typical-cortical-neuron" class="nav-link" data-scroll-target="#a-typical-cortical-neuron">A typical cortical neuron</a></li>
+  <li><a href="#synapses" id="toc-synapses" class="nav-link" data-scroll-target="#synapses">Synapses</a></li>
+  <li><a href="#how-synapses-adapt" id="toc-how-synapses-adapt" class="nav-link" data-scroll-target="#how-synapses-adapt">How synapses adapt</a></li>
+  <li><a href="#how-the-brain-works-on-one-slide" id="toc-how-the-brain-works-on-one-slide" class="nav-link" data-scroll-target="#how-the-brain-works-on-one-slide">How the brain works on one slide!</a></li>
+  <li><a href="#modularity-and-the-brain" id="toc-modularity-and-the-brain" class="nav-link" data-scroll-target="#modularity-and-the-brain">Modularity and the brain</a></li>
+  </ul></li>
+  <li><a href="#lecture-1c-some-simple-models-of-neurons" id="toc-lecture-1c-some-simple-models-of-neurons" class="nav-link" data-scroll-target="#lecture-1c-some-simple-models-of-neurons">Lecture 1c: Some simple models of neurons</a>
+  <ul class="collapse">
+  <li><a href="#idealized-neurons" id="toc-idealized-neurons" class="nav-link" data-scroll-target="#idealized-neurons">Idealized neurons</a></li>
+  <li><a href="#linear-neurons" id="toc-linear-neurons" class="nav-link" data-scroll-target="#linear-neurons">Linear neurons</a></li>
+  </ul></li>
+  <li><a href="#binary-threshold-units" id="toc-binary-threshold-units" class="nav-link" data-scroll-target="#binary-threshold-units">Binary threshold units</a></li>
+  <li><a href="#relu---rectified-linear-neurons-aka-linear-threshold-neurons" id="toc-relu---rectified-linear-neurons-aka-linear-threshold-neurons" class="nav-link" data-scroll-target="#relu---rectified-linear-neurons-aka-linear-threshold-neurons">RELU - REctified Linear Neurons AKA Linear Threshold neurons</a></li>
+  <li><a href="#sigmoid-neurons" id="toc-sigmoid-neurons" class="nav-link" data-scroll-target="#sigmoid-neurons">Sigmoid neurons</a></li>
+  <li><a href="#stochastic-binary-neurons" id="toc-stochastic-binary-neurons" class="nav-link" data-scroll-target="#stochastic-binary-neurons">Stochastic binary neurons</a></li>
+  <li><a href="#choosing-an-activation-function" id="toc-choosing-an-activation-function" class="nav-link" data-scroll-target="#choosing-an-activation-function">Choosing an activation function</a>
+  <ul class="collapse">
+  <li><a href="#linear-units" id="toc-linear-units" class="nav-link" data-scroll-target="#linear-units">Linear units</a></li>
+  <li><a href="#binary-threshold-units-1" id="toc-binary-threshold-units-1" class="nav-link" data-scroll-target="#binary-threshold-units-1">Binary threshold units</a></li>
+  <li><a href="#relu" id="toc-relu" class="nav-link" data-scroll-target="#relu">RELU</a></li>
+  <li><a href="#sigmoid" id="toc-sigmoid" class="nav-link" data-scroll-target="#sigmoid">Sigmoid</a></li>
+  <li><a href="#tanh" id="toc-tanh" class="nav-link" data-scroll-target="#tanh">TANH</a></li>
+  </ul></li>
+  <li><a href="#lecture-1d-a-simple-example-of-learning" id="toc-lecture-1d-a-simple-example-of-learning" class="nav-link" data-scroll-target="#lecture-1d-a-simple-example-of-learning">Lecture 1d: A simple example of learning</a>
+  <ul class="collapse">
+  <li><a href="#how-to-display-the-weights" id="toc-how-to-display-the-weights" class="nav-link" data-scroll-target="#how-to-display-the-weights">How to display the weights</a></li>
+  <li><a href="#how-to-learn-the-weights" id="toc-how-to-learn-the-weights" class="nav-link" data-scroll-target="#how-to-learn-the-weights">How to learn the weights</a></li>
+  <li><a href="#the-learned-weights" id="toc-the-learned-weights" class="nav-link" data-scroll-target="#the-learned-weights">The learned weights</a></li>
+  <li><a href="#why-the-simple-learning-algorithm-is-insufficient" id="toc-why-the-simple-learning-algorithm-is-insufficient" class="nav-link" data-scroll-target="#why-the-simple-learning-algorithm-is-insufficient">Why the simple learning algorithm is insufficient</a></li>
+  </ul></li>
+  <li><a href="#lecture-1e-three-types-of-learning" id="toc-lecture-1e-three-types-of-learning" class="nav-link" data-scroll-target="#lecture-1e-three-types-of-learning">Lecture 1e: Three types of learning</a></li>
+  <li><a href="#two-types-of-supervised-learning" id="toc-two-types-of-supervised-learning" class="nav-link" data-scroll-target="#two-types-of-supervised-learning">Two types of supervised learning</a></li>
+  <li><a href="#how-supervised-learning-typically-works" id="toc-how-supervised-learning-typically-works" class="nav-link" data-scroll-target="#how-supervised-learning-typically-works">How supervised learning typically works</a>
+  <ul class="collapse">
+  <li><a href="#reinforcement-learning" id="toc-reinforcement-learning" class="nav-link" data-scroll-target="#reinforcement-learning">Reinforcement learning</a></li>
+  <li><a href="#unsupervised-learning" id="toc-unsupervised-learning" class="nav-link" data-scroll-target="#unsupervised-learning">Unsupervised learning</a></li>
+  <li><a href="#other-goals-for-unsupervised-learning" id="toc-other-goals-for-unsupervised-learning" class="nav-link" data-scroll-target="#other-goals-for-unsupervised-learning">Other goals for unsupervised learning</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+<div class="page-columns page-full"><p></p><div class="no-row-height column-margin column-container"><object data="lec1.pdf" type="application/pdf" class=""><p>Unable to display PDF file. <a href="lec1.pdf">Download</a> instead.</p></object></div></div>
+<p>These is the first installment of notes to the course “Deep Neural Networks” by <a href="">Geffory Hinton</a> I took on Coursera</p>
+<p>This was one of the first course online on the subject.</p>
+<p>Hinton was one of the leading researchers on deep learning, his students are some of the most important reaserchers today. He introduced some algorithms and methods that were not published.</p>
+<p>This course is now outdated - it does not cover transformers and probably all the results have been beaten as this is a fast moving field.</p>
+<p>Still this is an interesting, if mathematicaly sophisticated introduction to deep learning.</p>
+<p><span class="hidden">{{&lt; video https://www.youtube.com/watch?v=2fRnHVVLf1Y     class=column-margin     title="Lecture 1"      width="1024"      height="720" &gt;}}</span></p>
+<section id="lecture-1a-why-do-we-need-machine-learning" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="lecture-1a-why-do-we-need-machine-learning">Lecture 1a: Why do we need machine learning?</h2>
+<div class="quarto-video"><iframe data-external="1" src="https://www.youtube.com/embed/4w0_mJ_6QoI" width="1024" height="720" title="Lecture 1 : Why do we need machine learning? " frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<section id="what-is-machine-learning" class="level3">
+<h3 class="anchored" data-anchor-id="what-is-machine-learning">What is Machine Learning?</h3>
+<ul>
+<li>It is very hard to write programs that solve problems like ==recognizing a 3d object== from a novel viewpoint in new lighting conditions in a cluttered scene.
+<ul>
+<li>We don’t know what program to write because we don’t know how its done in our brain.</li>
+<li>Even if we had a good idea about how to do it, the program might be horrendously complicated.</li>
+</ul></li>
+<li>It is hard to write a program to compute the probability that a <mark>credit card transaction is fraudulent</mark>.
+<ul>
+<li>There may not be any rules that are both simple and reliable. We need to combine a very large number of weak rules.</li>
+<li>Fraud is a moving target. The program needs to keep changing.</li>
+</ul></li>
+</ul>
+</section>
+<section id="the-machine-learning-approach" class="level3">
+<h3 class="anchored" data-anchor-id="the-machine-learning-approach">The Machine Learning Approach</h3>
+<ul>
+<li>Instead of writing a program by hand for each specific task, we <mark>collect lots of examples</mark> that specify the correct output for a given input.</li>
+<li>A <mark>machine learning algorithm then takes these examples and produces a program that does the job</mark>.
+<ul>
+<li>The program produced by the learning algorithm may look very different from a typical hand-written program. It may contain millions of numbers.</li>
+<li>If we do it right, the program works for new cases as well as the ones we trained it on.</li>
+<li>If the data changes the program can change too by training on the new data.</li>
+</ul></li>
+<li>Massive amounts of computation are now cheaper than paying someone to write a task-specific program.</li>
+</ul>
+</section>
+<section id="some-examples-of-tasks-best-solved-by-learning" class="level3">
+<h3 class="anchored" data-anchor-id="some-examples-of-tasks-best-solved-by-learning">Some examples of tasks best solved by learning</h3>
+<ul>
+<li>Recognizing patterns:
+<ul>
+<li>Objects in real scenes</li>
+<li>Facial identities or facial expressions</li>
+<li>Spoken words</li>
+</ul></li>
+<li>Recognizing anomalies:
+<ul>
+<li>Unusual sequences of credit card transactions</li>
+<li>Unusual patterns of sensor readings in a nuclear power plant</li>
+</ul></li>
+<li>Prediction:
+<ul>
+<li>Future stock prices or currency exchange rates</li>
+<li>Which movies will a person like?</li>
+</ul></li>
+</ul>
+</section>
+<section id="a-standard-example-of-machine-learning" class="level3">
+<h3 class="anchored" data-anchor-id="a-standard-example-of-machine-learning">A standard example of machine learning</h3>
+<ul>
+<li>A lot of genetics is done on fruit flies.
+<ul>
+<li>They are convenient because they breed fast.</li>
+<li>We already know a lot about them.</li>
+</ul></li>
+<li>The MNIST database of hand-written digits is the the machine learning equivalent of fruit flies.
+<ul>
+<li>They are publicly available and we can learn them quite fast in a moderate-sized neural net.</li>
+<li>We know a huge amount about how well various machine learning methods do on MNIST.</li>
+</ul></li>
+<li>We will use MNIST as our standard task.</li>
+</ul>
+</section>
+<section id="beyond-mnist-the-imagenet-task" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="beyond-mnist-the-imagenet-task">Beyond MNIST: The ImageNet task</h3>
+<ul>
+<li>1000 different object classes in 1.3 million high-resolution training images from the web.
+<ul>
+<li>Best system in 2010 competition got 47% error for its first choice and 25% error for its top 5 choices.</li>
+</ul></li>
+<li><a href="https://en.wikipedia.org/wiki/Jitendra_Malik">Jitendra Malik</a>, an eminent neural net sceptic, said that this competition is a good test of whether deep neural networks work well for object recognition.</li>
+<li>A very deep neural net <span class="citation" data-cites="krizhevsky2012imagenet">Krizhevsky, Sutskever, and Hinton (<a href="#ref-krizhevsky2012imagenet" role="doc-biblioref">2012</a>)</span> gets less that 40% error for its first choice and less than 20% for its top 5 choices.</li>
+</ul>
+<div class="no-row-height column-margin column-container"><div id="ref-krizhevsky2012imagenet" class="csl-entry" role="listitem">
+Krizhevsky, Alex, Ilya Sutskever, and Geoffrey E Hinton. 2012. <span>“Imagenet Classification with Deep Convolutional Neural Networks.”</span> <em>Advances in Neural Information Processing Systems</em> 25.
+</div></div></section>
+<section id="the-speech-recognition-task" class="level3">
+<h3 class="anchored" data-anchor-id="the-speech-recognition-task">The Speech Recognition Task</h3>
+<ul>
+<li>A speech recognition system has several stages:
+<ul>
+<li>Pre-processing: Convert the sound wave into a vector of acoustic coefficients. Extract a new vector about every 10 mille seconds.</li>
+<li>The acoustic model: Use a few adjacent vectors of acoustic coefficients to place bets on which part of which phoneme is being spoken.</li>
+<li>Decoding: Find the sequence of bets that does the best job of fitting the acoustic data and also fitting a model of the kinds of things people say.</li>
+</ul></li>
+<li>Deep neural networks pioneered by <a href="https://scholar.google.com/citations?user=ghbWy-0AAAAJ">George Dahl</a> and <a href="https://scholar.google.com/citations?user=tJ_PrzgAAAAJ&amp;hl=en">Abdel-rahman Mohamed</a> are now replacing the previous machine learning method for the acoustic model.</li>
+</ul>
+</section>
+<section id="phone-recognition-on-the-timit-benchmark" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="phone-recognition-on-the-timit-benchmark">Phone recognition on the TIMIT benchmark</h3>
+<div class="page-columns page-full"><p> He discusses work from from <span class="citation" data-cites="mohamed2012acoustic">Mohamed, Dahl, and Hinton (<a href="#ref-mohamed2012acoustic" role="doc-biblioref">2012</a>)</span> - After standard post-processing using a bi-phone model, a deep net with 8 layers gets 20.7% error rate. - The best previous speaker independent result on TIMIT was 24.4% and this required averaging several models. - Li Deng (at MSR) realized that this result could change the way speech recognition was done.</p><div class="no-row-height column-margin column-container"><img src="phone_recognition.png" class="img-fluid" alt="Phone recognition"><div id="ref-mohamed2012acoustic" class="csl-entry" role="listitem">
+Mohamed, Abdel-rahman, George E. Dahl, and Geoffrey Hinton. 2012. <span>“Acoustic Modeling Using Deep Belief Networks.”</span> <em>IEEE Transactions on Audio, Speech, and Language Processing</em> 20 (1): 14–22. <a href="https://doi.org/10.1109/TASL.2011.2109382">https://doi.org/10.1109/TASL.2011.2109382</a>.
+</div></div></div>
+</section>
+</section>
+<section id="lecture-1b-what-are-neural-networks" class="level2">
+<h2 class="anchored" data-anchor-id="lecture-1b-what-are-neural-networks">Lecture 1b: What are neural networks?</h2>
+<div class="quarto-video"><iframe data-external="1" src="https://www.youtube.com/embed/0JrfYvn8zns" width="1024" height="720" title="Lecture 1b: What are neural networks?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Some tasks that are easy or humans, like vision, are hard for software, and vice versa (chess).</p>
+<section id="reasons-to-study-neural-computation" class="level3">
+<h3 class="anchored" data-anchor-id="reasons-to-study-neural-computation">Reasons to study neural computation</h3>
+<ul>
+<li>To understand how the brain actually works.
+<ul>
+<li>Its very big and very complicated and made of stuff that dies when you poke it around. So we need to use computer simulations.</li>
+</ul></li>
+<li>To understand a style of parallel computation inspired by neurons and their adaptive connections.
+<ul>
+<li>Very different style from sequential computation.</li>
+<li>should be good for things that brains are good at (e.g.&nbsp;vision)</li>
+<li>Should be bad for things that brains are bad at (e.g.&nbsp;23 x 71)</li>
+</ul></li>
+<li>To solve practical problems by using novel learning algorithms inspired by the brain (this course)
+<ul>
+<li>Learning algorithms can be very useful even if they are not how the brain actually works.</li>
+</ul></li>
+</ul>
+</section>
+<section id="a-typical-cortical-neuron" class="level3">
+<h3 class="anchored" data-anchor-id="a-typical-cortical-neuron">A typical cortical neuron</h3>
+<ul>
+<li>Gross physical structure:
+<ul>
+<li>There is one axon that branches</li>
+<li>There is a dendritic tree that collects input from other neurons.</li>
+</ul></li>
+<li>Axons typically contact dendritic trees at synapses
+<ul>
+<li>A spike of activity in the axon causes charge to be injected into the post-synaptic neuron.</li>
+</ul></li>
+<li>Spike generation:
+<ul>
+<li>There is an axon hillock that generates outgoing spikes whenever enough charge has flowed in at synapses to depolarize the cell membrane.</li>
+</ul></li>
+</ul>
+</section>
+<section id="synapses" class="level3">
+<h3 class="anchored" data-anchor-id="synapses">Synapses</h3>
+<ul>
+<li>When a spike of activity travels along an axon and arrives at a synapse it causes vesicles of transmitter chemical to be released.
+<ul>
+<li>There are several kinds of transmitter.</li>
+</ul></li>
+<li>The transmitter molecules diffuse across the synaptic cleft and bind to receptor molecules in the membrane of the post-synaptic neuron thus changing their shape.
+<ul>
+<li>This opens up holes that allow specific ions in or out.</li>
+</ul></li>
+</ul>
+</section>
+<section id="how-synapses-adapt" class="level3">
+<h3 class="anchored" data-anchor-id="how-synapses-adapt">How synapses adapt</h3>
+<ul>
+<li>The effectiveness of the synapse can be changed:
+<ul>
+<li>vary the number of vesicles of transmitter.</li>
+<li>vary the number of receptor molecules.</li>
+</ul></li>
+<li>Synapses are slow, but they have advantages over RAM
+<ul>
+<li>They are very small and very low-power.</li>
+<li>They adapt using locally available signals
+<ul>
+<li>But what rules do they use to decide how to change?</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="how-the-brain-works-on-one-slide" class="level3">
+<h3 class="anchored" data-anchor-id="how-the-brain-works-on-one-slide">How the brain works on one slide!</h3>
+<ul>
+<li>Each neuron receives inputs from other neurons
+<ul>
+<li>A few neurons also connect to receptors.</li>
+<li>Cortical neurons use spikes to communicate.</li>
+</ul></li>
+<li>The effect of each input line on the neuron is controlled by a synaptic weight
+<ul>
+<li>The weights can be positive or negative.</li>
+</ul></li>
+<li>The synaptic weights adapt so that the whole network learns to perform useful computations
+<ul>
+<li>Recognizing objects, understanding language, making plans, controlling the body.</li>
+</ul></li>
+<li>You have about neurons each with about weights.
+<ul>
+<li>A huge number of weights can affect the computation in a very short time. Much better bandwidth than a workstation.</li>
+</ul></li>
+</ul>
+</section>
+<section id="modularity-and-the-brain" class="level3">
+<h3 class="anchored" data-anchor-id="modularity-and-the-brain">Modularity and the brain</h3>
+<ul>
+<li>Different bits of the cortex do different things.
+<ul>
+<li>Local damage to the brain has specific effects.</li>
+<li>Specific tasks increase the blood flow to specific regions.</li>
+</ul></li>
+<li>But cortex looks pretty much the same all over.
+<ul>
+<li>Early brain damage makes functions relocate.</li>
+</ul></li>
+<li>Cortex is made of general purpose stuff that has the ability to turn into special purpose hardware in response to experience.
+<ul>
+<li>This gives rapid parallel computation plus flexibility.</li>
+<li>Conventional computers get flexibility by having stored sequential programs, but this requires very fast central processors to perform long sequential computations.</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="lecture-1c-some-simple-models-of-neurons" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="lecture-1c-some-simple-models-of-neurons">Lecture 1c: Some simple models of neurons</h2>
+<div class="quarto-video"><iframe data-external="1" src="https://www.youtube.com/embed/z9lE4cowVFw" width="1024" height="720" title="Lecture 1c: Some simple models of neurons" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<section id="idealized-neurons" class="level3">
+<h3 class="anchored" data-anchor-id="idealized-neurons">Idealized neurons</h3>
+<ul>
+<li>To model things we have to idealize them (e.g.&nbsp;atoms)
+<ul>
+<li>Idealization removes complicated details that are not essential for understanding the main principles.</li>
+<li>It allows us to apply mathematics and to make analogies to other, familiar systems.</li>
+<li>Once we understand the basic principles, its easy to add complexity to make the model more faithful.</li>
+</ul></li>
+<li>It is often worth understanding models that are known to be wrong (but we must not forget that they are wrong!)
+<ul>
+<li>E.g. neurons that communicate real values rather than discrete spikes of activity.</li>
+</ul></li>
+</ul>
+</section>
+<section id="linear-neurons" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="linear-neurons">Linear neurons</h3>
+<ul>
+<li>These are simple but computationally limited
+<ul>
+<li>If we can make them learn we <em>may</em> get insight into more complicated neurons.</li>
+</ul></li>
+</ul>
+<p><span class="math display">\[
+y=b+\sum_i{ x_i \times w_i}
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(y\)</span> is the output<br>
+</li>
+<li><span class="math inline">\(b\)</span> is the <strong>bias</strong></li>
+<li><span class="math inline">\(i\)</span> is the index over input connectinos<br>
+</li>
+<li><span class="math inline">\(x_i\)</span> is the i<sup>th</sup> <strong>input</strong></li>
+<li><span class="math inline">\(w_i\)</span> is the <strong>weight</strong> on i<sup>th</sup> input</li>
+</ul>
+<p><strong>Bias</strong> is often conveniently chosen to be 0 which is odd considering that it is the constraint on the activation. This is handled formally by a technique called <strong>batch normalization</strong></p>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><a href="2022-09-20-08-28-31.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-1" data-glightbox="description: .lightbox-desc-1" title="linear activation function"><div class="no-row-height column-margin column-container"><img src="2022-09-20-08-28-31.png" class="img-fluid figure-img" alt="linear activation function"></div></a></p>
+<figcaption>linear activation function</figcaption>
+</figure>
+</div>
+<p>These are simple but computationally limited.</p>
+<ul>
+<li>If we can make them learn we <code>may</code> get insight into more complicated neurons.</li>
+</ul>
+<p><span class="math display">\[
+y=b+\sum_i{ x_i \times w_i}
+\]</span></p>
+</section>
+</section>
+<section id="binary-threshold-units" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="binary-threshold-units">Binary threshold units</h2>
+<div class="page-columns page-full"><p> Binary threshold units are due to <a href="http://en.wikipedia.org/wiki/Warren_McCulloch">Warren McCulloch</a> and <a href="http://en.wikipedia.org/wiki/Walter_Pitts">Walter Pitts</a> from their <a href="McCulloch.and.Pitts.pdf"><span class="citation" data-cites="mcculloch1943logical">McCulloch and Pitts (<span>1943</span>)</span></a>. They were in turn influenced by earlier work by <a href="https://en.wikipedia.org/wiki/John_von_Neumann">John Von Neumann</a> the father of modern computer and game theory.</p><div class="no-row-height column-margin column-container"><img src="2022-09-20-12-06-42.png" class="img-fluid" alt="binary activation function"></div></div>
+<table class="table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Warren Sturgis Mcculloch</th>
+<th>Walter Pitts</th>
+<th>Johnvon Neumann</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img src="WarrenSturgisMcculloch.jpg" class="img-fluid" alt="Warren Sturgis Mcculloch"></td>
+<td><img src="WalterPitts.jpg" class="img-fluid" alt="Walter Pitts"></td>
+<td><img src="JohnvonNeumann.gif" class="img-fluid" alt="John von Neumann"></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>First compute a weighted sum of the inputs.</li>
+<li>Then send out a fixed size spike of activity if the weighted sum exceeds a threshold.</li>
+<li>McCulloch and Pitts thought that each spike is like the truth value of a proposition and each neuron combines truth values to compute the truth value of another proposition!</li>
+</ul>
+<p>There are two ways to write these mathematicaly:</p>
+<p><span class="math display">\[
+z = \sum_i{ x_i w_i}\\
+\theta = -b \\
+y = \left\{
+   \begin{array}{ll}
+       1 &amp; \text{if} \space z \ge \theta \\
+       0 &amp; \text{otherwise}
+   \end{array}
+    \right.
+\]</span></p>
+<p>using bias</p>
+<p><span class="math display">\[
+z = b+ \sum_i{ x_i w_i}\\
+y = \left\{
+   \begin{array}{ll}
+       1 &amp; \text{if} \space z \ge 0 \\
+       0 &amp; \text{otherwise}
+   \end{array}
+    \right.
+\]</span></p>
+</section>
+<section id="relu---rectified-linear-neurons-aka-linear-threshold-neurons" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="relu---rectified-linear-neurons-aka-linear-threshold-neurons">RELU - REctified Linear Neurons AKA Linear Threshold neurons</h2>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><a href="2022-09-20-12-05-29.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-2" data-glightbox="description: .lightbox-desc-2" title="RELU activation function"><div class="no-row-height column-margin column-container"><img src="2022-09-20-12-05-29.png" class="img-fluid figure-img" alt="RELU activation function"></div></a></p>
+<figcaption>RELU activation function</figcaption>
+</figure>
+</div>
+<ul>
+<li>They compute a <em>linear</em> weighted sum of their inputs.</li>
+<li>The output is a <strong>non-linear</strong> function of the total input.</li>
+</ul>
+<p><span class="math display">\[
+z = b + \sum _i x_iw_i \\
+\]</span></p>
+<p><span class="math display">\[
+y = \left\{
+   \begin{array}{ll}
+       z &amp; \text{if} \space z \gt 0 \\
+       0 &amp; \text{otherwise}
+   \end{array}
+   \right.
+\]</span></p>
+</section>
+<section id="sigmoid-neurons" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sigmoid-neurons">Sigmoid neurons</h2>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><a href="2022-09-20-12-05-05.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-3" data-glightbox="description: .lightbox-desc-3" title="Sigmoid activation function"><div class="no-row-height column-margin column-container"><img src="2022-09-20-12-05-05.png" class="img-fluid figure-img" alt="Sigmoid activation function"></div></a></p>
+<figcaption>Sigmoid activation function</figcaption>
+</figure>
+</div>
+<ul>
+<li>These give a real-valued output that is a smooth and bounded function of their total input.</li>
+<li>Typically they use the logistic function</li>
+<li>Have nice derivatives which make learning easy.</li>
+</ul>
+<p><span class="math display">\[
+z = b + \sum _i x_iw_i \\
+\space\\
+y = \frac{1}{1+e^{-z}}
+\]</span></p>
+</section>
+<section id="stochastic-binary-neurons" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="stochastic-binary-neurons">Stochastic binary neurons</h2>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><a href="2022-09-20-12-04-03.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-4" data-glightbox="description: .lightbox-desc-4" title="binary activation function"><div class="no-row-height column-margin column-container"><img src="2022-09-20-12-04-03.png" class="img-fluid figure-img" alt="binary activation function"></div></a></p>
+<figcaption>binary activation function</figcaption>
+</figure>
+</div>
+<p>These use the same equations as logistic units. - But they treat the output of the logistic as the probability of producing a spike in a short time window.</p>
+<p>We can do a similar trick for rectified linear units:</p>
+<ul>
+<li>The output is treated as the Poisson rate for spikes.</li>
+</ul>
+<p><span class="math display">\[
+z = b + \sum _i x_iw_i \\
+\space\\
+p(s=1) = \frac{1}{1+e^{-z}}
+\]</span></p>
+</section>
+<section id="choosing-an-activation-function" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="choosing-an-activation-function">Choosing an activation function</h2>
+<p>First let us note that many other activation function exist, this <a href="https://en.wikipedia.org/wiki/Activation_function#Table_of_activation_functions">table</a> list the following:</p>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><a href="2022-09-20-09-45-19.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-5" data-glightbox="description: .lightbox-desc-5" title="activation functions"><div class="no-row-height column-margin column-container"><img src="2022-09-20-09-45-19.png" class="img-fluid figure-img" alt="activation functions"></div></a></p>
+<figcaption>activation functions</figcaption>
+</figure>
+</div>
+<p>At this point in the course we do not go into how one should pick a preferred activation function for the given problem. Some ideas for this are mentioned during the course. If we look at this from an <code>engineering</code> perspective some units tend to work well with other units and there are some other constraints like the range of inputs.</p>
+<section id="linear-units" class="level3">
+<h3 class="anchored" data-anchor-id="linear-units">Linear units</h3>
+<p>Their main benefit is that they help us write down the mathematically familiar linear model which is great for getting a basic insight into the problem. We can analyze this model in term of linear and or abstract algebra using concepts like spaces, subspace, solutions, eigenvectors, eigenvalues and so on. Unfortunately linear units they are not expressive enough to perform as a basis of an efficient <a href="https://en.wikipedia.org/wiki/Universal_approximation_theorem">universal approximator</a>. A linear model is equivalent to a large logistic regression as each variable will effect all other variables. So once we developed some intuition about our linear model we would want to switch to a non-liner units and make use of the full power of neural networks.</p>
+</section>
+<section id="binary-threshold-units-1" class="level3">
+<h3 class="anchored" data-anchor-id="binary-threshold-units-1">Binary threshold units</h3>
+<p>Their main benefit seem to be for modeling logical gates or logical circuits. Cons: have only zero and infinite gradients so are unsuitable for use in networks that are trained using gradient descent. They are used however in Hopfield networks. We will also consider later using a fully baysian approch to neural networks where we don’t need stochastic gradient descent - instead using MCMC search. It would seem that is such a settings using binary threshold units would dramatically decrease the search space.</p>
+</section>
+<section id="relu" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="relu">RELU</h3>
+<div class="page-columns page-full"><p>This is the simplest non linear units - using it is essentially introducing constraints in the form of inequalities. It should only be used in a hidden layer. A classification will need to add a Softmax and a regression a linear function. RELUs can die - so a Leaky RELU can be a better choice. </p><div class="no-row-height column-margin column-container"><img src="2022-09-20-12-02-43.png" class="img-fluid"></div></div>
+</section>
+<section id="sigmoid" class="level3">
+<h3 class="anchored" data-anchor-id="sigmoid">Sigmoid</h3>
+<p>This is continuous and has a gradient between 0 and 1 - pros: sigmoid with weight initialized to zero behave like a linear system. As the weights increase towards they networks<br>
+- cons: saturate and kill gradients also when output is not centered about 0 then gradients tend to go to far to 0 or 1. They converge slowly.</p>
+</section>
+<section id="tanh" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="tanh">TANH</h3>
+<p>pros: very high values are similar (~1) and very low values are also similar (~1) cons: sub optimal for a deep network, as gradient diminish in the deeper parts of the model. RMSProp will compensate for that, but still changing to RELU will improve convergence speed c.f. <span class="citation" data-cites="SEuser2017Deep">user8272359 (<a href="#ref-SEuser2017Deep" role="doc-biblioref">2017</a>)</span>. It is better then sigmoid as it avoids the exploding gradient problem</p>
+<div class="no-row-height column-margin column-container"><div id="ref-SEuser2017Deep" class="csl-entry" role="listitem">
+user8272359. 2017. <span>“Deep Neural Network Using Keras/Tensorflow Solves Spiral Dataset Classification. But Accuracy Is Stuck Around 50.”</span> August 5, 2017. <a href="https://datascience.stackexchange.com/questions/22830/deep-neural-network-using-keras-tensorflow-solves-spiral-dataset-classification">https://datascience.stackexchange.com/questions/22830/deep-neural-network-using-keras-tensorflow-solves-spiral-dataset-classification</a>.
+</div></div></section>
+</section>
+<section id="lecture-1d-a-simple-example-of-learning" class="level2">
+<h2 class="anchored" data-anchor-id="lecture-1d-a-simple-example-of-learning">Lecture 1d: A simple example of learning</h2>
+<div class="quarto-video"><iframe data-external="1" src="https://www.youtube.com/embed/iryPlswgRSA" width="1024" height="720" title="Lecture 1c: Some simple models of neurons" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Visualization of neural networks is one of the few methods to get some insights into what is going on inside the black box.</p>
+<p>• Consider a neural network with two layers of neurons. – neurons in the top layer represent known shapes. – neurons in the bottom layer represent pixel intensities. • A pixel gets to vote if it has ink on it. – Each inked pixel can vote for several different shapes. • The shape that gets the most votes wins.</p>
+<section id="how-to-display-the-weights" class="level3">
+<h3 class="anchored" data-anchor-id="how-to-display-the-weights">How to display the weights</h3>
+<p>Give each output unit its own “map” of the input image and display the weight coming from each pixel in the location of that pixel in the map.</p>
+<p>Use a black or white blob with the area representing the magnitude of the weight and the color representing the sign.</p>
+</section>
+<section id="how-to-learn-the-weights" class="level3">
+<h3 class="anchored" data-anchor-id="how-to-learn-the-weights">How to learn the weights</h3>
+<p>Show the network an image and increment the weights from active pixels to the correct class.</p>
+<p>Then decrement the weights from active pixels to whatever class the network guesses</p>
+</section>
+<section id="the-learned-weights" class="level3">
+<h3 class="anchored" data-anchor-id="the-learned-weights">The learned weights</h3>
+<p>The details of the learning algorithm will be explained in future lectures.</p>
+</section>
+<section id="why-the-simple-learning-algorithm-is-insufficient" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-simple-learning-algorithm-is-insufficient">Why the simple learning algorithm is insufficient</h3>
+<ul>
+<li>A two layer network with a single winner in the top layer is equivalent to having a rigid template for each shape.</li>
+<li>The winner is the template that has the biggest overlap with the ink.</li>
+<li>The ways in which hand-written digits vary are much too complicated to be captured by simple template matches of whole shapes.</li>
+<li>To capture all the allowable variations of a digit we need to learn the features that it is composed of.</li>
+</ul>
+</section>
+</section>
+<section id="lecture-1e-three-types-of-learning" class="level2">
+<h2 class="anchored" data-anchor-id="lecture-1e-three-types-of-learning">Lecture 1e: Three types of learning</h2>
+<div class="quarto-video"><iframe data-external="1" src="https://www.youtube.com/embed/7IUhZ_XOYeU" width="1024" height="720" title="Lecture 1d: A simple example of learning" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>The three main types of learning machine learning:</p>
+<dl>
+<dt>Supervised learning</dt>
+<dd>
+Learn to predict an output given an input vector
+</dd>
+<dt>Reinforcement learning</dt>
+<dd>
+Learn to select an action to maximize payoff.
+</dd>
+<dt>Unsupervised learning</dt>
+<dd>
+Discover a good internal representation of the input.
+</dd>
+<dt>Semi supervised learning</dt>
+<dd>
+Semi-supervised uses a small amount of supervised data and large amount of unsupervised elarning
+</dd>
+<dt>Few/one shot learning</dt>
+<dd>
+Supervised learning with inference from one or a few examples
+</dd>
+<dt>Zero shot learning</dt>
+<dd>
+Supervised learning with inference for inputs not seen in training - usually based on learned structrure
+</dd>
+<dt>Transfer learning</dt>
+<dd>
+Learning something from one data set and use it on another
+</dd>
+</dl>
+</section>
+<section id="two-types-of-supervised-learning" class="level2">
+<h2 class="anchored" data-anchor-id="two-types-of-supervised-learning">Two types of supervised learning</h2>
+<ul>
+<li>Each training case consists of an input vector x and a target output t.</li>
+<li>Regression: The target output is a real number or a whole vector of real numbers.
+<ul>
+<li>The price of a stock in 6 months time.</li>
+<li>The temperature at noon tomorrow.</li>
+</ul></li>
+<li>Classification: The target output is a class label.
+<ul>
+<li>The simplest case is a choice between 1 and 0.</li>
+<li>We can also have multiple alternative labels.</li>
+</ul></li>
+</ul>
+</section>
+<section id="how-supervised-learning-typically-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-supervised-learning-typically-works">How supervised learning typically works</h2>
+<ul>
+<li>We start by choosing a model-class:
+<ul>
+<li>A model-class, f, is a way of using some numerical <span class="math inline">\(y=f(x;W)\)</span> parameters, W, to map each input vector, x, into a predicted output y.</li>
+</ul></li>
+<li>Learning usually means adjusting the parameters to reduce the discrepancy between the target output, t, on each training case and the actual output, y, produced by the model.
+<ul>
+<li>For regression, <span class="math inline">\(\frac{1}{2}(y-t)^2\)</span>is often a sensible measure of the discrepancy.</li>
+<li>For classification there are other measures that are generally more sensible (they also work better).</li>
+</ul></li>
+</ul>
+<section id="reinforcement-learning" class="level3">
+<h3 class="anchored" data-anchor-id="reinforcement-learning">Reinforcement learning</h3>
+<ul>
+<li>In reinforcement learning, the output is an action or sequence of actions and the only supervisory signal is an occasional scalar reward.
+<ul>
+<li>The goal in selecting each action is to maximize the expected sum of the future rewards.</li>
+<li>We usually use a discount factor for delayed rewards so that we don’t have to look too far into the future.</li>
+</ul></li>
+<li>Reinforcement learning is difficult:
+<ul>
+<li>The rewards are typically delayed so its hard to know where we went wrong (or right).</li>
+<li>A scalar reward does not supply much information.</li>
+</ul></li>
+<li>This course cannot cover everything and reinforcement learning is one of the important topics we will not cover.</li>
+</ul>
+</section>
+<section id="unsupervised-learning" class="level3">
+<h3 class="anchored" data-anchor-id="unsupervised-learning">Unsupervised learning</h3>
+<ul>
+<li>For about 40 years, unsupervised learning was largely ignored by the machine learning community
+<ul>
+<li>Some widely used definitions of machine learning actually excluded it.</li>
+<li>Many researchers thought that clustering was the only form of unsupervised learning.</li>
+</ul></li>
+<li>It is hard to say what the aim of unsupervised learning is.
+<ul>
+<li>One major aim is to create an internal representation of the input that is useful for subsequent supervised or reinforcement learning.</li>
+<li>You can compute the distance to a surface by using the disparity between two images. But you don’t want to learn to compute disparities by stubbing your toe thousands of times.</li>
+</ul></li>
+</ul>
+</section>
+<section id="other-goals-for-unsupervised-learning" class="level3">
+<h3 class="anchored" data-anchor-id="other-goals-for-unsupervised-learning">Other goals for unsupervised learning</h3>
+<ul>
+<li>It provides a compact, low-dimensional representation of the input.
+<ul>
+<li>High-dimensional inputs typically live on or near a lowdimensional manifold (or several such manifolds).</li>
+<li>Principal Component Analysis is a widely used linear method for finding a low-dimensional representation.</li>
+</ul></li>
+<li>It provides an economical high-dimensional representation of the input in terms of learned features.
+<ul>
+<li>Binary features are economical. – So are real-valued features that are nearly all zero.</li>
+</ul></li>
+<li>It finds sensible clusters in the input.
+<ul>
+<li>This is an example of a <em>very</em> sparse code in which only one of the features is non-zero.</li>
+</ul></li>
+</ul>
+
+
+<div class="hidden" aria-hidden="true">
+<span class="glightbox-desc lightbox-desc-1">linear activation function</span>
+<span class="glightbox-desc lightbox-desc-2">RELU activation function</span>
+<span class="glightbox-desc lightbox-desc-3">Sigmoid activation function</span>
+<span class="glightbox-desc lightbox-desc-4">binary activation function</span>
+<span class="glightbox-desc lightbox-desc-5">activation functions</span>
+</div>
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2017,
+  author = {Bochman, Oren},
+  title = {Notes for {Lesson} 1 of {Deep} {Neural} {Networks}},
+  date = {2017-08-06},
+  url = {https://orenbochman.github.io/blog//posts/2017/dnn-01/2017-08-06-deep-neural-networks-notes-01.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2017" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2017. <span>“Notes for Lesson 1 of Deep Neural
+Networks.”</span> August 6, 2017. <a href="https://orenbochman.github.io/blog//posts/2017/dnn-01/2017-08-06-deep-neural-networks-notes-01.html">https://orenbochman.github.io/blog//posts/2017/dnn-01/2017-08-06-deep-neural-networks-notes-01.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/orenbochman\.github\.io\/blog\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"openEffect":"zoom","closeEffect":"zoom","selector":".lightbox","loop":false,"descPosition":"bottom"});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
+
+
+
+
+</body></html>

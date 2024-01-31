@@ -23,6 +23,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 /* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
@@ -53,6 +87,8 @@ div.csl-indent {
 <script src="../../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
 <script src="../../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -64,6 +100,7 @@ div.csl-indent {
 <link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/nutshell-1.0.0/nutshell.min.js"></script>
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -92,10 +129,34 @@ div.csl-indent {
   }
 }</script>
 
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
 
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Quarto Migration Notes">
+<meta name="twitter:description" content="some migration notes from Blooger to Jekyl to Quarto blog.">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/posts/2023/2023-05-10-migration-notes/pexels-kaique-rocha-379960.jpg">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image:alt" content="man standing beside pipes by Kaique Rocha">
 </head>
 
-<body class="floating nav-fixed">
+<body class="floating nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -175,9 +236,9 @@ div.csl-indent {
         </div>
       </div>
                           <div class="quarto-categories">
-                <div class="quarto-category">Quarto</div>
-                <div class="quarto-category">Blogging</div>
-                <div class="quarto-category">Reproducibility</div>
+                <div class="quarto-category">quarto</div>
+                <div class="quarto-category">blogging</div>
+                <div class="quarto-category">code</div>
               </div>
                   </div>
   </div>
@@ -210,8 +271,16 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#virtual-environments" id="toc-virtual-environments" class="nav-link active" data-scroll-target="#virtual-environments">Virtual Environments</a></li>
+  <li><a href="#giants" id="toc-giants" class="nav-link active" data-scroll-target="#giants">:giants</a></li>
+  <li><a href="#the-devil-is-in-the-details" id="toc-the-devil-is-in-the-details" class="nav-link" data-scroll-target="#the-devil-is-in-the-details">The devil is in the details</a></li>
+  <li><a href="#virtual-environments" id="toc-virtual-environments" class="nav-link" data-scroll-target="#virtual-environments">Virtual Environments</a></li>
+  <li><a href="#lightbox-galleries" id="toc-lightbox-galleries" class="nav-link" data-scroll-target="#lightbox-galleries">Lightbox Galleries</a></li>
   <li><a href="#extras" id="toc-extras" class="nav-link" data-scroll-target="#extras">Extras</a></li>
+  <li><a href="#nutshell-addin" id="toc-nutshell-addin" class="nav-link" data-scroll-target="#nutshell-addin">Nutshell Addin</a>
+  <ul class="collapse">
+  <li><a href="#nutshells" id="toc-nutshells" class="nav-link" data-scroll-target="#nutshells">:Nutshells</a></li>
+  <li><a href="#open-issues" id="toc-open-issues" class="nav-link" data-scroll-target="#open-issues">Open issues:</a></li>
+  </ul></li>
   </ul>
 </nav>
 </nav>
@@ -220,13 +289,25 @@ div.csl-indent {
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
 
 
 
 
 
-<p>I was able to stand on the shoulders of Giants, <span class="citation" data-cites="navarro2022">(<a href="#ref-navarro2022" role="doc-biblioref">Navarro 2022</a>)</span>, <span class="citation" data-cites="hill2022">(<a href="#ref-hill2022" role="doc-biblioref">Hill 2022</a>)</span>, <span class="citation" data-cites="kaye2022">(<a href="#ref-kaye2022" role="doc-biblioref">Kaye 2022</a>)</span> when I migrated this blog.</p>
+<p>I was able to stand on the shoulders of <a href="#giants">:giants</a> when I migrated this blog.</p>
+<section id="giants" class="level2 invisible page-columns page-full">
+<h2 class="invisible anchored" data-anchor-id="giants">:giants</h2>
+<p><span class="citation" data-cites="navarro2022">(<a href="#ref-navarro2022" role="doc-biblioref">Navarro 2022</a>)</span>, <span class="citation" data-cites="hill2022">(<a href="#ref-hill2022" role="doc-biblioref">Hill 2022</a>)</span>, <span class="citation" data-cites="kaye2022">(<a href="#ref-kaye2022" role="doc-biblioref">Kaye 2022</a>)</span></p>
+<div class="no-row-height column-margin column-container"><div id="ref-navarro2022" class="csl-entry" role="listitem">
+Navarro, Danielle. 2022. <span>“Porting a Distill Blog to Quarto.”</span> April 20, 2022. <a href="https://blog.djnavarro.net/posts/2022-04-20_porting-to-quarto">https://blog.djnavarro.net/posts/2022-04-20_porting-to-quarto</a>.
+</div><div id="ref-hill2022" class="csl-entry" role="listitem">
+Hill, Alison. 2022. <span>“We Don’t Talk about Quarto.”</span> April 4, 2022. <a href="https://www.apreshill.com/blog/2022-04-we-dont-talk-about-quarto/">https://www.apreshill.com/blog/2022-04-we-dont-talk-about-quarto/</a>.
+</div><div id="ref-kaye2022" class="csl-entry" role="listitem">
+Kaye, Ella. 2022. <span>“Welcome to My <span>Quarto</span> Website!”</span> December 11, 2022. <a href="https://ellakaye.co.uk/posts/2022-12-11_welcome-quarto">https://ellakaye.co.uk/posts/2022-12-11_welcome-quarto</a>.
+</div></div></section>
+<section id="the-devil-is-in-the-details" class="level2">
+<h2 class="anchored" data-anchor-id="the-devil-is-in-the-details">The devil is in the details</h2>
 <p>There are lots of details that should be in the guide that are scattered all over the quarto site.</p>
 <p>I decided that all posts should have the following fields in their front matter:</p>
 <ol type="1">
@@ -238,12 +319,26 @@ div.csl-indent {
 <li>image</li>
 <li>image-description</li>
 </ol>
+</section>
 <section id="virtual-environments" class="level2">
 <h2 class="anchored" data-anchor-id="virtual-environments">Virtual Environments</h2>
 <ul>
 <li>are documented <a href="https://quarto.org/docs/projects/virtual-environments.html#rstudio">here</a></li>
 <li>ideal one can have one virtual environment for the whole site</li>
 </ul>
+</section>
+<section id="lightbox-galleries" class="level2">
+<h2 class="anchored" data-anchor-id="lightbox-galleries">Lightbox Galleries</h2>
+<p>so far I used this only in the <a href="../2023-12-20-autogluon/index.html">this page</a></p>
+<p>the light box plugin was integrated into Quarto in the version 4.1 which I migrated to. I have been using light box to make notes of talks and so on. So in for this blog adding light boxes is a breeze.</p>
+<p>All that’s realy needed is to change setting in the frontmatter:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>lightbox<span class="op">:</span> <span class="kw">true</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>which I did for all posts by adding the setting to the <code>_metadata.yaml</code> in the posts directory. And now all images default to opening within their own lightbox when clicked upon.</p>
+<p>to disable the feature say, on a logo for example just add <code>.no-lightbox</code> css style to the image like this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="al">![caption](filename.png)</span>{.no-lightbox}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>if you want to be able to scroll through a series of images we need to decorate each images as follows:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="al">![caption](filename.png)</span>{group="my-gallery"}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>An added bonus is that it is possible to zoom into these light-boxed images</p>
 </section>
 <section id="extras" class="level2">
 <h2 class="anchored" data-anchor-id="extras">Extras</h2>
@@ -252,22 +347,41 @@ div.csl-indent {
 <li>icons for navigation come from <a href="https://icons.getbootstrap.com/?q=archive%3E">bootstrap</a></li>
 <li>cover images are from <a href="www.pexels.com">pexels</a></li>
 </ul>
+</section>
+<section id="nutshell-addin" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="nutshell-addin">Nutshell Addin</h2>
+<p><a href="#Nutshells">:Nutshells</a>: seems like an interesting way to reduce the clutter by hiding unessential exposition.</p>
+<ul>
+<li>Will users realize they can interact with these nutshells <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> ?</li>
+<li>Not sure if the implementation is good enough to be worth the hassle.</li>
+<li>They also seem to be unwieldy, <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>?</li>
+<li>Can we get the page to keep track of the nutshell state so we can bookmarkit ?</li>
+<li>I’m going to try it out and see if they are pages for which they are suitable.</li>
+</ul>
+<div class="no-row-height column-margin column-container"><p><sup>1</sup>&nbsp;in landing pages I used to have an animation to get users to engage with in-lined content </p><p><sup>2</sup>&nbsp;could we loose the callout/baloon</p></div><section id="nutshells" class="level3 invisible">
+<h3 class="invisible anchored" data-anchor-id="nutshells">:Nutshells</h3>
+<p>which are links that expand inline into content</p>
+</section>
+<section id="open-issues" class="level3">
+<h3 class="anchored" data-anchor-id="open-issues">Open issues:</h3>
+<ul>
+<li>can I readily integrate books and presentation into this blog ?
+<ul>
+<li>can I drop them in or do I need to build them in another repo</li>
+<li>then deploy</li>
+<li>then link!?</li>
+</ul></li>
+<li>how about embedding repls</li>
+<li>how about embedding shiny live apps</li>
+</ul>
 
 
 
 </section>
+</section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-hill2022" class="csl-entry" role="listitem">
-Hill, Alison. 2022. <span>“We Don’t Talk about Quarto.”</span> April 4, 2022. <a href="https://www.apreshill.com/blog/2022-04-we-dont-talk-about-quarto/">https://www.apreshill.com/blog/2022-04-we-dont-talk-about-quarto/</a>.
-</div>
-<div id="ref-kaye2022" class="csl-entry" role="listitem">
-Kaye, Ella. 2022. <span>“Welcome to My <span>Quarto</span> Website!”</span> December 11, 2022. <a href="https://ellakaye.co.uk/posts/2022-12-11_welcome-quarto">https://ellakaye.co.uk/posts/2022-12-11_welcome-quarto</a>.
-</div>
-<div id="ref-navarro2022" class="csl-entry" role="listitem">
-Navarro, Danielle. 2022. <span>“Porting a Distill Blog to Quarto.”</span> April 20, 2022. <a href="https://blog.djnavarro.net/posts/2022-04-20_porting-to-quarto">https://blog.djnavarro.net/posts/2022-04-20_porting-to-quarto</a>.
-</div>
-</div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
   author = {Bochman, Oren},
   title = {Quarto {Migration} {Notes}},
   date = {2024-01-30},
@@ -278,24 +392,6 @@ Navarro, Danielle. 2022. <span>“Porting a Distill Blog to Quarto.”</span> Ap
 Bochman, Oren. 2024. <span>“Quarto Migration Notes.”</span> January 30,
 2024. <a href="https://orenbochman.github.io/blog//posts/2023/2023-05-10-migration-notes">https://orenbochman.github.io/blog//posts/2023/2023-05-10-migration-notes</a>.
 </div></div></section></div></main> <!-- /main -->
-<div>
-<hr>
-
-<h3> Stay in touch </h3>
-
-<p> If you enjoyed this post, then don't miss out on any future posts by subscribing to my email newsletter. </p>
-
-<iframe src="https://embeds.beehiiv.com/f34cfae8-60d7-4f52-9a57-d24b6f089703" data-test-id="beehiiv-embed" width="100%" height="320" frameborder="0" scrolling="no" style="border-radius: 4px; border: 2px solid #e5e7eb; margin: 0; background-color: transparent;"></iframe>
-
-
-
-<h3> Support my work with a coffee </h3>
-
-<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="bochman" data-color="#FFDD00" data-emoji="" data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff"></script>
-
-<h3> Share </h3>
-
-<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-hashtags="DataScience" data-show-count="false">Tweet</a><script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -944,8 +1040,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Copyright 2024, Oren Bochman</p>
-</div>
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.qmd">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.qmd">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
@@ -955,4 +1070,4 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-</div></body></html>
+</body></html>

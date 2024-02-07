@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2017-11-21">
+<meta name="description" content="Notes for Deep learning focusing on the basics">
+
+<title>Oren Bochman’s Blog - Deep Neural Networks - Notes for Lesson 14</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+<style>
+
+      .quarto-title-block .quarto-title-banner {
+        background-image: url(banner_deep.jpg);
+background-size: cover;
+      }
+</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Deep Neural Networks - Notes for Lesson 14">
+<meta name="twitter:description" content="Notes for Deep learning focusing on the basics">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/notes/dnn/dnn-14/thumbnail_blog.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+        <li>
+    <a class="dropdown-item" href="../../../dnn.html">
+ <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../model-thinking.html">
+ <span class="dropdown-text">Model Thinking</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Deep Neural Networks - Notes for Lesson 14</h1>
+            <p class="subtitle lead">Deeep neural with generative pre-training</p>
+                  <div>
+        <div class="description">
+          Notes for Deep learning focusing on the basics
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">deep learning</div>
+                <div class="quarto-category">neural networks</div>
+                <div class="quarto-category">notes</div>
+                <div class="quarto-category">coursera</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 21, 2017</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-14a-learning-layers-of-features-by-stacking-rbms" id="toc-lecture-14a-learning-layers-of-features-by-stacking-rbms" class="nav-link active" data-scroll-target="#lecture-14a-learning-layers-of-features-by-stacking-rbms">Lecture 14a Learning layers of features by stacking RBMs</a>
+  <ul class="collapse">
+  <li><a href="#training-a-deep-network-by-stacking-rbms" id="toc-training-a-deep-network-by-stacking-rbms" class="nav-link" data-scroll-target="#training-a-deep-network-by-stacking-rbms">Training a deep network by stacking RBMs</a></li>
+  <li><a href="#combining-two-rbms-to-make-a-dbn" id="toc-combining-two-rbms-to-make-a-dbn" class="nav-link" data-scroll-target="#combining-two-rbms-to-make-a-dbn">Combining two RBMs to make a DBN</a></li>
+  <li><a href="#an-aside-averaging-factorial-distributions" id="toc-an-aside-averaging-factorial-distributions" class="nav-link" data-scroll-target="#an-aside-averaging-factorial-distributions">An aside: Averaging factorial distributions</a></li>
+  <li><a href="#why-does-greedy-learning-work" id="toc-why-does-greedy-learning-work" class="nav-link" data-scroll-target="#why-does-greedy-learning-work">Why does greedy learning work?</a></li>
+  <li><a href="#fine-tuning-with-a-contrastive-version-of-the-wake-sleep-algorithm" id="toc-fine-tuning-with-a-contrastive-version-of-the-wake-sleep-algorithm" class="nav-link" data-scroll-target="#fine-tuning-with-a-contrastive-version-of-the-wake-sleep-algorithm">Fine-tuning with a contrastive version of the wake-sleep algorithm</a></li>
+  <li><a href="#the-dbn-used-for-modeling-the-joint-distribution-of-mnist-digits-and-their-labels" id="toc-the-dbn-used-for-modeling-the-joint-distribution-of-mnist-digits-and-their-labels" class="nav-link" data-scroll-target="#the-dbn-used-for-modeling-the-joint-distribution-of-mnist-digits-and-their-labels">The DBN used for modeling the joint distribution of MNIST digits and their labels</a></li>
+  </ul></li>
+  <li><a href="#lecture-14b-discriminative-fine-tuning-for-dbns" id="toc-lecture-14b-discriminative-fine-tuning-for-dbns" class="nav-link" data-scroll-target="#lecture-14b-discriminative-fine-tuning-for-dbns">Lecture 14b Discriminative fine-tuning for DBNs</a>
+  <ul class="collapse">
+  <li><a href="#fine-tuning-for-discrimination" id="toc-fine-tuning-for-discrimination" class="nav-link" data-scroll-target="#fine-tuning-for-discrimination">Fine-tuning for discrimination</a></li>
+  <li><a href="#why-backpropagation-works-better-with-greedy-pre-training-the-optimization-view" id="toc-why-backpropagation-works-better-with-greedy-pre-training-the-optimization-view" class="nav-link" data-scroll-target="#why-backpropagation-works-better-with-greedy-pre-training-the-optimization-view">Why backpropagation works better with greedy pre-training: The optimization view</a></li>
+  <li><a href="#why-backpropagation-works-better-with-greedy-pre-training-the-overfitting-view" id="toc-why-backpropagation-works-better-with-greedy-pre-training-the-overfitting-view" class="nav-link" data-scroll-target="#why-backpropagation-works-better-with-greedy-pre-training-the-overfitting-view">Why backpropagation works better with greedy pre-training: The overfitting view</a></li>
+  </ul></li>
+  <li><a href="#first-model-the-distribution-of-digit-images" id="toc-first-model-the-distribution-of-digit-images" class="nav-link" data-scroll-target="#first-model-the-distribution-of-digit-images">First, model the distribution of digit images</a>
+  <ul class="collapse">
+  <li><a href="#results-on-the-permutation-invariant-mnist-task" id="toc-results-on-the-permutation-invariant-mnist-task" class="nav-link" data-scroll-target="#results-on-the-permutation-invariant-mnist-task">Results on the permutation-invariant MNIST task</a></li>
+  <li><a href="#unsupervised-pre-training-also-helps-for-models-that-have-more-data-and-better-priors" id="toc-unsupervised-pre-training-also-helps-for-models-that-have-more-data-and-better-priors" class="nav-link" data-scroll-target="#unsupervised-pre-training-also-helps-for-models-that-have-more-data-and-better-priors">Unsupervised “pre-training” also helps for models that have more data and better priors</a></li>
+  <li><a href="#phone-recognition-on-the-timit-benchmark-mohamed-dahl-hinton-2009-2012" id="toc-phone-recognition-on-the-timit-benchmark-mohamed-dahl-hinton-2009-2012" class="nav-link" data-scroll-target="#phone-recognition-on-the-timit-benchmark-mohamed-dahl-hinton-2009-2012">Phone recognition on the TIMIT benchmark (Mohamed, Dahl, &amp; Hinton, 2009 &amp; 2012)</a></li>
+  </ul></li>
+  <li><a href="#lecture-14c-what-happens-during-discriminative-fine-tuning" id="toc-lecture-14c-what-happens-during-discriminative-fine-tuning" class="nav-link" data-scroll-target="#lecture-14c-what-happens-during-discriminative-fine-tuning">Lecture 14c What happens during discriminative fine-tuning?</a>
+  <ul class="collapse">
+  <li><a href="#learning-dynamics-of-deep-nets-the-next-4-slides-describe-work-by-yoshua-bengios-group" id="toc-learning-dynamics-of-deep-nets-the-next-4-slides-describe-work-by-yoshua-bengios-group" class="nav-link" data-scroll-target="#learning-dynamics-of-deep-nets-the-next-4-slides-describe-work-by-yoshua-bengios-group">Learning Dynamics of Deep Nets the next 4 slides describe work by Yoshua Bengio’s group</a></li>
+  <li><a href="#effect-of-unsupervised-pre-training" id="toc-effect-of-unsupervised-pre-training" class="nav-link" data-scroll-target="#effect-of-unsupervised-pre-training">Effect of Unsupervised Pre-training</a></li>
+  <li><a href="#effect-of-depth" id="toc-effect-of-depth" class="nav-link" data-scroll-target="#effect-of-depth">Effect of Depth</a></li>
+  <li><a href="#trajectories-of-the-learning-in-function-space" id="toc-trajectories-of-the-learning-in-function-space" class="nav-link" data-scroll-target="#trajectories-of-the-learning-in-function-space">Trajectories of the learning in function space</a></li>
+  <li><a href="#why-unsupervised-pre-training-makes-sense" id="toc-why-unsupervised-pre-training-makes-sense" class="nav-link" data-scroll-target="#why-unsupervised-pre-training-makes-sense">Why unsupervised pre-training makes sense</a></li>
+  </ul></li>
+  <li><a href="#lecture-14dmodeling-real-valued-data-with-an-rb" id="toc-lecture-14dmodeling-real-valued-data-with-an-rb" class="nav-link" data-scroll-target="#lecture-14dmodeling-real-valued-data-with-an-rb">Lecture 14dModeling real-valued data with an RB</a>
+  <ul class="collapse">
+  <li><a href="#modeling-real-valued-data" id="toc-modeling-real-valued-data" class="nav-link" data-scroll-target="#modeling-real-valued-data">Modeling real-valued data</a></li>
+  <li><a href="#a-standard-type-of-real-valued-visible-unit" id="toc-a-standard-type-of-real-valued-visible-unit" class="nav-link" data-scroll-target="#a-standard-type-of-real-valued-visible-unit">A standard type of real-valued visible unit</a></li>
+  <li><a href="#gaussian-binary-rbms" id="toc-gaussian-binary-rbms" class="nav-link" data-scroll-target="#gaussian-binary-rbms">Gaussian-Binary RBM’s</a></li>
+  <li><a href="#stepped-sigmoid-units-a-neat-way-to-implement-integer-values" id="toc-stepped-sigmoid-units-a-neat-way-to-implement-integer-values" class="nav-link" data-scroll-target="#stepped-sigmoid-units-a-neat-way-to-implement-integer-values">Stepped sigmoid units: A neat way to implement integer values</a></li>
+  <li><a href="#a-nice-property-of-rectified-linear-units" id="toc-a-nice-property-of-rectified-linear-units" class="nav-link" data-scroll-target="#a-nice-property-of-rectified-linear-units">A nice property of rectified linear units</a></li>
+  <li><a href="#another-view-of-why-layer-by-layer-learning-works-hinton2006fast" id="toc-another-view-of-why-layer-by-layer-learning-works-hinton2006fast" class="nav-link" data-scroll-target="#another-view-of-why-layer-by-layer-learning-works-hinton2006fast">Another view of why layer-by-layer learning works — <span class="citation" data-cites="hinton2006fast">Hinton, Osindero, and Teh (2006)</span></a></li>
+  <li><a href="#an-infinite-sigmoid-belief-net-that-is-equivalent-to-an-rbm" id="toc-an-infinite-sigmoid-belief-net-that-is-equivalent-to-an-rbm" class="nav-link" data-scroll-target="#an-infinite-sigmoid-belief-net-that-is-equivalent-to-an-rbm">An infinite sigmoid belief net that is equivalent to an RBM</a></li>
+  <li><a href="#inference-in-an-infinite-sigmoid-belief-net" id="toc-inference-in-an-infinite-sigmoid-belief-net" class="nav-link" data-scroll-target="#inference-in-an-infinite-sigmoid-belief-net">Inference in an infinite sigmoid belief net</a></li>
+  <li><a href="#learning-a-deep-directed-network" id="toc-learning-a-deep-directed-network" class="nav-link" data-scroll-target="#learning-a-deep-directed-network">Learning a deep directed network</a></li>
+  <li><a href="#what-happens-when-the-weights-in-higher-layers-become-different-from-the-weights-in-the-first-layer" id="toc-what-happens-when-the-weights-in-higher-layers-become-different-from-the-weights-in-the-first-layer" class="nav-link" data-scroll-target="#what-happens-when-the-weights-in-higher-layers-become-different-from-the-weights-in-the-first-layer">What happens when the weights in higher layers become different from the weights in the first layer?</a></li>
+  <li><a href="#what-is-really-happening-in-contrastive-divergence-learning" id="toc-what-is-really-happening-in-contrastive-divergence-learning" class="nav-link" data-scroll-target="#what-is-really-happening-in-contrastive-divergence-learning">What is really happening in contrastive divergence learning?</a></li>
+  <li><a href="#why-is-it-ok-to-ignore-the-derivatives-in-higher-layers" id="toc-why-is-it-ok-to-ignore-the-derivatives-in-higher-layers" class="nav-link" data-scroll-target="#why-is-it-ok-to-ignore-the-derivatives-in-higher-layers">Why is it OK to ignore the derivatives in higher layers?</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+<style>
+.a4paper {margin: 0; aspect-ratio: 1 / 1.41;}
+.letterpaper  {margin: 0; aspect-ratio: 22 / 17;}
+.ppSlide {margin: 0; aspect-ratio: 22 / 13;}
+</style>
+<p><object data="lec14.pdf" type="application/pdf" width="100%" class="ppSlide"><p>Unable to display PDF file. <a href="lec14.pdf">Download</a> instead.</p></object></p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/kkKu787Oph8" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div></div><section id="lecture-14a-learning-layers-of-features-by-stacking-rbms" class="level1 page-columns page-full">
+<h1>Lecture 14a Learning layers of features by stacking RBMs</h1>
+<section id="training-a-deep-network-by-stacking-rbms" class="level2">
+<h2 class="anchored" data-anchor-id="training-a-deep-network-by-stacking-rbms">Training a deep network by stacking RBMs</h2>
+<ul>
+<li>First train a layer of features that receive input directly from the pixels.</li>
+<li>Then treat the activations of the trained features as if they were pixels and learn features of features in a second hidden layer.</li>
+<li>Then do it again.</li>
+<li>It can be proved that each time we add another layer of features we improve a variational lower bound on the log probability of generating the training data.
+<ul>
+<li>The proof is complicated and only applies to unreal cases.</li>
+<li>It is based on a neat equivalence between an RBM and an infinitely deep belief net (see lecture 14b).</li>
+</ul></li>
+</ul>
+</section>
+<section id="combining-two-rbms-to-make-a-dbn" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="combining-two-rbms-to-make-a-dbn">Combining two RBMs to make a DBN</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="RDBM_Combo.png" class="lightbox" data-glightbox="description: .lightbox-desc-1" data-gallery="quarto-lightbox-gallery-1" title="RDBM Combo"><img src="RDBM_Combo.png" class="img-fluid figure-img" alt="RDBM Combo"></a></p>
+<figcaption>RDBM Combo</figcaption>
+</figure>
+</div>
+<section id="the-generative-model-after-learning-3-layers" class="level2">
+<h2 class="anchored" data-anchor-id="the-generative-model-after-learning-3-layers">The generative model after learning 3 layers</h2>
+</section>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="RDBM_3_layersS..png" class="lightbox" data-glightbox="description: .lightbox-desc-2" data-gallery="quarto-lightbox-gallery-2" title="RDBM Combo"><img src="RDBM_3_layersS..png" class="img-fluid figure-img" alt="RDBM Combo"></a></p>
+<figcaption>RDBM Combo</figcaption>
+</figure>
+</div>
+</div></div><p>To generate data:</p>
+<ol type="1">
+<li>Get an equilibrium sample from the toplevel RBM by performing alternating Gibbs sampling for a long time.</li>
+<li>Perform a top-down pass to get states for all the other layers.</li>
+</ol>
+<p>The lower level bottom-up connections are <strong>not</strong> part of the generative model. They are just used for inference.</p>
+</section>
+<section id="an-aside-averaging-factorial-distributions" class="level2">
+<h2 class="anchored" data-anchor-id="an-aside-averaging-factorial-distributions">An aside: Averaging factorial distributions</h2>
+<ul>
+<li>If you average some factorial distributions, you do NOT get a factorial distribution.
+<ul>
+<li>In an RBM, the posterior over 4 hidden units is factorial for each visible vector.</li>
+</ul></li>
+<li>Posterior for v1: 0.9, 0.9, 0.1, 0.1</li>
+<li>Posterior for v2: 0.1, 0.1, 0.9, 0.9</li>
+<li>Aggregated = 0.5, 0.5, 0.5, 0.5</li>
+<li>Consider the binary vector 1,1,0,0.
+<ul>
+<li>in the posterior for v1, p(1,1,0,0) = 0.9^4 = 0.43</li>
+<li>in the posterior for v2, p(1,1,0,0) = 0.1^4 = .0001 – in the aggregated posterior, p(1,1,0,0) = 0.215.</li>
+</ul></li>
+<li>If the aggregated posterior was factorial it would have p = 0.5^4</li>
+</ul>
+</section>
+<section id="why-does-greedy-learning-work" class="level2">
+<h2 class="anchored" data-anchor-id="why-does-greedy-learning-work">Why does greedy learning work?</h2>
+<p>The weights, W, in the bottom level RBM define many different distributions: <span class="math inline">p(v|h); p(h|v); p(v,h); p(h); p(v).</span></p>
+<p>We can express the RBM model as</p>
+<p><span class="math display">
+p(v)= \sum_h p(h) p(v \mid h)
+</span></p>
+<p>If we leave <span class="math inline">p(v|h)</span> alone and improve <span class="math inline">p(h)</span>, we will improve <span class="math inline">p(v)</span>.</p>
+<p>To improve <span class="math inline">p(h)</span>, we need it to be a better model than <span class="math inline">p(h;W)</span> of the <strong>aggregated posterior</strong> distribution over hidden vectors produced by applying W transpose to the data.</p>
+</section>
+<section id="fine-tuning-with-a-contrastive-version-of-the-wake-sleep-algorithm" class="level2">
+<h2 class="anchored" data-anchor-id="fine-tuning-with-a-contrastive-version-of-the-wake-sleep-algorithm">Fine-tuning with a contrastive version of the wake-sleep algorithm</h2>
+<p>After learning many layers of features, we can fine-tune the features to improve generation.</p>
+<ol type="1">
+<li>Do a stochastic bottom-up pass
+<ul>
+<li>Then adjust the top-down weights of lower layers to be good at reconstructing the feature activities in the layer below.</li>
+</ul></li>
+<li>Do a few iterations of sampling in the top level RBM
+<ul>
+<li>Then adjust the weights in the top-level RBM using CD.</li>
+</ul></li>
+<li>Do a stochastic top-down pass
+<ul>
+<li>Then Adjust the bottom-up weights to be good at reconstructing the feature activities in the layer above.</li>
+</ul></li>
+</ol>
+</section>
+<section id="the-dbn-used-for-modeling-the-joint-distribution-of-mnist-digits-and-their-labels" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-dbn-used-for-modeling-the-joint-distribution-of-mnist-digits-and-their-labels">The DBN used for modeling the joint distribution of MNIST digits and their labels</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="RDBM_mnist.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="RDBM_mnist.png" class="img-fluid"></a></p>
+</div></div><ul>
+<li>The first two hidden layers are learned without using labels.</li>
+<li>The top layer is learned as an RBM for modeling the labels concatenated with the features in the second hidden layer.</li>
+<li>The weights are then fine-tuned to be a better generative model using contrastive wake-sleep.</li>
+</ul>
+</section>
+</section>
+<section id="lecture-14b-discriminative-fine-tuning-for-dbns" class="level1">
+<h1>Lecture 14b Discriminative fine-tuning for DBNs</h1>
+<section id="fine-tuning-for-discrimination" class="level2">
+<h2 class="anchored" data-anchor-id="fine-tuning-for-discrimination">Fine-tuning for discrimination</h2>
+<ul>
+<li>First learn one layer at a time by stacking RBMs.</li>
+<li>Treat this as “pre-training” that finds a good initial set of weights which can then be fine-tuned by a local search procedure.
+<ul>
+<li>Contrastive wake-sleep is a way of fine-tuning the model to be better at generation.</li>
+</ul></li>
+<li>Backpropagation can be used to fine-tune the model to be better at discrimination.
+<ul>
+<li>This overcomes many of the limitations of standard backpropagation.</li>
+<li>It makes it easier to learn deep nets.</li>
+<li>It makes the nets generalize better.</li>
+</ul></li>
+</ul>
+</section>
+<section id="why-backpropagation-works-better-with-greedy-pre-training-the-optimization-view" class="level2">
+<h2 class="anchored" data-anchor-id="why-backpropagation-works-better-with-greedy-pre-training-the-optimization-view">Why backpropagation works better with greedy pre-training: The optimization view</h2>
+<ul>
+<li>Greedily learning one layer at a time scales well to really big networks, especially if we have locality in each layer.</li>
+<li>We do not start backpropagation until we already have sensible feature detectors that should already be very helpful for the discrimination task.
+<ul>
+<li>So the initial gradients are sensible and backpropagation only needs to perform a local search from a sensible starting point</li>
+</ul></li>
+</ul>
+</section>
+<section id="why-backpropagation-works-better-with-greedy-pre-training-the-overfitting-view" class="level2">
+<h2 class="anchored" data-anchor-id="why-backpropagation-works-better-with-greedy-pre-training-the-overfitting-view">Why backpropagation works better with greedy pre-training: The overfitting view</h2>
+<ul>
+<li>Most of the information in the final weights comes from modeling the distribution of input vectors.
+<ul>
+<li>The input vectors generally contain a lot more information than the labels.</li>
+<li>The precious information in the labels is only used for the fine tuning.</li>
+</ul></li>
+<li>The fine-tuning only modifies the features slightly to get the category boundaries right. It does not need to discover new features.</li>
+<li>This type of back-propagation works well even if most of the training data is unlabeled.
+<ul>
+<li>The unlabeled data is still very useful for discovering good features.</li>
+</ul></li>
+<li>An objection: Surely, many of the features will be useless for any particular discriminative task (consider shape &amp; pose).
+<ul>
+<li>But the ones that are useful will be much more useful than the raw inputs.</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="first-model-the-distribution-of-digit-images" class="level1 page-columns page-full">
+<h1>First, model the distribution of digit images</h1>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="RDBM_mnist_2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="RDBM_mnist_2.png" class="img-fluid"></a></p>
+</div></div><p>The top two layers form a restricted Boltzmann machine whose energy landscape should model the low dimensional manifolds of the digits</p>
+<p>The network learns a density model for unlabeled digit images. When we generate from the model we get things that look like real digits of all classes.</p>
+<p>But do the hidden features really help with digit discrimination? Add a 10-way softmax at the top and do backpropagation.</p>
+<section id="results-on-the-permutation-invariant-mnist-task" class="level2">
+<h2 class="anchored" data-anchor-id="results-on-the-permutation-invariant-mnist-task">Results on the permutation-invariant MNIST task</h2>
+<table class="table">
+<colgroup>
+<col style="width: 80%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>paper</th>
+<th>Error rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Backprop net with one or two hidden layers (Platt; Hinton)</td>
+<td>1.6%</td>
+</tr>
+<tr class="even">
+<td>Backprop with L2 constraints on incoming weights</td>
+<td>1/4%</td>
+</tr>
+<tr class="odd">
+<td>Support Vector Machines (Decoste &amp; Schoelkopf, 2002)</td>
+<td>1.4%</td>
+</tr>
+<tr class="even">
+<td>Generative model of joint density of images and labels (+ generative fine-tuning)</td>
+<td>1.25%</td>
+</tr>
+<tr class="odd">
+<td>Generative model of unlabelled digits followed by gentle backpropagation (Hinton &amp; Salakhutdinov, 2006)</td>
+<td>1.15%-&gt;1.0%</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="unsupervised-pre-training-also-helps-for-models-that-have-more-data-and-better-priors" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="unsupervised-pre-training-also-helps-for-models-that-have-more-data-and-better-priors">Unsupervised “pre-training” also helps for models that have more data and better priors</h2>
+<ul>
+<li>In <span class="citation" data-cites="NIPS2006_87f4d79e">Ranzato et al. (<a href="#ref-NIPS2006_87f4d79e" role="doc-biblioref">2006</a>)</span> the authors used an additional 600,000 distorted digits.</li>
+<li>They also used convolutional multilayer neural networks.</li>
+</ul>
+<div class="no-row-height column-margin column-container"><div id="ref-NIPS2006_87f4d79e" class="csl-entry" role="listitem">
+Ranzato, Marcaurelio, Christopher Poultney, Sumit Chopra, and Yann Cun. 2006. <span>“Efficient Learning of Sparse Representations with an Energy-Based Model.”</span> In <em>Advances in Neural Information Processing Systems</em>, edited by B. Schölkopf, J. Platt, and T. Hoffman. Vol. 19. MIT Press. <a href="https://proceedings.neurips.cc/paper_files/paper/2006/file/87f4d79e36d68c3031ccf6c55e9bbd39-Paper.pdf">https://proceedings.neurips.cc/paper_files/paper/2006/file/87f4d79e36d68c3031ccf6c55e9bbd39-Paper.pdf</a>.
+</div></div><p>Back-propagation alone: 0.49% Unsupervised layer-by-layer pre-training followed by back-prop: 0.39% (record at the time)</p>
+</section>
+<section id="phone-recognition-on-the-timit-benchmark-mohamed-dahl-hinton-2009-2012" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="phone-recognition-on-the-timit-benchmark-mohamed-dahl-hinton-2009-2012">Phone recognition on the TIMIT benchmark (Mohamed, Dahl, &amp; Hinton, 2009 &amp; 2012)</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="phone_recognition_on_TIMIT.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="phone_recognition_on_TIMIT.png" class="img-fluid"></a></p>
+</div></div><ul>
+<li>After standard post-processing using a bi-phone model, a deep net with 8 layers gets 20.7% error rate.</li>
+<li>The best previous speaker independent result on TIMIT was 24.4% and this required averaging several models.</li>
+<li>Li Deng (at MSR) realized that this result could change the way speech recognition was done. It has!</li>
+</ul>
+</section>
+</section>
+<section id="lecture-14c-what-happens-during-discriminative-fine-tuning" class="level1 page-columns page-full">
+<h1>Lecture 14c What happens during discriminative fine-tuning?</h1>
+<section id="learning-dynamics-of-deep-nets-the-next-4-slides-describe-work-by-yoshua-bengios-group" class="level2">
+<h2 class="anchored" data-anchor-id="learning-dynamics-of-deep-nets-the-next-4-slides-describe-work-by-yoshua-bengios-group">Learning Dynamics of Deep Nets the next 4 slides describe work by Yoshua Bengio’s group</h2>
+<p><a href="benjio_1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="benjio_1.png" class="img-fluid"></a></p>
+</section>
+<section id="effect-of-unsupervised-pre-training" class="level2">
+<h2 class="anchored" data-anchor-id="effect-of-unsupervised-pre-training">Effect of Unsupervised Pre-training</h2>
+<p><a href="benjio_2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="benjio_2.png" class="img-fluid"></a></p>
+</section>
+<section id="effect-of-depth" class="level2">
+<h2 class="anchored" data-anchor-id="effect-of-depth">Effect of Depth</h2>
+<p><a href="benjio_3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="benjio_3.png" class="img-fluid"></a></p>
+</section>
+<section id="trajectories-of-the-learning-in-function-space" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="trajectories-of-the-learning-in-function-space">Trajectories of the learning in function space</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="benjio_4.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="benjio_4.png" class="img-fluid"></a></p>
+</div></div><p>Each point is a model in function space</p>
+<ul>
+<li>Color = epoch</li>
+<li>Top: trajectories without pre-training. Each trajectory converges to a different local min.</li>
+<li>Bottom: Trajectories with pre-training.</li>
+<li>No overlap!</li>
+</ul>
+</section>
+<section id="why-unsupervised-pre-training-makes-sense" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="why-unsupervised-pre-training-makes-sense">Why unsupervised pre-training makes sense</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="chain_graph.png" class="lightbox" data-glightbox="description: .lightbox-desc-10" data-gallery="quarto-lightbox-gallery-10" title="chain graph"><img src="chain_graph.png" class="img-fluid figure-img" alt="chain graph"></a></p>
+<figcaption>chain graph</figcaption>
+</figure>
+</div>
+</div></div><ul>
+<li>If image-label pairs were generated this way, it would make sense to try to go straight from images to labels. For example, do the pixels have even parity?</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="v_graph.png" class="lightbox" data-glightbox="description: .lightbox-desc-11" data-gallery="quarto-lightbox-gallery-11" title="v graph"><img src="v_graph.png" class="img-fluid figure-img" alt="v graph"></a></p>
+<figcaption>v graph</figcaption>
+</figure>
+</div>
+</div></div><p>If image-label pairs are generated this way, it makes sense to first learn to recover the stuff that caused the image by inverting the high bandwidth pathway.</p>
+</section>
+</section>
+<section id="lecture-14dmodeling-real-valued-data-with-an-rb" class="level1 page-columns page-full">
+<h1>Lecture 14dModeling real-valued data with an RB</h1>
+<section id="modeling-real-valued-data" class="level2">
+<h2 class="anchored" data-anchor-id="modeling-real-valued-data">Modeling real-valued data</h2>
+<ul>
+<li>For images of digits, intermediate intensities can be represented as if they were probabilities by using “mean-field” logistic units.
+<ul>
+<li>We treat intermediate values as the probability that the pixel is inked.</li>
+</ul></li>
+<li>This will not work for real images.
+<ul>
+<li>In a real image, the intensity of a pixel is almost always, almost exactly the average of the neighboring pixels.</li>
+<li>Mean-field logistic units cannot represent precise intermediate values.</li>
+</ul></li>
+</ul>
+</section>
+<section id="a-standard-type-of-real-valued-visible-unit" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="a-standard-type-of-real-valued-visible-unit">A standard type of real-valued visible unit</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="guassian_pixels.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="guassian_pixels.png" class="img-fluid"></a></p>
+</div></div><ul>
+<li>Model pixels as Gaussian variables. Alternating Gibbs sampling is still easy, though learning needs to be much slower.</li>
+</ul>
+<p><span class="math display">
+E(v,h) = \sum_{i\in vis} \frac{(v_i-b_i)^2}{2\sigma^2_i} - \sum_j b_jh_j- \sum_{i,j} \frac{v_i}{\sigma_i} h_i w_{ij}
+</span> where:</p>
+<ul>
+<li>the first term is parabolic containment function</li>
+<li>the last term is energy-gradient produced by the total input to a visible unit</li>
+</ul>
+</section>
+<section id="gaussian-binary-rbms" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="gaussian-binary-rbms">Gaussian-Binary RBM’s</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="Gaussian_binary_RBM.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="Gaussian_binary_RBM.png" class="img-fluid"></a></p>
+</div></div><ul>
+<li><p>Lots of people have failed to get these to work properly. Its extremely hard to learn tight variances for the visible units.</p>
+<ul>
+<li>It took a long time for us to figure out why it is so hard to learn the visible variances.</li>
+</ul></li>
+<li><p>When sigma is small, we need many more hidden units than visible units.</p></li>
+<li><p>This allows small weights to produce big top-down effects.</p></li>
+<li><p>When sigma is much less than 1, the bottom-up effects are too big and the top-down effects are too small.</p></li>
+</ul>
+</section>
+<section id="stepped-sigmoid-units-a-neat-way-to-implement-integer-values" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="stepped-sigmoid-units-a-neat-way-to-implement-integer-values">Stepped sigmoid units: A neat way to implement integer values</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="stepped_sigmoid.png" class="lightbox" data-glightbox="description: .lightbox-desc-14" data-gallery="quarto-lightbox-gallery-14" title="stepped sigmoid"><img src="stepped_sigmoid.png" class="img-fluid figure-img" alt="stepped sigmoid"></a></p>
+<figcaption>stepped sigmoid</figcaption>
+</figure>
+</div>
+</div></div><ul>
+<li>Make many copies of a stochastic binary unit.</li>
+<li>All copies have the same weights and the same adaptive bias, b, but they have different fixed offsets to the bias:<br>
+<span class="math display">
+b −0.5,\ b −1.5,\ b −2.5, b −3.5,\ \ldots
+</span> ## Fast approximations</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="stepped_sigmoid_approx_logistic.png" class="lightbox" data-glightbox="description: .lightbox-desc-15" data-gallery="quarto-lightbox-gallery-15" title="logarithmic approximation"><img src="stepped_sigmoid_approx_logistic.png" class="img-fluid figure-img" alt="logarithmic approximation"></a></p>
+<figcaption>logarithmic approximation</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="stepped_sigmoid_approx_linear.png" class="lightbox" data-glightbox="description: .lightbox-desc-16" data-gallery="quarto-lightbox-gallery-16" title="linear approximation"><img src="stepped_sigmoid_approx_linear.png" class="img-fluid figure-img" alt="linear approximation"></a></p>
+<figcaption>linear approximation</figcaption>
+</figure>
+</div>
+</div></div><p><span class="math display">
+\langle y \rangle = \sum_{n=1}^{\infty} \sigma (x + 0.5− n)  ≈ log(1+ e^x) ≈ max(0, x + noise)
+</span></p>
+<ul>
+<li><strong>Contrastive divergence learning</strong> works well for the sum of stochastic logistic units with offset biases.</li>
+<li>The noise variance is <span class="math inline">\sigma(y)</span></li>
+<li>It also works for RELUs, which are faster to compute than the sum of many logistic units with different biases.</li>
+</ul>
+</section>
+<section id="a-nice-property-of-rectified-linear-units" class="level2">
+<h2 class="anchored" data-anchor-id="a-nice-property-of-rectified-linear-units">A nice property of rectified linear units</h2>
+<ul>
+<li>If a RELU has a bias of zero, it exhibits scale equivariance:</li>
+<li>This is a very nice property to have for images.</li>
+<li>It is like the equivariance to translation exhibited by convolutional nets.</li>
+</ul>
+<p><span class="math display">
+R(shift(x)) = shift(R(x))
+</span> # Lecture 14e : RBMs are Infinite Sigmoid Belief Nets</p>
+<p>This is advanced material</p>
+</section>
+<section id="another-view-of-why-layer-by-layer-learning-works-hinton2006fast" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="another-view-of-why-layer-by-layer-learning-works-hinton2006fast">Another view of why layer-by-layer learning works — <span class="citation" data-cites="hinton2006fast">Hinton, Osindero, and Teh (<a href="#ref-hinton2006fast" role="doc-biblioref">2006</a>)</span></h2>
+<div class="no-row-height column-margin column-container"></div><ul>
+<li>There is an unexpected equivalence between RBM’s and directed networks with many layers that all share the same weight matrix.
+<ul>
+<li>This equivalence also gives insight into why contrastive divergence learning works.</li>
+</ul></li>
+<li>An RBM is actually just an infinitely deep sigmoid belief net with a lot of weight sharing.
+<ul>
+<li><mark>The Markov chain we run when we want to sample from the equilibrium distribution of an RBM can be viewed as <strong>a sigmoid belief net</strong></mark>.</li>
+</ul></li>
+</ul>
+</section>
+<section id="an-infinite-sigmoid-belief-net-that-is-equivalent-to-an-rbm" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="an-infinite-sigmoid-belief-net-that-is-equivalent-to-an-rbm">An infinite sigmoid belief net that is equivalent to an RBM</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="inf_RBM.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="inf_RBM.png" class="img-fluid"></a></p>
+</div></div><ul>
+<li>The distribution generated by this infinite directed net with replicated weights is the equilibrium distribution for a compatible pair of conditional distributions: <span class="math inline">p(v \mid h)</span> and <span class="math inline">p(h \mid v)</span> that are both defined by <span class="math inline">W</span>
+<ul>
+<li>A top-down pass of the directed net is exactly equivalent to letting a Restricted Boltzmann Machine settle to equilibrium.</li>
+<li>So this infinite directed net defines the same distribution as an RBM</li>
+</ul></li>
+</ul>
+</section>
+<section id="inference-in-an-infinite-sigmoid-belief-net" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="inference-in-an-infinite-sigmoid-belief-net">Inference in an infinite sigmoid belief net</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="inf_RBM._inference.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="inf_RBM._inference.png" class="img-fluid"></a></p>
+</div></div><ul>
+<li>The variables in <span class="math inline">h_0</span> are conditionally independent given <span class="math inline">v_0</span>.
+<ul>
+<li>Inference is trivial. Just multiply <span class="math inline">v_0</span> by <span class="math inline">W^T</span></li>
+<li>The model above h0 implements a complementary prior.</li>
+<li>Multiplying v0 by gives the product of the likelihood term and the prior term.</li>
+<li>The complementary prior cancels the explaining away.</li>
+</ul></li>
+<li>Inference in the directed net is exactly equivalent to letting an RBM settle to equilibrium starting at the data.</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="inf_RBM_rule.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="inf_RBM_rule.png" class="img-fluid"></a></p>
+</div></div><ul>
+<li>The learning rule for a sigmoid belief net is:</li>
+</ul>
+<p><span class="math display">
+  \Delta w_{ij} ∝ s_j(s_i − p_i)
+</span></p>
+<p>where <span class="math inline">s_j^1</span> is an unbiased sample from <span class="math inline">p^i_0</span></p>
+<ul>
+<li>With replicated weights this rule becomes:</li>
+</ul>
+<p><span class="math display">
+  s_j^0 s_i^0 - s_j^\infty s_j^\infty
+</span></p>
+</section>
+<section id="learning-a-deep-directed-network" class="level2">
+<h2 class="anchored" data-anchor-id="learning-a-deep-directed-network">Learning a deep directed network</h2>
+<ul>
+<li><p>First learn with all the weights tied. This is exactly equivalent to learning an RBM.</p>
+<ul>
+<li>Think of the symmetric connections as a shorthand notation for an infinite directed net with tied weights.</li>
+</ul></li>
+<li><p>We ought to use maximum likelihood learning, but we use CD1 as a shortcut.</p></li>
+<li><p>Then freeze the first layer of weights in both directions and learn the remaining weights (still tied together).</p>
+<ul>
+<li>This is equivalent to learning another RBM, using the aggregated posterior distribution of h0 as the data.</li>
+</ul></li>
+</ul>
+</section>
+<section id="what-happens-when-the-weights-in-higher-layers-become-different-from-the-weights-in-the-first-layer" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="what-happens-when-the-weights-in-higher-layers-become-different-from-the-weights-in-the-first-layer">What happens when the weights in higher layers become different from the weights in the first layer?</h2>
+<ul>
+<li>The higher layers no longer implement a complementary prior.
+<ul>
+<li>So performing inference using the frozen weights in the first layer is no longer correct.</li>
+<li>But its still pretty good.</li>
+<li>Using this incorrect inference procedure gives a variational lower bound on the log probability of the data.</li>
+</ul></li>
+<li>The higher layers learn a prior that is closer to the aggregated posterior distribution of the first hidden layer.
+<ul>
+<li>This improves the network’s model of the data.</li>
+<li>In <span class="citation" data-cites="hinton2006fast">(<a href="#ref-hinton2006fast" role="doc-biblioref">Hinton, Osindero, and Teh 2006</a>)</span> the authors prove that this improvement is always bigger than the loss in the variational bound caused by using less accurate inference.</li>
+</ul></li>
+</ul>
+<div class="no-row-height column-margin column-container"><div id="ref-hinton2006fast" class="csl-entry" role="listitem">
+Hinton, Geoffrey E, Simon Osindero, and Yee-Whye Teh. 2006. <span>“A Fast Learning Algorithm for Deep Belief Nets.”</span> <em>Neural Computation</em> 18 (7): 1527–54.
+</div></div></section>
+<section id="what-is-really-happening-in-contrastive-divergence-learning" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-really-happening-in-contrastive-divergence-learning">What is really happening in contrastive divergence learning?</h2>
+<ul>
+<li>Contrastive divergence learning in this RBM is equivalent to ignoring the small derivatives contributed by the tied weights in higher layers.</li>
+</ul>
+</section>
+<section id="why-is-it-ok-to-ignore-the-derivatives-in-higher-layers" class="level2">
+<h2 class="anchored" data-anchor-id="why-is-it-ok-to-ignore-the-derivatives-in-higher-layers">Why is it OK to ignore the derivatives in higher layers?</h2>
+<ul>
+<li>When the weights are small, the Markov chain mixes fast.
+<ul>
+<li>So the higher layers will be close to the equilibrium distribution (i.e they will have “forgotten” the data vector).</li>
+<li>At equilibrium the derivatives must average to zero, because the current weights are a perfect model of the equilibrium distribution!</li>
+</ul></li>
+<li>As the weights grow we may need to run more iterations of CD.
+<ul>
+<li>This allows CD to continue to be a good approximation to maximum likelihood.</li>
+<li>But for learning layers of features, it does not need to be a good approximation to maximum likelihood</li>
+</ul></li>
+</ul>
+
+
+<div class="hidden" aria-hidden="true">
+<span class="glightbox-desc lightbox-desc-1">RDBM Combo</span>
+<span class="glightbox-desc lightbox-desc-2">RDBM Combo</span>
+<span class="glightbox-desc lightbox-desc-10">chain graph</span>
+<span class="glightbox-desc lightbox-desc-11">v graph</span>
+<span class="glightbox-desc lightbox-desc-14">stepped sigmoid</span>
+<span class="glightbox-desc lightbox-desc-15">logarithmic approximation</span>
+<span class="glightbox-desc lightbox-desc-16">linear approximation</span>
+</div>
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2017,
+  author = {Bochman, Oren},
+  title = {Deep {Neural} {Networks} - {Notes} for {Lesson} 14},
+  date = {2017-11-21},
+  url = {https://orenbochman.github.io/blog//notes/dnn/dnn-14/l_14.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2017" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2017. <span>“Deep Neural Networks - Notes for Lesson
+14.”</span> November 21, 2017. <a href="https://orenbochman.github.io/blog//notes/dnn/dnn-14/l_14.html">https://orenbochman.github.io/blog//notes/dnn/dnn-14/l_14.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","closeEffect":"zoom","descPosition":"bottom","openEffect":"zoom","loop":false});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

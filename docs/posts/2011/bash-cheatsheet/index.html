@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2011-09-10">
+<meta name="description" content="This is a quick reference cheat sheet to getting started with linux bash shell scripting.">
+
+<title>Oren Bochman’s Blog - Bash</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Bash">
+<meta name="twitter:description" content="This is a quick reference cheat sheet to getting started with linux bash shell scripting.">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/posts/2011/bash-cheatsheet/thumbnail_blog.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Bash</h1>
+            <p class="subtitle lead">cheet sheet</p>
+                  <div>
+        <div class="description">
+          This is a quick reference cheat sheet to getting started with linux bash shell scripting.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">shell</div>
+                <div class="quarto-category">sh</div>
+                <div class="quarto-category">echo</div>
+                <div class="quarto-category">script</div>
+                <div class="quarto-category">linux</div>
+                <div class="quarto-category">programming</div>
+                <div class="quarto-category">operating system</div>
+                <div class="quarto-category">cheatsheets</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 10, 2011</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting Started</a>
+  <ul class="collapse">
+  <li><a href="#hello.sh" id="toc-hello.sh" class="nav-link" data-scroll-target="#hello.sh">hello.sh</a></li>
+  <li><a href="#variables" id="toc-variables" class="nav-link" data-scroll-target="#variables">Variables</a></li>
+  <li><a href="#comments" id="toc-comments" class="nav-link" data-scroll-target="#comments">Comments</a></li>
+  <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a></li>
+  <li><a href="#conditionals-example" id="toc-conditionals-example" class="nav-link" data-scroll-target="#conditionals-example">Conditionals</a></li>
+  <li><a href="#brace-expansion" id="toc-brace-expansion" class="nav-link" data-scroll-target="#brace-expansion">Brace expansion</a></li>
+  <li><a href="#shell-execution" id="toc-shell-execution" class="nav-link" data-scroll-target="#shell-execution">Shell execution</a></li>
+  </ul></li>
+  <li><a href="#bash-parameter-expansions" id="toc-bash-parameter-expansions" class="nav-link" data-scroll-target="#bash-parameter-expansions">Bash Parameter expansions</a>
+  <ul class="collapse">
+  <li><a href="#syntax" id="toc-syntax" class="nav-link" data-scroll-target="#syntax">Syntax</a></li>
+  <li><a href="#substitution" id="toc-substitution" class="nav-link" data-scroll-target="#substitution">Substitution</a></li>
+  <li><a href="#slicing" id="toc-slicing" class="nav-link" data-scroll-target="#slicing">Slicing</a></li>
+  <li><a href="#basepath-dirpath" id="toc-basepath-dirpath" class="nav-link" data-scroll-target="#basepath-dirpath">basepath &amp; dirpath</a></li>
+  <li><a href="#transform" id="toc-transform" class="nav-link" data-scroll-target="#transform">Transform</a></li>
+  </ul></li>
+  <li><a href="#bash-arrays" id="toc-bash-arrays" class="nav-link" data-scroll-target="#bash-arrays">Bash Arrays</a>
+  <ul class="collapse">
+  <li><a href="#defining-arrays" id="toc-defining-arrays" class="nav-link" data-scroll-target="#defining-arrays">Defining arrays</a></li>
+  <li><a href="#indexing" id="toc-indexing" class="nav-link" data-scroll-target="#indexing">Indexing</a></li>
+  <li><a href="#iteration" id="toc-iteration" class="nav-link" data-scroll-target="#iteration">Iteration</a></li>
+  <li><a href="#operations" id="toc-operations" class="nav-link" data-scroll-target="#operations">Operations</a></li>
+  <li><a href="#arrays-as-arguments" id="toc-arrays-as-arguments" class="nav-link" data-scroll-target="#arrays-as-arguments">Arrays as arguments</a></li>
+  </ul></li>
+  <li><a href="#bash-dictionaries" id="toc-bash-dictionaries" class="nav-link" data-scroll-target="#bash-dictionaries">Bash Dictionaries</a>
+  <ul class="collapse">
+  <li><a href="#defining" id="toc-defining" class="nav-link" data-scroll-target="#defining">Defining</a></li>
+  <li><a href="#working-with-dictionaries" id="toc-working-with-dictionaries" class="nav-link" data-scroll-target="#working-with-dictionaries">Working with dictionaries</a></li>
+  <li><a href="#iteration-1" id="toc-iteration-1" class="nav-link" data-scroll-target="#iteration-1">Iteration</a></li>
+  </ul></li>
+  <li><a href="#bash-conditionals" id="toc-bash-conditionals" class="nav-link" data-scroll-target="#bash-conditionals">Bash Conditionals</a>
+  <ul class="collapse">
+  <li><a href="#integer-conditions" id="toc-integer-conditions" class="nav-link" data-scroll-target="#integer-conditions">Integer conditions</a></li>
+  <li><a href="#string-conditions" id="toc-string-conditions" class="nav-link" data-scroll-target="#string-conditions">String conditions</a></li>
+  <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example">Example</a></li>
+  <li><a href="#file-conditions" id="toc-file-conditions" class="nav-link" data-scroll-target="#file-conditions">File conditions</a></li>
+  <li><a href="#more-conditions" id="toc-more-conditions" class="nav-link" data-scroll-target="#more-conditions">More conditions</a></li>
+  <li><a href="#logical-and-or" id="toc-logical-and-or" class="nav-link" data-scroll-target="#logical-and-or">logical and, or</a></li>
+  </ul></li>
+  <li><a href="#bash-loops" id="toc-bash-loops" class="nav-link" data-scroll-target="#bash-loops">Bash Loops</a>
+  <ul class="collapse">
+  <li><a href="#basic-for-loop" id="toc-basic-for-loop" class="nav-link" data-scroll-target="#basic-for-loop">Basic for loop</a></li>
+  <li><a href="#c-like-for-loop" id="toc-c-like-for-loop" class="nav-link" data-scroll-target="#c-like-for-loop">C-like for loop</a></li>
+  <li><a href="#ranges" id="toc-ranges" class="nav-link" data-scroll-target="#ranges">Ranges</a></li>
+  <li><a href="#auto-increment" id="toc-auto-increment" class="nav-link" data-scroll-target="#auto-increment">Auto increment</a></li>
+  <li><a href="#auto-decrement" id="toc-auto-decrement" class="nav-link" data-scroll-target="#auto-decrement">Auto decrement</a></li>
+  <li><a href="#continue" id="toc-continue" class="nav-link" data-scroll-target="#continue">Continue</a></li>
+  <li><a href="#break" id="toc-break" class="nav-link" data-scroll-target="#break">Break</a></li>
+  <li><a href="#until" id="toc-until" class="nav-link" data-scroll-target="#until">Until</a></li>
+  <li><a href="#forever" id="toc-forever" class="nav-link" data-scroll-target="#forever">Forever</a></li>
+  <li><a href="#forever-shorthand" id="toc-forever-shorthand" class="nav-link" data-scroll-target="#forever-shorthand">Forever (shorthand)</a></li>
+  <li><a href="#reading-lines" id="toc-reading-lines" class="nav-link" data-scroll-target="#reading-lines">Reading lines</a></li>
+  </ul></li>
+  <li><a href="#bash-functions" id="toc-bash-functions" class="nav-link" data-scroll-target="#bash-functions">Bash Functions</a>
+  <ul class="collapse">
+  <li><a href="#defining-functions" id="toc-defining-functions" class="nav-link" data-scroll-target="#defining-functions">Defining functions</a></li>
+  <li><a href="#returning-values" id="toc-returning-values" class="nav-link" data-scroll-target="#returning-values">Returning values</a></li>
+  <li><a href="#raising-errors" id="toc-raising-errors" class="nav-link" data-scroll-target="#raising-errors">Raising errors</a></li>
+  </ul></li>
+  <li><a href="#bash-options" id="toc-bash-options" class="nav-link" data-scroll-target="#bash-options">Bash Options</a>
+  <ul class="collapse">
+  <li><a href="#options" id="toc-options" class="nav-link" data-scroll-target="#options">Options</a></li>
+  <li><a href="#glob-options" id="toc-glob-options" class="nav-link" data-scroll-target="#glob-options">Glob options</a></li>
+  </ul></li>
+  <li><a href="#bash-history" id="toc-bash-history" class="nav-link" data-scroll-target="#bash-history">Bash History</a>
+  <ul class="collapse">
+  <li><a href="#commands" id="toc-commands" class="nav-link" data-scroll-target="#commands">Commands</a></li>
+  <li><a href="#expansions" id="toc-expansions" class="nav-link" data-scroll-target="#expansions">Expansions</a></li>
+  <li><a href="#operations-1" id="toc-operations-1" class="nav-link" data-scroll-target="#operations-1">Operations</a></li>
+  <li><a href="#slices" id="toc-slices" class="nav-link" data-scroll-target="#slices">Slices</a></li>
+  </ul></li>
+  <li><a href="#miscellaneous" id="toc-miscellaneous" class="nav-link" data-scroll-target="#miscellaneous">Miscellaneous</a>
+  <ul class="collapse">
+  <li><a href="#numeric-calculations" id="toc-numeric-calculations" class="nav-link" data-scroll-target="#numeric-calculations">Numeric calculations</a></li>
+  <li><a href="#subshells" id="toc-subshells" class="nav-link" data-scroll-target="#subshells">Subshells</a></li>
+  <li><a href="#inspecting-commands" id="toc-inspecting-commands" class="nav-link" data-scroll-target="#inspecting-commands">Inspecting commands</a></li>
+  <li><a href="#redirection" id="toc-redirection" class="nav-link" data-scroll-target="#redirection">Redirection</a></li>
+  <li><a href="#source-relative" id="toc-source-relative" class="nav-link" data-scroll-target="#source-relative">Source relative</a></li>
+  <li><a href="#directory-of-script" id="toc-directory-of-script" class="nav-link" data-scroll-target="#directory-of-script">Directory of script</a></li>
+  <li><a href="#caseswitch" id="toc-caseswitch" class="nav-link" data-scroll-target="#caseswitch">Case/switch</a></li>
+  <li><a href="#trap-errors" id="toc-trap-errors" class="nav-link" data-scroll-target="#trap-errors">Trap errors</a></li>
+  <li><a href="#printf" id="toc-printf" class="nav-link" data-scroll-target="#printf">printf</a></li>
+  <li><a href="#getting-options" id="toc-getting-options" class="nav-link" data-scroll-target="#getting-options">Getting options</a></li>
+  <li><a href="#check-for-commands-result" id="toc-check-for-commands-result" class="nav-link" data-scroll-target="#check-for-commands-result">Check for command’s result</a></li>
+  <li><a href="#special-variables" id="toc-special-variables" class="nav-link" data-scroll-target="#special-variables">Special variables</a></li>
+  <li><a href="#grep-check" id="toc-grep-check" class="nav-link" data-scroll-target="#grep-check">Grep check</a></li>
+  <li><a href="#backslash-escapes" id="toc-backslash-escapes" class="nav-link" data-scroll-target="#backslash-escapes">Backslash escapes</a></li>
+  <li><a href="#heredoc" id="toc-heredoc" class="nav-link" data-scroll-target="#heredoc">Heredoc</a></li>
+  <li><a href="#go-to-previous-directory" id="toc-go-to-previous-directory" class="nav-link" data-scroll-target="#go-to-previous-directory">Go to previous directory</a></li>
+  <li><a href="#reading-input" id="toc-reading-input" class="nav-link" data-scroll-target="#reading-input">Reading input</a></li>
+  <li><a href="#conditional-execution" id="toc-conditional-execution" class="nav-link" data-scroll-target="#conditional-execution">Conditional execution</a></li>
+  <li><a href="#strict-mode" id="toc-strict-mode" class="nav-link" data-scroll-target="#strict-mode">Strict mode</a></li>
+  <li><a href="#optional-arguments" id="toc-optional-arguments" class="nav-link" data-scroll-target="#optional-arguments">Optional arguments</a></li>
+  </ul></li>
+  <li><a href="#also-see" id="toc-also-see" class="nav-link" data-scroll-target="#also-see">Also see</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="getting-started" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
+<section id="hello.sh" class="level3">
+<h3 class="anchored" data-anchor-id="hello.sh">hello.sh</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">VAR</span><span class="op">=</span><span class="st">"world"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Hello </span><span class="va">$VAR</span><span class="st">!"</span> <span class="co"># =&gt; Hello world!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Execute the script <code>shell script $ bash hello.sh</code></p>
+</section>
+<section id="variables" class="level3">
+<h3 class="anchored" data-anchor-id="variables">Variables</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">NAME</span><span class="op">=</span><span class="st">"John"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${NAME}</span>    <span class="co"># =&gt; John (Variables)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$NAME</span>      <span class="co"># =&gt; John (Variables)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"</span><span class="va">$NAME</span><span class="st">"</span>    <span class="co"># =&gt; John (Variables)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'$NAME'</span>    <span class="co"># =&gt; $NAME (Exact string)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"</span><span class="va">${NAME}</span><span class="st">!"</span> <span class="co"># =&gt; John! (Variables)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">NAME</span> = <span class="st">"John"</span>   <span class="co"># =&gt; Error (about space)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="comments" class="level3">
+<h3 class="anchored" data-anchor-id="comments">Comments</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This is an inline Bash comment.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">:</span> <span class="st">'</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="st">This is a</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">very neat comment</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">in bash</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Multi-line comments use <code>:'</code> to open and <code>'</code> to close</p>
+</section>
+<section id="arguments" class="level3 row-span-2">
+<h3 class="row-span-2 anchored" data-anchor-id="arguments">Arguments</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Expression</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>$1</code> … <code>$9</code></td>
+<td>Parameter 1 … 9</td>
+</tr>
+<tr class="even">
+<td><code>$0</code></td>
+<td>Name of the script itself</td>
+</tr>
+<tr class="odd">
+<td><code>$1</code></td>
+<td>First argument</td>
+</tr>
+<tr class="even">
+<td><code>${10}</code></td>
+<td>Positional parameter 10</td>
+</tr>
+<tr class="odd">
+<td><code>$#</code></td>
+<td>Number of arguments</td>
+</tr>
+<tr class="even">
+<td><code>$$</code></td>
+<td>Process id of the shell</td>
+</tr>
+<tr class="odd">
+<td><code>$*</code></td>
+<td>All arguments</td>
+</tr>
+<tr class="even">
+<td><code>$@</code></td>
+<td>All arguments, starting from first</td>
+</tr>
+<tr class="odd">
+<td><code>$-</code></td>
+<td>Current options</td>
+</tr>
+<tr class="even">
+<td><code>$_</code></td>
+<td>Last argument of the previous command</td>
+</tr>
+</tbody>
+</table>
+<p>See: <a href="http://wiki.bash-hackers.org/syntax/shellvars#special_parameters_and_shell_variables">Special parameters</a></p>
+</section>
+<section id="functions" class="level3">
+<h3 class="anchored" data-anchor-id="functions">Functions</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_name()</span> <span class="kw">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"John"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"You are </span><span class="va">$(</span><span class="ex">get_name</span><span class="va">)</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>See: <a href="#bash-functions">Functions</a></p>
+</section>
+<section id="conditionals-example" class="level3">
+<h3 class="anchored" data-anchor-id="conditionals-example">Conditionals</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">-z</span> <span class="st">"</span><span class="va">$string</span><span class="st">"</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"String is empty"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> <span class="kw">[[</span> <span class="ot">-n</span> <span class="st">"</span><span class="va">$string</span><span class="st">"</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"String is not empty"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>See: <a href="#bash-conditionals">Conditionals</a></p>
+</section>
+<section id="brace-expansion" class="level3">
+<h3 class="anchored" data-anchor-id="brace-expansion">Brace expansion</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="dt">{A</span><span class="op">,</span><span class="dt">B}</span>.js</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Expression</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>{A,B}</code></td>
+<td>Same as <code>A B</code></td>
+</tr>
+<tr class="even">
+<td><code>{A,B}.js</code></td>
+<td>Same as <code>A.js B.js</code></td>
+</tr>
+<tr class="odd">
+<td><code>{1..5}</code></td>
+<td>Same as <code>1 2 3 4 5</code></td>
+</tr>
+</tbody>
+</table>
+<p>See: <a href="http://wiki.bash-hackers.org/syntax/expansion/brace">Brace expansion</a></p>
+</section>
+<section id="shell-execution" class="level3">
+<h3 class="anchored" data-anchor-id="shell-execution">Shell execution</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =&gt; I'm in /path/of/current</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"I'm in </span><span class="va">$(</span><span class="ex">PWD</span><span class="va">)</span><span class="st">"</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Same as:</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"I'm in </span><span class="kw">`</span><span class="bu">pwd</span><span class="kw">`</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>See: <a href="http://wiki.bash-hackers.org/syntax/expansion/cmdsubst">Command substitution</a></p>
+</section>
+</section>
+<section id="bash-parameter-expansions" class="level2">
+<h2 class="anchored" data-anchor-id="bash-parameter-expansions">Bash Parameter expansions</h2>
+<section id="syntax" class="level3 row-span-2">
+<h3 class="row-span-2 anchored" data-anchor-id="syntax">Syntax</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>${FOO%suffix}</code></td>
+<td>Remove suffix</td>
+</tr>
+<tr class="even">
+<td><code>${FOO#prefix}</code></td>
+<td>Remove prefix</td>
+</tr>
+<tr class="odd">
+<td><code>${FOO%%suffix}</code></td>
+<td>Remove long suffix</td>
+</tr>
+<tr class="even">
+<td><code>${FOO##prefix}</code></td>
+<td>Remove long prefix</td>
+</tr>
+<tr class="odd">
+<td><code>${FOO/from/to}</code></td>
+<td>Replace first match</td>
+</tr>
+<tr class="even">
+<td><code>${FOO//from/to}</code></td>
+<td>Replace all</td>
+</tr>
+<tr class="odd">
+<td><code>${FOO/%from/to}</code></td>
+<td>Replace suffix</td>
+</tr>
+<tr class="even">
+<td><code>${FOO/#from/to}</code></td>
+<td>Replace prefix</td>
+</tr>
+</tbody>
+</table>
+<section id="substrings" class="level4">
+<h4 class="anchored" data-anchor-id="substrings">Substrings</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Expression</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>${FOO:0:3}</code></td>
+<td>Substring <em>(position, length)</em></td>
+</tr>
+<tr class="even">
+<td><code>${FOO:(-3):3}</code></td>
+<td>Substring from the right</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="length" class="level4">
+<h4 class="anchored" data-anchor-id="length">Length</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Expression</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>${#FOO}</code></td>
+<td>Length of <code>$FOO</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="default-values" class="level4">
+<h4 class="anchored" data-anchor-id="default-values">Default values</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Expression</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>${FOO:-val}</code></td>
+<td><code>$FOO</code>, or <code>val</code> if unset</td>
+</tr>
+<tr class="even">
+<td><code>${FOO:=val}</code></td>
+<td>Set <code>$FOO</code> to <code>val</code> if unset</td>
+</tr>
+<tr class="odd">
+<td><code>${FOO:+val}</code></td>
+<td><code>val</code> if <code>$FOO</code> is set</td>
+</tr>
+<tr class="even">
+<td><code>${FOO:?message}</code></td>
+<td>Show message and exit if <code>$FOO</code> is unset</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="substitution" class="level3">
+<h3 class="anchored" data-anchor-id="substitution">Substitution</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${food</span><span class="op">:-</span>Cake<span class="va">}</span>  <span class="co">#=&gt; $food or "Cake"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="va">STR</span><span class="op">=</span><span class="st">"/path/to/foo.cpp"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">%</span>.cpp<span class="va">}</span>    <span class="co"># /path/to/foo</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">%</span>.cpp<span class="va">}</span>.o  <span class="co"># /path/to/foo.o</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">%</span>/<span class="pp">*</span><span class="va">}</span>      <span class="co"># /path/to</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">##</span><span class="pp">*</span>.<span class="va">}</span>     <span class="co"># cpp (extension)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">##</span><span class="pp">*</span>/<span class="va">}</span>     <span class="co"># foo.cpp (basepath)</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">#</span><span class="pp">*</span>/<span class="va">}</span>      <span class="co"># path/to/foo.cpp</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">##</span><span class="pp">*</span>/<span class="va">}</span>     <span class="co"># foo.cpp</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">/</span><span class="ss">foo</span><span class="op">/</span>bar<span class="va">}</span> <span class="co"># /path/to/bar.cpp</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="slicing" class="level3">
+<h3 class="anchored" data-anchor-id="slicing">Slicing</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="va">name</span><span class="op">=</span><span class="st">"John"</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${name}</span>           <span class="co"># =&gt; John</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${name</span><span class="op">:</span><span class="dv">0</span><span class="op">:</span><span class="dv">2</span><span class="va">}</span>       <span class="co"># =&gt; Jo</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${name</span><span class="op">::</span><span class="dv">2</span><span class="va">}</span>        <span class="co"># =&gt; Jo</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${name</span><span class="op">::</span>-<span class="dv">1</span><span class="va">}</span>       <span class="co"># =&gt; Joh</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${name</span><span class="op">:</span>(-<span class="dv">1</span>)<span class="va">}</span>      <span class="co"># =&gt; n</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${name</span><span class="op">:</span>(-<span class="dv">2</span>)<span class="va">}</span>      <span class="co"># =&gt; hn</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${name</span><span class="op">:</span>(-<span class="dv">2</span>)<span class="op">:</span><span class="dv">2</span><span class="va">}</span>    <span class="co"># =&gt; hn</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="va">length</span><span class="op">=</span>2</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${name</span><span class="op">:</span><span class="dv">0</span><span class="op">:</span>length<span class="va">}</span>  <span class="co"># =&gt; Jo</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>See: <a href="http://wiki.bash-hackers.org/syntax/pe">Parameter expansion</a></p>
+</section>
+<section id="basepath-dirpath" class="level3">
+<h3 class="anchored" data-anchor-id="basepath-dirpath">basepath &amp; dirpath</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="va">SRC</span><span class="op">=</span><span class="st">"/path/to/foo.cpp"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="va">BASEPATH</span><span class="op">=</span><span class="va">${SRC</span><span class="op">##</span><span class="pp">*</span>/<span class="va">}</span>   </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$BASEPATH</span>  <span class="co"># =&gt; "foo.cpp"</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="va">DIRPATH</span><span class="op">=</span><span class="va">${SRC</span><span class="op">%</span><span class="va">$BASEPATH}</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$DIRPATH</span>   <span class="co"># =&gt; "/path/to/"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="transform" class="level3">
+<h3 class="anchored" data-anchor-id="transform">Transform</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="va">STR</span><span class="op">=</span><span class="st">"HELLO WORLD!"</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">,</span><span class="va">}</span>   <span class="co"># =&gt; hELLO WORLD!</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">,,</span><span class="va">}</span>  <span class="co"># =&gt; hello world!</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="va">STR</span><span class="op">=</span><span class="st">"hello world!"</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">^</span><span class="va">}</span>   <span class="co"># =&gt; Hello world!</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${STR</span><span class="op">^^</span><span class="va">}</span>  <span class="co"># =&gt; HELLO WORLD!</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="va">ARR</span><span class="op">=</span><span class="va">(</span>hello World<span class="va">)</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"</span><span class="va">${ARR</span><span class="op">[@],</span><span class="va">}</span><span class="st">"</span> <span class="co"># =&gt; hello world</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"</span><span class="va">${ARR</span><span class="op">[@]^</span><span class="va">}</span><span class="st">"</span> <span class="co"># =&gt; Hello World</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="bash-arrays" class="level2">
+<h2 class="anchored" data-anchor-id="bash-arrays">Bash Arrays</h2>
+<section id="defining-arrays" class="level3">
+<h3 class="anchored" data-anchor-id="defining-arrays">Defining arrays</h3>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">=</span><span class="va">(</span><span class="st">'Apple'</span> <span class="st">'Banana'</span> <span class="st">'Orange'</span><span class="va">)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">[</span><span class="dv">0</span><span class="op">]=</span><span class="st">"Apple"</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">[</span><span class="dv">1</span><span class="op">]=</span><span class="st">"Banana"</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">[</span><span class="dv">2</span><span class="op">]=</span><span class="st">"Orange"</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="va">ARRAY1</span><span class="op">=</span><span class="va">(</span>foo<span class="dt">{</span><span class="dv">1</span><span class="dt">..</span><span class="dv">2</span><span class="dt">}</span><span class="va">)</span> <span class="co"># =&gt; foo1 foo2</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="va">ARRAY2</span><span class="op">=</span><span class="va">(</span><span class="dt">{</span>A<span class="dt">..</span>D<span class="dt">}</span><span class="va">)</span>    <span class="co"># =&gt; A B C D</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge =&gt; foo1 foo2 A B C D</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="va">ARRAY3</span><span class="op">=</span><span class="va">(${ARRAY1</span><span class="op">[@]</span><span class="va">}</span> <span class="va">${ARRAY2</span><span class="op">[@]</span><span class="va">})</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co"># declare construct</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="bu">declare</span> <span class="at">-a</span> <span class="va">Numbers</span><span class="op">=</span><span class="va">(</span>1 2 3<span class="va">)</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="va">Numbers</span><span class="op">+=</span><span class="va">(</span>4 5<span class="va">)</span> <span class="co"># Append =&gt; 1 2 3 4 5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="indexing" class="level3">
+<h3 class="anchored" data-anchor-id="indexing">Indexing</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>-</th>
+<th>-</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>${Fruits[0]}</code></td>
+<td>First element</td>
+</tr>
+<tr class="even">
+<td><code>${Fruits[-1]}</code></td>
+<td>Last element</td>
+</tr>
+<tr class="odd">
+<td><code>${Fruits[*]}</code></td>
+<td>All elements</td>
+</tr>
+<tr class="even">
+<td><code>${Fruits[@]}</code></td>
+<td>All elements</td>
+</tr>
+<tr class="odd">
+<td><code>${#Fruits[@]}</code></td>
+<td>Number of all</td>
+</tr>
+<tr class="even">
+<td><code>${#Fruits}</code></td>
+<td>Length of 1st</td>
+</tr>
+<tr class="odd">
+<td><code>${#Fruits[3]}</code></td>
+<td>Length of nth</td>
+</tr>
+<tr class="even">
+<td><code>${Fruits[@]:3:2}</code></td>
+<td>Range</td>
+</tr>
+<tr class="odd">
+<td><code>${!Fruits[@]}</code></td>
+<td>Keys of all</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="iteration" class="level3">
+<h3 class="anchored" data-anchor-id="iteration">Iteration</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">=</span><span class="va">(</span><span class="st">'Apple'</span> <span class="st">'Banana'</span> <span class="st">'Orange'</span><span class="va">)</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> e <span class="kw">in</span> <span class="st">"</span><span class="va">${Fruits</span><span class="op">[@]</span><span class="va">}</span><span class="st">"</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">$e</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="with-index" class="level4">
+<h4 class="anchored" data-anchor-id="with-index">With index</h4>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="st">"</span><span class="va">${</span><span class="op">!</span><span class="va">Fruits</span><span class="op">[@]</span><span class="va">}</span><span class="st">"</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">printf</span> <span class="st">"%s\t%s\n"</span> <span class="st">"</span><span class="va">$i</span><span class="st">"</span> <span class="st">"</span><span class="va">${Fruits</span><span class="op">[</span><span class="va">$i</span><span class="op">]</span><span class="va">}</span><span class="st">"</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="operations" class="level3 col-span-2">
+<h3 class="col-span-2 anchored" data-anchor-id="operations">Operations</h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">=</span><span class="va">(</span><span class="st">"</span><span class="va">${Fruits</span><span class="op">[@]</span><span class="va">}</span><span class="st">"</span> <span class="st">"Watermelon"</span><span class="va">)</span>     <span class="co"># Push</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">+=</span><span class="va">(</span><span class="st">'Watermelon'</span><span class="va">)</span>                   <span class="co"># Also Push</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">=</span><span class="va">(</span> <span class="va">${Fruits</span><span class="op">[@]/</span><span class="ss">Ap</span><span class="pp">*</span><span class="op">/</span><span class="va">}</span> <span class="va">)</span>             <span class="co"># Remove by regex match</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="bu">unset</span> <span class="va">Fruits[</span><span class="dv">2</span><span class="op">]</span>                          <span class="co"># Remove one item</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">=</span><span class="va">(</span><span class="st">"</span><span class="va">${Fruits</span><span class="op">[@]</span><span class="va">}</span><span class="st">"</span><span class="va">)</span>                  <span class="co"># Duplicate</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">=</span><span class="va">(</span><span class="st">"</span><span class="va">${Fruits</span><span class="op">[@]</span><span class="va">}</span><span class="st">"</span> <span class="st">"</span><span class="va">${Veggies</span><span class="op">[@]</span><span class="va">}</span><span class="st">"</span><span class="va">)</span>  <span class="co"># Concatenate</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="va">lines</span><span class="op">=</span><span class="va">(</span><span class="kw">`</span><span class="fu">cat</span> <span class="st">"logfile"</span><span class="kw">`</span><span class="va">)</span>                  <span class="co"># Read from file</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="arrays-as-arguments" class="level3">
+<h3 class="anchored" data-anchor-id="arrays-as-arguments">Arrays as arguments</h3>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span><span class="fu"> extract()</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">local</span> <span class="at">-n</span> <span class="va">myarray</span><span class="op">=</span><span class="va">$1</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">local</span> <span class="va">idx</span><span class="op">=</span><span class="va">$2</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"</span><span class="va">${myarray</span><span class="op">[</span><span class="va">$idx</span><span class="op">]</span><span class="va">}</span><span class="st">"</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="va">Fruits</span><span class="op">=</span><span class="va">(</span><span class="st">'Apple'</span> <span class="st">'Banana'</span> <span class="st">'Orange'</span><span class="va">)</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="ex">extract</span> Fruits 2     <span class="co"># =&gt; Orangle</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="bash-dictionaries" class="level2">
+<h2 class="anchored" data-anchor-id="bash-dictionaries">Bash Dictionaries</h2>
+<section id="defining" class="level3">
+<h3 class="anchored" data-anchor-id="defining">Defining</h3>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">declare</span> <span class="at">-A</span> <span class="va">sounds</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="va">sounds</span><span class="op">[</span>dog<span class="op">]=</span><span class="st">"bark"</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="va">sounds</span><span class="op">[</span>cow<span class="op">]=</span><span class="st">"moo"</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="va">sounds</span><span class="op">[</span>bird<span class="op">]=</span><span class="st">"tweet"</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="va">sounds</span><span class="op">[</span>wolf<span class="op">]=</span><span class="st">"howl"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="working-with-dictionaries" class="level3">
+<h3 class="anchored" data-anchor-id="working-with-dictionaries">Working with dictionaries</h3>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${sounds</span><span class="op">[</span>dog<span class="op">]</span><span class="va">}</span> <span class="co"># Dog's sound</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${sounds</span><span class="op">[@]</span><span class="va">}</span>   <span class="co"># All values</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${</span><span class="op">!</span><span class="va">sounds</span><span class="op">[@]</span><span class="va">}</span>  <span class="co"># All keys</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">${</span><span class="op">#</span><span class="va">sounds</span><span class="op">[@]</span><span class="va">}</span>  <span class="co"># Number of elements</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="bu">unset</span> <span class="va">sounds[</span>dog<span class="op">]</span>   <span class="co"># Delete dog</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="iteration-1" class="level3">
+<h3 class="anchored" data-anchor-id="iteration-1">Iteration</h3>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> val <span class="kw">in</span> <span class="st">"</span><span class="va">${sounds</span><span class="op">[@]</span><span class="va">}</span><span class="st">"</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">$val</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> key <span class="kw">in</span> <span class="st">"</span><span class="va">${</span><span class="op">!</span><span class="va">sounds</span><span class="op">[@]</span><span class="va">}</span><span class="st">"</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">$key</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="bash-conditionals" class="level2">
+<h2 class="anchored" data-anchor-id="bash-conditionals">Bash Conditionals</h2>
+<section id="integer-conditions" class="level3">
+<h3 class="anchored" data-anchor-id="integer-conditions">Integer conditions</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>[[ NUM -eq NUM ]]</code></td>
+<td><yel>Eq</yel>ual</td>
+</tr>
+<tr class="even">
+<td><code>[[ NUM -ne NUM ]]</code></td>
+<td><yel>N</yel>ot <yel>e</yel>qual</td>
+</tr>
+<tr class="odd">
+<td><code>[[ NUM -lt NUM ]]</code></td>
+<td><yel>L</yel>ess <yel>t</yel>han</td>
+</tr>
+<tr class="even">
+<td><code>[[ NUM -le NUM ]]</code></td>
+<td><yel>L</yel>ess than or <yel>e</yel>qual</td>
+</tr>
+<tr class="odd">
+<td><code>[[ NUM -gt NUM ]]</code></td>
+<td><yel>G</yel>reater <yel>t</yel>han</td>
+</tr>
+<tr class="even">
+<td><code>[[ NUM -ge NUM ]]</code></td>
+<td><yel>G</yel>reater than or <yel>e</yel>qual</td>
+</tr>
+<tr class="odd">
+<td><code>(( NUM &lt; NUM ))</code></td>
+<td>Less than</td>
+</tr>
+<tr class="even">
+<td><code>(( NUM &lt;= NUM ))</code></td>
+<td>Less than or equal</td>
+</tr>
+<tr class="odd">
+<td><code>(( NUM &gt; NUM ))</code></td>
+<td>Greater than</td>
+</tr>
+<tr class="even">
+<td><code>(( NUM &gt;= NUM ))</code></td>
+<td>Greater than or equal</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="string-conditions" class="level3">
+<h3 class="anchored" data-anchor-id="string-conditions">String conditions</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>[[ -z STR ]]</code></td>
+<td>Empty string</td>
+</tr>
+<tr class="even">
+<td><code>[[ -n STR ]]</code></td>
+<td><yel>N</yel>ot empty string</td>
+</tr>
+<tr class="odd">
+<td><code>[[ STR == STR ]]</code></td>
+<td>Equal</td>
+</tr>
+<tr class="even">
+<td><code>[[ STR = STR ]]</code></td>
+<td>Equal (Same above)</td>
+</tr>
+<tr class="odd">
+<td><code>[[ STR &lt; STR ]]</code></td>
+<td>Less than <em>(ASCII)</em></td>
+</tr>
+<tr class="even">
+<td><code>[[ STR &gt; STR ]]</code></td>
+<td>Greater than <em>(ASCII)</em></td>
+</tr>
+<tr class="odd">
+<td><code>[[ STR != STR ]]</code></td>
+<td>Not Equal</td>
+</tr>
+<tr class="even">
+<td><code>[[ STR =~ STR ]]</code></td>
+<td>Regexp</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example" class="level3 row-span-3">
+<h3 class="row-span-3 anchored" data-anchor-id="example">Example</h3>
+<section id="string" class="level4">
+<h4 class="anchored" data-anchor-id="string">String</h4>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">-z</span> <span class="st">"</span><span class="va">$string</span><span class="st">"</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"String is empty"</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> <span class="kw">[[</span> <span class="ot">-n</span> <span class="st">"</span><span class="va">$string</span><span class="st">"</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"String is not empty"</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"This never happens"</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="combinations" class="level4">
+<h4 class="anchored" data-anchor-id="combinations">Combinations</h4>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> X <span class="kw">&amp;&amp;</span> Y <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="equal" class="level4">
+<h4 class="anchored" data-anchor-id="equal">Equal</h4>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="st">"</span><span class="va">$A</span><span class="st">"</span> <span class="ot">==</span> <span class="st">"</span><span class="va">$B</span><span class="st">"</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">...</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="regex" class="level4">
+<h4 class="anchored" data-anchor-id="regex">Regex</h4>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="st">'1. abc'</span> <span class="ot">=~</span> <span class="op">([</span><span class="ss">a</span><span class="op">-</span><span class="ss">z</span><span class="op">]</span><span class="pp">+</span><span class="op">)</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">${BASH_REMATCH</span><span class="op">[</span><span class="dv">1</span><span class="op">]</span><span class="va">}</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="smaller" class="level4">
+<h4 class="anchored" data-anchor-id="smaller">Smaller</h4>
+<div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">((</span> <span class="va">$a</span> <span class="op">&lt;</span> <span class="va">$b</span> <span class="kw">));</span> <span class="cf">then</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>   <span class="bu">echo</span> <span class="st">"</span><span class="va">$a</span><span class="st"> is smaller than </span><span class="va">$b</span><span class="st">"</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="exists" class="level4">
+<h4 class="anchored" data-anchor-id="exists">Exists</h4>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="ot">-e</span> <span class="st">"file.txt"</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"file exists"</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="file-conditions" class="level3 row-span-2">
+<h3 class="row-span-2 anchored" data-anchor-id="file-conditions">File conditions</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>[[ -e FILE ]]</code></td>
+<td><yel>E</yel>xists</td>
+</tr>
+<tr class="even">
+<td><code>[[ -d FILE ]]</code></td>
+<td><yel>D</yel>irectory</td>
+</tr>
+<tr class="odd">
+<td><code>[[ -f FILE ]]</code></td>
+<td><yel>F</yel>ile</td>
+</tr>
+<tr class="even">
+<td><code>[[ -h FILE ]]</code></td>
+<td>Symlink</td>
+</tr>
+<tr class="odd">
+<td><code>[[ -s FILE ]]</code></td>
+<td>Size is &gt; 0 bytes</td>
+</tr>
+<tr class="even">
+<td><code>[[ -r FILE ]]</code></td>
+<td><yel>R</yel>eadable</td>
+</tr>
+<tr class="odd">
+<td><code>[[ -w FILE ]]</code></td>
+<td><yel>W</yel>ritable</td>
+</tr>
+<tr class="even">
+<td><code>[[ -x FILE ]]</code></td>
+<td>Executable</td>
+</tr>
+<tr class="odd">
+<td><code>[[ f1 -nt f2 ]]</code></td>
+<td>f1 <yel>n</yel>ewer <yel>t</yel>han f2</td>
+</tr>
+<tr class="even">
+<td><code>[[ f1 -ot f2 ]]</code></td>
+<td>f2 <yel>o</yel>lder <yel>t</yel>han f1</td>
+</tr>
+<tr class="odd">
+<td><code>[[ f1 -ef f2 ]]</code></td>
+<td>Same files</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="more-conditions" class="level3">
+<h3 class="anchored" data-anchor-id="more-conditions">More conditions</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>[[ -o noclobber ]]</code></td>
+<td>If OPTION is enabled</td>
+</tr>
+<tr class="even">
+<td><code>[[ ! EXPR ]]</code></td>
+<td>Not</td>
+</tr>
+<tr class="odd">
+<td><code>[[ X &amp;&amp; Y ]]</code></td>
+<td>And</td>
+</tr>
+<tr class="even">
+<td><code>[[ X || Y ]]</code></td>
+<td>Or</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="logical-and-or" class="level3">
+<h3 class="anchored" data-anchor-id="logical-and-or">logical and, or</h3>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="st">"</span><span class="va">$1</span><span class="st">"</span> <span class="ot">=</span> <span class="st">'y'</span> <span class="ot">-a</span> <span class="va">$2</span> <span class="ot">-gt</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"yes"</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="st">"</span><span class="va">$1</span><span class="st">"</span> <span class="ot">=</span> <span class="st">'n'</span> <span class="ot">-o</span> <span class="va">$2</span> <span class="ot">-lt</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"no"</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="bash-loops" class="level2">
+<h2 class="anchored" data-anchor-id="bash-loops">Bash Loops</h2>
+<section id="basic-for-loop" class="level3">
+<h3 class="anchored" data-anchor-id="basic-for-loop">Basic for loop</h3>
+<div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> /etc/rc.<span class="pp">*</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">$i</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="c-like-for-loop" class="level3">
+<h3 class="anchored" data-anchor-id="c-like-for-loop">C-like for loop</h3>
+<div class="sourceCode" id="cb33"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="kw">((</span><span class="va">i</span> <span class="op">=</span> <span class="dv">0</span> <span class="kw">;</span> <span class="va">i</span> <span class="op">&lt;</span> <span class="dv">100</span> <span class="kw">;</span> <span class="va">i</span><span class="op">++</span><span class="kw">));</span> <span class="cf">do</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">$i</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="ranges" class="level3 row-span-2">
+<h3 class="row-span-2 anchored" data-anchor-id="ranges">Ranges</h3>
+<div class="sourceCode" id="cb34"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="dt">{</span><span class="dv">1</span><span class="dt">..</span><span class="dv">5</span><span class="dt">}</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"Welcome </span><span class="va">$i</span><span class="st">"</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="with-step-size" class="level4">
+<h4 class="anchored" data-anchor-id="with-step-size">With step size</h4>
+<div class="sourceCode" id="cb35"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="dt">{</span><span class="dv">5</span><span class="dt">..</span><span class="dv">50</span><span class="dt">..</span><span class="dv">5</span><span class="dt">}</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"Welcome </span><span class="va">$i</span><span class="st">"</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="auto-increment" class="level3">
+<h3 class="anchored" data-anchor-id="auto-increment">Auto increment</h3>
+<div class="sourceCode" id="cb36"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="va">i</span><span class="op">=</span>1</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="kw">[[</span> <span class="va">$i</span> <span class="ot">-lt</span> 4 <span class="kw">]];</span> <span class="cf">do</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"Number: </span><span class="va">$i</span><span class="st">"</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">((</span><span class="va">i</span><span class="op">++</span><span class="kw">))</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="auto-decrement" class="level3">
+<h3 class="anchored" data-anchor-id="auto-decrement">Auto decrement</h3>
+<div class="sourceCode" id="cb37"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="va">i</span><span class="op">=</span>3</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="kw">[[</span> <span class="va">$i</span> <span class="ot">-gt</span> 0 <span class="kw">]];</span> <span class="cf">do</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"Number: </span><span class="va">$i</span><span class="st">"</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">((</span><span class="va">i</span><span class="op">--</span><span class="kw">))</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="continue" class="level3">
+<h3 class="anchored" data-anchor-id="continue">Continue</h3>
+<div class="sourceCode" id="cb38" data="3,5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> number <span class="kw">in</span> <span class="va">$(</span><span class="fu">seq</span> 1 3<span class="va">)</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">[[</span> <span class="va">$number</span> <span class="ot">==</span> 2 <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span><span class="kw">;</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"</span><span class="va">$number</span><span class="st">"</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="break" class="level3">
+<h3 class="anchored" data-anchor-id="break">Break</h3>
+<div class="sourceCode" id="cb39"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> number <span class="kw">in</span> <span class="va">$(</span><span class="fu">seq</span> 1 3<span class="va">)</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">[[</span> <span class="va">$number</span> <span class="ot">==</span> 2 <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Skip entire rest of loop.</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span><span class="kw">;</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This will only print 1</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"</span><span class="va">$number</span><span class="st">"</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="until" class="level3">
+<h3 class="anchored" data-anchor-id="until">Until</h3>
+<div class="sourceCode" id="cb40"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="va">count</span><span class="op">=</span>0</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="cf">until</span> <span class="bu">[</span> <span class="va">$count</span> <span class="ot">-gt</span> 10 <span class="bu">]</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"</span><span class="va">$count</span><span class="st">"</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">((</span><span class="va">count</span><span class="op">++</span><span class="kw">))</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="forever" class="level3">
+<h3 class="anchored" data-anchor-id="forever">Forever</h3>
+<div class="sourceCode" id="cb41"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="fu">true</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># here is some code.</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="forever-shorthand" class="level3">
+<h3 class="anchored" data-anchor-id="forever-shorthand">Forever (shorthand)</h3>
+<div class="sourceCode" id="cb42"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="bu">:</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># here is some code.</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="reading-lines" class="level3">
+<h3 class="anchored" data-anchor-id="reading-lines">Reading lines</h3>
+<div class="sourceCode" id="cb43"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> file.txt <span class="kw">|</span> <span class="cf">while</span> <span class="bu">read</span> <span class="va">line</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">$line</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="bash-functions" class="level2">
+<h2 class="anchored" data-anchor-id="bash-functions">Bash Functions</h2>
+<section id="defining-functions" class="level3">
+<h3 class="anchored" data-anchor-id="defining-functions">Defining functions</h3>
+<div class="sourceCode" id="cb44"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfunc()</span> <span class="kw">{</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"hello </span><span class="va">$1</span><span class="st">"</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Same as above (alternate syntax)</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span><span class="fu"> myfunc()</span> <span class="kw">{</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"hello </span><span class="va">$1</span><span class="st">"</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="ex">myfunc</span> <span class="st">"John"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="returning-values" class="level3">
+<h3 class="anchored" data-anchor-id="returning-values">Returning values</h3>
+<div class="sourceCode" id="cb47"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfunc()</span> <span class="kw">{</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">local</span> <span class="va">myresult</span><span class="op">=</span><span class="st">'some value'</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">$myresult</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="va">result</span><span class="op">=</span><span class="st">"</span><span class="va">$(</span><span class="ex">myfunc</span><span class="va">)</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="raising-errors" class="level3">
+<h3 class="anchored" data-anchor-id="raising-errors">Raising errors</h3>
+<div class="sourceCode" id="cb49"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfunc()</span> <span class="kw">{</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="ex">myfunc</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"success"</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"failure"</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="bash-options" class="level2 cols-2">
+<h2 class="cols-2 anchored" data-anchor-id="bash-options">Bash Options</h2>
+<section id="options" class="level3">
+<h3 class="anchored" data-anchor-id="options">Options</h3>
+<div class="sourceCode" id="cb51"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Avoid overlay files</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (echo "hi" &gt; foo)</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-o</span> noclobber</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Used to exit upon error</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="co"># avoiding cascading errors</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-o</span> errexit   </span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Unveils hidden failures</span></span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-o</span> pipefail  </span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Exposes unset variables</span></span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-o</span> nounset</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="glob-options" class="level3">
+<h3 class="anchored" data-anchor-id="glob-options">Glob options</h3>
+<div class="sourceCode" id="cb52"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Non-matching globs are removed  </span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ('*.foo' =&gt; '')</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="bu">shopt</span> <span class="at">-s</span> nullglob   </span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Non-matching globs throw errors</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="bu">shopt</span> <span class="at">-s</span> failglob  </span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Case insensitive globs</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a><span class="bu">shopt</span> <span class="at">-s</span> nocaseglob </span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Wildcards match dotfiles </span></span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a><span class="co"># ("*.sh" =&gt; ".foo.sh")</span></span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a><span class="bu">shopt</span> <span class="at">-s</span> dotglob    </span>
+<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-15"><a href="#cb52-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Allow ** for recursive matches </span></span>
+<span id="cb52-16"><a href="#cb52-16" aria-hidden="true" tabindex="-1"></a><span class="co"># ('lib/**/*.rb' =&gt; 'lib/a/b/c.rb')</span></span>
+<span id="cb52-17"><a href="#cb52-17" aria-hidden="true" tabindex="-1"></a><span class="bu">shopt</span> <span class="at">-s</span> globstar   </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="bash-history" class="level2 cols-2">
+<h2 class="cols-2 anchored" data-anchor-id="bash-history">Bash History</h2>
+<section id="commands" class="level3">
+<h3 class="anchored" data-anchor-id="commands">Commands</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>history</code></td>
+<td>Show history</td>
+</tr>
+<tr class="even">
+<td><code>sudo !!</code></td>
+<td>Run the previous command with sudo</td>
+</tr>
+<tr class="odd">
+<td><code>shopt -s histverify</code></td>
+<td>Don’t execute expanded result immediately</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="expansions" class="level3">
+<h3 class="anchored" data-anchor-id="expansions">Expansions</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Expression</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>!$</code></td>
+<td>Expand last parameter of most recent command</td>
+</tr>
+<tr class="even">
+<td><code>!*</code></td>
+<td>Expand all parameters of most recent command</td>
+</tr>
+<tr class="odd">
+<td><code>!-n</code></td>
+<td>Expand <code>n</code>th most recent command</td>
+</tr>
+<tr class="even">
+<td><code>!n</code></td>
+<td>Expand <code>n</code>th command in history</td>
+</tr>
+<tr class="odd">
+<td><code>!&lt;command&gt;</code></td>
+<td>Expand most recent invocation of command <code>&lt;command&gt;</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="operations-1" class="level3">
+<h3 class="anchored" data-anchor-id="operations-1">Operations</h3>
+<table class="table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 76%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>!!</code></td>
+<td>Execute last command again</td>
+</tr>
+<tr class="even">
+<td><code>!!:s/&lt;FROM&gt;/&lt;TO&gt;/</code></td>
+<td>Replace first occurrence of <code>&lt;FROM&gt;</code> to <code>&lt;TO&gt;</code> in most recent command</td>
+</tr>
+<tr class="odd">
+<td><code>!!:gs/&lt;FROM&gt;/&lt;TO&gt;/</code></td>
+<td>Replace all occurrences of <code>&lt;FROM&gt;</code> to <code>&lt;TO&gt;</code> in most recent command</td>
+</tr>
+<tr class="even">
+<td><code>!$:t</code></td>
+<td>Expand only basename from last parameter of most recent command</td>
+</tr>
+<tr class="odd">
+<td><code>!$:h</code></td>
+<td>Expand only directory from last parameter of most recent command</td>
+</tr>
+</tbody>
+</table>
+<p><code>!!</code> and <code>!$</code> can be replaced with any valid expansion.</p>
+</section>
+<section id="slices" class="level3">
+<h3 class="anchored" data-anchor-id="slices">Slices</h3>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 90%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>!!:n</code></td>
+<td>Expand only <code>n</code>th token from most recent command (command is <code>0</code>; first argument is <code>1</code>)</td>
+</tr>
+<tr class="even">
+<td><code>!^</code></td>
+<td>Expand first argument from most recent command</td>
+</tr>
+<tr class="odd">
+<td><code>!$</code></td>
+<td>Expand last token from most recent command</td>
+</tr>
+<tr class="even">
+<td><code>!!:n-m</code></td>
+<td>Expand range of tokens from most recent command</td>
+</tr>
+<tr class="odd">
+<td><code>!!:n-$</code></td>
+<td>Expand <code>n</code>th token to last from most recent command</td>
+</tr>
+</tbody>
+</table>
+<p><code>!!</code> can be replaced with any valid expansion i.e.&nbsp;<code>!cat</code>, <code>!-2</code>, <code>!42</code>, etc.</p>
+</section>
+</section>
+<section id="miscellaneous" class="level2">
+<h2 class="anchored" data-anchor-id="miscellaneous">Miscellaneous</h2>
+<section id="numeric-calculations" class="level3">
+<h3 class="anchored" data-anchor-id="numeric-calculations">Numeric calculations</h3>
+<div class="sourceCode" id="cb53"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="va">$((a</span> <span class="op">+</span> <span class="dv">200</span><span class="va">))</span>      <span class="co"># Add 200 to $a</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="va">$(($RANDOM</span><span class="op">%</span><span class="dv">200</span><span class="va">))</span>  <span class="co"># Random number 0..199</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="subshells" class="level3">
+<h3 class="anchored" data-anchor-id="subshells">Subshells</h3>
+<div class="sourceCode" id="cb55"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="bu">cd</span> somedir<span class="kw">;</span> <span class="bu">echo</span> <span class="st">"I'm now in </span><span class="va">$PWD</span><span class="st">"</span><span class="kw">)</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="bu">pwd</span> <span class="co"># still in first directory</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="inspecting-commands" class="level3">
+<h3 class="anchored" data-anchor-id="inspecting-commands">Inspecting commands</h3>
+<div class="sourceCode" id="cb56"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="bu">command</span> <span class="at">-V</span> cd</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="co">#=&gt; "cd is a function/alias/whatever"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="redirection" class="level3 row-span-2 col-span-2">
+<h3 class="row-span-2 col-span-2 anchored" data-anchor-id="redirection">Redirection</h3>
+<div class="sourceCode" id="cb57"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> hello.py <span class="op">&gt;</span> output.txt   <span class="co"># stdout to (file)</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> hello.py <span class="op">&gt;&gt;</span> output.txt  <span class="co"># stdout to (file), append</span></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> hello.py <span class="dv">2</span><span class="op">&gt;</span> error.log   <span class="co"># stderr to (file)</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> hello.py <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span>           <span class="co"># stderr to stdout</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> hello.py <span class="dv">2</span><span class="op">&gt;</span>/dev/null    <span class="co"># stderr to (null)</span></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> hello.py <span class="op">&amp;&gt;</span>/dev/null    <span class="co"># stdout and stderr to (null)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> hello.py <span class="op">&lt;</span> foo.txt      <span class="co"># feed foo.txt to stdin for python</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="source-relative" class="level3">
+<h3 class="anchored" data-anchor-id="source-relative">Source relative</h3>
+<div class="sourceCode" id="cb59"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> <span class="st">"</span><span class="va">${0</span><span class="op">%</span>/<span class="pp">*</span><span class="va">}</span><span class="st">/../share/foo.sh"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="directory-of-script" class="level3">
+<h3 class="anchored" data-anchor-id="directory-of-script">Directory of script</h3>
+<div class="sourceCode" id="cb60"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="va">DIR</span><span class="op">=</span><span class="st">"</span><span class="va">${0</span><span class="op">%</span>/<span class="pp">*</span><span class="va">}</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="caseswitch" class="level3">
+<h3 class="anchored" data-anchor-id="caseswitch">Case/switch</h3>
+<div class="sourceCode" id="cb61"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="cf">case</span> <span class="st">"</span><span class="va">$1</span><span class="st">"</span> <span class="kw">in</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>    <span class="ss">start</span> <span class="kw">|</span> <span class="ss">up</span><span class="kw">)</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">vagrant</span> up</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">;;</span></span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>    <span class="pp">*</span><span class="kw">)</span></span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"Usage: </span><span class="va">$0</span><span class="st"> {start|stop|ssh}"</span></span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">;;</span></span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a><span class="cf">esac</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="trap-errors" class="level3 col-span-2">
+<h3 class="col-span-2 anchored" data-anchor-id="trap-errors">Trap errors</h3>
+<div class="sourceCode" id="cb62"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="bu">trap</span> <span class="st">'echo Error at about $LINENO'</span> ERR</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">traperr()</span> <span class="kw">{</span></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"ERROR: </span><span class="va">${BASH_SOURCE</span><span class="op">[</span><span class="dv">1</span><span class="op">]</span><span class="va">}</span><span class="st"> at about </span><span class="va">${BASH_LINENO</span><span class="op">[</span><span class="dv">0</span><span class="op">]</span><span class="va">}</span><span class="st">"</span></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-o</span> errtrace</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a><span class="bu">trap</span> traperr ERR</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="printf" class="level3">
+<h3 class="anchored" data-anchor-id="printf">printf</h3>
+<div class="sourceCode" id="cb64"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="bu">printf</span> <span class="st">"Hello %s, I'm %s"</span> Sven Olga</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="co">#=&gt; "Hello Sven, I'm Olga</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a><span class="bu">printf</span> <span class="st">"1 + 1 = %d"</span> 2</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a><span class="co">#=&gt; "1 + 1 = 2"</span></span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a><span class="bu">printf</span> <span class="st">"Print a float: %f"</span> 2</span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a><span class="co">#=&gt; "Print a float: 2.000000"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="getting-options" class="level3 col-span-2">
+<h3 class="col-span-2 anchored" data-anchor-id="getting-options">Getting options</h3>
+<div class="sourceCode" id="cb65"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="kw">[[</span> <span class="st">"</span><span class="va">$1</span><span class="st">"</span> <span class="ot">=~</span> <span class="pp">^</span><span class="ss">-</span> <span class="kw">&amp;&amp;</span> <span class="ot">!</span> <span class="st">"</span><span class="va">$1</span><span class="st">"</span> <span class="ot">==</span> <span class="st">"--"</span> <span class="kw">]];</span> <span class="cf">do</span> <span class="cf">case</span> <span class="va">$1</span> <span class="kw">in</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>    <span class="ss">-V</span> <span class="kw">|</span> <span class="ss">--version</span> <span class="kw">)</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">$version</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">exit</span></span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">;;</span></span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>    <span class="ss">-s</span> <span class="kw">|</span> <span class="ss">--string</span> <span class="kw">)</span></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">shift</span><span class="kw">;</span> <span class="va">string</span><span class="op">=</span><span class="va">$1</span></span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">;;</span></span>
+<span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a>    <span class="ss">-f</span> <span class="kw">|</span> <span class="ss">--flag</span> <span class="kw">)</span></span>
+<span id="cb65-10"><a href="#cb65-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">flag</span><span class="op">=</span>1</span>
+<span id="cb65-11"><a href="#cb65-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">;;</span></span>
+<span id="cb65-12"><a href="#cb65-12" aria-hidden="true" tabindex="-1"></a><span class="cf">esac</span><span class="kw">;</span> <span class="bu">shift</span><span class="kw">;</span> <span class="cf">done</span></span>
+<span id="cb65-13"><a href="#cb65-13" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">[[</span> <span class="st">"</span><span class="va">$1</span><span class="st">"</span> <span class="ot">==</span> <span class="st">'--'</span> <span class="kw">]];</span> <span class="cf">then</span> <span class="bu">shift</span><span class="kw">;</span> <span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="check-for-commands-result" class="level3 col-span-2">
+<h3 class="col-span-2 anchored" data-anchor-id="check-for-commands-result">Check for command’s result</h3>
+<div class="sourceCode" id="cb66"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="fu">ping</span> <span class="at">-c</span> 1 google.com<span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"It appears you have a working internet connection"</span></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="special-variables" class="level3 row-span-2">
+<h3 class="row-span-2 anchored" data-anchor-id="special-variables">Special variables</h3>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Expression</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>$?</code></td>
+<td>Exit status of last task</td>
+</tr>
+<tr class="even">
+<td><code>$!</code></td>
+<td>PID of last background task</td>
+</tr>
+<tr class="odd">
+<td><code>$$</code></td>
+<td>PID of shell</td>
+</tr>
+<tr class="even">
+<td><code>$0</code></td>
+<td>Filename of the shell script</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="http://wiki.bash-hackers.org/syntax/shellvars#special_parameters_and_shell_variables">Special parameters</a>.</p>
+</section>
+<section id="grep-check" class="level3 col-span-2">
+<h3 class="col-span-2 anchored" data-anchor-id="grep-check">Grep check</h3>
+<div class="sourceCode" id="cb67"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="fu">grep</span> <span class="at">-q</span> <span class="st">'foo'</span> ~/.bash_history<span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"You appear to have typed 'foo' in the past"</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="backslash-escapes" class="level3 row-span-2">
+<h3 class="row-span-2 anchored" data-anchor-id="backslash-escapes">Backslash escapes</h3>
+<ul>
+<li>&nbsp;</li>
+<li>!</li>
+<li>"</li>
+<li>#</li>
+<li>&amp;</li>
+<li>'</li>
+<li>(</li>
+<li>)</li>
+<li>,</li>
+<li>;</li>
+<li>&lt;</li>
+<li>&gt;</li>
+<li>[</li>
+<li>|</li>
+<li>\</li>
+<li>]</li>
+<li>^</li>
+<li>{</li>
+<li>}</li>
+<li>`</li>
+<li>$</li>
+<li>*</li>
+<li>? {.cols-4 .marker-none}</li>
+</ul>
+<p>Escape these special characters with <code>\</code></p>
+</section>
+<section id="heredoc" class="level3">
+<h3 class="anchored" data-anchor-id="heredoc">Heredoc</h3>
+<div class="sourceCode" id="cb68"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&lt;&lt;END</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="st">hello world</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a><span class="op">END</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="go-to-previous-directory" class="level3">
+<h3 class="anchored" data-anchor-id="go-to-previous-directory">Go to previous directory</h3>
+<div class="sourceCode" id="cb69"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="bu">pwd</span> <span class="co"># /home/user/foo</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> bar/</span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a><span class="bu">pwd</span> <span class="co"># /home/user/foo/bar</span></span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="at">-</span></span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a><span class="bu">pwd</span> <span class="co"># /home/user/foo</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="reading-input" class="level3">
+<h3 class="anchored" data-anchor-id="reading-input">Reading input</h3>
+<div class="sourceCode" id="cb70"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-n</span> <span class="st">"Proceed? [y/n]: "</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a><span class="bu">read</span> <span class="va">ans</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$ans</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="bu">read</span> <span class="at">-n</span> 1 <span class="va">ans</span>    <span class="co"># Just one character</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="conditional-execution" class="level3">
+<h3 class="anchored" data-anchor-id="conditional-execution">Conditional execution</h3>
+<div class="sourceCode" id="cb72"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="kw">&amp;&amp;</span> <span class="fu">git</span> push</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="kw">||</span> <span class="bu">echo</span> <span class="st">"Commit failed"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="strict-mode" class="level3">
+<h3 class="anchored" data-anchor-id="strict-mode">Strict mode</h3>
+<div class="sourceCode" id="cb73"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-euo</span> pipefail</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a><span class="va">IFS</span><span class="op">=</span><span class="st">$'</span><span class="dt">\n\t</span><span class="st">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>See: <a href="http://redsymbol.net/articles/unofficial-bash-strict-mode/">Unofficial bash strict mode</a></p>
+</section>
+<section id="optional-arguments" class="level3">
+<h3 class="anchored" data-anchor-id="optional-arguments">Optional arguments</h3>
+<div class="sourceCode" id="cb74"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="va">args</span><span class="op">=</span><span class="va">(</span><span class="st">"</span><span class="va">$@</span><span class="st">"</span><span class="va">)</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a><span class="va">args</span><span class="op">+=</span><span class="va">(</span>foo<span class="va">)</span></span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a><span class="va">args</span><span class="op">+=</span><span class="va">(</span>bar<span class="va">)</span></span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"</span><span class="va">${args</span><span class="op">[@]</span><span class="va">}</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Put the arguments into an array and then append</p>
+</section>
+</section>
+<section id="also-see" class="level2 cols-1">
+<h2 class="cols-1 anchored" data-anchor-id="also-see">Also see</h2>
+<ul>
+<li><a href="https://devhints.io/bash">Devhints</a> <em>(devhints.io)</em></li>
+<li><a href="http://wiki.bash-hackers.org/">Bash-hackers wiki</a> <em>(bash-hackers.org)</em></li>
+<li><a href="http://wiki.bash-hackers.org/syntax/shellvars">Shell vars</a> <em>(bash-hackers.org)</em></li>
+<li><a href="https://learnxinyminutes.com/docs/bash/">Learn bash in y minutes</a> <em>(learnxinyminutes.com)</em></li>
+<li><a href="http://mywiki.wooledge.org/BashGuide">Bash Guide</a> <em>(mywiki.wooledge.org)</em></li>
+<li><a href="https://www.shellcheck.net/">ShellCheck</a> <em>(shellcheck.net)</em></li>
+<li><a href="https://devmanual.gentoo.org/tools-reference/bash/index.html">shell - Standard Shell</a> <em>(devmanual.gentoo.org)</em></li>
+</ul>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2011,
+  author = {Bochman, Oren},
+  title = {Bash},
+  date = {2011-09-10},
+  url = {https://orenbochman.github.io/blog//posts/2011/bash-cheatsheet},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2011" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2011. <span>“Bash.”</span> September 10, 2011. <a href="https://orenbochman.github.io/blog//posts/2011/bash-cheatsheet">https://orenbochman.github.io/blog//posts/2011/bash-cheatsheet</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

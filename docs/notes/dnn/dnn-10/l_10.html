@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2017-10-01">
+<meta name="description" content="This module we look at why it helps to combine multiple NN to improve generalization">
+
+<title>Oren Bochman’s Blog - Deep Neural Networks - Notes for Lesson 10</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+<style>
+
+      .quarto-title-block .quarto-title-banner {
+        background-image: url(banner_deep.jpg);
+background-size: cover;
+      }
+</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Deep Neural Networks - Notes for Lesson 10">
+<meta name="twitter:description" content="This module we look at why it helps to combine multiple NN to improve generalization">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/notes/dnn/dnn-10/thumbnail_blog.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Deep Neural Networks - Notes for Lesson 10</h1>
+            <p class="subtitle lead">Combining multile NN to imporove generalization</p>
+                  <div>
+        <div class="description">
+          This module we look at why it helps to combine multiple NN to improve generalization
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">deep learning</div>
+                <div class="quarto-category">neural networks</div>
+                <div class="quarto-category">notes</div>
+                <div class="quarto-category">overfitting</div>
+                <div class="quarto-category">regularization</div>
+                <div class="quarto-category">coursera</div>
+                <div class="quarto-category">mixtures of experts</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">October 1, 2017</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lecture-10a-why-it-helps-to-combine-models" id="toc-lecture-10a-why-it-helps-to-combine-models" class="nav-link active" data-scroll-target="#lecture-10a-why-it-helps-to-combine-models">Lecture 10a: Why it helps to combine models</a>
+  <ul class="collapse">
+  <li><a href="#combining-networks-the-bias-variance-trade-off" id="toc-combining-networks-the-bias-variance-trade-off" class="nav-link" data-scroll-target="#combining-networks-the-bias-variance-trade-off">Combining networks: The bias-variance trade-off</a></li>
+  <li><a href="#how-the-combined-predictor-compares-with-the-individual-predictors" id="toc-how-the-combined-predictor-compares-with-the-individual-predictors" class="nav-link" data-scroll-target="#how-the-combined-predictor-compares-with-the-individual-predictors">How the combined predictor compares with the individual predictors</a></li>
+  <li><a href="#combining-networks-reduces-variance" id="toc-combining-networks-reduces-variance" class="nav-link" data-scroll-target="#combining-networks-reduces-variance">Combining networks reduces variance</a></li>
+  <li><a href="#a-picture" id="toc-a-picture" class="nav-link" data-scroll-target="#a-picture">A picture</a></li>
+  <li><a href="#what-about-discrete-distributions-over-class-labels" id="toc-what-about-discrete-distributions-over-class-labels" class="nav-link" data-scroll-target="#what-about-discrete-distributions-over-class-labels">What about discrete distributions over class labels?</a></li>
+  <li><a href="#overview-of-ways-to-make-predictors-differ" id="toc-overview-of-ways-to-make-predictors-differ" class="nav-link" data-scroll-target="#overview-of-ways-to-make-predictors-differ">Overview of ways to make predictors differ</a></li>
+  <li><a href="#making-models-differ-by-changing-their-training-data" id="toc-making-models-differ-by-changing-their-training-data" class="nav-link" data-scroll-target="#making-models-differ-by-changing-their-training-data">Making models differ by changing their training data</a></li>
+  </ul></li>
+  <li><a href="#lecture-10b-mixtures-of-experts" id="toc-lecture-10b-mixtures-of-experts" class="nav-link" data-scroll-target="#lecture-10b-mixtures-of-experts">Lecture 10b: Mixtures of Experts</a>
+  <ul class="collapse">
+  <li><a href="#mixtures-of-experts" id="toc-mixtures-of-experts" class="nav-link" data-scroll-target="#mixtures-of-experts">Mixtures of Experts</a></li>
+  <li><a href="#multiple-local-models" id="toc-multiple-local-models" class="nav-link" data-scroll-target="#multiple-local-models">Multiple local models</a></li>
+  <li><a href="#partitioning-based-on-input-alone-versus-partitioning-based-on-the-input-output-relationship" id="toc-partitioning-based-on-input-alone-versus-partitioning-based-on-the-input-output-relationship" class="nav-link" data-scroll-target="#partitioning-based-on-input-alone-versus-partitioning-based-on-the-input-output-relationship">Partitioning based on input alone versus partitioning based on the input-output relationship</a></li>
+  <li><a href="#a-picture-of-why-averaging-models-during-training-causes-cooperation-not-specialization" id="toc-a-picture-of-why-averaging-models-during-training-causes-cooperation-not-specialization" class="nav-link" data-scroll-target="#a-picture-of-why-averaging-models-during-training-causes-cooperation-not-specialization">A picture of why averaging models during training causes cooperation not specialization</a></li>
+  <li><a href="#an-error-function-that-encourages-cooperation" id="toc-an-error-function-that-encourages-cooperation" class="nav-link" data-scroll-target="#an-error-function-that-encourages-cooperation">An error function that encourages <strong>cooperation</strong></a></li>
+  <li><a href="#an-error-function-that-encourages-specialization" id="toc-an-error-function-that-encourages-specialization" class="nav-link" data-scroll-target="#an-error-function-that-encourages-specialization">An error function that encourages <strong>specialization</strong></a></li>
+  <li><a href="#the-mixture-of-experts-architecture-almost" id="toc-the-mixture-of-experts-architecture-almost" class="nav-link" data-scroll-target="#the-mixture-of-experts-architecture-almost">The mixture of experts architecture (almost)</a></li>
+  <li><a href="#the-derivatives-of-the-simple-cost-function" id="toc-the-derivatives-of-the-simple-cost-function" class="nav-link" data-scroll-target="#the-derivatives-of-the-simple-cost-function">The derivatives of the simple cost function</a></li>
+  <li><a href="#a-better-cost-function-for-mixtures-of-experts-jacobs1991adaptive" id="toc-a-better-cost-function-for-mixtures-of-experts-jacobs1991adaptive" class="nav-link" data-scroll-target="#a-better-cost-function-for-mixtures-of-experts-jacobs1991adaptive">A better cost function for mixtures of experts <span class="citation" data-cites="jacobs1991adaptive">(Jacobs et al. 1991)</span></a></li>
+  <li><a href="#the-probability-of-the-target-under-a-mixture-of-gaussians" id="toc-the-probability-of-the-target-under-a-mixture-of-gaussians" class="nav-link" data-scroll-target="#the-probability-of-the-target-under-a-mixture-of-gaussians">The probability of the target under a mixture of Gaussians</a></li>
+  </ul></li>
+  <li><a href="#lecture-10c-the-idea-of-full-bayesian-learning" id="toc-lecture-10c-the-idea-of-full-bayesian-learning" class="nav-link" data-scroll-target="#lecture-10c-the-idea-of-full-bayesian-learning">Lecture 10c: The idea of full Bayesian learning</a>
+  <ul class="collapse">
+  <li><a href="#full-bayesian-learning" id="toc-full-bayesian-learning" class="nav-link" data-scroll-target="#full-bayesian-learning">Full Bayesian Learning</a></li>
+  <li><a href="#overfitting-a-frequentist-illusion" id="toc-overfitting-a-frequentist-illusion" class="nav-link" data-scroll-target="#overfitting-a-frequentist-illusion">Overfitting: A frequentist illusion?</a></li>
+  <li><a href="#a-classic-example-of-overfitting" id="toc-a-classic-example-of-overfitting" class="nav-link" data-scroll-target="#a-classic-example-of-overfitting">A classic example of overfitting</a></li>
+  <li><a href="#approximating-full-bayesian-learning-in-a-neural-net" id="toc-approximating-full-bayesian-learning-in-a-neural-net" class="nav-link" data-scroll-target="#approximating-full-bayesian-learning-in-a-neural-net">Approximating full Bayesian learning in a neural net</a></li>
+  <li><a href="#an-example-of-full-bayesian-learning" id="toc-an-example-of-full-bayesian-learning" class="nav-link" data-scroll-target="#an-example-of-full-bayesian-learning">An example of full Bayesian learning</a></li>
+  </ul></li>
+  <li><a href="#lecture-10d-making-full-bayesian-learning-practical" id="toc-lecture-10d-making-full-bayesian-learning-practical" class="nav-link" data-scroll-target="#lecture-10d-making-full-bayesian-learning-practical">Lecture 10d: Making full Bayesian learning practical</a>
+  <ul class="collapse">
+  <li><a href="#what-can-we-do-if-there-are-too-many-parameters-for-a-grid" id="toc-what-can-we-do-if-there-are-too-many-parameters-for-a-grid" class="nav-link" data-scroll-target="#what-can-we-do-if-there-are-too-many-parameters-for-a-grid">What can we do if there are too many parameters for a grid?</a></li>
+  <li><a href="#sampling-weight-vectors" id="toc-sampling-weight-vectors" class="nav-link" data-scroll-target="#sampling-weight-vectors">Sampling weight vectors</a></li>
+  <li><a href="#one-method-for-sampling-weight-vectors" id="toc-one-method-for-sampling-weight-vectors" class="nav-link" data-scroll-target="#one-method-for-sampling-weight-vectors">One method for sampling weight vectors</a></li>
+  <li><a href="#the-wonderful-property-of-markov-chain-monte-carlo" id="toc-the-wonderful-property-of-markov-chain-monte-carlo" class="nav-link" data-scroll-target="#the-wonderful-property-of-markov-chain-monte-carlo">The wonderful property of Markov Chain Monte Carlo</a></li>
+  <li><a href="#full-bayesian-learning-with-mini-batches" id="toc-full-bayesian-learning-with-mini-batches" class="nav-link" data-scroll-target="#full-bayesian-learning-with-mini-batches">Full Bayesian learning with mini-batches</a></li>
+  </ul></li>
+  <li><a href="#lecture-10e-dropout" id="toc-lecture-10e-dropout" class="nav-link" data-scroll-target="#lecture-10e-dropout">Lecture 10e: Dropout</a>
+  <ul class="collapse">
+  <li><a href="#two-ways-to-average-models" id="toc-two-ways-to-average-models" class="nav-link" data-scroll-target="#two-ways-to-average-models">Two ways to average models</a></li>
+  <li><a href="#dropout-an-efficient-way-to-average-many-large-neural-nets" id="toc-dropout-an-efficient-way-to-average-many-large-neural-nets" class="nav-link" data-scroll-target="#dropout-an-efficient-way-to-average-many-large-neural-nets">Dropout: An efficient way to average many large neural nets</a></li>
+  <li><a href="#dropout-as-a-form-of-model-averaging" id="toc-dropout-as-a-form-of-model-averaging" class="nav-link" data-scroll-target="#dropout-as-a-form-of-model-averaging">Dropout as a form of model averaging</a></li>
+  <li><a href="#but-what-do-we-do-at-test-time" id="toc-but-what-do-we-do-at-test-time" class="nav-link" data-scroll-target="#but-what-do-we-do-at-test-time">But what do we do at test time?</a></li>
+  <li><a href="#what-if-we-have-more-hidden-layers" id="toc-what-if-we-have-more-hidden-layers" class="nav-link" data-scroll-target="#what-if-we-have-more-hidden-layers">What if we have more hidden layers?</a></li>
+  <li><a href="#what-about-the-input-layer" id="toc-what-about-the-input-layer" class="nav-link" data-scroll-target="#what-about-the-input-layer">What about the input layer?</a></li>
+  <li><a href="#how-well-does-dropout-work" id="toc-how-well-does-dropout-work" class="nav-link" data-scroll-target="#how-well-does-dropout-work">How well does dropout work?</a></li>
+  <li><a href="#another-way-to-think-about-dropout" id="toc-another-way-to-think-about-dropout" class="nav-link" data-scroll-target="#another-way-to-think-about-dropout">Another way to think about dropout</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+<style>
+.a4paper {margin: 0; aspect-ratio: 1 / 1.41;}
+.letterpaper  {margin: 0; aspect-ratio: 22 / 17;}
+.ppSlide {margin: 0; aspect-ratio: 22 / 13;}
+</style>
+<p><object data="lec10.pdf" type="application/pdf" width="100%" class="ppSlide"><p>Unable to display PDF file. <a href="lec10.pdf">Download</a> instead.</p></object></p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/IVfAs03sBSU" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div></div><section id="lecture-10a-why-it-helps-to-combine-models" class="level1 page-columns page-full">
+<h1>Lecture 10a: Why it helps to combine models</h1>
+<p>This lecture is about using a mixture of experts to reduce overfitting. The notion is to train lower capacity models specializing on subsets of the data and learn to predict which one would be the best predictor. Then use the best model for prediction. Alternatively we might average the results of the simpler models.</p>
+<p>The lecture is challenging as it skims the prior work failing to sufficiently motivate why the different error function arise (they depend on the way the learning scheme are set up) as the paper tries to bridge between competitive learning and a modular neural network.</p>
+<p>There’s, again, a lot of math, although it’s less difficult than in videos 9d and 9e. Be sure to understand the formulas before moving on.</p>
+<p>We’re going to combine many models, by using the average of their predictions, at test time. 5:38: There’s a mistake in the explanation of why that term disappears.</p>
+<p>The mistake is that -2(t-ybar) is not a random variable, so it makes no sense to talk about its variance, mean, correlations, etc.</p>
+<p>The real reason why the term disappears is simply that the right half of the term, i.e.i, is zero, because <span class="math inline">\bar{y}</span> is the mean of the <span class="math inline">y_i</span> values.</p>
+<section id="combining-networks-the-bias-variance-trade-off" class="level2">
+<h2 class="anchored" data-anchor-id="combining-networks-the-bias-variance-trade-off">Combining networks: The bias-variance trade-off</h2>
+<ul>
+<li>When the amount of training data is limited, we get overfitting.</li>
+<li>Averaging the predictions of many different models is a good way to reduce overfitting.</li>
+<li>It helps most when the models make very different predictions.</li>
+<li>For regression, the squared error can be decomposed into a “bias” term and a “variance” term.</li>
+<li>The bias term is big if the model has too little capacity to fit the data.</li>
+<li>The variance term is big if the model has so much capacity that it is good at fitting the sampling error in each particular training set.</li>
+<li>By averaging away the variance we can use individual models with high capacity. These models have high variance but low bias.</li>
+</ul>
+</section>
+<section id="how-the-combined-predictor-compares-with-the-individual-predictors" class="level2">
+<h2 class="anchored" data-anchor-id="how-the-combined-predictor-compares-with-the-individual-predictors">How the combined predictor compares with the individual predictors</h2>
+<ul>
+<li>On any one test case, some individual predictors may be better than the combined predictor.</li>
+<li>But different individual predictors will be better on different cases.</li>
+<li>If the individual predictors disagree a lot, the combined predictor is typically better than all of the individual predictors when we average over test cases.</li>
+<li>So we should try to make the individual predictors disagree (without making them much worse individually).</li>
+</ul>
+</section>
+<section id="combining-networks-reduces-variance" class="level2">
+<h2 class="anchored" data-anchor-id="combining-networks-reduces-variance">Combining networks reduces variance</h2>
+<p>We want to compare two expected squared errors: Pick a predictor at random versus use the average of all the predictors:</p>
+<!-- TODO: add math -->
+</section>
+<section id="a-picture" class="level2">
+<h2 class="anchored" data-anchor-id="a-picture">A picture</h2>
+<p><a href="picture_of_ensambling.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="picture_of_ensambling.png" class="img-fluid"></a></p>
+<ul>
+<li>The predictors that are further than average from t make bigger than average squared errors.</li>
+<li>The predictors that are nearer than average to t make smaller then average squared errors.</li>
+<li>The first effect dominates because squares work like that.</li>
+<li>Don’t try averaging if you want to synchronize a bunch of clocks!
+<ul>
+<li>The noise is not Gaussian</li>
+</ul></li>
+</ul>
+<p><span class="math display">
+\frac{ (\bar{y}+\epsilon)^2 + (\bar{y} + \epsilon )^2}{2} = \bar{y}^2 + \epsilon^2
+</span></p>
+</section>
+<section id="what-about-discrete-distributions-over-class-labels" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="what-about-discrete-distributions-over-class-labels">What about discrete distributions over class labels?</h2>
+<!-- TODO: add the screenshot  -->
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="chart.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="chart.png" class="img-fluid"></a></p>
+</div></div><ul>
+<li>Suppose that one model gives the correct label probability and the other model gives it</li>
+<li>Is it better to pick one model at random, or is it better to average the two probabilities?</li>
+</ul>
+<!-- TODO: add math -->
+<p><span class="math display">
+\log \Biggr( \frac{ p_i + p_j }{2} \Biggr) \ge \frac{\log p_i + \log p_j}{2}
+</span></p>
+</section>
+<section id="overview-of-ways-to-make-predictors-differ" class="level2">
+<h2 class="anchored" data-anchor-id="overview-of-ways-to-make-predictors-differ">Overview of ways to make predictors differ</h2>
+<ul>
+<li>Rely on the learning algorithm getting stuck in different local optima.</li>
+<li>A dubious hack (but worth a try).</li>
+<li>Use lots of different kinds of models, including ones that are not neural networks.</li>
+<li>Decision trees</li>
+<li>Gaussian Process models</li>
+<li>Support Vector Machines</li>
+<li>and many others.</li>
+<li>For neural network models, make them different by using:
+<ul>
+<li>Different numbers of hidden layers.</li>
+<li>Different numbers of units per layer.</li>
+<li>Different types of unit.</li>
+<li>Different types or strengths of weight penalty.</li>
+<li>Different learning algorithms.</li>
+</ul></li>
+</ul>
+</section>
+<section id="making-models-differ-by-changing-their-training-data" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="making-models-differ-by-changing-their-training-data">Making models differ by changing their training data</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><img src="bagging.png" class="img-fluid"> <img src="boosting.png" class="img-fluid"></p>
+</div></div><ul>
+<li><a href="">Bagging</a>: Train different models on different subsets of the data.
+<ul>
+<li>Bagging gets different training sets by using sampling with replacement: <span class="math inline">\{a,b,c,d,e\} \to &lt;a, c, c, d, d, \ldots &gt;</span></li>
+<li><a href="">Random forests</a> use lots of different decision trees trained using bagging. They work well.</li>
+</ul></li>
+<li>We could use bagging with neural nets but its very expensive.</li>
+<li><a href="">Boosting</a>: Train a sequence of low capacity models. Weight the training cases differently for each model in the sequence.
+<ul>
+<li>Boosting up-weights cases that previous models got wrong.</li>
+<li>An early use of boosting was with neural nets for MNIST.</li>
+<li>It focused the computational resources on modeling the tricky cases.</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="lecture-10b-mixtures-of-experts" class="level1 page-columns page-full">
+<h1>Lecture 10b: Mixtures of Experts</h1>
+<ul>
+<li>This is a different way of combining multiple models.</li>
+<li><em>Nearest neighbor</em> is a very simple regression method that’s not a neural network.</li>
+<li>7:22: The formula is confusing.</li>
+<li>The idea is a weighted average of squared errors (weighted by those probabilities p_i).</li>
+<li>That can be written as an <mark>weighted expectation</mark>, with weights <span class="math inline">p_i</span>, of <span class="math inline">(t-y_i)^2;</span> or as a <span class="math inline">\sum p_i \times (t-y_i)^2</span>. The formula on the slide mixes those two notations.</li>
+</ul>
+<p>On the next slide it’s written correctly.</p>
+<p>10:03: This formula is not trivial to find, but if you differentiate and simplify, you will find it.</p>
+<section id="mixtures-of-experts" class="level2">
+<h2 class="anchored" data-anchor-id="mixtures-of-experts">Mixtures of Experts</h2>
+<!-- TODO: add the screenshot  -->
+<ul>
+<li>Can we do better that just averaging models in a way that does not depend on the particular training case? – Maybe we can look at the input data for a particular case to help us decide which model to rely on. – This may allow particular models to specialize in a subset of the training cases. – They do not learn on cases for which they are not picked. So they can ignore stuff they are not good at modeling. Hurray for nerds!</li>
+<li>The key idea is to make each expert focus on predicting the right answer for the cases where it is already doing better than the other experts. – This causes specialization. # A spectrum of models</li>
+</ul>
+<p><strong>Very local models</strong> – e.g.&nbsp;Nearest neighbors - Very fast to fit - Just store training cases - Local smoothing would obviously improve things.</p>
+<p><strong>Fully global models</strong> - e. g. A polynomial - May be slow to fit and also unstable. - Each parameter depends on all the data. Small changes to data can cause big changes to the fit.</p>
+</section>
+<section id="multiple-local-models" class="level2">
+<h2 class="anchored" data-anchor-id="multiple-local-models">Multiple local models</h2>
+<ul>
+<li>Instead of using a single global model or lots of very local models, use several models of intermediate complexity.
+<ul>
+<li>Good if the dataset contains several different regimes which have different relationships between input and output.
+<ul>
+<li>e.g.&nbsp;financial data which depends on the state of the economy.</li>
+</ul></li>
+</ul></li>
+<li>But how do we partition the dataset into regimes?</li>
+</ul>
+</section>
+<section id="partitioning-based-on-input-alone-versus-partitioning-based-on-the-input-output-relationship" class="level2">
+<h2 class="anchored" data-anchor-id="partitioning-based-on-input-alone-versus-partitioning-based-on-the-input-output-relationship">Partitioning based on input alone versus partitioning based on the input-output relationship</h2>
+<!-- TODO: add the screenshot  -->
+<ul>
+<li>We need to cluster the training cases into subsets, one for each local model.
+<ul>
+<li>The aim of the clustering is NOT to find clusters of similar input vectors.</li>
+<li>We want each cluster to have a relationship between input and output that can be well-modeled by one local model.</li>
+</ul></li>
+</ul>
+</section>
+<section id="a-picture-of-why-averaging-models-during-training-causes-cooperation-not-specialization" class="level2">
+<h2 class="anchored" data-anchor-id="a-picture-of-why-averaging-models-during-training-causes-cooperation-not-specialization">A picture of why averaging models during training causes cooperation not specialization</h2>
+<!-- TODO: add the screenshot  -->
+<p>Do we really want to move the output of model i away from the target value?</p>
+</section>
+<section id="an-error-function-that-encourages-cooperation" class="level2">
+<h2 class="anchored" data-anchor-id="an-error-function-that-encourages-cooperation">An error function that encourages <strong>cooperation</strong></h2>
+<p>If we want to encourage cooperation, we compare the average of all the predictors with the target and train to reduce the discrepancy. – This can overfit badly. It makes the model much more powerful than training each predictor separately. <span class="math display">
+E=(t - \lt y_i \gt_i )^2
+</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">y_i</span> is the average over all predictors.</li>
+</ul>
+</section>
+<section id="an-error-function-that-encourages-specialization" class="level2">
+<h2 class="anchored" data-anchor-id="an-error-function-that-encourages-specialization">An error function that encourages <strong>specialization</strong></h2>
+<ul>
+<li>If we want to encourage specialization we compare each predictor separately with the target.</li>
+<li>We also use a “manager” to determine the probability of picking each expert.
+<ul>
+<li>Most experts end up ignoring most targets</li>
+</ul></li>
+</ul>
+<p><span class="math display">
+  E =  \lt p_i(t- y_i)^2 \gt_i
+</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">y_i</span> is the avarage over all predictors.</li>
+<li><span class="math inline">p_i</span> probability of the manager picking expert i for this case.</li>
+</ul>
+</section>
+<section id="the-mixture-of-experts-architecture-almost" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-mixture-of-experts-architecture-almost">The mixture of experts architecture (almost)</h2>
+<p>A simple cost function <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="no-row-height column-margin column-container"><p><sup>1</sup>&nbsp;There is a better cost function based on a mixture model.</p></div><p><span class="math display">
+  E = \sum_i p_i (t- y_i)^2
+</span></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="mixture_of_experts.png" class="lightbox" data-glightbox="description: .lightbox-desc-3" data-gallery="quarto-lightbox-gallery-3" title="simplified mixture of experts architecture"><img src="mixture_of_experts.png" class="img-fluid figure-img" alt="simplified mixture of experts architecture"></a></p>
+<figcaption>simplified mixture of experts architecture</figcaption>
+</figure>
+</div>
+</section>
+<section id="the-derivatives-of-the-simple-cost-function" class="level2">
+<h2 class="anchored" data-anchor-id="the-derivatives-of-the-simple-cost-function">The derivatives of the simple cost function</h2>
+<ul>
+<li>If we differentiate w.r.t. the <strong>outputs of the experts</strong> we get a signal for training each <strong>expert</strong>.</li>
+<li>If we differentiate w.r.t. the <strong>outputs of the gating network</strong> we get a signal for training the <strong>gating net</strong>.
+<ul>
+<li>We want to raise p for all experts that give less than the average squared error of all the experts (weighted by p)</li>
+</ul></li>
+</ul>
+<p><span class="math display">
+p_j = \frac{e^{x_j}}{\sum_i e^x_i}
+</span></p>
+<p><span id="eq-ensamble-simple-loss"><span class="math display">
+E = \sum_i p_i (t- y_i)^2
+\tag{1}</span></span></p>
+<p><span id="eq-diff_wrt_output"><span class="math display">
+\frac{\partial E}{\partial y_i} = p_i(t-y_i)
+\tag{2}</span></span></p>
+<p><span id="eq-diff_wrt_input"><span class="math display">
+\frac{\partial E}{\partial x_i} = p_i\Bigg((t-y_i)^2-E\Bigg)
+\tag{3}</span></span></p>
+</section>
+<section id="a-better-cost-function-for-mixtures-of-experts-jacobs1991adaptive" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="a-better-cost-function-for-mixtures-of-experts-jacobs1991adaptive">A better cost function for mixtures of experts <span class="citation" data-cites="jacobs1991adaptive">(<a href="#ref-jacobs1991adaptive" role="doc-biblioref">Jacobs et al. 1991</a>)</span></h2>
+<div class="no-row-height column-margin column-container"><div id="ref-jacobs1991adaptive" class="csl-entry" role="listitem">
+Jacobs, Robert A, Michael I Jordan, Steven J Nowlan, and Geoffrey E Hinton. 1991. <span>“Adaptive Mixtures of Local Experts.”</span> <em>Neural Computation</em> 3 (1): 79–87. <a href="https://doi.org/10.1162/neco.1991.3.1.79">https://doi.org/10.1162/neco.1991.3.1.79</a>.
+</div><div class="">
+<p><a href="mix_1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="mix_1.png" class="img-fluid"></a></p>
+<p><a href="mix_2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="mix_2.png" class="img-fluid"></a></p>
+</div></div>
+<ul>
+<li>Think of each expert as making a prediction that is a Gaussian distribution around its output (with variance 1).</li>
+<li>Think of the manager as deciding on a scale for each of these Gaussians. The scale is called a “mixing proportion”. e.g {0.4 0.6}</li>
+<li>Maximize the log probability of the target value under this mixture of Gaussians model i.e.&nbsp;the sum of the two scaled Gaussians.</li>
+</ul>
+</section>
+<section id="the-probability-of-the-target-under-a-mixture-of-gaussians" class="level2">
+<h2 class="anchored" data-anchor-id="the-probability-of-the-target-under-a-mixture-of-gaussians">The probability of the target under a mixture of Gaussians</h2>
+<p><span id="eq-ensamble-mixture-loss"><span class="math display">
+p(t^c | MoE) = \sum_i p_i^c {\color{red}\frac{1}{\sqrt{2\pi}}} e^−\frac{1}{2} (t^c−y_i^c )^2
+\tag{4}</span></span></p>
+<p>where:</p>
+<ul>
+<li>lhs - prob. of target value on case c given the mixture.</li>
+<li>MoE — Mixture of Experts</li>
+<li><span class="math inline">y_i</span> = output of expert i</li>
+<li>the constant in red - normalization term for a Gaussian with <span class="math inline">\sigma^2=1</span></li>
+</ul>
+</section>
+</section>
+<section id="lecture-10c-the-idea-of-full-bayesian-learning" class="level1 page-columns page-full">
+<h1>Lecture 10c: The idea of full Bayesian learning</h1>
+<p>In this video you learn what exactly we want to do with that difficult-to-compute posterior distribution.</p>
+<p>We learn about doing which is so time-consuming that we can never do it for normal-size neural networks. This is a theory video.</p>
+<p>We average the predictions from many weight vectors on test data, with averaging weights coming from the posterior over weight vectors given the training data.</p>
+<p>That sounds simple and is indeed, in a sense, what happens.</p>
+<p>However, there’s more to be said about what this “averaging” entails.</p>
+<p>The Bayesian approach is all about probabilities, so the idea of producing a single number as output has no place in the Bayesian approach.</p>
+<p>Instead, the output is a distribution, indicating how likely the net considers every possible output value to be.</p>
+<p>In video 9e we introduced the idea that the scalar output from a network really is the mean of such a predictive distribution. We need that idea again here.</p>
+<p>That is what Geoffrey means at 6:37. “Adding noise to the output” is a way of saying that the output is simply the centre of a predictive distribution.</p>
+<p>What’s averaged is those distributions: the predictive distribution of the Bayesian approach is the weighted mean of all those Gaussian predictive distributions of the various weight vectors.</p>
+<p>By the way, the result of this averaging of many such Gaussian distributions is not a Gaussian distribution.</p>
+<p>However, if we’re only interested in the mean of the predictive distribution (which would not be very</p>
+<p>Bayesian in spirit), then we can simply average the outputs of the networks to get that mean. You can mathematically verify this for yourself.</p>
+<section id="full-bayesian-learning" class="level2">
+<h2 class="anchored" data-anchor-id="full-bayesian-learning">Full Bayesian Learning</h2>
+<ul>
+<li>Instead of trying to find the best single setting of the parameters (as in Maximum Likelihood or MAP) compute the full posterior distribution over all possible parameter settings.
+<ul>
+<li>This is extremely computationally intensive for all but the simplest models (its feasible for a biased coin).</li>
+</ul></li>
+<li>To make predictions, let each different setting of the parameters make its own prediction and then combine all these predictions by weighting each of them by the posterior probability of that setting of the parameters.
+<ul>
+<li>This is also very computationally intensive.</li>
+</ul></li>
+<li>The full Bayesian approach allows us to use complicated models even when we do not have much data.</li>
+</ul>
+</section>
+<section id="overfitting-a-frequentist-illusion" class="level2">
+<h2 class="anchored" data-anchor-id="overfitting-a-frequentist-illusion">Overfitting: A frequentist illusion?</h2>
+<ul>
+<li>If you do not have much data, you should use a simple model, because a complex one will overfit.
+<ul>
+<li>This is true.</li>
+<li>But only if you assume that fitting a model means choosing a single best setting of the parameters.</li>
+</ul></li>
+<li>If you use the full posterior distribution over parameter settings, overfitting disappears.
+<ul>
+<li>When there is very little data, you get very vague predictions because many different parameters settings have significant posterior probability</li>
+</ul></li>
+</ul>
+</section>
+<section id="a-classic-example-of-overfitting" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="a-classic-example-of-overfitting">A classic example of overfitting</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="overfitting_2.png" class="lightbox" data-glightbox="description: .lightbox-desc-6" data-gallery="quarto-lightbox-gallery-6" title="overfitting"><img src="overfitting_2.png" class="img-fluid figure-img" alt="overfitting"></a></p>
+<figcaption>overfitting</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="overfitting_1.png" class="lightbox" data-glightbox="description: .lightbox-desc-7" data-gallery="quarto-lightbox-gallery-7" title="not-overfitting"><img src="overfitting_1.png" class="img-fluid figure-img" alt="not-overfitting"></a></p>
+<figcaption>not-overfitting</figcaption>
+</figure>
+</div>
+</div></div><ul>
+<li>Which model do you believe?
+<ul>
+<li>The complicated model fits the data better.</li>
+<li>But it is not economical and it makes silly predictions.</li>
+</ul></li>
+<li>But what if we start with a reasonable prior over all fifth-order polynomials and use the full posterior distribution.
+<ul>
+<li>Now we get vague and sensible predictions.</li>
+</ul></li>
+<li>There is no reason why the amount of data should influence our prior beliefs about the complexity of the model.</li>
+</ul>
+</section>
+<section id="approximating-full-bayesian-learning-in-a-neural-net" class="level2">
+<h2 class="anchored" data-anchor-id="approximating-full-bayesian-learning-in-a-neural-net">Approximating full Bayesian learning in a neural net</h2>
+<ul>
+<li>If the neural net only has a few parameters we could put a grid over the parameter space and evaluate <span class="math inline">p( W | D )</span> at each grid-point.
+<ul>
+<li>This is expensive, but it does not involve any gradient descent and there are no local optimum issues.</li>
+</ul></li>
+<li>After evaluating each grid point we use all of them to make predictions on test data
+<ul>
+<li>This is also expensive, but it works much better than ML learning when the posterior is vague or multimodal (this happens when data is scarce).</li>
+</ul></li>
+</ul>
+<p><span id="eq-full-bayesian-approx"><span class="math display">
+p(t_{test} \mid \text{input}_{test}) = \sum_{g \in grid} p(W_g \mid D) p(t_{test} \mid \text{input}_{test}, W_g )
+\tag{5}</span></span></p>
+</section>
+<section id="an-example-of-full-bayesian-learning" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="an-example-of-full-bayesian-learning">An example of full Bayesian learning</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><a href="full_Bayesian_learning_example.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="full_Bayesian_learning_example.png" class="img-fluid"></a></p>
+</div></div><ul>
+<li>Allow each of the 6 weights or biases to have the 9 possible values <span class="math inline">-2,\ -1.5,\ -1,\ -0.5,\ 0,\ 0.5,\ 1,\ 1.5,\ 2</span>
+<ul>
+<li>There are 9^6 grid-points in parameter space</li>
+</ul></li>
+<li>For each grid-point compute the probability of the observed outputs of all the training cases.</li>
+<li>Multiply the prior for each grid-point by the likelihood term and renormalize to get the posterior probability for each grid-point.</li>
+<li>Make predictions by using the posterior probabilities to average the predictions made by the different grid-points.</li>
+</ul>
+</section>
+</section>
+<section id="lecture-10d-making-full-bayesian-learning-practical" class="level1 page-columns page-full">
+<h1>Lecture 10d: Making full Bayesian learning practical</h1>
+<p>Maximum Likelihood is the least Bayesian.</p>
+<p>Maximum A Posteriori (i.e.&nbsp;using weight decay) is slightly more Bayesian.</p>
+<p>This video introduces a feasible method that’s even closer to the Bayesian ideal. However, it’s necessarily still an approximation.</p>
+<p>4:22: “save the weights” means recording the current weight vector as a sampled weight vector.</p>
+<section id="what-can-we-do-if-there-are-too-many-parameters-for-a-grid" class="level2">
+<h2 class="anchored" data-anchor-id="what-can-we-do-if-there-are-too-many-parameters-for-a-grid">What can we do if there are too many parameters for a grid?</h2>
+<ul>
+<li>The number of grid points is exponential in the number of parameters.
+<ul>
+<li>So we cannot deal with more than a few parameters using a grid.</li>
+</ul></li>
+<li>If there is enough data to make most parameter vectors very unlikely, only a tiny fraction of the grid points make a significant contribution to the predictions.
+<ul>
+<li>Maybe we can just evaluate this tiny fraction</li>
+</ul></li>
+<li>Idea: <span class="emoji" data-emoji="bulb">💡</span> <mark>It might be good enough to just sample weight vectors according to their posterior probabilities.</mark></li>
+</ul>
+<p><span class="math display">
+p(y_{test} \mid \text{input}_{test},D) = \sum_{i} {\color{green}{ p(W_i \mid D)}} p(y_{test} \mid \text{input}_{test}, W_i )
+</span></p>
+<p>where:</p>
+<ul>
+<li>the green term - Sample weight vectors with this probability</li>
+</ul>
+</section>
+<section id="sampling-weight-vectors" class="level2">
+<h2 class="anchored" data-anchor-id="sampling-weight-vectors">Sampling weight vectors</h2>
+<ul>
+<li>In standard backpropagation we keep moving the weights in the direction that decreases the cost.
+<ul>
+<li>i.e.&nbsp;the direction that increases the log likelihood plus the log prior, summed over all training cases.</li>
+<li>Eventually, the weights settle into a local minimum or get stuck on a plateau or just move so slowly that we run out of patience.</li>
+</ul></li>
+</ul>
+</section>
+<section id="one-method-for-sampling-weight-vectors" class="level2">
+<h2 class="anchored" data-anchor-id="one-method-for-sampling-weight-vectors">One method for sampling weight vectors</h2>
+<ul>
+<li>Suppose we add some Gaussian noise to the weight vector after each update.
+<ul>
+<li>So the weight vector never settles down.</li>
+<li>It keeps wandering around, but it tends to prefer low cost regions of the weight space.</li>
+<li>Can we say anything about how often it will visit each possible setting of the weights?</li>
+</ul></li>
+</ul>
+</section>
+<section id="the-wonderful-property-of-markov-chain-monte-carlo" class="level2">
+<h2 class="anchored" data-anchor-id="the-wonderful-property-of-markov-chain-monte-carlo">The wonderful property of Markov Chain Monte Carlo</h2>
+<ul>
+<li>Amazing fact: If we use just the right amount of noise, and if we let the weight vector wander around for long enough before we take a sample, we will get an unbiased sample from the true posterior over weight vectors.
+<ul>
+<li>This is called a “Markov Chain Monte Carlo” method.</li>
+<li>MCMC makes it feasible to use full Bayesian learning with thousands of parameters.</li>
+</ul></li>
+<li>There are related MCMC methods that are more complicated but more efficient:
+<ul>
+<li>We don’t need to let the weights wander around for so long before we get samples from the posterior.</li>
+</ul></li>
+</ul>
+</section>
+<section id="full-bayesian-learning-with-mini-batches" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="full-bayesian-learning-with-mini-batches">Full Bayesian learning with mini-batches</h2>
+<ul>
+<li>If we compute the gradient of the cost function on a random mini-batch we will get an unbiased estimate with sampling noise.
+<ul>
+<li>Maybe we can use the sampling noise to provide the noise that an MCMC method needs!</li>
+</ul></li>
+<li>In <span class="citation" data-cites="Ahn2012Bayesian">(<a href="#ref-Ahn2012Bayesian" role="doc-biblioref">Ahn, Korattikara, and Welling 2012</a>)</span> <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> the authors showed how to do this fairly efficiently.
+<ul>
+<li>So full Bayesian learning is now possible with lots of parameters.</li>
+</ul></li>
+</ul>
+<div class="no-row-height column-margin column-container"><div id="ref-Ahn2012Bayesian" class="csl-entry" role="listitem">
+Ahn, Sungjin, Anoop Korattikara, and Max Welling. 2012. <span>“Bayesian Posterior Sampling via Stochastic Gradient Fisher Scoring.”</span> In <em>Proceedings of the 29th International Coference on International Conference on Machine Learning</em>, 1771–78. ICML’12. Madison, WI, USA: Omnipress. <a href="https://doi.org/10.5555/3042573.3042799">https://doi.org/10.5555/3042573.3042799</a>.
+</div><p><sup>2</sup>&nbsp;<a href="1206.6380.pdf">pdf</a></p></div></section>
+</section>
+<section id="lecture-10e-dropout" class="level1 page-columns page-full">
+<h1>Lecture 10e: Dropout</h1>
+<p>This is not Bayesian. This is a specific way of adding noise (that idea was introduced in general in video 9c). It’s a recent discovery and it works very, very well.</p>
+<p>Dropout can be viewed in different ways:</p>
+<p>One way to view this method is that we add noise.</p>
+<p>Another more complicated way, which is introduced first in the video, is about weight sharing and different models.</p>
+<p>That second way to view it serves as the explanation of why adding noise works so well.</p>
+<p>The first slide in other words: a mixture of models involves taking the arithmetic mean (a.k.a. “the mean”) of the outputs, while a product of models involves taking the geometric mean of the outputs, which is a different kind of mean.</p>
+<section id="two-ways-to-average-models" class="level2">
+<h2 class="anchored" data-anchor-id="two-ways-to-average-models">Two ways to average models</h2>
+<ul>
+<li>MIXTURE: We can combine models by averaging their output probabilities:</li>
+</ul>
+<p>Model A: .3 .2 .5 Model B: .1 .8 .1 Combined .2 .5 .3</p>
+<ul>
+<li>PRODUCT: We can combine models by taking the geometric means of their output probabilities:</li>
+</ul>
+<p>Model A: .3 .2 .5 Model B: .1 .8 .1 Combined .03 .16 .05 /sum</p>
+</section>
+<section id="dropout-an-efficient-way-to-average-many-large-neural-nets" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="dropout-an-efficient-way-to-average-many-large-neural-nets">Dropout: An efficient way to average many large neural nets</h2>
+<p><a href="http://arxiv.org/abs/1207.0580">preprint</a> <span class="citation" data-cites="hinton2012">(<a href="#ref-hinton2012" role="doc-biblioref">Hinton et al. 2012</a>)</span></p>
+<div class="no-row-height column-margin column-container"><div id="ref-hinton2012" class="csl-entry" role="listitem">
+Hinton, Geoffrey E., Nitish Srivastava, Alex Krizhevsky, Ilya Sutskever, and Ruslan R. Salakhutdinov. 2012. <span>“Improving Neural Networks by Preventing Co-Adaptation of Feature Detectors.”</span> <a href="https://doi.org/10.48550/ARXIV.1207.0580">https://doi.org/10.48550/ARXIV.1207.0580</a>.
+</div></div><p>TODO add picture</p>
+<ul>
+<li>Consider a neural net with one hidden layer.</li>
+<li>Each time we present a training example, we randomly omit each hidden unit with probability 0.5.</li>
+<li>So we are randomly sampling from <span class="math inline">2^H</span> different architectures. – All architectures share weights</li>
+</ul>
+</section>
+<section id="dropout-as-a-form-of-model-averaging" class="level2">
+<h2 class="anchored" data-anchor-id="dropout-as-a-form-of-model-averaging">Dropout as a form of model averaging</h2>
+<ul>
+<li><p>We sample from 2^H models. So only a few of the models ever get trained, and they only get one training example.</p>
+<ul>
+<li>This is as extreme as bagging can get.</li>
+</ul></li>
+<li><p>The sharing of the weights means that every model is very strongly regularized.</p>
+<ul>
+<li>It’s a much better regularizer than L2 or L1 penalties that pull the weights towards zero.</li>
+</ul></li>
+</ul>
+</section>
+<section id="but-what-do-we-do-at-test-time" class="level2">
+<h2 class="anchored" data-anchor-id="but-what-do-we-do-at-test-time">But what do we do at test time?</h2>
+<ul>
+<li><p>We could sample many different architectures and take the geometric mean of their output distributions.</p></li>
+<li><p>It better to use all of the hidden units, but to halve their outgoing weights.</p>
+<ul>
+<li>This exactly computes the geometric mean of the predictions of all <span class="math inline">2^H</span> models.</li>
+</ul></li>
+</ul>
+</section>
+<section id="what-if-we-have-more-hidden-layers" class="level2">
+<h2 class="anchored" data-anchor-id="what-if-we-have-more-hidden-layers">What if we have more hidden layers?</h2>
+<ul>
+<li><p>Use dropout of 0.5 in every layer.</p></li>
+<li><p>At test time, use the “mean net” that has all the outgoing weights halved.</p>
+<ul>
+<li><p>This is not exactly the same as averaging all the separate dropped out models, but it’s a pretty good approximation, and its fast.</p></li>
+<li><p>Alternatively, run the stochastic model several times on the same input.</p>
+<ul>
+<li>This gives us an idea of the uncertainty in the answer.</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="what-about-the-input-layer" class="level2">
+<h2 class="anchored" data-anchor-id="what-about-the-input-layer">What about the input layer?</h2>
+<ul>
+<li>It helps to use dropout there too, but with a higher probability of keeping an input unit.
+<ul>
+<li>This trick is already used by the <strong>denoising autoencoders</strong> developed by Pascal Vincent, Hugo Larochelle and Yoshua Bengio.</li>
+</ul></li>
+</ul>
+</section>
+<section id="how-well-does-dropout-work" class="level2">
+<h2 class="anchored" data-anchor-id="how-well-does-dropout-work">How well does dropout work?</h2>
+<ul>
+<li>The record breaking object recognition net developed by Alex Krizhevsky (see lecture 5) uses dropout and it helps a lot.</li>
+<li>If your deep neural net is significantly overfitting, dropout will usually reduce the number of errors by a lot.
+<ul>
+<li>Any net that uses “early stopping” can do better by using dropout (at the cost of taking quite a lot longer to train).</li>
+</ul></li>
+<li>If your deep neural net is not overfitting you should be using a bigger one!</li>
+</ul>
+</section>
+<section id="another-way-to-think-about-dropout" class="level2">
+<h2 class="anchored" data-anchor-id="another-way-to-think-about-dropout">Another way to think about dropout</h2>
+<ul>
+<li>If a hidden unit knows which other hidden units are present, it can co-adapt to them on the training data.
+<ul>
+<li>But complex co-adaptations are likely to go wrong on new test data.</li>
+<li>Big, complex conspiracies are not robust.</li>
+</ul></li>
+<li>If a hidden unit has to work well with combinatorially many sets of co-workers, it is more likely to do something that is individually useful.
+<ul>
+<li>But it will also tend to do something that is marginally useful given what its co-workers achieve.</li>
+</ul></li>
+</ul>
+
+
+<div class="hidden" aria-hidden="true">
+<span class="glightbox-desc lightbox-desc-3">simplified mixture of experts architecture</span>
+<span class="glightbox-desc lightbox-desc-6">overfitting</span>
+<span class="glightbox-desc lightbox-desc-7">not-overfitting</span>
+</div>
+
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2017,
+  author = {Bochman, Oren},
+  title = {Deep {Neural} {Networks} - {Notes} for {Lesson} 10},
+  date = {2017-10-01},
+  url = {https://orenbochman.github.io/blog//notes/dnn/dnn-10/l_10.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2017" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2017. <span>“Deep Neural Networks - Notes for Lesson
+10.”</span> October 1, 2017. <a href="https://orenbochman.github.io/blog//notes/dnn/dnn-10/l_10.html">https://orenbochman.github.io/blog//notes/dnn/dnn-10/l_10.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","openEffect":"zoom","loop":false,"descPosition":"bottom","closeEffect":"zoom"});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

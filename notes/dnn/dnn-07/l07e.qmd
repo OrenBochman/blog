@@ -1,0 +1,89 @@
+---
+date: 2017-09-06
+last-modified: 2013-01-19
+title: Deep Neural Networks - Notes for Lesson 7e
+subtitle: Recurrent neural networks
+description: Training RNNs with back propagation  
+categories: [deep learning, neural networks, notes, coursera, seq2seq, RNNs, LSTM] 
+title-block-banner: banner_deep.jpg
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{=html}
+<style>
+.a4paper {margin: 0; aspect-ratio: 1 / 1.41;}
+.letterpaper  {margin: 0; aspect-ratio: 22 / 17;}
+.ppSlide {margin: 0; aspect-ratio: 22 / 13;}
+</style>
+```
+
+{{< pdf lec8.pdf width="100%" class="ppSlide" >}}
+
+::: column-margin
+{{< video https://www.youtube.com/watch?v=_gZ1NcYoVv4 >}}
+
+
+# Lecture 7e: Long-term Short-term-memory 
+
+This video is about a solution to the vanishing or exploding gradient problem. Make sure that you understand that problem first, because otherwise this video won't make much sense. 
+
+The material in this video is quite advanced.
+
+In the diagram of the memory cell, there's a somewhat new type of connection: a multiplicative connection. 
+It's shown as a triangle. 
+
+It can be thought of as a connection of which the strength is not a learned parameter, but is instead determined by the rest of the neural network, and is therefore probably different for different training cases. 
+
+This is the interpretation that Mr Hinton uses when he explains backpropagation through time through such a memory cell. 
+
+That triangle can, alternatively, be thought of as a multiplicative unit: it receives input from two different places, it multiplies those two numbers, and it sends the product somewhere else as its output. 
+
+Which two of the three lines indicate input and which one indicates output is not shown in the diagram, but is explained. 
+
+In Geoffrey's explanation of row 4 of the video, "the most active character" means the character that the net, at this time, consider most likely to be the next character in the character string, based on what the pen is doing. 
+
+
+## Long Short Term Memory (LSTM)
+
+- Hochreiter & Schmidhuber (1997) solved the problem of getting an RNN to remember things for a long time (like hundreds of time steps).
+- They designed a memory cell using logistic and linear units with multiplicative interactions. 
+- Information gets into the cell whenever its **write** gate is on. 
+- The information stays in the cell so long as its **keep** gate is on.
+- Information can be read from the cell by turning on its **read** gate. 
+
+
+## Implementing a memory cell in a neural network
+
+![](implementing_lstm.png)
+
+To preserve information for a long time in the activities of an RNN, we use a circuit that implements an analog memory cell. 
+  - A linear unit that has a self-link with a weight of 1 will maintain its state.  
+  - Information is stored in the cell by activating its write gate. 
+  - Information is retrieved by activating the read gate. 
+  - We can backpropagate through this circuit because logistics have nice derivatives. 
+
+## Backpropagation through a memory cell 
+
+![](lstm_backprop.png)
+
+## Reading cursive handwriting
+
+- This is a natural task for an RNN.
+- The input is a sequence of $(x,y,p)$ coordinates of the tip of the pen, where p indicates whether the pen is up or down.
+- The output is a sequence of characters.
+- Graves & Schmidhuber (2009) showed that RNNs with LSTM are currently the best systems for reading cursive writing.
+  - They used a sequence of small images as input rather than pen coordinates. 
+A demonstration of online handwriting recognition by an RNN with Long Short Term Memory (from Alex Graves)
+- The movie that follows shows several things:
+- Row 1: This shows when the characters are recognized.
+  - It never revises its output so difficult decisions are more delayed.
+- Row 2: This shows the states of a subset of the memory cells.
+  - Notice how they get reset when it recognizes a character.
+- Row 3: This shows the writing. The net sees the x and y coordinates.
+  - Optical input actually works a bit better than pen coordinates.
+- Row 4: This shows the gradient backpropagated all the way to the x and y inputs from the currently most active character.
+  - This lets you see which bits of the data are influencing the decision. 
+
+ 

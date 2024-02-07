@@ -1,0 +1,61 @@
+---
+date: 2017-08-14
+last-modified: 2013-01-20
+title: Deep Neural Networks - Notes for lecture 4d
+subtitle: Neuro-probabilistic language models 
+description:  Neuro-probabilistic language models 
+categories: [deep learning, neural networks, notes, coursera, NLP] 
+title-block-banner: banner_deep.jpg
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+
+# Lecture 4d: Neuro-probabilistic language models 
+
+This is the first of several applications of neural networks that we'll studying in some detail, in this course. 
+
+Synonyms: word embedding; word feature vector; word encoding. 
+
+All of these describe the learned collection of numbers that is used to represent a word. 
+"embedding" emphasizes that it's a location in a high-dimensional space: it's where the words are embedded in that space. When we check to see which words are close to each other, we're thinking about that embedding. 
+
+"feature vector" emphasizes that it's a vector instead of a scalar, and that it's componential, i.e. composed of multiple feature values. 
+
+"encoding" is very generic and doesn't emphasize anything specific. 
+looks at the trigram model 
+
+### A basic problem in speech recognition
+
+- We cannot identify phonemes perfectly in noisy speech
+  - The acoustic input is often ambiguous: there are several different words that fit the acoustic signal equally well.
+- People use their understanding of the meaning of the utterance to hear the right words.
+  - We do this unconsciously when we wreck a nice beach.
+  - We are very good at it.
+- This means speech recognizers have to know which words are likely to come next and which are not.
+  - Fortunately, words can be predicted quite well without full understanding. 
+  
+### The standard “trigram” method
+
+- Take a huge amount of text and count the frequencies of all triples of words.
+- Use these frequencies to make bets on the relative probabilities of words given the previous two words:
+
+$$
+\frac{p(w_3=c|w_2=b,w_1=a)}{p(w_3=d|w_2=b,w_1=a)}=\frac{count(abc)}{count(abd)}
+$$
+
+- Until very recently this was the state-of-the-art.
+ - We cannot use a much bigger context because there are too many possibilities to store and the counts would mostly be zero.
+  - We have to “back-off” to digrams when the count for a trigram is too small.
+    - The probability is not zero just because the count is zero! 
+
+
+### Information that the trigram model fails to use
+
+- Suppose we have seen the sentence “the cat got squashed in the garden on friday”
+- This should help us predict words in the sentence “the dog got flattened in the yard on monday”
+- A trigram model does not understand the similarities between
+  - cat/dog squashed/flattened garden/yard friday/monday
+- To overcome this limitation, we need to use the semantic and syntactic features of previous words to predict the features of the next word.
+  - Using a feature representation also allows a context that contains many more previous words (e.g. 10).

@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2021-09-24">
+<meta name="description" content="Language models and explainability">
+
+<title>Oren Bochman’s Blog - Language models and explainability</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Language models and explainability">
+<meta name="twitter:description" content="Language models and explainability">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/posts/2021/2021-11-12-language-models-and-explainability/word-cloud.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image-height" content="154">
+<meta name="twitter:image-width" content="326">
+</head>
+
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+        <li>
+    <a class="dropdown-item" href="../../../dnn.html">
+ <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../model-thinking.html">
+ <span class="dropdown-text">Model Thinking</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Language models and explainability</h1>
+                  <div>
+        <div class="description">
+          Language models and explainability
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">data science</div>
+                <div class="quarto-category">statistics</div>
+                <div class="quarto-category">marketing</div>
+                <div class="quarto-category">NLP</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 24, 2021</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">May 1, 2022</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#tldr" id="toc-tldr" class="nav-link active" data-scroll-target="#tldr">TLDR</a></li>
+  <li><a href="#some-questions" id="toc-some-questions" class="nav-link" data-scroll-target="#some-questions">Some questions</a>
+  <ul class="collapse">
+  <li><a href="#back-off" id="toc-back-off" class="nav-link" data-scroll-target="#back-off">Back off</a></li>
+  <li><a href="#why-are-deep-language-models-sota" id="toc-why-are-deep-language-models-sota" class="nav-link" data-scroll-target="#why-are-deep-language-models-sota">Why are deep language models SOTA?</a></li>
+  </ul></li>
+  <li><a href="#making-models-less-opaque" id="toc-making-models-less-opaque" class="nav-link" data-scroll-target="#making-models-less-opaque">Making models less opaque?</a>
+  <ul class="collapse">
+  <li><a href="#a-fearful-symmetry" id="toc-a-fearful-symmetry" class="nav-link" data-scroll-target="#a-fearful-symmetry">A fearful symmetry</a></li>
+  <li><a href="#how-can-we-explicitly-process-higher-level-construct" id="toc-how-can-we-explicitly-process-higher-level-construct" class="nav-link" data-scroll-target="#how-can-we-explicitly-process-higher-level-construct">How Can we explicitly process higher level construct</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+<div class=".column-margin page-columns page-full">
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><a href="word-cloud.png" class="lightbox page-columns page-full" data-glightbox="description: .lightbox-desc-1" data-gallery="quarto-lightbox-gallery-1" title="word cloud"><div class="no-row-height column-margin column-container"><img src="word-cloud.png" class="img-fluid figure-img" alt="word cloud"></div></a></p>
+<figcaption>word cloud</figcaption>
+</figure>
+</div>
+</div>
+<section id="tldr" class="level1">
+<h1>TLDR</h1>
+<p>What is a language model in NLP? And today how can we make them less opaque?</p>
+</section>
+<section id="some-questions" class="level1">
+<h1>Some questions</h1>
+<p>Originally Language models were used to handle the task to determining to what degree a sequence of words would be expected to arise in the wild. Formally, This took the form a joint probability distribution or a conditional probability distribution. Frequentist methods proved inadequate since it was realized by Ziff and others that language distribution followed power laws which in plain English means that when ever we look at a bigger sample there will be a few new phrases that arise but many more that seem to be missing and not because they are ungrammatical, but simply because the sample is too small. This concept is sometimes called the curse of dimensionality, but it raises some additional issues.</p>
+<p>To address this challenge a number of techniques were put to use including back-off and smoothing which try to estimate probability of longer sequences using the best available extrapolation for shorter ones. And the second idea was to reserve some probability for handling out of vocabulary tokens which always came up when trying to use a model trained on a corpus with our own data.</p>
+<p>What one expects is that language models would capture more structure and meaning of language if they correctly estimate the probability of longer sequences, like the 100-200 word sentences used by Dickens. There are many constructs in language that simply require more than 5 words to capture. On the other hand one would like to see the model reject ungrammatical sequences even if it has never seen them.</p>
+<p>To realize this additional techniques like Markov chain, probabilistic grammars and so which allow the model to also learn likelihood of phrase structures. These models were less bad but required more work to create large supervised data sets. But the common problem seemed to be that beyond a certain sequence length the model would quickly to point that they have only seen a certain sequence once and then show that they prefer to rote learn many sequences rather than generalize the way one would expect. For your typical corpus this number was between 4 and 7 words. This meant that capturing real probabilities of longer phenomena was increasingly challenging - even if one could reject certain errors agreement and pronouns resolution tends to fail as these grow further apart.</p>
+<p>But all this seemed to change for two reasons. We started using neural networks which seem to have better capacity for representing relations than most of the previously mentioned techniques. But perhaps more significantly we started to work with significantly larger corpus.</p>
+<p>This led to models that can capture relations between very long sequences (hundreds and thousands of words) and to consider a much richer sets of features for those words. What we see is that it is very challenging to estimate.</p>
+<p>The main problem with these models is that the sparsity of data at longer sequence length.</p>
+<p># What is a language model?</p>
+<p>The classical definition of a language model is a conditional probability distribution for a word given some a context. The context is a sequence of words before after the word being predicted. Context may be enriched with more information, such as relative position, part of speech, and they may be restricted to a certain window size. Word models are ubiquitous in NLP where they are used to estimate the likelihood of a given sequence or to generate sequences.</p>
+<p>Why are classical models so hard to get right?</p>
+<p>There is a theoretical problem - we have finite evidence (in the corpus) but we want to model an infinite space (all possible sequences in a language), which manifests in the real world as number of challenges.</p>
+<p>The evidence is sparse - For N&gt;3 Almost all word permutations will never be seen in a corpus. This means that there is no evidence if the permutation is ungrammatical, uncommon or that it is part of language not covered by the model</p>
+<p>Ziffp’s Law - Most words are rare, but a few words are very common. Sequences of length N &gt; 3 are often unique in the sense that generating text using such n-grams will just recreate long sequences from the corpus and fail to capture the more general structure of language So to summarize - we only have good data on shot n-grams, but we want the model to capture the true behavior of arbitrary long sequences.</p>
+<section id="back-off" class="level3">
+<h3 class="anchored" data-anchor-id="back-off">Back off</h3>
+<p>A number of statistically motivated methods have been proposed to combine data from shorter sequences into longer sequences. The main idea is that we don’t have a trigram probability we can back off to bigrams and use product of their probabilities. However, natural language have complex structure and for back off to produce a good estimate requires that the shorter n-grams are distributed independently which is not the case. We can double the corpus size, but that will only just introduce new words and phrases that are even less common than any we have seen before.</p>
+</section>
+<section id="why-are-deep-language-models-sota" class="level2">
+<h2 class="anchored" data-anchor-id="why-are-deep-language-models-sota">Why are deep language models SOTA?</h2>
+<p>In the era of deep learning language model are trained and represented by neural networks. Neural language models have higher capacity for capturing evidence than other language models such as Markov chains. Another facet of higher capacity is that these models learn both the structure and what features are present in the data. I mentioned Markov chains as they are mathematically close to conditional probability distributions with simplifying assumption (similar to back off) which are models. Higher capacity allows neural language model to encode more details from the corpus for a given network size than other models. However, since storage is so cheap what this advantage translates to how well the model can recall and generalize from a limited amount of training data. We should note that neural nets are slow to train slow to evaluate, require lots of data and their high capacity often leads to overfitting as they will learn both signal and noise. Research has shown that for many NLP tasks using the many tricks, models are very simple and research has demonstrated that one can reach equivalent results by fine-tuning non-neural models with the same data. How have language models evolved in the last few years?</p>
+<p>RNNs (recurrent neural networks)</p>
+<p>The initial breakthrough in NLP were in machine translation using RNNs (recurrent neural networks). But RNN turned out to be one of the most challenging type of models to train. Initially the main problem was to get RNN models to converge - they often entered a chaotic phase and then never leave it later as we learned to get these to converge better than the vanishing and exploding gradient problems came to light which in the case of word distribution was more challenging as the models are multiplicative and when run on GPUs that have low precision representation of floats leads to loss of information due to round off errors. Finally, RNN take longer to train as they grow longer as the models typically need to run N times in series (for N units) which makes poor use of the high parallelism offered by the GPU hardware. In retrospect, we can see that RNN are slow and difficult to train and tend to suffer from information due to an inability to allow information to be accessed over long distances. Some of these issues we addressed by <em>LSTMs</em> and later <em>GRUs</em>. These are more complicated architectures that aim to improve information routing. Using units like <em>RELU</em> and <em>Batch normalization</em> helped to reduce the vanishing and exploding gradients. Which let RNN become effective at a length of about 100 units. But they still had to run in series, and they still tend to lose information. This changed when attention mechanisms and transformers architecture were used in seq2seq models. These models could be evaluated for n-units in a single step. They were mathematically much simpler than LSTM and GRUs and could handle sequences of hundreds of units. This allowed them to pick up long distance structure of language that had eluded RNN based models. More recent improvements like the multi-headed attention and the reformer architecture have led to models capable of handling book long sequences in memory. Transformers are also much better at routing information over these very long sequences.</p>
+<p>As a rule of thumb the best way to improve a model is to give it more data though this will also require increasing the size of the net and training longer. Transformers would be trained in an unsupervised fashion on web scale corpuses. Models like BER and GP3 soon became some of the biggest models developed for use in Deep Learning. These language models are more flexible that the joint probability models described above in a sense that their internal state seems to capture diverse aspects of both language and of the real world and allows them to perform well on many tasks they were not trained on.</p>
+<p>When is bigger not necessarily better?</p>
+<p>One of the more fatuous points made in the literature is how almost anything that improves the model works as a regularizer - a mechanism that reduces overfitting. Neural nets are notorious for overfitting data due to their high capacity and many methods like early stopping and restoring model weights, adding penalties on kernels, weights, biases and outputs to the loss. Using drop out and batch normalization are some possibilities for use to combat overfitting.</p>
+<p>“Providing more data works well as a regularizer”. This is best understood by considering that language acquisition is many layers ability much like a linguistic onion. The first level might be the use of 1000 core words, a limited vocabulary but all the grammatical words. This is enough for a foreigner to communicate. Next one might master 3000 words get a better grasp of intermediate grammar, and morphology. We could communicate more freely and no longer need a learner’s dictionary. To pick up idioms and phrases that are used in a newspaper one might need to reach 5000 words. To master a technical area like business or medicine one needs about 15000 more words mostly unique to that field so at 20000. But 15,000-20,000 is also the amount of words used by native language speakers. A dictionary for English might have 150,000 words which would give one access to reading literature and even many obsolete words used in older religious works. After that we can consider encyclopedias full of technical information. Wikipedia has over 6,000,000 articles covering many technical and non-technical areas. News and Web sized corpus are even larger.</p>
+<p>When we are training a language model it would acquire the most common grammatical words and their grammar. It will, with enough data proceed to learn to acquire the semantics of core concepts in the language even with a limited corpus. At any corpus suited to a given level of words in our onion there will be some words from the next which appear too rarely to fully master. But by the time the model has a distributed representation of say 2000-8000 words and perhaps much sooner the model should be able to comprehend unknown words based on its context and other words most familiar for that context. Models like BERT are trained specifically to predict missing words from sentences.</p>
+<p>This follows from the law of large numbers arises from a random walk. We know that real signals like features tend to aggregate over time while spurious signals tend to cancel out. The challenge is that each time we double our data we will add new features in the form of rare words phrases entities and even senses for words that have not been seen before. At the same time evidence will build up due to chance for phrases or grammatical structures. The net will try to learn all of these.</p>
+<p>Like technical term in a news corpus may we will make sense because the net is trained to penalize bad input and as more evidence is presented it will learn to tell apart spurious data patterns that arise due to chance from real patterns. The law of large numbers means that distributions tend - but it needs to see the real ones patterns in such quantity that their signals overpowers noise. (Adding more data also adds more chance that some spurious patterns will appear frequently)much more frequently.</p>
+<p>The unreasonable effectiveness of transformers soon lead us to see that test used in evaluating the language skill, comprehension ability of these models are easily beaten by ML. We are not easily able to make tests that are easy for humans and almost impossible for models. Also, it can be challenging to tell text generated by these models (and cherry-picked by the developers) from text written by human writers. This has led many people to think that these models have become truly intelligent in the sense that they comprehend texts about the real world.</p>
+<p>Deeper scrutiny shows that neural language models are incapable of doing basic arithmetic which is not a language skill. They are also seemed to recall and recreate approximation of text that they have seen - much like 4-GRAM models trained on the works of Shakespeare - they will spew long sequences they remember. It is not impossible to make very smart models, but it is much easier to make a model that seems smarter than it is.</p>
+<p>An early result in image processing comes to mind - a model that was able to tell apart tanks from trucks was able to do this by summing all the pixels because one group was taken on a sunny day and the other an overcast day. Image classifiers will learn to focus on a single pixel per class if such pixels are unique to each class. It becomes increasingly challenging as the data grows to ensure what is going on within the model.</p>
+<p>Models like GPT3 used massive compute and lots of data but were developed using poor methodology, so that success on downstream tasks could not be credited to anything other than having seen similar data. This leads more NLP practitioners to consider that the larger model sizes is not necessarily a better model in the sense that a smarter/more efficient representation should be able to provide better results. While there are general research groups like Open AI who build bigger model like GPT2 and GPT3 there are other researchers who work on</p>
+<p>Some known issues with neural networks are that they tend to overfit the data which means that every larger datasets are required to regularize this. Recent language models like GPT2, GP3 etc. use a very large number of parameters. Scrutiny of their output leads to output that appears to be written by humans. However, this is familiar issue from 4-grams or 5-grams N-grams models where sparsity of data (say the complete works of Shakespeare) leads to more and longer sequences being memorized by the (Markov chain model) and the output being a somewhat lossy compression of the corpus. As DNN will prefer to memorize and then retrieve the data rather than to model and infer. In the case of DNN with internet sized corpuses the researchers can easily fool themselves that the model is not stitching up its output from more examples rather than learning to model what is needed to represent the language. (Note Wikipedians also frequently stitch up articles on subject they are not very knowledgeable about and only domain experts can readily find the glaring errors that betray the ineptitude.)</p>
+<p>Specifically we are now seeing and therefore expecting deep language models to learn the grammar, the lexicon, semantics, pragmatic commonsense knowledge of the world, and a rudimentary logical reasoning ability.</p>
+<p>Classic Linguistic theory postulates that an efficient representation of language should consist of a grammar and a lexicon. This approach was shown to make sense in computational area of morphology where finite state morphologies were most efficiently represented by specified and combining a grammar with a lexicon.</p>
+</section>
+</section>
+<section id="making-models-less-opaque" class="level1">
+<h1>Making models less opaque?</h1>
+<p>If we think about language model arising from something like an HMM using Vitrebi with two components - one that generates the evolution of the hidden state and the second an emission matrix that generates a lexeme for each state. We might even oversimplify and imagine the first is a morphosyntactic state and the second a semantic probabilistic lexicon. The second part seems to be fairly simple - just a big lookup table. While the first part is a model for the grammar and morphology. But if we have a good representation we might actually be able to learn the first part faster than the second.</p>
+<p>How come - the lexicon is finite, but the grammar can generate infinite number of sentences. But the grammar is represented using a small set of rules with just a few symbols per rules say 4 on average. And the cardinality of the symbols in that component is perhaps many orders of magnitude smaller than the full lexicon.</p>
+<p>So while we will always have just an approximation of each component we should expect to see each rules of length 3 many times before we see all our trigrams. The challenge is for the model to capture the reality that we have the same syntax for such varied semantics.</p>
+<p>So how can we make the model less opaque?</p>
+<p>Let’s imagine that the model really learns all this stuff - it has captured a much deeper grammar for language than we have ever envisioned. Let’s also imagine we have a regularization process to distill this knowledge and discard the noise learned along with the signal. The problem is that we want to extract this representation, but the state is very complicated it has stuff from most linguistic theories as well as some constructs we never even came up with (like Alpha Go’s strategies.) And all the ‘stuff’ is jumbled up into matrix which represents all these jointly using inscrutable embeddings.</p>
+<p>What we want is to unscramble the state matrix into one populated with symbols for the constructs we already know about and perhaps a few extra god-symbols that perhaps we don’t know about.</p>
+<p>A second paradigm is that we might not be able to unscramble this but, we might be able to query it and extract all the constructs up to a certain level.</p>
+<p>Again it may well be the case that we will discover that the model under constraints of regularization will pick a rather small dimension of symbols for its semantic atoms and for its grammar and not require a massive grammar. I.e. we might end up with a rather smaller model then most we have been training. Where 99% of the data is the lexicon, but the lexicon might have a number of arbitrary looking genders which organize features from different levels.</p>
+<p>We could try a number of approaches, one is to include in out model higher level nodes in out parse tree as nodes which we can recognize (NP for noun phrase) and we might have some more other constructs like frames for verbs and scripts for complex actions</p>
+<section id="a-fearful-symmetry" class="level2">
+<h2 class="anchored" data-anchor-id="a-fearful-symmetry">A fearful symmetry</h2>
+<p>We may even imagine a situation where we have separated the language into a number of constructs each with its hidden states and an emission matrix which converts the signal at the interface. Most signals get processed layer by layer but on occasion they might skip or cross.</p>
+</section>
+<section id="how-can-we-explicitly-process-higher-level-construct" class="level2">
+<h2 class="anchored" data-anchor-id="how-can-we-explicitly-process-higher-level-construct">How Can we explicitly process higher level construct</h2>
+<p>As pointed earlier models that model sequences using a probabilistic grammar rather than looking just at sequences is going to capture a much richer view of language.</p>
+<p>There are a couple of reasons for this. Perhaps the more significant factor is the ability to capture much longer sequences which will expose the model to much richer wealth of signals. Grammar is typically represented using production rules which typically replace a symbol with two or more new symbols. These require moderately shorter sequences, and they also have a much lower cardinality for the symbols needed to represent the grammatical entities, at least when compared to the cardinality of the words in a language or its leading categories. For rich morphologies even more significantly. Which means that grammar should be learned much faster than a detailed lexicon. Since rules are so much shorter than sentences the grammar should be learned with significantly higher confidence at any given point.</p>
+
+
+<div class="hidden" aria-hidden="true">
+<span class="glightbox-desc lightbox-desc-1">word cloud</span>
+</div>
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2021,
+  author = {Bochman, Oren},
+  title = {Language Models and Explainability},
+  date = {2021-09-24},
+  url = {https://orenbochman.github.io/blog//posts/2021/2021-11-12-language-models-and-explainability/2021-11-12-language-models-and-explainability.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2021" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2021. <span>“Language Models and Explainability.”</span>
+September 24, 2021. <a href="https://orenbochman.github.io/blog//posts/2021/2021-11-12-language-models-and-explainability/2021-11-12-language-models-and-explainability.html">https://orenbochman.github.io/blog//posts/2021/2021-11-12-language-models-and-explainability/2021-11-12-language-models-and-explainability.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","openEffect":"zoom","loop":false,"selector":".lightbox"});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

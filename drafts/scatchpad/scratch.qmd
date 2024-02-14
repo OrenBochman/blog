@@ -1,0 +1,419 @@
+---
+title: scratch pad
+draft: true
+---
+
+# new tools
+1. 
+
+### kkk
+
+```{{python pr_pr_to_s3}}
+
+# This is an example file for extracting some data from s3.
+
+# you should :
+​
+
+# s3cmd put to_s3_csv.py s3://quicklizard/spark/python/ai_team.py
+​
+
+# connect to vpn 
+​
+
+# open 
+
+# http://delivery-scheduler.production.usea.quicklizard.service/resque/schedule
+​
+
+# and press the Queue now button for ai_team_job ( should be second row )
+​
+import os
+from io import BytesIO, StringIO
+​
+#Spark imports
+from pyspark import SparkContext, SparkConf
+from pyspark.sql import SQLContext
+import pyspark.sql.functions as sql
+from pyspark.sql.functions import lit, when, udf
+from pyspark.sql.types import FloatType, MapType, StringType, StructField, StructType
+​
+#import libraries
+import pandas as pd
+import numpy as np
+import gc
+from datetime import datetime, timedelta
+import argparse
+​
+
+# S3 imports
+import boto3
+​
+##### ****** ##### ****** ##### ****** ##### ******
+#### VERIFY THE RUN TYPE ##########################
+is_local = True
+is_debug_mode = True
+is_generate_uid_label_df = True
+if is_local:
+    s3_overlay = "s3a"
+else:
+    s3_overlay = "s3"
+​
+
+# "csv", "parquet" or "dfw", where dfw uses pyspark.sql.DataFrameWriter.parquet
+
+# The result in the "dfw" case is a folder called target_name, holding a single parquet file
+output_type = "dfw"
+​
+default_num_days_to_learn = 3
+default_client_key = 'brackch'
+#### VERIFY THE RUN TYPE ##########################
+##### ****** ##### ****** ##### ****** ##### ******
+​
+if default_client_key == "bikestercom":
+    default_attributes_pr = "brand,celling_price,floor_price,high_runner,leader,top_level_category,mid_level_category,low_level_category,product_model_year,product_classification,market_position,marketing_cost,season_code,seasonal,shipping_costs,sku"
+    # default_attributes_pe = None
+    # comps = "digitec"
+elif default_client_key == "healthandlifechgoogle":
+    default_attributes_pr = "brand,category,category_world,market_position,product_id,sku"
+    # default_attributes_pe = None
+    # comps = ""
+elif default_client_key == "luckyvitamincom":
+    default_attributes_pr = "brand_name,category,category_group,department,financial_dept,dropship,exstocked,market_position,min_price,price_profile,product_sku,msrp"
+    # default_attributes_pe = None
+    # comps = ""
+elif default_client_key == "brackch":
+    default_attributes_pr = 'market_position,bereich,pim_strktur_1,pim_strktur_2,pim_strktur_3,pim_strktur_4'
+    default_attributes_pe = None
+    comps = ""
+​
+defaultPrefix = 'idan/s3_data'
+​
+
+# command line support & parsing using default values
+#################################
+parser = argparse.ArgumentParser()
+parser.add_argument('--awsKey', action='store', required=True)
+parser.add_argument('--awsSecret', action='store', required=True) 
+parser.add_argument('--clientKey', action='store',
+                    required=False, default=default_client_key)
+parser.add_argument('--dayToLearn', action='store',
+                    required=False, default=default_num_days_to_learn)
+parser.add_argument('--attributes', action='store',
+                    required=False, default=default_attributes_pr)
+parser.add_argument('--comps', action='store',
+                    required=False, default=comps)
+parser.add_argument('--prefix', action='store',
+                    required=False, default=defaultPrefix)
+​
+namespace = parser.parse_args()
+​
+
+# Extract parameters from argparse
+#############################
+client_key = namespace.clientKey
+accesskey = namespace.awsKey
+secretkey = namespace.awsSecret
+num_days_to_learn = int(namespace.dayToLearn)
+grouping_attributes = namespace.attributes.split(',')
+comp_names = namespace.comps.split(",")
+prefix = namespace.prefix
+​
+​
+
+# list available csv
+#########################
+def s3_ls(bucket_name, prefix, s3_client):
+    ret = []
+    cont = s3_client.list_objects(Bucket=bucket_name, Prefix=prefix)
+    if 'Contents' in cont:
+        ret = [c['Key'].split(output_type)[0] + output_type for c in cont['Contents'] if output_type in c["Key"]]
+    return set(ret)
+​
+​
+
+# s3 upload using boto3
+########################################
+def dataframe_to_s3(s3_client, input_df, bucket_name, file_path, format="parquet"):
+    if format == 'parquet':
+        out_buffer = BytesIO()
+        input_df.to_parquet(out_buffer, index=False)
+    elif format == 'csv':
+        out_buffer = StringIO()
+        input_df.csv(out_buffer, index=False)
+​
+    s3_client.put_object(Bucket=bucket_name, Key=file_path, Body=out_buffer.getvalue())
+​
+​
+def save_df_to_disk(output_type, target_name, df, s3_client=None):
+    if is_debug_mode:
+        print(f"Saving to: {s3_overlay}://quicklizard/{prefix}/{target_name}")
+    if output_type == "dfw":
+        # https://stackoverflow.com/questions/51628958/spark-savewrite-parquet-only-one-file
+        df.repartition(1).write.format("parquet").mode("append").save(f"{s3_overlay}://quicklizard/{prefix}/{target_name}")
+    else:
+        dataframe_to_s3(s3_client, df, 'quicklizard', f"{prefix}/{target_name}", format=output_type)
+​
+​
+
+# User Defined Functions for unpacking aggregate fields like attr and prices
+##########################################
+def get_attributes(attrs_list):
+    '''extract attributes from the attrs column and return their value as a dictionary'''
+    attributes = {}
+    attributes.update({str(attr_dict['name']): str(attr_dict['value']) for attr_dict in attrs_list if attr_dict['name'] in grouping_attributes})
+    return attributes
+​
+​
+get_attributes_udf = udf(lambda attrs: get_attributes(attrs), MapType(StringType(), StringType()))
+​
+​
+def get_shelf_price(prices_list):
+    price = 0.0
+    price = round(float(prices_list[-1]["shelf_price"]), 2)
+    return float(price)
+​
+​
+get_shelf_price_udf = udf(lambda x: get_shelf_price(x), FloatType())
+​
+​
+def get_competitor_prices(prices_list):
+    d = {}
+    d.update({str(x["identifier"][len(client_key):]): round(float(x['shelf_price']), 2) for x in prices_list if x['identifier'] != client_key})
+    return d
+​
+​
+get_competitor_prices_udf = udf(lambda x: get_competitor_prices(x), MapType(StringType(), FloatType()))
+​
+​
+def get_datetime(timestamp):
+    return datetime.utcfromtimestamp(timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')
+​
+​
+get_datetime_udf = udf(lambda x: get_datetime(x), StringType())
+​
+​
+
+# dates lists generation
+################################
+def date_gen(num_days_to_learn):
+    """Generates date as dictionary for flexible use """
+    datetime_end_time = datetime.now() - timedelta(1)
+​
+    for i in range(num_days_to_learn):
+        date = (datetime_end_time - timedelta(i)).strftime('%Y-%m-%d')
+        # convert the date to a dictionary
+        yield dict(zip(['year', 'month', 'day'], date.split('-')))
+​
+​
+def update_uid_label_df(uid_label_df, tmp_df):
+    """Save a dataframe with a mapping between a product's uid and label (i.e. the product description).
+    This function generates a single file for the entire run. Therefore, it MAY BE MISTAKINGLY OVERWRITTEN!
+    df1 = df1.append(df2[~df2["x"].isin(df1["x"])], ignore_index=True)
+    
+    Args:
+        client_key (_type_): _description_
+        y (_type_): _description_
+        m (_type_): _description_
+        d (_type_): _description_
+        s3_files_list (_type_): _description_
+        sqlContext (_type_): _description_
+        prefix (_type_): _description_
+        s3_client (_type_): _description_
+    """
+    if is_debug_mode:
+        print("Updating uid_label_df")
+    uid_label_df = uid_label_df.union(tmp_df)
+    uid_label_df.drop_duplicates(["uid"])
+​
+    del(tmp_df)
+    gc.collect()
+    if is_debug_mode:
+        print('generate_uid_label_file success')
+    return uid_label_df
+​
+​
+def generate_price_recommendation_file(client_key, y, m, d, s3_files_set, sql_context, s3_client, ul_df):
+    pd_df = None
+    target_name = f'{client_key}/price_recommendation_{y}-{m}-{d}.{output_type}'
+    if is_debug_mode:
+        print(f'Now at {prefix}/{target_name}')
+    if f'{prefix}/{target_name}' in s3_files_set:
+        print(f'{target_name} found in s3... skipping day')
+    else:
+        if is_debug_mode:
+            print('file not available - generating')
+        try:
+            df = sql_context.read.parquet(
+                f'{s3_overlay}://quicklizard/parquet/tables/price_recommendations/date={y}{m}{d}/client_key={client_key}/*.snappy.parquet')
+        except Exception as err:
+            print(err)
+            return ul_df
+​
+        if is_debug_mode:
+            print(f"Processing {target_name}")
+        
+        df = df.withColumn('attributes', get_attributes_udf(df['attrs']))
+        for col in grouping_attributes:
+            df = df.withColumn(col, sql.col("attributes").getItem(col))
+        df = df.withColumn('shelf_price', get_shelf_price_udf(df['prices']))
+        df = df.withColumn('comp_prices', get_competitor_prices_udf(df['prices']))
+        df = df.withColumn('datetime', get_datetime_udf(df['timestamp']))
+        if is_generate_uid_label_df:
+            ul_df = update_uid_label_df(uid_label_df=ul_df, tmp_df=df.select(["uid", "label"]))
+​
+        df = df.select([
+            'uid', 
+            "datetime", 
+            "rule", 
+            "group", 
+            'channel', 
+            'shelf_price', 
+            "cost", 
+            "comp_prices", 
+            'inventory', 
+            "recommendedPrice"] + [col for col in grouping_attributes])
+        df.drop_duplicates(["uid"])
+        
+        # Add a column for each competitor
+        from pyspark.sql.functions import explode,map_keys,col
+        keysDF = df.select(explode(map_keys(df["comp_prices"]))).distinct()
+        keysList = keysDF.rdd.map(lambda x:x[0]).collect()
+        keyCols = list(map(lambda x: col("comp_prices").getItem(x).alias(str(x)), keysList))
+        comp_df = df.select("uid", *keyCols)
+        df = df.drop("comp_prices")
+        df = df.join(comp_df, on=["uid"])
+​
+        # pd_df = df.toPandas()
+        # # For each uid, keep the row that appears for the most number of hours in the current day
+        # # Needs to be converted to spark execution, rather than pandas
+        # pd_df["datetime"] = pd.to_datetime(pd_df["datetime"])
+        # pd_df["end_date"] = pd_df.groupby("uid")["datetime"].shift(-1)
+        # pd_df["end_date"].fillna(pd.to_datetime(f"{y}-{m}-{d} 23:59:59"), inplace=True)
+        # pd_df["timedelta"] = pd_df["end_date"] - pd_df["datetime"]
+        # pd_df = pd_df.loc[pd_df.groupby("uid")["timedelta"].idxmax()].drop(columns=["end_date", "timedelta"])
+        # pd_df["datetime"] = pd_df["datetime"].dt.date
+        # df = sqlContext.createDataFrame(pd_df)
+​
+        save_df_to_disk(output_type, target_name, df, s3_client)
+​
+        del(df)
+        del(comp_df)
+        if pd_df:
+            del(pd_df)
+        gc.collect()
+        if is_debug_mode:
+            print('generate_price_recommendation_file done')
+        return ul_df
+​
+​
+def generate_product_events_file(client_key, y, m, d, s3_files_list, sqlContext, s3_client):
+    pd_df = None
+    # this is the file name for the target parquet
+    target_name = f'{client_key}/product_events_{y}-{m}-{d}.{output_type}'
+    if is_debug_mode:
+        print(f'Now at {prefix}/{target_name}')
+    if f'{prefix}/{target_name}' in s3_files_list:
+        print(f'{target_name} found in s3... skipping day')
+    else:
+        if is_debug_mode:
+            print('file not available - generating')
+        try:
+            df = sqlContext.read.parquet(
+                f'{s3_overlay}://quicklizard/parquet/tables/product_events/date={y}-{m}-{d}/client_key={client_key}/*.snappy.parquet')
+        except Exception as err:
+            print(err)
+            return
+​
+        if is_debug_mode:
+            print(f"Processing {target_name}")
+        
+        # df = df.filter(df['counter'] == 'conversions')
+        
+        df = df.withColumn('views', lit(when(df['counter'] == "views", 1).otherwise(0)))
+        df = df.withColumn('conversions', lit(when(df['counter'] == "conversions", 1).otherwise(0)))
+        df = df.select("uid", "views", "conversions", "units").groupby("uid").sum()
+        df = df.withColumnRenamed("sum(views)", "views").withColumnRenamed("sum(conversions)", "conversions").withColumnRenamed("sum(units)", "units_sold")
+        
+        # pd_df = df.toPandas()
+        # pd_df.loc[pd_df.counter == "conversions", "conversions"] = 1
+        # pd_df["conversions"].fillna(0, inplace=True)
+        # pd_df = pd_df.groupby("uid")[["value", "units", "conversions"]].sum().astype("int").reset_index()
+        # pd_df.rename(columns={"value": "views"}, inplace=True)
+​
+        save_df_to_disk(output_type, target_name, df, s3_client)
+​
+        del(df)
+        if pd_df:
+            del(pd_df)
+        gc.collect()
+        if is_debug_mode:
+            print('generate_product_events_file done')
+​
+​
+def run():
+    print('running application')
+    
+    conf = SparkConf()
+    sc = SparkContext(conf=conf)
+    sqlContext = SQLContext(sc)
+​
+    #S3 configuration
+    hadoopConf=sc._jsc.hadoopConfiguration()
+    hadoopConf.set("fs.s3n.awsAccessKeyId", accesskey)
+    hadoopConf.set("fs.s3n.awsSecretAccessKey", secretkey)
+​
+    s3_client = boto3.client('s3', aws_access_key_id=accesskey, aws_secret_access_key=secretkey)
+    s3_files_set = s3_ls('quicklizard', prefix, s3_client)
+​
+    uid_label_df = None
+    if is_generate_uid_label_df:
+        from pyspark.sql import SparkSession
+        spark = SparkSession.builder.getOrCreate()
+        empty_RDD = spark.sparkContext.emptyRDD()
+        schema = StructType([
+            StructField("uid", StringType(), True),
+            StructField("label", StringType(), True)
+            ])
+        uid_label_df = sqlContext.createDataFrame(empty_RDD, schema)
+​
+    dates = date_gen(num_days_to_learn=num_days_to_learn)
+    for idx, date in enumerate(dates):
+        _year, _month, _day = date['year'], date['month'], date['day']
+        uid_label_df = generate_price_recommendation_file(
+            client_key=client_key, 
+            y=_year, m=_month, d=_day, 
+            s3_files_set=s3_files_set, 
+            sql_context=sqlContext, 
+            s3_client=s3_client, 
+            ul_df=uid_label_df)
+        generate_product_events_file(client_key, _year, _month, _day, s3_files_set, sqlContext, s3_client)
+​
+        if is_debug_mode:
+            print(f'day {idx + 1} done')
+​
+    save_df_to_disk(output_type, f"{client_key}/uid_label.{output_type}", uid_label_df, s3_client)
+​
+    
+​
+​
+if __name__ == '__main__':
+    run()
+    # persist_actions()
+    exit(0)
+```
+![suffling spark ]( https://www.youtube.com/watch?v=KQ6zr6kCPj8)
+Spark RDD triggers shuffle for several operations like repartition(),  groupByKey(),  reduceByKey(), cogroup() and join() but not countByKey() .
+spark.conf.set("spark.sql.shuffle.partitions",100)
+println(df.groupBy("_c0").count().rdd.partitions.length)
+```
+![the nicholas cage matrix](https://www.theshiznit.co.uk/media/NewsJan2011/cage-matrix-final-5.jpg)
+```{{python}}
+conf = SparkConf()
+sc = SparkContext(conf=conf)
+if is_local:
+    sc.setSystemProperty('spark.executor.memory', '4g')
+    sc.setSystemProperty('spark.driver.memory', '4g')
+sqlContext = SQLContext(sc) 
+```
+http://pyro.ai/examples/svi_part_ii.html

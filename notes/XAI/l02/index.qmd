@@ -1,0 +1,601 @@
+---
+date: 2023-03-13
+title:  2 Local Explanations - Concept and Methods
+subtitle: XAI Course Notes
+description: |
+   Machine learning models can be analyzed at a high level using global explanations, such as linear model coefficients. 
+   However, there are several limitations to these global explanations.
+   In this talk, I will review the use cases where local explanations are needed and introduce two popular methods for generating local explanations
+   LIME and SHAP. Our learning will be focused on SHAP, its theory, model-agnostic and model-specific versions, and how to use and read SHAP visualizations.
+categories:
+    - explainable AI
+    - XAI
+    - machine learning
+    - ML
+    - data science
+    - contrafactuals
+    - global explantions
+    - local explantions
+    - LIME
+    - SHAP
+    - CI
+image: XAI_Poster.jpg
+nocite: | 
+  @molnar2022
+---
+
+
+
+XAI is all about illuminating the opaque inner working of black box model. 
+These are the type of models data scientist prefer to deploy to production as they tend to give better results. 
+The rub is that many end users and other stakeholders like executives may not trust the predictions made by such models.
+After all we all learned that:
+
+> all model are wrong but some are useful.
+
+XAI empowers the data scientist with **post hoc methods** that manipulate the black box model and make the outcomes more aproachable to users. 
+
+There are added benefits - when we use **local explanations** to understand why the model is giving bad predictions for specific entries. This understanding is the best way to move forward and improve the model. We can also use these to understand the biases that tend to creep into our model so we can take steps to mitigate it.
+
+This is a fascinating session on XAI, building on the previous session. I've embedded the video below.
+
+The speakers did not provide code samples. I have tried to add some code samples but any shortcoming are mine.
+
+
+
+## Series Poster
+
+![series poster](XAI_Poster.jpg){}
+
+## Session Video
+
+This is the video for this session: 
+
+{{< video https://youtu.be/1Qswc9eNj9g >}}
+
+## Instructor Biographies
+
+- Bitya Neuhof
+  - Ph.D student, Statistics & Data Science
+  - HUJI
+  - Bitya is a Ph.D. student in Statistics and Data Science at the Hebrew University, exploring and developing explainable AI methods. 
+    Before her PhD she worked as a Data Scientist specializing in analyzing high-dimensional tabular data.
+    Bitya is also a Core-Team member at Baot, the largest Israeli community of experienced women in R&D.
+  - [linkedin profile](https://www.linkedin.com/in/bitya-neuhof/)
+- Yasmin Bokobza
+  - ML Scientist Leader
+  - Microsoft
+  - Yasmin is a ML Scientist Leader and Mentor in the Startups Accelerator program at Microsoft. 
+    Her work focuses on developing  (ML) models for Microsoft Cloud Computing Platforms and Services. 
+    Part of her work has been filed as patents, published in Microsoft Journal of Applied Research (MSJAR), and presented at various conferences, meetups and webinars. 
+    Previously her work focused on the security field developing ML models to detect cyber-attacks and methods to harvest leaked information in social networks using socialbots and crawler and detecting the source of the leak. 
+    She is listed as a cyber threat detection method patent author and part of her research was published at the IEEE/ACM International Conference on Advances in Social Networks Analysis and Mining.
+    Yasmin graduated fast track for an MSc degree, that focused on ML & Security, in the department of Information Systems Engineering at Ben-Gurion University in Israel.
+  - [linkedin profile](https://www.linkedin.com/in/yasmin-bokobza-a5b1206a/)
+
+## Agenda
+
+- Approaches:
+  - Post-hoc - create a new model to explain the main model.
+  - Transparent/Intrinsic models - e.g. a probabilistic model 
+- Local v.s. Global
+- Post-hoc Explainability
+  - Technique Categorization
+  - Lime 
+  - SHAP
+- Conclusions
+
+## Explainability approaches
+
+![Explainability approaches](sl_002.png){.column-margin group="my-gallery"}
+
+- Post hoc techniques - make use an *explainer model* to provide explanations.
+- Transparent models - can be queried directly to provide explanations
+  - probabilistic models
+  - decision trees
+  - regression models
+
+
+# Local V.S. Global Explanations 
+
+Next we look at the difference between Global and local explanations.
+
+## Global Explanations 
+
+
+
+- [Global explanations describe the **average behavior** of a ML model]{.mark}.
+  - What for?
+    - Provide insights into the overall behavior of ML model
+    - Can help identify patterns and relations in the data learned by the model
+  - Techniques:
+    - Decision Tree
+  - Why?
+    - Analyze the general behavior of the model
+    - Identify important features for the model's predictions
+    - Feature selection
+    - Model optimization
+  - Why Not?
+      - What is a sensible way to aggregate a model ?
+      - May **Oversimplify** a complex model.
+      - Which leads to **inaccurate interpretations**.
+
+---
+
+## Local Explanations 
+
+- [Local explanations are  interpretation of the ML prediction for **individual instances**]{.mark}. ^[i.e. for a breakdown for the given prediction]
+  - What for?
+    - Provide a detailed understanding of how a model arrived at its prediction for a specific input.
+    - Can help [identify and correct model errors]{.mark}
+    - Foster trust in stakeholders whom are skeptical of black box models.
+  - Techniques:
+    - [LIME] (Local Interpretable Model Agnostic Explanations), introduced in [@Ribeiro2016Why]
+    - [SHAP]() (Shapely Additive Explanations), introduced in [@lundberg2017unified]
+  - Why?
+    - Provides insights into predictions for specific rows.
+    - A complex model can be simple locally. ^[think anomalies and sub-populations]
+    - Can explain changes of prediction for rows without changes in the model.
+  - Why Not?
+      - Limited in scope.
+      - Does not provide a holistic understanding of the model.
+      - Constitutionally expensive for large datasets
+
+---
+
+![Local & Global method Comparison](sl_008.png){#tbl-global-local-comparison}
+
+---
+
+# Post-hoc Explainability
+
+![Techniques Categorization Table](sl_009.png){#tbl-techniques-categorization}
+---
+
+![Post-hoc Explainability Table](sl_011.png){#tbl-techniques-categorization}
+
+- Model agnostic methods:
+  - ICE (Individual Conditional Expectation) introduced in [@Goldstein2013PeekingIT]
+  - LIME (Local Interperetable Model Agnostic Explanations) introduced in [@Ribeiro2016Why]
+  - SHAP (Shapely Additive Explanations) introduced in [@lundberg2017unified]
+  - FACE (Feasible & Actionable Contractual Explanation) introduced in  [@Poyiadzi2019Feasible]
+- Model specific methods:
+  - Grad-CAM (Gradient-weighted Class Activation Mapping) introduced in  [@Selvaraju2016GradCam]
+  - DeepRED, (Deep Randomized Excitation and De-Excitation) introduced in [@Zilke2016DeepREDR]
+  - MIE (Mean Increase Error) introduced in [@breiman1984classification]
+
+---
+
+# LIME 
+
+![LIME Post-hoc](sl_019.png){.column-margin group="my-gallery"}
+
+- the advantages is we can perturb by adding some noise the input.
+  - this can be done in human understandable ways 
+  - we get contrafactuals about which we may should have good intuition.
+- [the intuitions is it can be much easier to understand a complex model using a local linear model]{.mark}.
+
+---
+
+# Code Examples
+
+let's use the [salary prediction dataset](https://www.kaggle.com/datasets/rkiattisak/salaly-prediction-for-beginer) from Kaggle to try XAI methods:
+
+![salary prediction dataset overview](sl_013.png){.column-margin group="my-gallery"}
+
+### Load the dataset
+
+![Salary Prediction DS](sl_014.png){.column-margin group="my-gallery"}
+
+
+```{python}
+#| label: tbl-salery-df-raw
+#| fig-cap: "raw Salary DataSet"
+#| warning: false
+import numpy as np                                          # <1>
+import pandas as pd                                         # <1>
+from itables import show
+import matplotlib.pyplot as plt                             # <1>
+import seaborn as sns                                       # <1>
+from sklearn.model_selection import train_test_split        # <1>
+import xgboost as xgb                                       # <1>
+
+df = pd.read_csv('./data/Salary Data.csv')                  # <2>
+show(df)                                                    # <3>
+
+```
+1. import the usual suspects
+2. load the salary dataset
+3. peek at the data
+
+---
+
+### Cleanup the dataset
+
+![Preprocessing](sl_015.png){.column-margin group="my-gallery"}
+
+- we can see that there are lots of categorical features
+- also there are missing values
+- we should encode gender as numeric or boolean
+- we should encode education level using dummy variables
+
+```{python}
+#| label: tbl-salery-df-wrangling
+#| fig-cap: "cleaned Salary data set "
+from sklearn.preprocessing import LabelEncoder,  OneHotEncoder # <1>
+
+df = (  df.dropna()                   # <2>
+          .drop_duplicates()          # <3>
+          .assign(is_male=lambda x: x['Gender'].apply(lambda y: 1 if y == 'Male' else 0),               # <4>
+                  is_PhD=lambda x: x['Education Level'].apply(lambda y: 1 if y == 'PhD' else 0),        # <5>
+                  is_BA=lambda x: x['Education Level'].apply(lambda y: 1 if y == 'Bachelor\'s' else 0), # <5>
+                  is_MA=lambda x: x['Education Level'].apply(lambda y: 1 if y == 'Master\'s' else 0),   # <5>
+                 
+          )
+          .rename(columns={'Years of Experience':'xp'}) #<6>
+          .drop(['Gender','Education Level','Job Title'],axis=1) #<7>
+
+    )
+
+#df['Education Level'] = edu_label_encoder.fit_transform(df['Education Level'])
+#job_title_encoder = LabelEncoder()
+#df['Job Title']=job_title_encoder.fit_transform(df['Job Title'])
+show(df)                                                    # <8>
+```
+
+1. import the usual suspects
+2. remove rows with missing values
+3. remove duplicate entries
+4. reencode gender to is_male
+5. reencode categorical education level to dummies
+6. rename columns
+7. drop columns
+8. peek at the data
+
+---
+
+```{python}
+#| echo: false
+df.info()
+```
+
+### Fit a Descion Tree
+
+```{python}
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor       # <1>
+from sklearn.model_selection import train_test_split  # <1>
+from sklearn import metrics      # <1>
+
+y = df['Salary']                 # <2>
+X = df.drop(['Salary'], axis=1)  # <3>
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=123) # <4>
+```
+1. import the usual suspects
+2. target variable
+3. features
+4. perform a test/train split
+
+```{python}
+dt_clf_model = DecisionTreeRegressor(
+  max_depth=3, 
+  random_state=123)
+dt_clf_model.fit(X_train, y_train)
+#Predict the response for test dataset
+y_pred = dt_clf_model.predict(X_test)
+
+# Model Accuracy, how often is the classifier correct?
+#print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+```
+
+```{python}
+#| include: false
+#| label: fig-decision-tree-plot_tree
+#| fig-cap: "A simple decision tree for the Salary DataSet"
+from sklearn import tree # <1>
+
+plot=tree.plot_tree(dt_clf_model,filled=True,
+                    #fontsize=4,proportion=True,
+                    feature_names=X_train.columns,rounded=True) 
+#plt.show()
+```
+
+```{python}
+#| label: fig-decision-tree-graphviz
+#| fig-cap: "A simple decision tree for the Salary DataSet"
+#| lightbox:
+#|   group: "my-gallery"
+#|   description: A depth 3 refression descision tree for the Salary DataSet
+import graphviz # <1>
+
+dot_data = tree.export_graphviz(dt_clf_model, out_file=None, 
+                              feature_names=X_train.columns,  
+                              class_names=y,  
+                              filled=True, rounded=True,  
+                              special_characters=True)
+
+graph = graphviz.Source(dot_data) 
+graph
+plt.show()
+```
+---
+
+## LIME for Tabular Data
+
+![LIME for Tabular](sl_017.png){.column-margin group="my-gallery"}
+
+
+```{python}
+#| label: lime-explainer
+#| fig-cap: "text output for a lime explainer"
+#| lightbox:
+#|   group: "my-gallery"
+#|   description: A LIME explaination for an entry in the Salary DataSet 
+from  lime import lime_tabular
+
+y_pred = dt_clf_model.predict(X_test)
+
+feature_names=X_train.columns
+lime_explainer = lime_tabular.LimeTabularExplainer(
+      training_data=X_train.to_numpy(),
+      feature_names=feature_names,
+      class_names=['Salary'],
+      categorical_features=['is_male','is_BA','is_MA','is_PhD'],
+      verbose=True,
+      mode='regression')
+
+i = np.random.randint(0, X_test.shape[0])
+
+exp = lime_explainer.explain_instance(X_test.values[i,:], 
+                                      dt_clf_model.predict, 
+                                      num_features=5,
+                                      num_samples=100)
+exp.as_list()
+```
+
+![LIME for Tabular Viz](sl_018.png){.column-margin group="my-gallery"}
+
+
+```{python}
+#| label: tbl-lime-viz
+#| fig-cap: A graphical LIME explaination for an entry in the *Salary DataSet*"
+#| lightbox:
+#|   group: "my-gallery"
+#|   description: A lime explanation with table
+exp.show_in_notebook(show_table=True)
+```
+
+```{python}
+import shap
+explainer = shap.TreeExplainer(dt_clf_model,X_test)
+shap_values = explainer.shap_values(X)
+shap_values[i]
+```
+
+---
+
+## LIME an intuitive explantion
+
+![LIME Post-hoc](sl_019.png){group="my-gallery"}
+1. Our data is a complex manifold with non-convex boundry pink region
+2. repeat:
+  1. We pick a single row $r_i$ in the data set which we call an instance.
+  2. We then perturb it by modifying the instance randomly $p_i=x_i + \delta$
+  3. We generate a prediction for the perturbation using our black box model $\hat y_{p_i}$
+  4. We reweigh each perturbation using the relative distance of the prediction: $w \propto | \hat{y} - \hat y_{p_i} |$
+  
+More precisely, the explanation for a data point $x$ is the model $g$ that minimizes the locality-aware loss $L(f,g,Π_x)$ measuring how unfaithful $g$ approximates the model to be explained $f$ in its vicinity $Π_x$ while keeping the model complexity denoted low.
+
+$$
+\arg\min _g L(f,g,\pi_x)+\Omega(g)
+$$
+
+Therefore, LIME experiences a trade off between model fidelity and complexity
+
+for more information on lime consult [@molnar2022] [section on Lime](https://christophm.github.io/interpretable-ml-book/lime.html) . 
+
+---
+
+## LIME for Images
+
+![LIME for Images](sl_020.png){.column-margin group="my-gallery"}
+---
+
+![LIME for Images](sl_023.png){.column-margin group="my-gallery"}
+
+---
+
+## LIME pros & Cons
+
+![LIME Pros & Cons](sl_024.png){.column-margin group="my-gallery"}
+
+---
+
+## SHAP
+
+![SHAP](sl_025.png){.column-margin group="my-gallery"}
+
+---
+
+
+![Terminology](sl_026.png){.column-margin group="my-gallery"}
+
+---
+
+![Shapley Values](sl_027.png){.column-margin group="my-gallery"}
+
+---
+
+- [Link to Wikipedia article](https://en.wikipedia.org/wiki/Shapley_value)
+- Lloyd Shapley was the [Noble Memorial Prize Laureate](https://www.nobelprize.org/prizes/economic-sciences/2012/shapley/lecture/) for this gem back in in 2012
+- Far a cooperative game it considers all coalitions and lets us see how much each is contributing to overall surplus.
+- This idea can then be used to decide how divide the surplus (profit) most fairly.
+- Think how the extremest can set the tone for a coalition by threatening to break it up.
+
+---
+
+![Shapley Fairness](sl_028.png){.column-margin group="my-gallery"}
+1. Efficiency - The sum of the Shapley values of all agents equals the value of the grand coalition, so that all the gain is distributed among the agents:
+2. Symmetry - equal treatment of equals
+3. Linearity - If two coalition games described by gain functions ${\displaystyle v}$ and ${\displaystyle w}$ are combined, then the distributed gains should correspond to the gains derived from ${\displaystyle v}$ and the gains derived from ${\displaystyle w}$
+4. Monotonically
+5. Null Player - The Shapley value $\varphi _{i}(v)$ of a null player $i$ in a game $v$ is zero.
+
+
+---
+
+![Shapley Formula](sl_029.png){.column-margin group="my-gallery"}
+
+---
+
+
+![In ML](sl_030.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![Shapley Problems](sl_031.png){.column-margin group="my-gallery"}
+
+---
+
+![Shapley for ML](sl_032.png){.column-margin group="my-gallery"}
+
+---
+
+
+![SHAP](sl_033.png){.column-margin group="my-gallery"}
+
+
+## SHAP - Shapley Addative Explanations
+
+
+![Kernel SHAP](sl_034.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![Tree SHAP](sl_035.png){.column-margin group="my-gallery"}
+
+
+---
+
+![Decision Tree](sl_036.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![TreeExplainer](sl_037.png){.column-margin group="my-gallery"}
+
+---
+
+
+![Kernel Explainer](sl_038.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![SHAP Visualization](sl_039.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![Local Waterfall Plot](sl_040.png){.column-margin group="my-gallery"}
+
+
+
+---
+
+
+![Local Bar Plot](sl_043.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![Global Bar Plot](sl_044.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![Global Bar Plot](sl_045.png){.column-margin group="my-gallery"}
+
+
+---
+
+![Global Beeswarm](sl_046.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![Global Scatter Plot](sl_047.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+
+![Globle Scatter Plot](sl_048.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![Globle Scatter Plot](sl_049.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![Model Hierarchy](sl_050.png){.column-margin group="my-gallery"}
+
+---
+
+## Hierarchy
+
+
+![Local Uncertainty](sl_051.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+![References](sl_052.png){.column-margin group="my-gallery"}
+
+
+---
+
+
+## Conclusion 
+
+This course presented so much information it is easy to loose sight of some key point, so here are a few conclusions.
+
+- other approaches which include EDA.
+- using more transparent models e.g. regressions or statistical models.
+- by far the most prevalent approach in XAI is *post hoc* methods.
+- defined global and local explanations and noted their limitations.
+
+What do we mean by explanations in XAI:
+
+ - could be any number of visualization. 
+ - could be a simplified model. :bulb: locally a complex manifold may look flat.
+ - could be a ranking of the features by their contribution. :bulb:  SHAP and MIE
+ - could be by picking related examples :bulb: KNN
+
+
+
+### References
+
+::: {#refs}
+:::
+
+
+
+
+

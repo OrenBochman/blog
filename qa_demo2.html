@@ -7,10 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="dcterms.date" content="2017-09-06">
-<meta name="description" content="Training RNNs with back propagation">
+<meta name="dcterms.date" content="2023-03-05">
 
-<title>Oren Bochman’s Blog - Deep Neural Networks - Notes for Lesson 7e</title>
+<title>Oren Bochman’s Blog - Lecture 1 — Introduction to XAI</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,32 +22,51 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
-<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../../">
-<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
-<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
-<script src="../../../site_libs/quarto-html/quarto.js"></script>
-<script src="../../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
-<link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
-<link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -95,76 +113,26 @@ cookieconsent.run({
 </script> 
   
 <style>html{ scroll-behavior: smooth; }</style>
-<style>
 
-      .quarto-title-block .quarto-title-banner {
-        background-image: url(banner_deep.jpg);
-background-size: cover;
-      }
-</style>
 
-  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", function () {
- var mathElements = document.getElementsByClassName("math");
- var macros = [];
- for (var i = 0; i < mathElements.length; i++) {
-  var texText = mathElements[i].firstChild;
-  if (mathElements[i].tagName == "SPAN") {
-   katex.render(texText.data, mathElements[i], {
-    displayMode: mathElements[i].classList.contains('display'),
-    throwOnError: false,
-    macros: macros,
-    fleqn: false
-   });
-}}});
-  </script>
-  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<meta name="twitter:title" content="Oren Bochman’s Blog - Deep Neural Networks - Notes for Lesson 7e">
-<meta name="twitter:description" content="Training RNNs with back propagation">
-<meta name="twitter:image" content="https://orenbochman.github.io/blog/notes/dnn/dnn-07/thumbnail_blog.png">
+<meta name="twitter:title" content="Oren Bochman’s Blog - Lecture 1 — Introduction to XAI">
+<meta name="twitter:description" content="XAI Course Notes">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/thumbnail_blog.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="floating nav-fixed">
+<body class="floating nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./images/logo.png" alt="" class="navbar-logo">
     </a>
-    <a class="navbar-brand" href="../../../index.html">
+    <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Oren Bochman’s Blog</span>
     </a>
   </div>
@@ -175,7 +143,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../../about.html"> 
+    <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -186,11 +154,11 @@ window.Quarto = {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
         <li>
-    <a class="dropdown-item" href="../../../dnn.html">
+    <a class="dropdown-item" href="./dnn.html">
  <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../../model-thinking.html">
+    <a class="dropdown-item" href="./model-thinking.html">
  <span class="dropdown-text">Model Thinking</span></a>
   </li>  
     </ul>
@@ -220,12 +188,12 @@ window.Quarto = {
     </ul>
   </li>
   <li class="nav-item compact">
-    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+    <a class="nav-link" href="./index.xml"> <i class="bi bi-rss" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+    <a class="nav-link" href="./archive.html"> <i class="bi bi-archive" role="img">
 </i> 
 <span class="menu-text">Archive</span></a>
   </li>  
@@ -246,21 +214,10 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Deep Neural Networks - Notes for Lesson 7e</h1>
-            <p class="subtitle lead">Recurrent neural networks</p>
-                  <div>
-        <div class="description">
-          Training RNNs with back propagation
-        </div>
-      </div>
-                          <div class="quarto-categories">
-                <div class="quarto-category">deep learning</div>
-                <div class="quarto-category">neural networks</div>
-                <div class="quarto-category">notes</div>
-                <div class="quarto-category">coursera</div>
-                <div class="quarto-category">seq2seq</div>
-                <div class="quarto-category">RNNs</div>
-                <div class="quarto-category">LSTM</div>
+      <h1 class="title">Lecture 1 — Introduction to XAI</h1>
+            <p class="subtitle lead">XAI Course Notes</p>
+                                <div class="quarto-categories">
+                <div class="quarto-category">bug report demo</div>
               </div>
                   </div>
   </div>
@@ -278,7 +235,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">September 6, 2017</p>
+        <p class="date">March 5, 2023</p>
       </div>
     </div>
     
@@ -293,12 +250,9 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#lecture-7e-long-term-short-term-memory" id="toc-lecture-7e-long-term-short-term-memory" class="nav-link active" data-scroll-target="#lecture-7e-long-term-short-term-memory">Lecture 7e: Long-term Short-term-memory</a>
+  <li><a href="#series-poster" id="toc-series-poster" class="nav-link active" data-scroll-target="#series-poster">Series Poster</a>
   <ul class="collapse">
-  <li><a href="#long-short-term-memory-lstm" id="toc-long-short-term-memory-lstm" class="nav-link" data-scroll-target="#long-short-term-memory-lstm">Long Short Term Memory (LSTM)</a></li>
-  <li><a href="#implementing-a-memory-cell-in-a-neural-network" id="toc-implementing-a-memory-cell-in-a-neural-network" class="nav-link" data-scroll-target="#implementing-a-memory-cell-in-a-neural-network">Implementing a memory cell in a neural network</a></li>
-  <li><a href="#backpropagation-through-a-memory-cell" id="toc-backpropagation-through-a-memory-cell" class="nav-link" data-scroll-target="#backpropagation-through-a-memory-cell">Backpropagation through a memory cell</a></li>
-  <li><a href="#reading-cursive-handwriting" id="toc-reading-cursive-handwriting" class="nav-link" data-scroll-target="#reading-cursive-handwriting">Reading cursive handwriting</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -308,93 +262,62 @@ window.Quarto = {
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
 
 
 
 
 
-<style>
-.a4paper {margin: 0; aspect-ratio: 1 / 1.41;}
-.letterpaper  {margin: 0; aspect-ratio: 22 / 17;}
-.ppSlide {margin: 0; aspect-ratio: 22 / 13;}
-</style>
-<p><object data="lec8.pdf" type="application/pdf" width="100%" class="ppSlide"><p>Unable to display PDF file. <a href="lec8.pdf">Download</a> instead.</p></object></p>
-<p>::: column-margin</p>
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/_gZ1NcYoVv4" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
-<section id="lecture-7e-long-term-short-term-memory" class="level1">
-<h1>Lecture 7e: Long-term Short-term-memory</h1>
-<p>This video is about a solution to the vanishing or exploding gradient problem. Make sure that you understand that problem first, because otherwise this video won’t make much sense.</p>
-<p>The material in this video is quite advanced.</p>
-<p>In the diagram of the memory cell, there’s a somewhat new type of connection: a multiplicative connection. It’s shown as a triangle.</p>
-<p>It can be thought of as a connection of which the strength is not a learned parameter, but is instead determined by the rest of the neural network, and is therefore probably different for different training cases.</p>
-<p>This is the interpretation that Mr Hinton uses when he explains backpropagation through time through such a memory cell.</p>
-<p>That triangle can, alternatively, be thought of as a multiplicative unit: it receives input from two different places, it multiplies those two numbers, and it sends the product somewhere else as its output.</p>
-<p>Which two of the three lines indicate input and which one indicates output is not shown in the diagram, but is explained.</p>
-<p>In Geoffrey’s explanation of row 4 of the video, “the most active character” means the character that the net, at this time, consider most likely to be the next character in the character string, based on what the pen is doing.</p>
-<section id="long-short-term-memory-lstm" class="level2">
-<h2 class="anchored" data-anchor-id="long-short-term-memory-lstm">Long Short Term Memory (LSTM)</h2>
-<ul>
-<li>Hochreiter &amp; Schmidhuber (1997) solved the problem of getting an RNN to remember things for a long time (like hundreds of time steps).</li>
-<li>They designed a memory cell using logistic and linear units with multiplicative interactions.</li>
-<li>Information gets into the cell whenever its <strong>write</strong> gate is on.</li>
-<li>The information stays in the cell so long as its <strong>keep</strong> gate is on.</li>
-<li>Information can be read from the cell by turning on its <strong>read</strong> gate.</li>
-</ul>
-</section>
-<section id="implementing-a-memory-cell-in-a-neural-network" class="level2">
-<h2 class="anchored" data-anchor-id="implementing-a-memory-cell-in-a-neural-network">Implementing a memory cell in a neural network</h2>
-<p><a href="implementing_lstm.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="implementing_lstm.png" class="img-fluid"></a></p>
-<p>To preserve information for a long time in the activities of an RNN, we use a circuit that implements an analog memory cell. - A linear unit that has a self-link with a weight of 1 will maintain its state.<br>
-- Information is stored in the cell by activating its write gate. - Information is retrieved by activating the read gate. - We can backpropagate through this circuit because logistics have nice derivatives.</p>
-</section>
-<section id="backpropagation-through-a-memory-cell" class="level2">
-<h2 class="anchored" data-anchor-id="backpropagation-through-a-memory-cell">Backpropagation through a memory cell</h2>
-<p><a href="lstm_backprop.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="lstm_backprop.png" class="img-fluid"></a></p>
-</section>
-<section id="reading-cursive-handwriting" class="level2">
-<h2 class="anchored" data-anchor-id="reading-cursive-handwriting">Reading cursive handwriting</h2>
-<ul>
-<li>This is a natural task for an RNN.</li>
-<li>The input is a sequence of <span class="math inline">(x,y,p)</span> coordinates of the tip of the pen, where p indicates whether the pen is up or down.</li>
-<li>The output is a sequence of characters.</li>
-<li>Graves &amp; Schmidhuber (2009) showed that RNNs with LSTM are currently the best systems for reading cursive writing.
-<ul>
-<li>They used a sequence of small images as input rather than pen coordinates. A demonstration of online handwriting recognition by an RNN with Long Short Term Memory (from Alex Graves)</li>
-</ul></li>
-<li>The movie that follows shows several things:</li>
-<li>Row 1: This shows when the characters are recognized.
-<ul>
-<li>It never revises its output so difficult decisions are more delayed.</li>
-</ul></li>
-<li>Row 2: This shows the states of a subset of the memory cells.
-<ul>
-<li>Notice how they get reset when it recognizes a character.</li>
-</ul></li>
-<li>Row 3: This shows the writing. The net sees the x and y coordinates.
-<ul>
-<li>Optical input actually works a bit better than pen coordinates.</li>
-</ul></li>
-<li>Row 4: This shows the gradient backpropagated all the way to the x and y inputs from the currently most active character.
-<ul>
-<li>This lets you see which bits of the data are influencing the decision.</li>
-</ul></li>
-</ul>
+<section id="series-poster" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="series-poster">Series Poster</h2>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><a href="https://placehold.co/600x400?font=roboto&amp;text=A+Click+Target+1.png" class="lightbox page-columns page-full" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-1" title="bug"><div class="no-row-height column-margin column-container"><img src="https://placehold.co/600x400?font=roboto&amp;text=A+Click+Target+1.png" class="img-fluid figure-img" alt="bug"></div></a></p>
+<figcaption>bug</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><a href="https://placehold.co/600x400?font=roboto&amp;text=A+Click+Target+2.png" class="lightbox page-columns page-full" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-2" title="bug"><div class="no-row-height column-margin column-container"><img src="https://placehold.co/600x400?font=roboto&amp;text=A+Click+Target+2.png" class="img-fluid figure-img" alt="bug"></div></a></p>
+<figcaption>bug</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><a href="https://placehold.co/600x400?font=roboto&amp;text=A+Click+Target+3.png" class="lightbox page-columns page-full" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-3" title="bug"><div class="no-row-height column-margin column-container"><img src="https://placehold.co/600x400?font=roboto&amp;text=A+Click+Target+3.png" class="img-fluid figure-img" alt="bug"></div></a></p>
+<figcaption>bug</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full">
+<p class="page-columns page-full"><a href="https://placehold.co/600x400?text=A+Click+Target+4.png" class="lightbox page-columns page-full" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-4" title="bug"><div class="no-row-height column-margin column-container"><img src="https://placehold.co/600x400?text=A+Click+Target+4.png" class="img-fluid figure-img" alt="bug"></div></a></p>
+<figcaption>bug</figcaption>
+</figure>
+</div>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
 
 
+
+<div class="hidden" aria-hidden="true">
+<span class="glightbox-desc lightbox-desc-1">bug</span>
+<span class="glightbox-desc lightbox-desc-2">bug</span>
+<span class="glightbox-desc lightbox-desc-3">bug</span>
+<span class="glightbox-desc lightbox-desc-4">bug</span>
+</div>
 </section>
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2017,
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2023,
   author = {Bochman, Oren},
-  title = {Deep {Neural} {Networks} - {Notes} for {Lesson} 7e},
-  date = {2017-09-06},
-  url = {https://orenbochman.github.io/blog//notes/dnn/dnn-07/l07e.html},
+  title = {Lecture 1 -\/-\/- {Introduction} to {XAI}},
+  date = {2023-03-05},
+  url = {https://orenbochman.github.io/blog//qa_demo2.html},
   langid = {en}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2017" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2017. <span>“Deep Neural Networks - Notes for Lesson
-7e.”</span> September 6, 2017. <a href="https://orenbochman.github.io/blog//notes/dnn/dnn-07/l07e.html">https://orenbochman.github.io/blog//notes/dnn/dnn-07/l07e.html</a>.
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2023" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2023. <span>“Lecture 1 --- Introduction to XAI.”</span>
+March 5, 2023. <a href="https://orenbochman.github.io/blog//qa_demo2.html">https://orenbochman.github.io/blog//qa_demo2.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1051,17 +974,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
  Copyright 2024, Oren Bochman
   </li>  
     <li class="nav-item">
-    <a class="nav-link" href="../../../about.html">
+    <a class="nav-link" href="./about.html">
 <p>About</p>
 </a>
   </li>  
     <li class="nav-item">
-    <a class="nav-link" href="../../../license.html">
+    <a class="nav-link" href="./license.html">
 <p>License</p>
 </a>
   </li>  
     <li class="nav-item">
-    <a class="nav-link" href="../../../trademark.html">
+    <a class="nav-link" href="./trademark.html">
 <p>Trademark</p>
 </a>
   </li>  
@@ -1072,7 +995,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"selector":".lightbox","closeEffect":"zoom","openEffect":"zoom","descPosition":"bottom","loop":false});
+<script>var lightboxQuarto = GLightbox({"loop":false,"closeEffect":"zoom","selector":".lightbox","descPosition":"bottom","openEffect":"zoom"});
 window.onload = () => {
   lightboxQuarto.on('slide_before_load', (data) => {
     const { slideIndex, slideNode, slideConfig, player, trigger } = data;
@@ -1101,5 +1024,5 @@ window.onload = () => {
 
 
 
-<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

@@ -1,16 +1,81 @@
 ---
 title: "Post With Code"
-
-date: "2024-01-28"
-date-modified: "2024-01-29"
-
+date: 2024-01-28
+date-modified: 2024-02-14
 categories: [news, code, analysis]
-image: "image.jpg"
+image: image.jpg
 jupyter: python3
 ---
 
-This is a post with executable code.
+This is an obligatory post with executable code.
 
 ```{python}
-1 + 1
+#| label: code-sum-of-all-knowledge
+1 + 1 # <1>
 ```
+1. this is an annotation
+
+and this is a figure with a caption
+
+```{python}
+#| label: fig-polar
+#| fig-cap: "A line plot on a polar axis"
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+r = np.arange(0, 2, 0.01)
+theta = 2 * np.pi * r
+fig, ax = plt.subplots(
+  subplot_kw = {'projection': 'polar'} 
+)
+ax.plot(theta, r)
+ax.set_rticks([0.5, 1, 1.5, 2])
+ax.grid(True)
+plt.show()
+```
+
+It's also useful to have a small sample of printing a table from a pandas data frame
+and a quick access to Pandas a fluent wrangling block 
+
+```{python}
+#| label: tbl-salery-df-raw
+#| fig-cap: "raw Salary DataSet"
+#| warning: false
+import numpy as np                                          # <1>
+import pandas as pd                                         # <1>
+from itables import show
+import matplotlib.pyplot as plt                             # <1>
+import seaborn as sns                                       # <1>
+from sklearn.model_selection import train_test_split        # <1>
+import xgboost as xgb                                       # <1>
+
+df = (    pd.read_csv('./data/Salary Data.csv')             # <2> 
+          .dropna()                   # <3>
+          .drop_duplicates()          # <4>
+          .assign(is_male=lambda x: x['Gender'].apply(lambda y: 1 if y == 'Male' else 0),               # <5>
+                  is_PhD=lambda x: x['Education Level'].apply(lambda y: 1 if y == 'PhD' else 0),        # <6>
+                  is_BA=lambda x: x['Education Level'].apply(lambda y: 1 if y == 'Bachelor\'s' else 0), # <6>
+                  is_MA=lambda x: x['Education Level'].apply(lambda y: 1 if y == 'Master\'s' else 0),   # <6>
+                 
+          )
+          .rename(columns={'Years of Experience':'xp'}) #<7>
+          .drop(['Gender','Education Level','Job Title'],axis=1) #<8>
+
+    )
+
+#df['Education Level'] = edu_label_encoder.fit_transform(df['Education Level'])
+#job_title_encoder = LabelEncoder()
+#df['Job Title']=job_title_encoder.fit_transform(df['Job Title'])
+show(df)                                                    # <9>
+```
+1. import the usual suspects
+2. load the salary dataset
+3. remove rows with missing values
+4. remove duplicate entries
+5. recode gender to is_male
+6. recode categorical education level to dummies
+7. rename columns
+8. drop columns
+9. peek at the data
+

@@ -1,0 +1,59 @@
+---
+title: Adaptive learning rates
+slug: Adaptive learning rates
+description: Robust Regression
+author: oren bochman
+date: 2022-09-12T16:03:06.877Z
+lastmod: 2022-09-12T16:13:54.042Z
+draft: true
+tags:
+  - machine learning
+  - ml engineering
+  - learning rate schedule
+  - adaptive learning tates
+  - deep learning
+  - fan in rate
+categories:
+  - data science
+  - adaptive learning rate
+---
+Credit: I took Hinton's course some years ago. And The Fast.ai sometime after that. They both discussed the important of optimising learning rates. Adjusting learning rates isn't new or specific to deep learning. Its used in many other ML algorithems. 
+ A bit of criticism - is that don't use `Mathematica` to code dl alg we use frameworks and that the courses had lots of ideas but did not cover much in the way of implementing those ideas. Neither from scratch nor demonstrating how to put into practice many of the more interesting  ideas using high-level `keras`, `tensorflow` and `pytorch`. 
+## Adaptive learning rates
+learning rates is a hyper parameter that is used to set the step size in an interactive learning alg. When too small that alg will not converge to the global minima. When too large the algorithms will overshoot and jump out of the minima to some other region of space.
+In reality we would like to start big, learn quickly and as we converge to the solution, scales tend to grow smaller and we should reduce the learning rate. We call this an adaptive learning rate.
+The main problem is as data scientists we use alg that are black boxes built by people who used some framework and we have no idea how to modify the algorithms to suit our needs. The main force behind this is that there are so many moving parts in ML and particularly in deep learning that it is hard to focus just on one aspect when you need so many other aspects of the algorithms to work fine.
+Recently the advent of `Pytorch` and more recently `Jax` seems make it again simpler to create rl and ml algorithms that are much learner. So perhaps it is time to revisit some of the more interesting ideas and see how easily we can implement them. 
+For example attention mechanisms, learning rates, regularization on weights, layers, combination of loss functions. 
+## Adaptivce learning rates in deep learning
+Deep learning uses multilayered neural networks and these tend to learns at a rate inversely proportional to the distance from the loss. This is simple if there is just one loss at the top. But if we are perusing a end to end model for a real problem we will end up with multiple tasks in our model and we may introduce losses in additional locations.
+Also in reality even simple nn have many issues with learning weights. Different reasons can cause the weights to die - they drop off the manifold and stop getting a signal. Sometimes this is due to undamped oscillations. This kind of feedback can send the wight to limbo but looking more broadly when the network oscillates it can slow or stop the convergence of the algorithm. If we could dump such oscillations we may be able to learn much faster.
+All these suggests that we should engineer our algorithm and our network so it allows fine tune learning rates globally using a schedule, adapt it for each layer, including freezing some layers. And ultimately control it at the weight level with some oscillation dumping mechanism. 
+
+## Globabl schedule
+In fast ai course there is taught a method to use a learning rate schedule that is learned using one epoch and then reuse it to speed up training.
+## Layer  by layer solution
+The next  idea is to do this per layer as the closer the layer to the loss the faster it learns.
+But what Hinton talks about is different learning rates per weight. Why would we bother ? Well Hinton explains that that there are a some mechanism that can make the weights oscillate. Oscillation in ml correspond to overshooting the target due to a large learning rate.  
+Since learning rater in NN can 
+The idea of using different learning rates for differernt layers is pretty 
+## Per wight solution
+[setting adaptive per weight learning rates](https://www.youtube.com/watch?v=76lj_cKBvmg&list=PLiPvV5TNogxKKwvKb1RKwkq2hm7ZvpHz0&index=44) - implement this this in jax/pytorch etc 
+due to :
+$$\Delta w_{ij}=\epsilon g_{ij} \frac {\partial E}{\partial w_{ij}}$$
+where: 
+- $g_{ij}$ is the gain (initially set to 1)
+- $\epsilon $ the learning rate 
+- the partial derivative is the change of the error with the weight.
+-  
+if 
+$$ \frac {\partial E}{\partial w_{ij}}(t) \cdot \frac {\partial E}{\partial w_{ij}}(t-1) >0 $$
+then
+$$g_{ij}(t)=g_{ij}(t-1)+0.5 $$
+else:
+$$g_{ij}(t)=g_{ij}(t-1)*.95 $$
+Ways to make this work better:
+- limit gains to avoid instabilities
+- better with large batches - since designed for bull bach learning
+- combine with momentum
+- Robert A.Jacobs Increased rates of convergence through learning rate adaptation https://doi.org/10.1016/0893-6080(88)90003-2

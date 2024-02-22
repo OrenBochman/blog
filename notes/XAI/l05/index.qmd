@@ -23,7 +23,7 @@ categories:
 image: XAI_Poster.jpg
 ---
 
-The XAI course provides a comprehensive overview of explainable AI, covering both theory and practice, and exploring various use cases for explainability. 
+The XAI course provides a comprehensive overview of explainable AI, covering both theory and practice, and exploring various use cases for explainability.
 
 Participants will learn not only how to generate explanations, but also how to evaluate and effectively communicate these explanations to diverse stakeholders.
 
@@ -31,19 +31,468 @@ Participants will learn not only how to generate explanations, but also how to e
 
 ## Series Poster
 
-![series poster](XAI_Poster.jpg){.column-margin}
+![series poster](XAI_Poster.jpg){.column-margin group="my-gallery"}
 
-## Session Descriprion
+## Session Description
 
-  How to properly incorporate explanations in machine learning projects and what aspects should you keep in mind?
-  Over the past few years the need to explain the output of machine learning models has received growing attention. 
-  Explanations not only reveal the reasons behind models predictions and increase users' trust in the model, but they can be used for different purposes.
-  To fully utilize explanations and incorporate them into machine learning projects the following aspects of explanations should taken into consideration --- explanation goals, the explanation method, and explanations’ quality. 
-  In this talk, we will discuss how to select the appropriate explanation method based on the intended purpose of the explanation. 
-  Then, we will present two approaches for evaluating explanations, including practical examples of evaluation metrics, while highlighting the importance of assessing explanation quality.
-  Next, we will examine the various purposes explanation can serve, along with the stage of the machine learning pipeline the explanation should be incorporated in. 
-  Finally we will present a real use case of script classification as malware-related in Microsoft and how we can benefit from high-dimensional explanations in this context.
+-   How to properly incorporate explanations in machine learning projects and what aspects should you keep in mind?
+
+-   Over the past few years the need to explain the output of machine learning models has received growing attention.
+
+-   Explanations not only reveal the reasons behind models predictions and increase users' trust in the model, but they can be used for different purposes.
+
+-   To fully utilize explanations and incorporate them into machine learning projects the following aspects of explanations should taken into consideration --- explanation goals, the explanation method, and explanations’ quality.
+
+-   In this talk, we will discuss how to select the appropriate explanation method based on the intended purpose of the explanation.
+
+-   Then, we will present two approaches for evaluating explanations, including practical examples of evaluation metrics, while highlighting the importance of assessing explanation quality.
+
+-   Next, we will examine the various purposes explanation can serve, along with the stage of the machine learning pipeline the explanation should be incorporated in.
+
+-   Finally we will present a real use case of script classification as malware-related in Microsoft and how we can benefit from high-dimensional explanations in this context.
 
 ## Session Video
 
 {{< video https://youtu.be/pHE9TePw9qs class="column-margin" >}}
+
+![slide](sl_001.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_002.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_004.png){.column-margin group="my-gallery"}
+
+-   The task here was to identify bad insurgence claims. e.g.
+
+    -   when the product was out of warranty
+
+    -   the item was not insured
+
+    -   the damage was not covered.
+
+-   the model found many claim that the insurance people had not and they were skeptical.
+
+-   the data scientist was on the spot and needed local explanations.
+
+------------------------------------------------------------------------
+
+![slide](sl_005.png){.column-margin group="my-gallery"}
+
+
+------------------------------------------------------------------------
+
+![slide](sl_006.png){.column-margin group="my-gallery"}
+
+
+------------------------------------------------------------------------
+
+![slide](sl_007.png){.column-margin group="my-gallery"}
+
+
+so we have some use cases, how do we do it!?
+
+------------------------------------------------------------------------
+
+## Adding post-hoc XAI to an ML project
+
+the idea is a process with 5 steps:
+
+1.  understand stakeholder - i.e. the end users of the project
+2.  identify the goals of using explanations
+3.  chose XAI method that fits with the project properties
+4.  implication - taking the goal one step further
+5.  decide on an evaluation metrics
+
+------------------------------------------------------------------------
+
+## 1. Who are the explanation for ?
+
+Different **stakeholders** have different *needs* from an ML model. 
+Once we captured these needs we can decide on a suitable strategy for providing 
+a suitable explanation.
+Understanding these needs will also aid in selecting the metrics utilized to determine the effectiveness of  explanation.
+
+| Stakeholder | Their Goal | 
+|---|---|
+| Data scientists    | *Debug* and *refine* the model|
+| Decision makers    | Assess model fit to a business strategy|
+| Model Risk Analyst | Assess the model's *robustness*|
+| Regulators         | Inspect model's *reliability* and *impact* on costumers|
+| Consumers          | *Transparency* into decisions that affect them|
+
+: XAI Stakeholders and their Needs {#tbl-xai-stakeholder .striped tbl-colwidths="[25,75]" tbl-cap-location=bottom}
+
+------------------------------------------------------------------------
+
+## Explanation goals ?
+
+1.  understanding predictions
+
+2.  model debugging and verification
+
+3.  improving performance
+
+4.  increasing trust
+
+------------------------------------------------------------------------
+
+## XAI method Selection
+
+-   Data
+    -   what is the scope of the explanation?
+    -   what is the data type ?
+    -   what output are we trying to explain ?
+-   Access level
+    -   Can the explainer access the model?
+    -   Can the explainer access the data?
+-   Stage
+    -   At What stage does the model require the explanation ?
+
+------------------------------------------------------------------------
+
+## Explanation methods map
+
+How do we pick the correct approach to explaining the model ?
+
+The next figure on the right can let us pick  
+
+::: column-margin
+![map of explainability approaches](sl_012.jpg){.column-margin group="my-gallery"}
+
+from [@belle2021]
+:::
+
+Anchors and InTrees were not discussed earlier in the course.
+
+::: column-margin
+![Comparing models on the kinds of transparency that are enabled](sl_12_table.jpg){#tbl-models .column-margin group="my-gallery"}
+
+from [@belle2021]
+:::
+
+
+::: column-margin
+![XAU methods 1](techne_2.jpg){.column-margin group="my-gallery"}
+
+from [@belle2021]
+:::
+
+
+::: column-margin
+![XAU methods 2](techne_1.jpg){.column-margin group="my-gallery"}
+
+from [@belle2021]
+:::
+
+
+
+
+-   We covered SHAP which identifies the contribution of of each feature to the game of cooperative prediction
+-   PDP / ICE - use a local model's decision boundary to identify at what point we switched class.
+-   Counterfactuals utilize the original model's decision boundary identify the intervention that would lead to the effect of switching class.
+
+
+
+
+-   Anchors, introduced in [@ribeiro2018] and called Scoped Rules in [@molnar2022 [§9.4](<https://christophm.github.io/interpretable-ml-book/anchors.html>)\]
+-   Deletion Diagnostics: How would removing the highest leverage points change the model's decision boundary
+-   InTrees: What rules approximate our decision ?
+
+------------------------------------------------------------------------
+
+## XAI Implications
+
+------------------------------------------------------------------------
+
+::: column-margin
+![slide](AI_vs_XAI.png){.column-margin group="my-gallery"}
+
+from [@DarpaXAI]
+:::
+
+c.f. <https://www.darpa.mil/program/explainable-artificial-intelligence>
+
+------------------------------------------------------------------------
+
+![slide](sl_016.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+## Model Verification
+
+![slide](sl_019.png){.column-margin group="my-gallery"}
+
+## Model Debugging
+
+![slide](sl_020.png){.column-margin group="my-gallery"}
+
+-   look at the errors of the models - false positives and false negatives
+
+-   use SHAP to identify features that should be excluded.[^1]
+
+[^1]: But we should be using Causal Inference for this, since fixing using a local explanation will surely impact all the data set. If we have a Causal DAG we can probably use this concept to identify nodes as confounders on some Causal path.
+
+------------------------------------------------------------------------
+
+![slide](sl_021.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_022.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_023.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_024.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_025.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_026.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_027.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_028.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_029.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_030.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_031.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_032.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_033.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_034.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_035.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_036.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_037.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_038.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_039.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_040.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_041.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_042.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_043.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_044.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_045.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_046.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_047.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_048.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_049.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_050.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_051.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_052.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_053.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_054.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_055.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_056.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_057.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_058.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_059.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_060.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_061.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_062.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_063.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_064.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_065.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_066.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_067.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_068.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_069.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_070.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_071.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_072.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_073.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_074.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_075.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_076.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_077.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_078.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_079.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_080.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_081.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_082.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_083.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_084.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------
+
+![slide](sl_085.png){.column-margin group="my-gallery"}
+
+------------------------------------------------------------------------

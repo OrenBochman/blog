@@ -1,0 +1,120 @@
+---
+layout: post
+title: entropy for uncertainty quantification
+date: 2022-09-22 08:36
+category: data science
+author: Oren Bochman
+tags: []
+summary: 
+---
+There is an e-commerce store. Every day it collects the `cost`, `sales` and `shelf price` for each product.
+Let's say we also have to deduct a sales tax or value added tax say at 17% which we can calculate as 
+$$ VAT = price * .17 $$
+At the end of the day the profits for a product is 
+$$ \text{profit} = ( \text{shelf price} - \text{cost} - VAT ) \times \text{units} $$
+|   date   |uid |price|cost|units|
+|----------|----|-----|----|-----|
+|2022-01-01|123 |20.0 |12.0|125.0| 
+|2022-01-02|123 |20.0 |12.0|115.0|
+|2022-01-03|123 |26.0 |12.0|105.0|
+|2022-01-04|123 |26.0 |12.0|95.0 |
+|2022-01-05|123 |30.0 |12.0|80.0 |
+|2022-01-05|123 |30.0 |12.0|80.0 |
+## The task
+What we want is to recommend a price that will maximize profit. Since we can set any price the main problem we have is that we 
+we never have a full picture of the demand there is always some uncertainty.
+## The probabilistic formulation
+Let's make this more precise.
+Demand seems a function of prices. Historical Prices have a historical distribution:
+each price appears for N day and we can aggregate :
+| shelf_price | tot_day |
+| ---         |---      |
+| 20.00 usd   | 12      |
+| 25.00 usd   | 10      |
+| 30.00 usd   | 8       |
+If we and we normalize by the total days we will have a discrete probability. Let's also consider additional prices (which the store's policy requires to be even numbers) 
+
+| price       | total days | p(price)| $\bar{Q}$
+|------------:|-----------:|--------:|----------:
+| 20.00 usd   | 12         |  12/30  |  120
+| 22.00 usd   |  0         |   0/30  |    0
+| 26.00 usd   | 10         |  10/30  |  100
+| 28.00 usd   |  0         |   0/30  |    0
+| 30.00 usd   |  8         |   8/30  |   80
+ We can use the above table to create a distribution of demand of a product at different prices.
+Next we want to look at demand which is a bit more complicated.
+We can start again simple and estimate the probability of each level of demand
+| demand (Q)  | tot_day | P(Q) |
+| -----------:|--------:|-----:|
+| 120         | 12      | 12/30|
+| 100         | 10      | 10/30|
+|  80         | 8       |  8/30| 
+we could use the mean daily units for each price 
+| price | $\bar{Q}$ |$p(price\mid Q)$|$P(Q)$|$p(Q\mid P)$  
+|------:|-------:|-----:|------:|:-------------:|
+| 20.00 | 120    | 12/30| 12/30 | ?              |
+| 26.00 | 100    | 10/30| 10/30 | ?              |
+| 30.00 |  80    |  8/30|  8/30 | ?              |
+Bayes formula tells us how to get $P(Q|P)$, the `distribution of demand given the price` by inverting the `distribution of price give demand`.  
+$$p(Q|price) = \frac { p(\text{price} \mid Q) \times p(\text{Q})}{p(\text{price})}$$
+ 
+## Issue 1 - Aggregation induced co-linearity in all our data distributions  
+Since we have used the mean demand per price all the marginal probabilities lined up by the days and are the same. (We introduced a correlation between P and Q )
+Can we do it all without aggregation ?
+- The calculation of $P(price)$ in the price distribution  remains the same.
+$$p(price) = \frac{1}{days_{tot}} \sum day_{p} $$
+- The calculation of $P(Q)$ is  
+$$p(demand) = \frac{1}{days_{tot}} \sum day_{q} $$
+Since we look at $Q$ instead of $\bar{Q}$ we will end up with more levels of demand and. We may even have some levels of demand corresponding to different prices. So while one would expect there to still be a correlation between $P$ and $Q$ it is not a deterministic relationship anymore.
+- The last quantity we need to look at is $P(P|Q)$ 
+$$P(Q) = p(price|q) = \frac{1}{days_{tot}}\sum_\Omega \delta(P=\text{price},Q=q) $$
+- Where $\omega$ just means sum over all events
+- and delta is Kroneker's delta function 
+  $$ delta(i,j) = \left\{ 
+   \begin{array}{ll}
+       1 & \text{if} & i=j \\
+       0 & \text{if} & i\ne j
+   \end{array}
+    \right. $$
+    which  is shorthand for sum over all cases where random variable Price (P) takes value price (p) and random variable demand  (Q) takes value q
+    so again we just count how many days each price quantity combo appeared.
+    Note: if our site changed prices hourly we could sum over hours.  The term before the sum just normalizes the event probabilities so they sum up to one.
+## Greaat Expectations - Estimating profit using probability
+We have estimated $p(Q|P)$, is out work done?
+well we can use it to estimate the profit ($\Pi$) using 
+$$ \Pi(\text{price}) = ( \text{price} - \text{cost} - \text{VAT} ) \times \mathbb{E}(q|\text{price}) $$
+- Where we replaced historical unit with expected units conditioned on a price.
+- Recall that the same levels of demand may correspond to different price level and that we set the price. 
+- Recall that expetion of  a random variable $\mathbb{E}(X=x)$ is defined as
+$$ E(X=x) = p(X=x)*x $$ 
+so in this case 
+$$ \Pi(\text{price}) = ( \text{price} - \text{cost} - \text{VAT} ) \times p(Q=q|P=\text{price}) \times q $$
+## Optimizing profits using probability
+So we have an probabilistic model, a fancy name for our conditional distribution, which we can use for estimating profit. Once so we have estimated the $\Pi$ profit at every price we can pick the best ane we are done.
+## A date with destiny - introducing uncertainty
+Well no quite, while our model is probably great at summarizing the past but as Yogi Berra pointed out "It's tough to make predictions, especially about the future."
+Our knowledge even of the past is far from complete. Talking with colleagues about our data we learn that.
+- Some of the products are brand new and have no data yet 
+- There are many prices we haven't tested  
+- How sure are we that the samples we collected are good.
+- Some products only sell a unit once per month.
+- Daily demand varies stochastically.
+- Conditions in the market for December  are expected to be different from November due to holidays.
+- Conditions in the market for next quarters are expected to be different from the previous month due to macroeconomic reasons.
+- Some products have a narrow price foot print and others have wider ones.
+- The last manager picked some bad prices which angered some client. Other prices made them happy but precipitated losses resulting in a summery dismissed.
+  
+It seems like there are some some risk factors when it comes to mistikes in pricing and we should look at mitigating these. 
+We can start by quantifying uncertainty. Some of the factors above we may be able to mitigate. We should have known unknowns and try to stir from unknown unknowns.
+It seems we may be able to do better if we at leWhat we may want to do is use our 
+Once we have collected some data can model future profit. Since we set the self price the only unknown in our little chart is the the corresponding level of demand for the product.
+We can also estimate the relation of demand and price using a regression with the following formula
+$$ Q = a_0 + P^\eta $$
+where:
+- Q is demand
+- a_0 is the marginal demand
+- P is the price
+- $\eta$ is the elasticity of demand
+$$ \text{profit} = ( \text{shelf price} - \text{cost} - VAT ) \times (a_0+P^\eta) $$
+
+which means that if our model is good we can estimate profits for 

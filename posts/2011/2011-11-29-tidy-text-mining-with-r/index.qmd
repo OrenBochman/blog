@@ -2,15 +2,13 @@
 title: Tidy Text Mining With R
 subtitle: an update on NLP with R
 date: 2011-11-29
-categories:
-    - R
-    - NLP
-    - Text Mining
+categories: [R, NLP, Text Mining, tidyverse, code]
 ---
 
 Computational Linguistics tasks:
 
 -   [x] create a corpus
+-   [x] tokenize it
 -   [x] clean it up
 -   [ ] create a vocabulary
 -   [ ] create a frequency list
@@ -21,17 +19,24 @@ Computational Linguistics tasks:
 -   similarity
     -   cosine similarity
     -   TDIDF
-    -   Nearest neighbour word clustering
--   embeddings
-    -   \[\] word embeddings
-    -   \[\] sentence embeddings
+    -   Nearest neighbor word clustering
+-   embedding
+    -   [ ] word embeddings
+    -   [ ] sentence embeddings
 -   [ ] concordance
-    -   KWIC, keywords in context
-    -   KWOC, keywords out of context
+    -   [ ] KWIC, keywords in context
+    -   [ ] KWOC, keywords out of context
 
-# Setup
+## Setup
 
-```{r setup}
+So this little gem - if it actually works should facilitate installing dependencies as needed
+and avoiding the time penalty if they are not.
+
+
+```{r}
+#| lst-label: setup
+#| label: setup
+#| 
 require_install <- function(libs) {
 
     for (i in libs){
@@ -45,9 +50,14 @@ require_install <- function(libs) {
 require_install(libs=c('SnowballC','tidytext','dplyr','wordcloud','janeaustenr','gutenbergr','quanteda'))
 ```
 
-# Corpus
+## Corpus
 
-```{r tm-load}
+here we build a small corpus by inserting some document into a `tibble`
+
+```{r }
+#| lst-label: tm-load
+#| label: tm-load
+ 
 doc1 <- "drugs, hospitals, doctors"
 doc2 <- "smog, pollution, micro-plastics, environment."
 doc3 <- "doctors, hospitals, healthcare"
@@ -59,18 +69,25 @@ doc8 <- "Time flies like an arrow, fruit flies like a banana."
 doc9 <- "pollution, greenhouse gasses, GHG, hydrofluorocarbons, ozone hole, global warming. Montreal Protocol."
 doc10 <- "greenhouse gasses, hydrofluorocarbons, perfluorocarbons, sulfur hexafluoride, carbon dioxide, carbon monoxide, CO2, hydrofluorocarbons, methane, nitrous oxide."
 
-text <- c(doc1, doc2, doc3, doc4,doc5,doc6,doc7,doc8,doc9,doc10)
+text <- c(doc1, doc2, doc3, doc4, doc5, doc6, doc7, doc8, doc9, doc10)
 
-tidy_corpus <- tibble(line = 1:10,text=text)   
+tidy_corpus <- tibble(doc_id = 1:10, text=text)   
 tidy_corpus
 ```
 
+`unnest_tokens` - Split a column into tokens, flattening the table into one-token-per-row.
+
 ```{r}
+#| label: normalize
+#| lst-label: normalize
+
 tidy_corpus %>% 
     unnest_tokens(word, text)
+
+head(tidy_corpus)
 ```
 
-note `unnest_tokens` removes puctuation and lower cases
+note `unnest_tokens` removes punctuation and lower cases
 
 3.  inspect the corpus
 
@@ -126,27 +143,128 @@ tidy_books %>%
 ```
 
 ```{r}
+#| lst-label: grab_books_by_hgwells
+#| label: grab_books_by_hgwells
 #devtools::install_github("ropensci/gutenbergr")
 library(gutenbergr)
 
-#hgwells <- gutenberg_download(c(35, 36,  159, 456, 1047, 3691, 5230, 11870, 12163, 23218, 28218, 35461,39585))
-hgwells <- gutenberg_download(c(35, 36,  159))
+cache_load <- function(ids) {
+  # Ensure the gutenbergr library is available
+  if (!requireNamespace("gutenbergr", quietly = TRUE)) {
+    stop("The 'gutenbergr' package is required but not installed. Please install it using install.packages('gutenbergr').")
+  }
+  
+  library(gutenbergr)
+  
+  # Initialize an empty data frame to hold all books' data
+  all_books_data <- data.frame()
+  
+  # Loop through each ID in the provided vector
+  for (id in ids) {
+    # Define the filename for local storage
+    filename <- paste0(id, ".csv")
+    
+    # Check if the file exists locally
+    if (file.exists(filename)) {
+      # Load the local copy
+      book_data <- read.csv(filename, stringsAsFactors = FALSE)
+      #cat("Loaded local copy of ID:", id, "\n")
+    } else {
+      # Download the book data using gutenbergr
+      book_data <- gutenberg_download(id, mirror = "http://mirrors.xmission.com/gutenberg/")
+      
+      # Save a local copy
+      write.csv(book_data, filename, row.names = FALSE)
+      #cat("Downloaded and saved local copy of ID:", id, "\n")
+    }
+    
+    # Combine the current book data with the accumulated data frame
+    all_books_data <- rbind(all_books_data, book_data)
+  }
+  
+  # Return the combined data frame
+  return(all_books_data)
+}
+
+
+
+cache_load <- function(ids) {
+  # Ensure the gutenbergr library is available
+  if (!requireNamespace("gutenbergr", quietly = TRUE)) {
+    stop("The 'gutenbergr' package is required but not installed. Please install it using install.packages('gutenbergr').")
+  }
+  
+  library(gutenbergr)
+  
+  # Initialize an empty data frame to hold all books' data
+  all_books_data <- data.frame()
+  
+  # Loop through each ID in the provided vector
+  for (id in ids) {
+    # Define the filename for local storage
+    filename <- paste0(id, ".csv")
+    
+    # Check if the file exists locally
+    if (file.exists(filename)) {
+      # Load the local copy
+      book_data <- read.csv(filename, stringsAsFactors = FALSE)
+      cat("Loaded local copy of ID:", id, "\n")
+    } else {
+      # Attempt to download the book data using gutenbergr
+      book_data <- tryCatch({
+        gutenberg_download(id, mirror = "http://mirrors.xmission.com/gutenberg/")
+      }, error = function(e) {
+        # Return an empty data frame in case of error (book not found)
+        data.frame()
+      })
+      
+      # Check if the book data is not empty (book was successfully downloaded)
+      if (nrow(book_data) > 0) {
+        # Save a local copy
+        write.csv(book_data, filename, row.names = FALSE)
+        cat("Downloaded and saved local copy of ID:", id, "\n")
+      } else {
+        # Inform the user that the book is missing and will not be saved
+        cat("Book with ID:", id, "is missing and will not be saved locally.\n")
+      }
+    }
+    
+    # Only combine the current book data if it's not empty
+    if (nrow(book_data) > 0) {
+      all_books_data <- rbind(all_books_data, book_data)
+    }
+  }
+  
+  # Return the combined data frame
+  return(all_books_data)
+}
 
 ```
 
 ```{r}
+hgwell_ids = c(35, 36, 159, 456, 1047, 3691, 5230, 11870, 12163, 23218, 28218, 35461,39585)
+hgwells <- cache_load(hgwell_ids)
+
+
+```
+
+```{r}
+#| warning: false
+#| message: false
 tidy_hgwells <- hgwells %>%
   unnest_tokens(word, text) %>%
   anti_join(stop_words)
-```
 
-```{r}
 tidy_hgwells %>%
   count(word, sort = TRUE)
 ```
 
+
 ```{r}
-bronte <- gutenberg_download(c(1260, 768, 969, 9182, 767))
+#| warning: false
+#| message: false
+bronte_ids = c(1260, 768, 969, 9182, 767)
+bronte <- cache_load(bronte_ids)
 
 
 tidy_bronte <- bronte %>%
@@ -176,7 +294,10 @@ frequency
 ```
 
 ```{r}
+#| warning: false
+#| message: false
 library(scales)
+library(ggplot2)
 
 # expect a warning about rows with missing values being removed
 ggplot(frequency, aes(x = proportion, y = `Jane Austen`, 
@@ -209,7 +330,7 @@ library(quanteda)
 library(gutenbergr)
 
 austen_works = gutenberg_works(author == "Austen, Jane")
-austen = gutenberg_download(austen_works$gutenberg_id)
+austen <- cache_load(austen_works$gutenberg_id)
 
 head(hgwells)
 # tidy_hgwells <- hgwells %>%

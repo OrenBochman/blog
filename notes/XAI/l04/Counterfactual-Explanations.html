@@ -116,6 +116,49 @@ cookieconsent.run({
   
 <style>html{ scroll-behavior: smooth; }</style>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta name="twitter:title" content="Oren Bochman’s Blog - 4 Counterfactual Explanations - Explaining and Debugging">
 <meta name="twitter:description" content="How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people? This question is key to ML explanations research because explanation techniques face an inherent tradeoff between fidelity and interpretability — a high-fidelity explanation for an ML model tends to be complex and hard to interpret, while an interpretable explanation is often inconsistent with the ML model. In this talk, I will present counterfactual (CF) explanations that bridge this tradeoff. Rather than approximate an ML model or rank features by their predictive importance, a CF explanation “interrogates” a model to find required changes that would flip the model’s decision and presents those examples to a user. Such examples offer a true reflection of how the model would change its prediction, thus helping decision-subject decide what they should do next to obtain a desired outcome and helping model designers debug their model. Using benchmark datasets on loan approval, I will compare counterfactual explanations to popular alternatives like LIME and SHAP. I will also present a case study on generating CF examples for image classifiers that can be used for evaluating fairness and even improving the generalizability of a model.">
@@ -124,7 +167,7 @@ cookieconsent.run({
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="floating nav-fixed">
+<body class="floating nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -267,7 +310,28 @@ cookieconsent.run({
   <li><a href="#session-video" id="toc-session-video" class="nav-link active" data-scroll-target="#session-video">Session Video</a></li>
   <li><a href="#course-leaders" id="toc-course-leaders" class="nav-link" data-scroll-target="#course-leaders">Course Leaders:</a></li>
   <li><a href="#speaker" id="toc-speaker" class="nav-link" data-scroll-target="#speaker">Speaker:</a></li>
-  <li><a href="#what-is-this-session-about" id="toc-what-is-this-session-about" class="nav-link" data-scroll-target="#what-is-this-session-about">What is this session about?</a></li>
+  <li><a href="#what-is-this-session-about" id="toc-what-is-this-session-about" class="nav-link" data-scroll-target="#what-is-this-session-about">What is this session about?</a>
+  <ul class="collapse">
+  <li><a href="#outline" id="toc-outline" class="nav-link" data-scroll-target="#outline">Outline</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a></li>
+  <li><a href="#counterfactual-definition" id="toc-counterfactual-definition" class="nav-link" data-scroll-target="#counterfactual-definition">Counterfactual Definition</a></li>
+  </ul></li>
+  <li><a href="#the-many-uses-of-model-cf-models" id="toc-the-many-uses-of-model-cf-models" class="nav-link" data-scroll-target="#the-many-uses-of-model-cf-models">The many uses of model CF Models</a>
+  <ul class="collapse">
+  <li><a href="#why-do-we-need-cf-explanations" id="toc-why-do-we-need-cf-explanations" class="nav-link" data-scroll-target="#why-do-we-need-cf-explanations">Why do we need CF Explanations?</a></li>
+  <li><a href="#feature-importance-is-not-enough" id="toc-feature-importance-is-not-enough" class="nav-link" data-scroll-target="#feature-importance-is-not-enough">Feature importance is not enough?</a></li>
+  <li><a href="#desiderata-for-counterfactuals" id="toc-desiderata-for-counterfactuals" class="nav-link" data-scroll-target="#desiderata-for-counterfactuals">Desiderata for counterfactuals</a></li>
+  <li><a href="#general-optimization-framework" id="toc-general-optimization-framework" class="nav-link" data-scroll-target="#general-optimization-framework">General Optimization framework</a></li>
+  <li><a href="#diverse-cfx" id="toc-diverse-cfx" class="nav-link" data-scroll-target="#diverse-cfx">Diverse CFX</a></li>
+  <li><a href="#generating-debugging-edge-cases" id="toc-generating-debugging-edge-cases" class="nav-link" data-scroll-target="#generating-debugging-edge-cases">Generating debugging edge-cases</a></li>
+  <li><a href="#quantitative-evaluation-for-cfx" id="toc-quantitative-evaluation-for-cfx" class="nav-link" data-scroll-target="#quantitative-evaluation-for-cfx">Quantitative Evaluation for CFX</a></li>
+  <li><a href="#how-does-dice-compare-with-lime-and-shap" id="toc-how-does-dice-compare-with-lime-and-shap" class="nav-link" data-scroll-target="#how-does-dice-compare-with-lime-and-shap">How does DiCE compare with LIME and SHAP</a></li>
+  <li><a href="#practical-considerations" id="toc-practical-considerations" class="nav-link" data-scroll-target="#practical-considerations">Practical considerations</a></li>
+  <li><a href="#returning-to-the-optimization-problem" id="toc-returning-to-the-optimization-problem" class="nav-link" data-scroll-target="#returning-to-the-optimization-problem">Returning to the optimization problem</a></li>
+  <li><a href="#how-to-generate-a-cf-for-a-ml-model" id="toc-how-to-generate-a-cf-for-a-ml-model" class="nav-link" data-scroll-target="#how-to-generate-a-cf-for-a-ml-model">How to Generate a CF for a ML model</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#conclusion-1" id="toc-conclusion-1" class="nav-link" data-scroll-target="#conclusion-1">Conclusion</a></li>
+  </ul></li>
   <li><a href="#resources" id="toc-resources" class="nav-link" data-scroll-target="#resources">Resources:</a></li>
   </ul>
 </nav>
@@ -277,7 +341,7 @@ cookieconsent.run({
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
 
 
 
@@ -290,16 +354,16 @@ cookieconsent.run({
 <section id="course-leaders" class="level2">
 <h2 class="anchored" data-anchor-id="course-leaders">Course Leaders:</h2>
 <ul>
-<li>Bitya Neuhof #DataNights</li>
-<li>Yasmin Bokobza #Microsoft</li>
+<li>Bitya Neuhof - DataNights</li>
+<li>Yasmin Bokobza - Microsoft</li>
 </ul>
 </section>
 <section id="speaker" class="level2">
 <h2 class="anchored" data-anchor-id="speaker">Speaker:</h2>
 <ul>
-<li>Amit Sharma #Microsoft</li>
+<li>Amit Sharma - Microsoft</li>
 </ul>
-<p>Amit Sharma is a Principal Researcher at Microsoft Research India. His work bridges causal inference techniques with machine learning, to make ML models generalize better, be explainable and avoid hidden biases. To this end, Amit has co-led the development of the open-source DoWhy library for causal inference and <a href="https://github.com/interpretml/DiCE" alt="Generate Diverse Counterfactual Explanations for any machine learning model.">DiCE</a> library for counterfactual explanations. The broader theme in his work is how machine learning can be used for better decision-making, especially in sensitive domains. In this direction, Amit collaborates with NIMHANS on mental health technology, including a recent app, MindNotes, that encourages people to break the stigma and reach out to professionals.</p>
+<p>Sharma is a Principal Researcher at Microsoft Research India. His work bridges CI (causal inference) techniques with machine learning, to make ML models generalize better, be explainable and avoid hidden biases. To this end, Sharma has co-led the development of the open-source <code>DoWhy</code> library for causal inference and <a href="https://github.com/interpretml/DiCE" alt="Generate Diverse Counterfactual Explanations for any machine learning model.">DiCE</a> library for counterfactual explanations. The broader theme in his work is how ML can be used for better decision-making, especially in sensitive domains. In this direction, Sharma collaborates with NIMHANS on mental health technology, including a recent app, MindNotes, that encourages people to break the stigma and reach out to professionals.</p>
 <p>His work has received many awards including:</p>
 <ul>
 <li>a Best Paper Award at ACM CHI 2021 conference,</li>
@@ -314,119 +378,322 @@ cookieconsent.run({
 <li><a href="https://www.microsoft.com/en-us/research/people/amshar/">Profile</a></li>
 </ul>
 </section>
-<section id="what-is-this-session-about" class="level1">
+<section id="what-is-this-session-about" class="level1 page-columns page-full">
 <h1>What is this session about?</h1>
-<p>How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people? This question is key to ML explanations research because explanation techniques face an inherent tradeoff between fidelity and interpretability: a high-fidelity explanation for an ML model tends to be complex and hard to interpret, while an interpretable explanation is often inconsistent with the ML model.</p>
-<p>In this talk, I will present counterfactual (CF) explanations that bridge this tradeoff. Rather than approximate an ML model or rank features by their predictive importance, a CF explanation “interrogates” a model to find required changes that would flip the model’s decision and presents those examples to a user. Such examples offer a true reflection of how the model would change its prediction, thus helping decision-subject decide what they should do next to obtain a desired outcome and helping model designers debug their model. Using benchmark datasets on loan approval, I will compare counterfactual explanations to popular alternatives like LIME and SHAP. I will also present a case study on generating CF examples for image classifiers that can be used for evaluating the fairness of models as well as improving the generalizability of a model.</p>
-<p>Amit pointed out that he is primarily interested in CI and that he later got interested in XAI at the cusp of CI and XAI. Also out that his initially his XAI work focused on deterministic, differential models. Later when people asked about using them with old school models like sk-learn random forest they went back to the drawing board and discovered that by sampling counterfactual locally they got the got even better results.</p>
-<p>He pointed out that LIME and SHAP may give us feature importance but that as such their explanation are not actionable in the sense that they do not spell out to the user/data-scientist/developer what changes/interventions/effects would be needed to cross the decision boundary to arrive at the desired.</p>
-<div class="quarto-figure quarto-figure-center">
+<p>How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people? This question is key to ML explanations research because explanation techniques face an inherent trade-off between fidelity and interpretability: a high-fidelity explanation for an ML model tends to be complex and hard to interpret, while an interpretable explanation is often inconsistent with the ML model.</p>
+<p>In this talk, the speaker presented counterfactual explanations (CFX) that bridge this trade-off. Rather than approximate an ML model or rank features by their predictive importance, a CF explanation “interrogates” a model to find required changes that would flip the model’s decision and presents those examples to a user. Such examples offer a true reflection of how the model would change its prediction, thus helping decision-subject decide what they should do next to obtain a desired outcome and helping model designers debug their model. Using benchmark datasets on loan approval, I will compare counterfactual explanations to popular alternatives like LIME and SHAP. I will also present a case study on generating CF examples for image classifiers that can be used for evaluating the fairness of models as well as improving the generalizability of a model.</p>
+<p>The speaker pointed out that he is primarily interested lay in CI and that when he later got interested in XAI his focused was on the cusp of CI and XAI.</p>
+<p>Sharma shared that initially his work on XAI focused on deterministic, differential models. Only later when people asked about using them with traditional ML models like sk-learn and random forest that he went back to the drawing board and discovered how sampling counterfactual locally it is possible to got even better results.</p>
+<p>Sharma also pointed out a shortcomings of algorithms like LIME and SHAP. While these present feature importance, their explanation are not actionable. This is in the sense that they fail to spell out to decision maker which interventions would allow them to cross decision boundaries, with least resistance, into their zone of desired outcomes.</p>
+<section id="outline" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="outline">Outline</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-23-50.png" class="lightbox" data-glightbox="description: .lightbox-desc-1" data-gallery="quarto-lightbox-gallery-1" title="contractual explanation properties"><img src="Screenshot from 2023-03-23 18-23-50.png" class="img-fluid figure-img" alt="contractual explanation properties"></a></p>
-<figcaption>contractual explanation properties</figcaption>
+<p><a href="talk-outline.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" data-glightbox="description: .lightbox-desc-1" title="outline"><img src="talk-outline.png" class="img-fluid figure-img" alt="outline"></a></p>
+<figcaption>outline</figcaption>
 </figure>
-</div>
+</div></div></section>
+<section id="background" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="asscessing-human-decision-making.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" data-glightbox="description: .lightbox-desc-2" title="Assessing human decision-making"><img src="asscessing-human-decision-making.png" class="img-fluid figure-img" alt="Assessing human decision-making"></a></p>
+<figcaption>Assessing human decision-making</figcaption>
+</figure>
+</div></div><p>A great starting point for ML tasks if often best motivated by considering pros and cons of human capabilities in these tasks. Sharma points out that in <span class="citation" data-cites="weichselbaumer2019">(<a href="#ref-weichselbaumer2019" role="doc-biblioref">Weichselbaumer 2019</a>)</span> researchers used counterfactual thinking to study if employers discriminate against women wearing a head scarf. The idea was to they sent resumes sent to German Companies and modified names and images of applicants. German companies usually require images in the C.V. The study found there was discrimination.</p>
+</section>
+<section id="counterfactual-definition" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="counterfactual-definition">Counterfactual Definition</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="what-is-a-counterfactuals.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" data-glightbox="description: .lightbox-desc-3" title="What is a counterfactual"><img src="what-is-a-counterfactuals.png" class="img-fluid figure-img" alt="What is a counterfactual"></a></p>
+<figcaption>What is a counterfactual</figcaption>
+</figure>
+</div></div><p>Sharma presents the definition for a counterfactual provided by Judea Pearl</p>
+<blockquote class="blockquote">
+<p>Given a system output <span class="math inline">y</span>, a counterfactual <span class="math inline">y_{X_i=x'}</span> is the output of a system had some input <span class="math inline">X_i</span> changed but everything else unaffected by <span class="math inline">X_i</span> remained the same. — <span class="citation" data-cites="pearl2009">(<a href="#ref-pearl2009" role="doc-biblioref">Pearl 2009</a>)</span>.</p>
+</blockquote>
+<p>Under the <a href="https://en.wikipedia.org/wiki/Holism">holistic</a> paradigm introduced in <span class="citation" data-cites="smuts1926holism">Smuts (<a href="#ref-smuts1926holism" role="doc-biblioref">1926</a>)</span> complex real world systems are inherently interconnected with the implication that that a change to just one thing will end up changing everything. ML Models of reality are reductionist, make simplifying assumptions Linear model and many traditional ML model will allow us to test a CF type intervention.</p>
+<p>And this can be be very useful.</p>
+</section>
+</section>
+<section id="the-many-uses-of-model-cf-models" class="level1 page-columns page-full">
+<h1>The many uses of model CF Models</h1>
+<p>Estimating <span class="math inline">f(X_i=x')-f(x)</span> can provide:</p>
+<ol type="1">
+<li><strong>Individual Effect</strong> of Feature a feature <span class="math inline">X_i</span></li>
+</ol>
+<p><span id="eq-individual-effect"><span class="math display">X_i = E[Y_{X_i=x'}\mid X=x,Y=y]-E[Y \mid X=x] \qquad \tag{1}</span></span></p>
+<ol start="2" type="1">
+<li><p>Explanation of how important is feature <span class="math inline">X_i</span></p></li>
+<li><p>Bias in model M if <span class="math inline">X_i</span> is a sensitive feature<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p></li>
+<li><p>More generally, CF provide a natural way to debug ML models via </p></li>
+</ol>
+<div class="no-row-height column-margin column-container"><a href="https://en.wikipedia.org/wiki/Fuzzing" class="">fuzz testing</a></div><section id="why-do-we-need-cf-explanations" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="why-do-we-need-cf-explanations">Why do we need CF Explanations?</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="explaining-ml-predictions.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" data-glightbox="description: .lightbox-desc-4" title="Feature Importance"><img src="explaining-ml-predictions.png" class="img-fluid figure-img" alt="Feature Importance"></a></p>
+<figcaption>Feature Importance</figcaption>
+</figure>
+</div></div></section>
+<section id="feature-importance-is-not-enough" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="feature-importance-is-not-enough">Feature importance is not enough?</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="the-problem.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" data-glightbox="description: .lightbox-desc-5" title="A problem with SHAP &amp; LIME"><img src="the-problem.png" class="img-fluid figure-img" alt="A problem with SHAP &amp; LIME"></a></p>
+<figcaption>A problem with SHAP &amp; LIME</figcaption>
+</figure>
+</div></div><p>Suppose an ML model recommends that an individual should be denied a loan</p>
 <ul>
-<li>actionability - all things being equal, CFX should be actionable</li>
-<li>diversity - we want to understand different casual choices</li>
-<li>proximity - the CFX should be similar to the “query” in the sense of a local explanation.</li>
-<li>user constraints - it should suggest actions that can be performed by the user.
-<ul>
-<li>the user cannot easily</li>
-<li>become younger</li>
-<li>change sex,</li>
-<li>get a degree</li>
-</ul></li>
-<li>sparsity
-<ul>
-<li>a good CFX should only require change a minimal set of features. i.e.&nbsp;a few small steps in two or three dimensions to cross the decision boundary.</li>
-</ul></li>
-<li>casual constraints</li>
+<li><p>🧑 <em>Loan Officer</em> : would like to understand why this individual was denied?</p></li>
+<li><p>👳 <em>Individual</em>: would also like to know what she could do get the loan approved?</p></li>
 </ul>
-<p>references are to:</p>
+<p>Sharma points out two shortcomings of traditional XAI methods</p>
 <ul>
-<li><span class="citation" data-cites="wachter2018counterfactual">(<a href="#ref-wachter2018counterfactual" role="doc-biblioref">Wachter, Mittelstadt, and Russell 2018</a>)</span></li>
-<li><span class="citation" data-cites="Russell2019Efficient">(<a href="#ref-Russell2019Efficient" role="doc-biblioref"><strong>Russell2019Efficient?</strong></a>)</span></li>
+<li>Feature importance is inadequate to fully inform the stakeholders if it does not suggest a useful action.</li>
+<li>Feature importance can have <strong>low fidelity</strong> 😡
+<ul>
+<li><p>The top feature may mandate unrealistic changes.</p>
+<p>e.g.&nbsp;“<em>increase your income by 5x</em>” 🙀</p></li>
+<li><p>While the third Credit years and may not be on the path of least resistance to getting the loan.</p>
+<p>e.g.&nbsp;“<em>just wait three more years and you will be approved.</em>” 👍</p></li>
+</ul></li>
 </ul>
-<div class="quarto-figure quarto-figure-center">
+</section>
+<section id="desiderata-for-counterfactuals" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="desiderata-for-counterfactuals">Desiderata for counterfactuals</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-24-29.png" class="lightbox" data-glightbox="description: .lightbox-desc-2" data-gallery="quarto-lightbox-gallery-2" title="contractual loss function"><img src="Screenshot from 2023-03-23 18-24-29.png" class="img-fluid figure-img" alt="contractual loss function"></a></p>
-<figcaption>contractual loss function</figcaption>
+<p><a href="CFX-Desiderata.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" data-glightbox="description: .lightbox-desc-6" title="Desiderata of contractual explanation"><img src="CFX-Desiderata.png" class="img-fluid figure-img" alt="Desiderata of contractual explanation"></a></p>
+<figcaption>Desiderata of contractual explanation</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
+</div></div><ol type="1">
+<li><strong>Actionalbility -</strong> <em>Ceteris paribus</em> a CFX should be actionable for the decision subject.</li>
+<li><strong>Diversity</strong> - we want to understand different casual choices</li>
+<li><strong>Proximity</strong> - the CFX should be similar to the “query” in the sense of a local explanation.</li>
+<li><strong>User constraints</strong> - it should only suggest actions that can be performed by the user. A loan applicant cannot easily, become younger, change sex or get a degree.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></li>
+<li><strong>Sparsity -</strong> a CFX should only require change a minimal set of features. i.e.&nbsp;a few small steps in two or three dimensions to cross the decision boundary.</li>
+<li><strong>Casual constraints</strong></li>
+</ol>
+<ul>
+<li>Going further it is suggested that we should view CFX as aggregating <em>feasibility</em> with <em>diversity</em> components</li>
+</ul>
+<p>Before introducing his ideas Sharma references two prior works.</p>
+<ul>
+<li><p>In the lengthy <span class="citation" data-cites="wachter2018counterfactual">(<a href="#ref-wachter2018counterfactual" role="doc-biblioref">Wachter, Mittelstadt, and Russell 2018</a>)</span>, the authors suggest that to comply with GDPR regulations CFX should take the form:</p>
+<blockquote class="blockquote">
+<p>Score <span class="math inline">p</span> was returned because variables <span class="math inline">V</span> had values <span class="math inline">(v_1,v_2,...)</span> associated with them. <strong>If</strong> <span class="math inline">V</span> instead had values <span class="math inline">(v_1',v_2',...)</span>, and all other variables had remained constant, <strong>then</strong> score <span class="math inline">p'</span> would have been returned.</p>
+</blockquote>
+<p>And and an approach to come up with suitable CFXs. Sharma references a formula:</p>
+<p><span id="eq-wachter-constratint"><span class="math display">
+C= \arg \min_c loss_y(f(c),y)+|x-c| \qquad
+\tag{2}</span></span></p>
+<p>🏴 But this formula is not in the 📃 paper — perhaps it is a simplification of the idea.<br>
+🤔 I believe it suggests their recipe to generate desirable CFX by picking a change <span class="math inline">c</span> in feature <span class="math inline">x</span> with a minimal impact on y as measured by some loss function on outcome <span class="math inline">y</span>.</p></li>
+<li><p>This approach is summarized in <a href="https://christophm.github.io/interpretable-ml-book/counterfactual.html#method-by-wachter-et-al.">@molnar2022§9.3.1.1</a></p></li>
+<li><p>In <span class="citation" data-cites="russell2019efficient">(<a href="#ref-russell2019efficient" role="doc-biblioref">Russell 2019</a>)</span> the author introduced a CFX algorithm based on mixed integer programming that supports diversity. However it is limited to linear ML models.</p></li>
+</ul>
+</section>
+<section id="general-optimization-framework" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="general-optimization-framework">General Optimization framework</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-28-49.png" class="lightbox" data-glightbox="description: .lightbox-desc-3" data-gallery="quarto-lightbox-gallery-3" title="slide"><img src="Screenshot from 2023-03-23 18-28-49.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
+<p><a href="CFX-loss-function.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" data-glightbox="description: .lightbox-desc-7" title="CF loss function"><img src="CFX-loss-function.png" class="img-fluid figure-img" alt="CF loss function"></a></p>
+<figcaption>CF loss function</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
+</div></div><p>This is the simple framework used in DICE to generate diverse counterfactual explanations.</p>
+<ul>
+<li><p>what is the easiest way to get CFX ?</p></li>
+<li><p>if the model is differentialable and</p></li>
+<li><p>if we have deep model we know gradient descent.</p></li>
+</ul>
+<p>What have we have here ?</p>
+<ul>
+<li>we start with a mean of a Wachter type constraint
+<ul>
+<li>this is being minimized.</li>
+</ul></li>
+<li>we add a <strong>proximity constraint</strong> weighted by hyper parameter <span class="math inline">\lambda_1</span>
+<ul>
+<li>this is being minimized.</li>
+</ul></li>
+<li>we add a <strong>diversity constraint</strong> weighted by hyper parameter <span class="math inline">\lambda_2</span>
+<ul>
+<li>this is being maximized.</li>
+<li>based on K some kind of metric for the distance for CFX distances.</li>
+</ul></li>
+</ul>
+<p>Sharma considers this approach dated in lieu of more recent publications.</p>
+<p>He references to other methods.</p>
+<p>I think though he is talking about <strong>MOC</strong> which is based on multi-objective optimization problem, introduced in <span class="citation" data-cites="Dandl_2020">(<a href="#ref-Dandl_2020" role="doc-biblioref">Dandl et al. 2020</a>)</span> which the authors compare to DiCE <span class="citation" data-cites="mothilal2020dice">(<a href="#ref-mothilal2020dice" role="doc-biblioref">Mothilal, Sharma, and Tan 2020</a>)</span> <strong>Recourse</strong> from <span class="citation" data-cites="ustun2019">(<a href="#ref-ustun2019" role="doc-biblioref">Ustun, Spangher, and Liu 2019</a>)</span> and <strong>Tweaking</strong> from <span class="citation" data-cites="Tolomei2017">(<a href="#ref-Tolomei2017" role="doc-biblioref">Tolomei et al. 2017</a>)</span></p>
+</section>
+<section id="diverse-cfx" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="diverse-cfx">Diverse CFX</h2>
+<div class="page-columns page-full"><p> these can be used to inspect the black box model and understand what is going in there</p><div class="no-row-height column-margin column-container"><img src="diverse-CFX.png" class="img-fluid" alt="diverse CFX"></div></div>
+</section>
+<section id="generating-debugging-edge-cases" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="generating-debugging-edge-cases">Generating debugging edge-cases</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-29-00.png" class="lightbox" data-glightbox="description: .lightbox-desc-4" data-gallery="quarto-lightbox-gallery-4" title="slide"><img src="Screenshot from 2023-03-23 18-29-00.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
+<p><a href="CFX-for-generating-debugging-edge-cases.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" data-glightbox="description: .lightbox-desc-8" title="CFX as a way to generate debugging edge cases"><img src="CFX-for-generating-debugging-edge-cases.png" class="img-fluid figure-img" alt="CFX as a way to generate debugging edge cases"></a></p>
+<figcaption>CFX as a way to generate debugging edge cases</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
+</div></div></section>
+<section id="quantitative-evaluation-for-cfx" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="quantitative-evaluation-for-cfx">Quantitative Evaluation for CFX</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-34-00.png" class="lightbox" data-glightbox="description: .lightbox-desc-5" data-gallery="quarto-lightbox-gallery-5" title="slide"><img src="Screenshot from 2023-03-23 18-34-00.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
+<p><a href="quantitative-evaluation-for-CFX.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9" data-glightbox="description: .lightbox-desc-9" title="Quantitative evaluation for CFX"><img src="quantitative-evaluation-for-CFX.png" class="img-fluid figure-img" alt="Quantitative evaluation for CFX"></a></p>
+<figcaption>Quantitative evaluation for CFX</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
+</div></div><p>This is how we translate the desiderata into a formal model using metrics.</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-34-18.png" class="lightbox" data-glightbox="description: .lightbox-desc-6" data-gallery="quarto-lightbox-gallery-6" title="slide"><img src="Screenshot from 2023-03-23 18-34-18.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
+<p><a href="results-comparing-CF-based-methods.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10" data-glightbox="description: .lightbox-desc-10" title="results comparing CF based methods"><img src="results-comparing-CF-based-methods.png" class="img-fluid figure-img" alt="results comparing CF based methods"></a></p>
+<figcaption>results comparing CF based methods</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
+</div></div></section>
+<section id="how-does-dice-compare-with-lime-and-shap" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="how-does-dice-compare-with-lime-and-shap">How does DiCE compare with LIME and SHAP</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-34-44.png" class="lightbox" data-glightbox="description: .lightbox-desc-7" data-gallery="quarto-lightbox-gallery-7" title="slide"><img src="Screenshot from 2023-03-23 18-34-44.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
+<p><a href="Comparing-DiCE-with-LIME-and-CHAP.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11" data-glightbox="description: .lightbox-desc-11" title="Comparing DiCE with LIME and CHAP"><img src="Comparing-DiCE-with-LIME-and-CHAP.png" class="img-fluid figure-img" alt="Comparing DiCE with LIME and CHAP"></a></p>
+<figcaption>Comparing DiCE with LIME and CHAP</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
+</div></div><p>The results section from the DiCE paper!</p>
+</section>
+<section id="practical-considerations" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="practical-considerations">Practical considerations</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-37-09.png" class="lightbox" data-glightbox="description: .lightbox-desc-8" data-gallery="quarto-lightbox-gallery-8" title="slide"><img src="Screenshot from 2023-03-23 18-37-09.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
+<p><a href="practical-considerations.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12" data-glightbox="description: .lightbox-desc-12" title="Practical Considerations"><img src="practical-considerations.png" class="img-fluid figure-img" alt="Practical Considerations"></a></p>
+<figcaption>Practical Considerations</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
+</div></div></section>
+<section id="returning-to-the-optimization-problem" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="returning-to-the-optimization-problem">Returning to the optimization problem</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-41-51.png" class="lightbox" data-glightbox="description: .lightbox-desc-9" data-gallery="quarto-lightbox-gallery-9" title="slide"><img src="Screenshot from 2023-03-23 18-41-51.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
+<p><a href="returning-to-the-optimization-problem.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13" data-glightbox="description: .lightbox-desc-13" title="Returning to the optimization problem"><img src="returning-to-the-optimization-problem.png" class="img-fluid figure-img" alt="Returning to the optimization problem"></a></p>
+<figcaption>Returning to the optimization problem</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
+</div></div></section>
+<section id="how-to-generate-a-cf-for-a-ml-model" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="how-to-generate-a-cf-for-a-ml-model">How to Generate a CF for a ML model</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-42-40.png" class="lightbox" data-glightbox="description: .lightbox-desc-10" data-gallery="quarto-lightbox-gallery-10" title="slide"><img src="Screenshot from 2023-03-23 18-42-40.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
+<p><a href="how-to-genenrate-CFX-for-a-ML-model.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14" data-glightbox="description: .lightbox-desc-14" title="How to generate a counterfactual for a ML model"><img src="how-to-genenrate-CFX-for-a-ML-model.png" class="img-fluid figure-img" alt="How to generate a counterfactual for a ML model"></a></p>
+<figcaption>How to generate a counterfactual for a ML model</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
+</div></div></section>
+<section id="conclusion" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-49-07.png" class="lightbox" data-glightbox="description: .lightbox-desc-11" data-gallery="quarto-lightbox-gallery-11" title="slide"><img src="Screenshot from 2023-03-23 18-49-07.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
+<p><a href="CFX-methods.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15" data-glightbox="description: .lightbox-desc-15" title="Methods"><img src="CFX-methods.png" class="img-fluid figure-img" alt="Methods"></a></p>
+<figcaption>Methods</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
+</div></div><table class="table">
+<thead>
+<tr class="header">
+<th>Data</th>
+<th>Name</th>
+<th>Citation</th>
+<th>Python</th>
+<th>R</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tabular</td>
+<td>DoWhy</td>
+<td><span class="citation" data-cites="dowhy">(<a href="#ref-dowhy" role="doc-biblioref">Sharma and Kiciman 2020a</a>)</span><br>
+<span class="citation" data-cites="dowhy_gcm">(<a href="#ref-dowhy_gcm" role="doc-biblioref">Blöbaum et al. 2022</a>)</span></td>
+<td><a href="https://www.pywhy.org/">pywhy</a></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Tabular</td>
+<td>DiCE</td>
+<td><span class="citation" data-cites="mothilal2020dice">(<a href="#ref-mothilal2020dice" role="doc-biblioref">Mothilal, Sharma, and Tan 2020</a>)</span></td>
+<td><a href="https://github.com/interpretml/DiCE">github</a></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Tabular</td>
+<td>MOC</td>
+<td><span class="citation" data-cites="Dandl_2020">(<a href="#ref-Dandl_2020" role="doc-biblioref">Dandl et al. 2020</a>)</span></td>
+<td><a href="https://github.com/dandls/moc">github</a></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Tabular</td>
+<td>Recourse</td>
+<td><span class="citation" data-cites="ustun2019">(<a href="#ref-ustun2019" role="doc-biblioref">Ustun, Spangher, and Liu 2019</a>)</span></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Tabular</td>
+<td>Tweaking</td>
+<td><span class="citation" data-cites="Tolomei2017">(<a href="#ref-Tolomei2017" role="doc-biblioref">Tolomei et al. 2017</a>)</span></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Text</td>
+<td>Checklist</td>
+<td><span class="citation" data-cites="ribeiro-etal-2020-beyond">(<a href="#ref-ribeiro-etal-2020-beyond" role="doc-biblioref">Ribeiro et al. 2020</a>)</span></td>
+<td><a href="https://github.com/marcotcr/checklist">checklist</a></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Text</td>
+<td>Litmus</td>
+<td></td>
+<td><a href="https://github.com/microsoft/Litmus">litmus</a></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Image</td>
+<td>CF-CLIP</td>
+<td><span class="citation" data-cites="yu2022cfx">(<a href="#ref-yu2022cfx" role="doc-biblioref">Yu et al. 2022</a>)</span></td>
+<td><a href="https://github.com/yingchen001/CF-CLIP">CF-CLIP</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="conclusion-1" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="conclusion-1">Conclusion</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Screenshot from 2023-03-23 18-55-02.png" class="lightbox" data-glightbox="description: .lightbox-desc-12" data-gallery="quarto-lightbox-gallery-12" title="slide"><img src="Screenshot from 2023-03-23 18-55-02.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
+<p><a href="conclusion.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16" data-glightbox="description: .lightbox-desc-16" title="Conclusion"><img src="conclusion.png" class="img-fluid figure-img" alt="Conclusion"></a></p>
+<figcaption>Conclusion</figcaption>
 </figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="Screenshot from 2023-03-23 19-00-26.png" class="lightbox" data-glightbox="description: .lightbox-desc-13" data-gallery="quarto-lightbox-gallery-13" title="slide"><img src="Screenshot from 2023-03-23 19-00-26.png" class="img-fluid figure-img" alt="slide"></a></p>
-<figcaption>slide</figcaption>
-</figure>
-</div>
+</div></div></section>
 </section>
 <section id="resources" class="level1">
 <h1>Resources:</h1>
 <ul>
-<li><span class="citation" data-cites="mothilal2020dice">(<a href="#ref-mothilal2020dice" role="doc-biblioref">Ramaravind K. Mothilal, Sharma, and Tan 2020b</a>)</span></li>
-<li><span class="citation" data-cites="mothilal2020explaining">(<a href="#ref-mothilal2020explaining" role="doc-biblioref">Ramaravind K. Mothilal, Sharma, and Tan 2020a</a>)</span></li>
-<li><a href="https://github.com/py-why/dowhy">DoWhy</a> is a Python library for causal inference that supports explicit modeling and testing of causal assumptions. DoWhy is based on a unified language for causal inference, combining causal graphical models and potential outcomes frameworks. <a href="">Microsoft Research Blog</a> | Video Tutorial | <span class="citation" data-cites="sharma2020dowhy">(<a href="#ref-sharma2020dowhy" role="doc-biblioref">Sharma and Kiciman 2020</a>)</span> | <span class="citation" data-cites="dowhy_gcm">(<a href="#ref-dowhy_gcm" role="doc-biblioref">Blöbaum et al. 2022</a>)</span> | <a href="https://www2.slideshare.net/AmitSharma315/dowhy-an-endtoend-library-for-causal-inference">Slides</a></li>
+<li><a href="https://github.com/py-why/dowhy">DoWhy</a> is a Python library for causal inference that supports explicit modeling and testing of causal assumptions. DoWhy is based on a unified language for causal inference, combining causal graphical models and potential outcomes frameworks. <a href="">Microsoft Research Blog</a> | Video Tutorial | <span class="citation" data-cites="sharma2020dowhy">(<a href="#ref-sharma2020dowhy" role="doc-biblioref">Sharma and Kiciman 2020b</a>)</span> | <span class="citation" data-cites="dowhy_gcm">(<a href="#ref-dowhy_gcm" role="doc-biblioref">Blöbaum et al. 2022</a>)</span> | <a href="https://www2.slideshare.net/AmitSharma315/dowhy-an-endtoend-library-for-causal-inference">Slides</a></li>
 </ul>
 <p>Action Items:</p>
 <ol type="1">
@@ -450,40 +717,77 @@ cookieconsent.run({
 
 
 <div class="hidden" aria-hidden="true">
-<span class="glightbox-desc lightbox-desc-1">contractual explanation properties</span>
-<span class="glightbox-desc lightbox-desc-2">contractual loss function</span>
-<span class="glightbox-desc lightbox-desc-3">slide</span>
-<span class="glightbox-desc lightbox-desc-4">slide</span>
-<span class="glightbox-desc lightbox-desc-5">slide</span>
-<span class="glightbox-desc lightbox-desc-6">slide</span>
-<span class="glightbox-desc lightbox-desc-7">slide</span>
-<span class="glightbox-desc lightbox-desc-8">slide</span>
-<span class="glightbox-desc lightbox-desc-9">slide</span>
-<span class="glightbox-desc lightbox-desc-10">slide</span>
-<span class="glightbox-desc lightbox-desc-11">slide</span>
-<span class="glightbox-desc lightbox-desc-12">slide</span>
-<span class="glightbox-desc lightbox-desc-13">slide</span>
+<span class="glightbox-desc lightbox-desc-1">outline</span>
+<span class="glightbox-desc lightbox-desc-2">Assessing human decision-making</span>
+<span class="glightbox-desc lightbox-desc-3">What is a counterfactual</span>
+<span class="glightbox-desc lightbox-desc-4">Feature Importance</span>
+<span class="glightbox-desc lightbox-desc-5">A problem with SHAP &amp; LIME</span>
+<span class="glightbox-desc lightbox-desc-6">Desiderata of contractual explanation</span>
+<span class="glightbox-desc lightbox-desc-7">CF loss function</span>
+<span class="glightbox-desc lightbox-desc-8">CFX as a way to generate debugging edge cases</span>
+<span class="glightbox-desc lightbox-desc-9">Quantitative evaluation for CFX</span>
+<span class="glightbox-desc lightbox-desc-10">results comparing CF based methods</span>
+<span class="glightbox-desc lightbox-desc-11">Comparing DiCE with LIME and CHAP</span>
+<span class="glightbox-desc lightbox-desc-12">Practical Considerations</span>
+<span class="glightbox-desc lightbox-desc-13">Returning to the optimization problem</span>
+<span class="glightbox-desc lightbox-desc-14">How to generate a counterfactual for a ML model</span>
+<span class="glightbox-desc lightbox-desc-15">Methods</span>
+<span class="glightbox-desc lightbox-desc-16">Conclusion</span>
 </div>
 
 </section>
+
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-dowhy_gcm" class="csl-entry" role="listitem">
 Blöbaum, Patrick, Peter Götz, Kailash Budhathoki, Atalanti A. Mastakouri, and Dominik Janzing. 2022. <span>“DoWhy-GCM: An Extension of DoWhy for Causal Inference in Graphical Causal Models.”</span> <em>arXiv Preprint arXiv:2206.06821</em>.
 </div>
-<div id="ref-mothilal2020explaining" class="csl-entry" role="listitem">
-Mothilal, Ramaravind K., Amit Sharma, and Chenhao Tan. 2020a. <span>“Explaining Machine Learning Classifiers Through Diverse Counterfactual Explanations.”</span> In <em>Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency</em>. ACM. <a href="https://doi.org/10.1145/3351095.3372850">https://doi.org/10.1145/3351095.3372850</a>.
+<div id="ref-Dandl_2020" class="csl-entry" role="listitem">
+Dandl, Susanne, Christoph Molnar, Martin Binder, and Bernd Bischl. 2020. <span>“Multi-Objective Counterfactual Explanations.”</span> In <em>Lecture Notes in Computer Science</em>, 448–69. Springer International Publishing. <a href="https://doi.org/10.1007/978-3-030-58112-1_31">https://doi.org/10.1007/978-3-030-58112-1_31</a>.
 </div>
 <div id="ref-mothilal2020dice" class="csl-entry" role="listitem">
-Mothilal, Ramaravind K, Amit Sharma, and Chenhao Tan. 2020b. <span>“Explaining Machine Learning Classifiers Through Diverse Counterfactual Explanations.”</span> In <em>Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency</em>, 607–17.
+Mothilal, Ramaravind K., Amit Sharma, and Chenhao Tan. 2020. <span>“Explaining Machine Learning Classifiers Through Diverse Counterfactual Explanations.”</span> In <em>Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency</em>. ACM. <a href="https://doi.org/10.1145/3351095.3372850">https://doi.org/10.1145/3351095.3372850</a>.
+</div>
+<div id="ref-pearl2009" class="csl-entry" role="listitem">
+Pearl, Judea. 2009. <span>“Causality,”</span> September. <a href="https://doi.org/10.1017/cbo9780511803161">https://doi.org/10.1017/cbo9780511803161</a>.
+</div>
+<div id="ref-ribeiro-etal-2020-beyond" class="csl-entry" role="listitem">
+Ribeiro, Marco Tulio, Tongshuang Wu, Carlos Guestrin, and Sameer Singh. 2020. <span>“Beyond Accuracy: Behavioral Testing of <span>NLP</span> Models with <span>C</span>heck<span>L</span>ist.”</span> In <em>Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics</em>, edited by Dan Jurafsky, Joyce Chai, Natalie Schluter, and Joel Tetreault, 4902–12. Online: Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/2020.acl-main.442">https://doi.org/10.18653/v1/2020.acl-main.442</a>.
+</div>
+<div id="ref-russell2019efficient" class="csl-entry" role="listitem">
+Russell, Chris. 2019. <span>“Efficient Search for Diverse Coherent Explanations.”</span> <em>CoRR</em> abs/1901.04909. <a href="http://arxiv.org/abs/1901.04909">http://arxiv.org/abs/1901.04909</a>.
 </div>
 <div id="ref-sharma2020dowhy" class="csl-entry" role="listitem">
-Sharma, Amit, and Emre Kiciman. 2020. <span>“DoWhy: An End-to-End Library for Causal Inference.”</span> <a href="https://arxiv.org/abs/2011.04216">https://arxiv.org/abs/2011.04216</a>.
+Sharma, Amit, and Emre Kiciman. 2020b. <span>“DoWhy: An End-to-End Library for Causal Inference.”</span> <a href="https://arxiv.org/abs/2011.04216">https://arxiv.org/abs/2011.04216</a>.
+</div>
+<div id="ref-dowhy" class="csl-entry" role="listitem">
+———. 2020a. <span>“DoWhy: An End-to-End Library for Causal Inference.”</span> <em>arXiv Preprint arXiv:2011.04216</em>.
+</div>
+<div id="ref-smuts1926holism" class="csl-entry" role="listitem">
+Smuts, J. C. 1926. <em>Holism and Evolution</em>. Books for College Libraries. Macmillan.
+</div>
+<div id="ref-Tolomei2017" class="csl-entry" role="listitem">
+Tolomei, Gabriele, Fabrizio Silvestri, Andrew Haines, and Mounia Lalmas. 2017. <span>“Interpretable Predictions of Tree-Based Ensembles via Actionable Feature Tweaking.”</span> In <em>Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining</em>, 465–74. KDD ’17. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/3097983.3098039">https://doi.org/10.1145/3097983.3098039</a>.
+</div>
+<div id="ref-ustun2019" class="csl-entry" role="listitem">
+Ustun, Berk, Alexander Spangher, and Yang Liu. 2019. <span>“Actionable Recourse in Linear Classification.”</span> <em>Proceedings of the Conference on Fairness, Accountability, and Transparency</em>, January. <a href="https://doi.org/10.1145/3287560.3287566">https://doi.org/10.1145/3287560.3287566</a>.
 </div>
 <div id="ref-wachter2018counterfactual" class="csl-entry" role="listitem">
 Wachter, Sandra, Brent Mittelstadt, and Chris Russell. 2018. <span>“Counterfactual Explanations Without Opening the Black Box: Automated Decisions and the GDPR.”</span> <a href="https://arxiv.org/abs/1711.00399">https://arxiv.org/abs/1711.00399</a>.
 </div>
-</div></section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2023,
+<div id="ref-weichselbaumer2019" class="csl-entry" role="listitem">
+Weichselbaumer, Doris. 2019. <span>“Multiple Discrimination Against Female Immigrants Wearing Headscarves.”</span> <em>ILR Review</em> 73 (3): 600–627. <a href="https://doi.org/10.1177/0019793919875707">https://doi.org/10.1177/0019793919875707</a>.
+</div>
+<div id="ref-yu2022cfx" class="csl-entry" role="listitem">
+Yu, Yingchen, Fangneng Zhan, Rongliang Wu, Jiahui Zhang, Shijian Lu, Miaomiao Cui, Xuansong Xie, Xian-Sheng Hua, and Chunyan Miao. 2022. <span>“Towards Counterfactual Image Manipulation via CLIP.”</span> <a href="https://arxiv.org/abs/2207.02812">https://arxiv.org/abs/2207.02812</a>.
+</div>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>what is a sensitive feature?<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Such factors can create a bias leading to discrimination.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2023,
   author = {Bochman, Oren},
   title = {4 {Counterfactual} {Explanations} - {Explaining} and
     {Debugging}},
@@ -1171,7 +1475,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"selector":".lightbox","descPosition":"bottom","loop":false,"openEffect":"zoom","closeEffect":"zoom"});
+<script>var lightboxQuarto = GLightbox({"loop":false,"descPosition":"bottom","openEffect":"zoom","selector":".lightbox","closeEffect":"zoom"});
 window.onload = () => {
   lightboxQuarto.on('slide_before_load', (data) => {
     const { slideIndex, slideNode, slideConfig, player, trigger } = data;

@@ -1,0 +1,618 @@
+---
+title: Lesson 5 - Analyzing Results
+description: Notes from Udacity A/B Testing course
+date: 2023-01-01
+image: AB-Test-Sparrows.jpg
+categories: [a/b-testing,notes]
+title-block-banner: banner_blue_1.jpg
+editor: 
+  markdown: 
+    wrap: sentence
+tbl-cap-location: bottom
+jupyter: python3
+---
+
+![udacity](/images/logos/udacity.png){.column-margin}
+
+Notes from Udacity A/B Testing course.
+
+# Lesson 5 - Analyzing Results
+
+## Intro
+
+::: {#fig-intro .column-margin}
+{{< video https://youtu.be/AyeKXinJ3W8 class="column-margin" >}}
+
+Introduction
+:::
+
+In @fig-intro Caroline assumes you've already chosen metrics, designed, and sized your experiment.
+We now focus on *analyzing the results and drawing conclusions*.
+
+-   The process involves:
+    -   **Sanity checks**: Verifying data integrity.
+    -   **Evaluation**: Handling single or multiple metrics to assess the change's impact.
+    -   **Analysis gotchas**: Avoiding common pitfalls in interpreting results.
+
+Remember A/B testing is *iterative*, meaning insights from analysis may influence future steps in designing your test.
+
+## Sanity Check
+
+::: {#fig-sanity-checks .column-margin}
+{{< video https://youtu.be/OVnlC_T3EpI class="column-margin" >}}
+
+Sanity Check
+:::
+
+In @fig-sanity-checks Diane warns Caroline against jumping straight into analyzing click-through rates from her experiment.
+Diane quickly enumerates many ways experiments may go awary.
+Conducting **sanity checks** is crucial prior to analysis.
+These checks ensure the experiment has ran correctly and the data is reliable.
+
+Two main types of sanity checks are defined as:
+
+Population sizing metrics
+
+:   Verify that the experiment and control groups are comparable in size based on the diversion unit.
+
+Invariant metrics
+
+:   Metrics should not change due to the experiment itself.
+    Analyzing their change helps identify potential issues.
+
+Only after passing these checks should you dive deeper into more complex analysis to interpret the experiment's success or failure and make recommendations.
+
+## Choosing Invariants
+
+::: {#fig-choosing-invariants .column-margin}
+{{< video https://youtu.be/qCnbDgy2yHk class="column-margin" >}}
+
+Choosing Invariants
+:::
+
+In @fig-choosing-invariants we get started with sanity checking our experiment results by picking the right invariant metrics.
+As Diane said, there are two types:
+
+1.  Population sizing metrics: These make sure the experiment and control groups are comparable in size, based on the diversion unit.
+2.  Other invariant metrics: Any metrics that shouldn't change due to the experiment itself.
+
+Now, I'll describe two experiments.
+For each one, think about what metrics would stay the same, meaning they wouldn't differ between the control and experiment groups.
+
+::: {#exm-changing-course-order}
+Experiment 1: Changing course order
+
+Udacity is testing a new way of ordering courses in the course list to see if it affects enrollment.
+Each user ID is considered a single *unit of diversion*, since users might browse before enrolling.
+:::
+
+::: {#exm-changing-video-infrastructure}
+Experiment 2: Changing video infrastructure
+
+Udacity is implementing a new system to deliver videos faster.
+This time, each event (like a video play) is considered a unit of diversion.
+:::
+
+Now, we should decide which of these metrics would be good invariant for each experiment:
+
+-   Number of signed-in users
+-   Number of cookies
+-   Number of events
+-   Click-through rate (CTR) on the "Start Now" button (This button takes users from the homepage to the course list.)
+-   Average time to complete a course
+
+Remember, an invariant metric should not change because of the experiment itself.
+Choose the ones that fit that criteria for each experiment
+
+| Invariant Metric           | course order | video infrastructure |
+|----------------------------|--------------|----------------------|
+| unit of diversion          | UID          | event                |
+| \# signed-in users         | :x:          | :x:                  |
+| \# cookies                 | :x:          | :x:                  |
+| \# events                  | :x:          | :x:                  |
+| CTR for "Start Now" button | :x:          | :x:                  |
+| Avg. time to complete      | :o:          | :x:                  |
+
+: Invariant Metrics for experiment 1 & 2 {#tbl-ex1 .striped }
+
+These are questions used the instructor to test the invariance for each metric.
+
+|     | Question                                                          |            | Decision         |
+|-------------|---------------------------------|-------------|-------------|
+| 1\. | is the metric directly randomized?                                | $\implies$ | invariant        |
+| 2\. | is the metric expected to be evenly split between the two groups? | $\implies$ | invariant        |
+| 3\. | is the metric measured before the test begins ?                   | $\implies$ | invariant        |
+| 4\. | is the metric altered by the experiment ?                         | $\implies$ | not an invariant |
+| 5\. | is the metric impossible to tracked?                              | $\implies$ | not an invariant |
+| 6\. | can the metric be assigned to different groups multiple times ?   | $\implies$ | not an invariant |
+
+: Invariance diagnostics {#tbl-metric-diag .striped }
+
+::: {#exm-changing-sign-in-location}
+Experiment 3: Change Sign in to be on all pages
+
+Udacity changes the "sign in" button to be on all pages.
+
+The unit diversion is a cookie
+:::
+
+| Invariant Metric           | course order | note                                   |
+|----------------------|------------------|--------------------------------|
+| unit of diversion          | cookie       |                                        |
+| \# events                  | :x:          | this, \# cookeis \# users are all good |
+| CTR for "Start Now" button | :o:          | this will change                       |
+| Probability of enrolling   | :o:          | should also change                     |
+| Sign-in rate               | :o:          | this is the metric we are testing      |
+| Video load time            | :x:          | should not change                      |
+
+: Invariant Metrics for experiment 3 {#tbl-ex3 .striped}
+
+## Checking Invariants
+
+::: {#fig-checking-invariants .column-margin}
+{{< video https://youtu.be/7CVlKQ3UjUI class="column-margin" >}}
+
+Checking Invariants
+:::
+
+In @fig-checking-invariants we get down to business and see how to check an invariant metric and ensure it's similar between the control and experiment groups.
+
+Say you ran a two-week experiment with cookies as your diversion unit.
+The first sanity check: comparing the number of cookies in each group.
+
+Here's the data:
+
+::: {#tbl-results layout-ncol="2"}
+| Day | control | experiment |
+|-----|---------|------------|
+| Mon | 5077    | 4877       |
+| Tue | 5495    | 4729       |
+| Wed | 5294    | 5063       |
+| Thu | 5446    | 5035       |
+| Fri | 5126    | 5010       |
+| Sat | 3382    | 3193       |
+| Sun | 2891    | 3226       |
+
+: Week 1 cookies for control & experiment {#tbl-week1 .striped tbl-cap-location="bottom"}
+
+| Day | control | experiment |
+|-----|---------|------------|
+| Mon | 5029    | 5092       |
+| Tue | 5166    | 5048       |
+| Wed | 4902    | 4985       |
+| Thu | 4923    | 4805       |
+| Fri | 4816    | 4741       |
+| Sat | 3411    | 2939       |
+| Sun | 3496    | 3075       |
+
+: Week 2 cookies for control & experiment {#tbl-week2 .striped tbl-cap-location="bottom"}
+
+Experiment 3 results
+:::
+
+Now, let's look at the total number of cookies in each group.
+If that overall split seems balanced, that's great.
+Otherwise, we'll need to dig deeper into the day-by-day breakdown.
+
+The totals show:
+
+-   Control group: 64,454 cookies
+-   Experiment group: 61,818 cookies
+
+While the control group has more cookies, the question is: is this difference unexpected?
+
+Think about it this way: each cookie was randomly assigned to either group with a 50% chance.
+So, the real question is: is it surprising that out of the total cookies, 64,454 ended up in the control group?
+
+Let's say that our $H_0$ null-hypothesis is that there is no difference between the groups.
+Or that the the probability for the data generating process is 0.5
+
+::: column-margin
+{{< video https://youtu.be/05jVh4kUbHU class="column-margin" >}}
+
+Checking Invariants II
+:::
+
+1.  We can think about this IID draws from a Bernoulli distribution which we assume that p=0.5
+2.  Sums of Bernoulli trials follow the Binomial distribution
+3.  Since N = 126272 \>\> 20 We can approximated the Binomial with a Gaussian distribution.
+4.  We can therefore test if the sd of the control and experiment are within CI for 95%
+5.  To do so we should first apply a Z transform and check against the standard normal.
+
+for CI of .95 Z = 1.96 $$
+CI = p \pm z \times SE = p \pm z \times \sqrt{\frac{p(1-p)}{N}} = 0.5 \pm 1.96 \times p \times 126272 ^{-2} \qquad 
+$$ {#eq-binomial-ci}
+
+```{python}
+#| label: CI-for-Binomial
+#| lst-label: CI-for-Binomial
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Define parameters
+p = 0.5
+N = 126272
+z = 1.96  # 95% confidence level
+
+# Calculate confidence interval bounds
+lower_bound = p - z * (p * (1 - p) / N)**0.5
+upper_bound = p + z * (p * (1 - p) / N)**0.5
+
+# lets create a df
+
+alpha = 0.05
+method = 'normal'
+
+# for experiment
+name='experiment'
+count = 61818
+proportion = count/N
+exeriment = {'name':name, 'count':count, 'lb':lower_bound,'ub':upper_bound,"proportion":proportion}
+
+# for control
+name='control'
+count = 64454
+proportion = count/N
+control= {'name':name, 'count':count, 'lb':lower_bound,'ub':upper_bound,"proportion":proportion}
+
+
+df = pd.DataFrame.from_records(data=(exeriment,control),index=['1', '2'])
+df
+```
+
+```{python}
+#| label: fig-ci
+#| fig-cap: Binomial Confidence Intervals
+import altair as alt
+import matplotlib.pyplot as plt
+
+points = alt.Chart(df).mark_point(filled=True, color='black').encode(
+  x=alt.X('name:N'),
+  y=alt.Y('proportion:Q'),
+)
+
+error_bars = alt.Chart(df).mark_errorbar().encode(
+  x = alt.X('name:N'),
+  y = alt.Y('lb:Q').scale(zero=False).title("lb"),
+  y2= alt.Y2('ub:Q').title("ub"),
+)
+
+points + error_bars
+```
+
+so this is not an error in the calculation - we can plainly see that the two groups are significantly outside the CI.
+This means that we are not getting the same behavior for each group.
+Sanity test fails 🤡
+
+Further analysis shows that the control is getting more cookies daily.
+
+Note we can perform this analysis more directly under the Bayesian paradigm using a Beta prior and a Binomial Likelihood.
+
+Here is the instructors analysis:
+
+-   Given: Each cookie is randomly assigned to the control or experiment group with probability $p = 0.5$. Use this to compute SD of binomial with probability 0.5 of success. Calculate the confidence interval. The observed fraction of control group is greater than the upper bound of CI =\> there is something wrong with the setup.
+-   Do day-by-day analysis. If control group samples are more on a lot of dates, not just a specific day, we can
+    1.  Talk to the engineers about experiment infrastructure, unit of diversion, etc.
+    2.  Try slicing to see if one particular slice is weird, e.g. country, language, platform.
+    3.  Check the age of cookies — does one group have more new cookies
+    4.  Retrospective analysis: recreate the experiment diversion from the data capture to understand the problem.
+    5.  Pre- and post-period: check invariant. If similar changes exist on the pre-period, it could be problems with the experiment infrastructure (e.g. cookie reset), setup (e.g. not filter correctly between groups), etc. If the changes are only observed in the post-period, the issue may be associated with the experiment itself such as data capture (e.g. capture correctly in trt but not in control). Learning effect may take time. If the issues are observed at the beginning of the experiment, might not be learning effect.
+
+| Day | control | experiment |
+|-----|---------|------------|
+| Mon | 2451    | 2404       |
+| Tue | 2475    | 2507       |
+| Wed | 2394    | 2376       |
+| Thu | 2482    | 2444       |
+| Fri | 2374    | 2504       |
+| Sat | 1704    | 1612       |
+| Sun | 1468    | 1465       |
+
+: Another experiment {#tbl-week2 .striped tbl-cap-location="bottom"}
+
+::: column-margin
+{{< video https://youtu.be/Mftti4FSjn4 class="column-margin" >}}
+
+Checking Invariants II Solved
+:::
+
+## Sanity Checking: Wrap-up
+
+::: {#fig-sanity-checking-wrapup .column-margin}
+{{< video https://youtu.be/rCAYdZk5O2E class="column-margin" >}}
+
+Sanity Checking: Wrapup
+:::
+
+In @fig-sanity-checking-wrapup Diane point out that failing a sanity check in your experiment is like landing on "do not pass GO" in Monopoly.
+It means you shouldn't proceed with analyzing the results until you understand why the check failed.
+
+Here's what to do if your sanity check fails:
+
+1.  Debug the experiment setup:
+    -   Collaborate with engineers to check:
+        -   Technical issues: Is there something wrong with the experiment infrastructure or the way it's set up?
+        -   Diversion issues: Did the experiment assign users to groups correctly?
+2.  Retrospective analysis:
+    -   Try recreating experiment diversion from the data to understand if the issue is inherent to the experiment itself.
+3.  Utilize pre and post periods:
+    -   Compare the invariant metrics in the pre-period (before the experiment) to those in the experiment and post-period (after the experiment).
+        -   If the change only occurs in the experiment period, it points to an issue with the experiment itself (data capture, etc.).
+4.  If the change occurs in both the pre-period and experiment, it suggests an infrastructure issue.
+
+Remember:
+
+-   Failing a sanity check doesn't necessarily mean there's a major problem, but it does require investigation before drawing conclusions.
+
+-   Even with passing checks, slight differences in metrics are expected due to random chance.
+
+-   Learning effects (users adapting over time) can also impact results.
+    Look for a gradual increase in change over time, not an immediate significant change.
+
+If all checks pass, then you can move on to analyzing the experiment results.
+
+Note: when I run A/B test for clients at an advertising agency.
+I used tested framework like Google Analytics, VWO, Crazy Egg, and Firebase to run them and none of this was a major issue.
+However, many people have had test that run awry, so sanity tests are not such a bad idea.
+
+## A Single Metric
+
+::: {#fig-single-metric-intro .column-margin}
+{{< video https://youtu.be/StP9L9f70EU class="column-margin" >}}
+
+Single Metric: Introduction
+:::
+
+In @fig-single-metric-intro Carey, explained how to analyze the results of an A/B experiment with a single evaluation metric.
+
+**The goal:** Decide if the experiment had a statistically significant, positive impact on the metric, and estimate the size and direction of the change.
+This information helps you decide whether to recommend launching the experiment broadly.
+
+**Steps involved:**
+
+1.  **Characterize the metric:** Understand its variability (covered in Lesson 3).
+
+2.  **Estimate experiment parameters:** Use the variability to determine how long to run the experiment and how many users to include (covered in Lesson 4).
+
+3.  **Analyze for statistical significance:**
+
+    -   Combine the information from steps 1 and 2 to estimate the variability for analyzing the experiment.
+
+    -   Use statistical tests (like hypothesis tests) to assess if the observed change is statistically significant, meaning it's unlikely due to random chance.
+
+**What to do if the results are not statistically significant:**
+
+-   **Further analysis:**
+
+    -   Look for patterns by segmenting the data (e.g., by platform, day of the week).
+        This might reveal bugs or suggest new hypotheses.
+
+    -   Compare your results with other methods (e.g., non-parametric tests) to confirm or explore inconsistencies.
+
+-   Consider the possibility that the observed change, although not statistically significant, might still be valuable for the business.
+
+### What *not* to do if your results aren't significant
+
+Carrie gave some ideas of what you can do if your results aren't significant, but you were expecting they would be.
+One tempting idea is to run the experiment for a few more days and see if the extra data helps get you a significant result.
+However, this can lead to a much higher false positive rate than you expecting!
+See [How Not To Run an A/B Test by Evan Miller](http://www.evanmiller.org/how-not-to-run-an-ab-test.html) for more details.
+Instead of running for longer when you don't like the results, you should be sizing your experiment in advance to ensure that you will have enough power the first time you look at your results.
+
+## Overview of **How Not To Run an A/B Test: Avoiding Repeated Significance Testing Errors by Evan Miller** 
+
+![no peeking](ab_testing_meme_no_peeking.jpg){.column-margin}
+
+The blog post recommended in this lesson explains how "peeking" at A/B test results and stopping the experiment based on interim significance can lead to misleading conclusions.
+
+Here's the key takeaway:
+
+**Problem:**
+
+-   A/B testing software will often displays "chance of beating original" or "statistical significance" during the experiment.
+
+-   These are estimates with a strong assumption of a fixed sample size set before starting the experiment.
+
+-   Experiment will switch between favouring A and B many times and as this happens it will loose and then regain statistical significance.
+
+-   If you **Peek** at the data and stopp the experiment early this not only violates the assumption of a fixed sample size it also inflates the reported significance level.
+
+-   Actually it is much worse is you stop early (e.g., when it first shows significance) you have **cherry picked** the result.
+    The statistical significance isn't just inflated it is meaningless.
+
+**Consequences:**
+
+-   You might wrongly conclude that an insignificant difference is actually significant (**false positive**).
+
+-   Think about it - it is like stopping the election when less than 10% of the votes are counted - there is little reason to think you really seen the big picture.
+
+-   The more you peek, the worse the problem gets.
+
+**Solutions:**
+
+- For experimenters:
+    -   **Fix the sample size in advance** and stick to it, regardless of interim results.
+    -   **Avoid peeking** at the data or stopping early.
+    -   Use the formula `n=16σ²/δ²` as a rule of thumb to estimate the required sample size, considering the desired effect size (`δ`) and expected variance (`σ²`).
+-For A/B testing software developers:
+    -   Don't show significance levels until the experiment ends.
+    -   Instead, report the **detectable effect size** based on current data.
+    -   Consider removing "current estimate" of the treatment effect.
+- Advanced options:
+    -   **Sequential experiment design:** Predefined checkpoints to decide on continuing the experiment while maintaining valid significance levels.
+    -   **Bayesian experiment design:** Allows stopping the experiment and making valid inferences at any time, potentially better suited for real-time web experiments.
+
+**Conclusion:**
+
+-   Don't rely on preliminary significance indicators in A/B testing dashboards.
+-   Fix the sample size upfront and avoid peeking at data to ensure reliable results.
+-   Consider advanced techniques like [sequential](https://www.evanmiller.org/sequential-ab-testing.html) or [Bayesian designs](https://www.evanmiller.org/bayesian-ab-testing.html) for greater flexibility.
+
+A couple of comments:
+
+1.  Most people, data scientists, included don't have a clue estimating statistical power, effect sizes the sample size required to reach significance for an a/b test. Given all that they have even less of a clue on the Practical significance of the test which is what matters in the business setting and what creates the costs for the loosing
+2.  A Bayesian design is definitely better than the frequentist approach - particularly if it figures in the cost of testing each arm.
+3.  The only thing in your favour is that you can get an easy win or two if you have not done any a/b testing. Afterwards it gets harder and harder to get a large effect size.
+
+
+::: {#fig-single-metric-example .column-margin}
+{{< video https://youtu.be/LCZG4wlEFXE class="column-margin" >}}
+
+Single Metric: Example
+:::
+
+::: {#exm-changing-start-now}
+change color and placement of Start Now button
+
+- metric: CTR
+- Unit of diversion: cookie
+$$d_{min}=0.01,\quad  \alpha=0.05,\quad \beta=0.2$$
+:::
+
+
+
+
+```{python}
+import numpy as np
+Xs_cont = np.asarray([196, 200, 200, 216, 212, 185, 225, 187, 205, 211, 192, 196, 223, 192])
+Ns_cont = np.asarray([2029, 1991, 1951, 1985, 1973, 2021, 2041, 1980, 1951, 1988, 1977, 2019, 2035, 2007])
+Xs_exp = np.asarray([179, 208, 205, 175, 191, 291, 278, 216, 225, 207, 205, 200, 297, 299])
+Ns_exp = np.asarray([1971, 2009, 2049, 2015, 2027, 1979, 1959, 2020, 2049, 2012, 2023, 1981, 1965, 1993])
+
+data = {
+  "clicks_cont": Xs_cont,
+  "views_cont":  Ns_cont,
+  "ctr_cont":    Xs_cont/Ns_cont,
+  "clicks_exp":  Xs_exp,
+  "views_exp":   Ns_exp,
+  "ctr_exp":    Xs_exp/Ns_exp,
+}
+
+df = pd.DataFrame.from_dict(data)
+df
+
+d_min = 0.01
+alpha = 0.05
+empirical_se   = 0.062
+epirical_views = 5000 # per group
+
+effect_size=0
+#sign_test= statsmodels.stats.descriptivestats.sign_test(df[], mu0=0)
+
+```
+
+
+## Single Metric: Gotchas
+::: {#fig-single-metric-gotchas .column-margin}
+{{< video https://youtu.be/WrfWFLiFeMU class="column-margin" >}}
+
+Single Metric: Gotchas
+:::
+
+In @fig-single-metric-gotchas the instructor discusses Simpson's Paradox
+
+We start with sime definitions
+
+Conflicting results
+: When statistical tests disagree, like sign test and hypothesis test, or results differ across subgroups, a closer look at the data is necessary.
+
+Simpson's paradox
+: This phenomenon occurs when a trend appears in the overall data but reverses direction when analyzed within subgroups.
+
+Subgroup analysis
+: Examining data within relevant subgroups like departments, platforms, or user types can reveal hidden patterns.
+
+Confounding variables
+: Variables not directly measured but influencing the observed relationship can lead to misleading interpretations.
+
+The example is a well known result regarding admissions to Berkley University  
+
+Example:
+
+Berkeley admissions: In aggregate, women had a lower acceptance rate than men. However, analyzing by department showed women had higher acceptance rates in some departments but applied more to lower acceptance departments, leading to the overall trend.
+
+Application:
+
+Experiment analysis: Similar to the Berkeley admissions example, experiment results can be misleading if analyzed without considering subgroup behavior.
+
+Further Learning:
+
+The speaker mentions an upcoming example of how Simpson's paradox affects experiment analysis.
+
+
+**Remember:**
+
+-   Non-significant results don't necessarily mean there's no effect, but they require further investigation before drawing conclusions.
+
+-   See if there’s a significant difference.
+    If not as expected, break/slice and check the results.
+    It helps with debugging the experiment setup, and get new hypotheses.
+
+-   **Simpson Paradox**.
+    Although for each subgroup it seems that CTR has improved, the overall CTR was not improved.
+    We cannot say the experiment is successful.
+    Need to dig deeper to understand what caused the difference between new users and experienced users.
+
+## Multiple Metrics
+
+- Challenge: When evaluating multiple metrics simultaneously, random chance increases the likelihood of seeing seemingly significant differences that aren't truly meaningful. (Lines 3-7)
+
+- Mitigating factors:
+  - Repeatability: If the "significant" difference doesn't occur again in repeated experiments (e.g., different days, data slices, or bootstrap analysis), it's likely a chance finding. (Lines 8-11)
+  - Multiple Comparisons: This technique adjusts the significance level to account for the number of metrics tested, reducing the probability of false positives. (Lines 13-15)
+- Applications:
+  - Exploratory Data Analysis (EDA): Multiple comparisons help identify consistently significant metrics and avoid overfitting to random noise. (Lines 19-21)
+  - Automatic Alerting: When setting up alerts based on significant changes in metrics, using multiple comparisons helps prevent false positives triggering alerts. (Lines 22-24)
+
+
+
+
+### Multiple comparison problem
+
+As you test more metrics, it becomes more likely that one of them will show a statistically significant result by chance.
+- In other words, the probability of any false positive increases as you increase the number of metrics.
+- For example, when we measure 3 independent metrics at the same time, alpha = 0.05, the probability that at least one metric by chance is significant (False Positive) is
+
+```         
+- $P(FP=0) = 0.95*0.95*0.95 = 0.857$ 
+- so $P(FP≥1) = 1-P(FP=0) = 1–0.857 = 0.143$
+- Solution: Use a higher confidence level for each metric
+```
+
+-   **Method 1**: Set up an overall alpha and use it to calculate each individual alpha. Assume independence.
+
+$$\alpha_{overall} = 1 - ( 1 - \alpha_{individual})^n$$
+
+-   **Method 2**: **Bonferroni correction**.
+
+$\alpha_{individual} = \alpha_{overall}/n$
+
+A problem with **Bonferroni correction** is, if our metrics are correlated, they tend to move at the same time.
+In this way, the method is too conservative -- it results in less significant difference.
+
+**Solution: 1** Use *false discovery rate* \$ FDR = E( \frac{\text{false positives}}{\text{ rejections}}) \$ instead of family-wise error rate (FWER, control probability that any metric shows a false positive)
+
+**Solution: 2️** Use less conservative multiple comparison methods, e.g. closed testing procedure, Boole-Bonferroni bound, and Holm-Bonferroni method.
+
+### Focus on Business Goals
+
+Overall evaluation criteria (OEC) should be established based on an understanding of what your company is doing and what the problems are.
+It should balance long-term and short-term benefits.
+Business analysis is needed to make the decision.
+Once you have some candidates of OEC, you can run a few experiments to see how they steer you (whether in the right direction).
+
+### Whether to launch an experiment or not??
+
+-   Statistically and practically significant to justify the change?
+-   Do you understand what the change can do to the user experience?
+-   Is it worth the investment?
+
+### Ramp up A/B test
+
+-   Start with 1% of the traffic and divert to experiment and increase that until the feature is fully launched.
+-   During the ramp-up process, effects may not be statistically significant even if they are significant before. Reason:
+    -   Seasonality such as school season, holiday, etc. 🌟
+        -   Solution: have a holdback group (launch the experiment to everyone except for a small holdback who doesn’t get the change, and you continue to compare them to the control)
+    -   Novelty effect or change aversion: as users discover or change their adoption of your change, their behavior can change and measured effect can change — can do cohort analysis. 🌟
+        -   Solution: Pre- and post-period analysis with cohort analysis to understand the learning effect — i.e. how users adapt to the changes over time.
+-   Business-wise, need to consider the engineering cost of maintaining the change, if there are customer support or sales issue, opportunity cost, etc.

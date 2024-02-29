@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2016-01-23">
+
+<title>Oren Bochman’s Blog - 05 - Means-End Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - 05 - Means-End Analysis">
+<meta name="twitter:description" content="Personal website, portfolio and blog">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/notes/cognitivie-ai-cs7637/05-means-end-analysis/thumbnail_blog.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+        <li>
+    <a class="dropdown-item" href="../../../dnn.html">
+ <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../model-thinking.html">
+ <span class="dropdown-text">Model Thinking</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../xai.html">
+ <span class="dropdown-text">XAI</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rl.html">
+ <span class="dropdown-text">rl</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rhetoric.html">
+ <span class="dropdown-text">rhetoric</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../tfp.html">
+ <span class="dropdown-text">TFP</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../ab-testing.html">
+ <span class="dropdown-text">AB testing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../cognitiveai.html">
+ <span class="dropdown-text">cognitive AI</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">05 - Means-End Analysis</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 23, 2016</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#preview" id="toc-preview" class="nav-link active" data-scroll-target="#preview">Preview</a></li>
+  <li><a href="#exercise-the-block-problem" id="toc-exercise-the-block-problem" class="nav-link" data-scroll-target="#exercise-the-block-problem">Exercise The Block Problem</a></li>
+  <li><a href="#exercise-the-block-problem-1" id="toc-exercise-the-block-problem-1" class="nav-link" data-scroll-target="#exercise-the-block-problem-1">Exercise The Block Problem</a></li>
+  <li><a href="#state-spaces" id="toc-state-spaces" class="nav-link" data-scroll-target="#state-spaces">State Spaces</a></li>
+  <li><a href="#differences-in-state-spaces" id="toc-differences-in-state-spaces" class="nav-link" data-scroll-target="#differences-in-state-spaces">Differences in State Spaces</a></li>
+  <li><a href="#process-of-means-end-analysis" id="toc-process-of-means-end-analysis" class="nav-link" data-scroll-target="#process-of-means-end-analysis">Process of Means End Analysis</a></li>
+  <li><a href="#exercise-block-problem-i" id="toc-exercise-block-problem-i" class="nav-link" data-scroll-target="#exercise-block-problem-i">Exercise Block Problem I</a></li>
+  <li><a href="#exercise-block-problem-i-1" id="toc-exercise-block-problem-i-1" class="nav-link" data-scroll-target="#exercise-block-problem-i-1">Exercise Block Problem I</a></li>
+  <li><a href="#exercise-block-problem-ii" id="toc-exercise-block-problem-ii" class="nav-link" data-scroll-target="#exercise-block-problem-ii">Exercise Block Problem II</a></li>
+  <li><a href="#exercise-block-problem-ii-1" id="toc-exercise-block-problem-ii-1" class="nav-link" data-scroll-target="#exercise-block-problem-ii-1">Exercise Block Problem II</a></li>
+  <li><a href="#exercise-block-problem-iii" id="toc-exercise-block-problem-iii" class="nav-link" data-scroll-target="#exercise-block-problem-iii">Exercise Block Problem III</a></li>
+  <li><a href="#exercise-block-problem-iii-1" id="toc-exercise-block-problem-iii-1" class="nav-link" data-scroll-target="#exercise-block-problem-iii-1">Exercise Block Problem III</a></li>
+  <li><a href="#exercise-block-problem-iv" id="toc-exercise-block-problem-iv" class="nav-link" data-scroll-target="#exercise-block-problem-iv">Exercise Block Problem IV</a></li>
+  <li><a href="#exercise-block-problem-iv-1" id="toc-exercise-block-problem-iv-1" class="nav-link" data-scroll-target="#exercise-block-problem-iv-1">Exercise Block Problem IV</a></li>
+  <li><a href="#exercise-block-problem-v" id="toc-exercise-block-problem-v" class="nav-link" data-scroll-target="#exercise-block-problem-v">Exercise Block Problem V</a></li>
+  <li><a href="#exercise-block-problem-v-1" id="toc-exercise-block-problem-v-1" class="nav-link" data-scroll-target="#exercise-block-problem-v-1">Exercise Block Problem V</a></li>
+  <li><a href="#assignment-means-ends-analysis" id="toc-assignment-means-ends-analysis" class="nav-link" data-scroll-target="#assignment-means-ends-analysis">Assignment Means-Ends Analysis</a></li>
+  <li><a href="#problem-reduction" id="toc-problem-reduction" class="nav-link" data-scroll-target="#problem-reduction">Problem Reduction</a></li>
+  <li><a href="#problem-reduction-in-the-block-problem" id="toc-problem-reduction-in-the-block-problem" class="nav-link" data-scroll-target="#problem-reduction-in-the-block-problem">Problem Reduction in the Block Problem</a></li>
+  <li><a href="#exercise-problem-reduction-i" id="toc-exercise-problem-reduction-i" class="nav-link" data-scroll-target="#exercise-problem-reduction-i">Exercise Problem Reduction I</a></li>
+  <li><a href="#exercise-problem-reduction-i-1" id="toc-exercise-problem-reduction-i-1" class="nav-link" data-scroll-target="#exercise-problem-reduction-i-1">Exercise Problem Reduction I</a></li>
+  <li><a href="#exercise-problem-reduction-ii" id="toc-exercise-problem-reduction-ii" class="nav-link" data-scroll-target="#exercise-problem-reduction-ii">Exercise Problem Reduction II</a></li>
+  <li><a href="#exercise-problem-reduction-ii-1" id="toc-exercise-problem-reduction-ii-1" class="nav-link" data-scroll-target="#exercise-problem-reduction-ii-1">Exercise Problem Reduction II</a></li>
+  <li><a href="#exercise-problem-reduction-iii" id="toc-exercise-problem-reduction-iii" class="nav-link" data-scroll-target="#exercise-problem-reduction-iii">Exercise Problem Reduction III</a></li>
+  <li><a href="#exercise-problem-reduction-iii-1" id="toc-exercise-problem-reduction-iii-1" class="nav-link" data-scroll-target="#exercise-problem-reduction-iii-1">Exercise Problem Reduction III</a></li>
+  <li><a href="#exercise-problem-reduction-iii-2" id="toc-exercise-problem-reduction-iii-2" class="nav-link" data-scroll-target="#exercise-problem-reduction-iii-2">Exercise Problem Reduction III</a></li>
+  <li><a href="#exercise-problem-reduction-iii-3" id="toc-exercise-problem-reduction-iii-3" class="nav-link" data-scroll-target="#exercise-problem-reduction-iii-3">Exercise Problem Reduction III</a></li>
+  <li><a href="#means-ends-analysis-for-ravens" id="toc-means-ends-analysis-for-ravens" class="nav-link" data-scroll-target="#means-ends-analysis-for-ravens">Means-Ends Analysis for Ravens</a></li>
+  <li><a href="#assignment-problem-reduction" id="toc-assignment-problem-reduction" class="nav-link" data-scroll-target="#assignment-problem-reduction">Assignment Problem Reduction</a></li>
+  <li><a href="#wrap-up" id="toc-wrap-up" class="nav-link" data-scroll-target="#wrap-up">Wrap Up</a></li>
+  <li><a href="#the-cognitive-connection" id="toc-the-cognitive-connection" class="nav-link" data-scroll-target="#the-cognitive-connection">The Cognitive Connection</a></li>
+  <li><a href="#final-quiz" id="toc-final-quiz" class="nav-link" data-scroll-target="#final-quiz">Final Quiz</a></li>
+  <li><a href="#final-quiz-1" id="toc-final-quiz-1" class="nav-link" data-scroll-target="#final-quiz-1">Final Quiz</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>.. image:: https://dl.dropbox.com/s/uud7z2pqx8hflp2/Screenshot%202016-01-27%2001.33.06.png :align: center :height: 300 :width: 450</p>
+<section id="preview" class="level1">
+<h1>Preview</h1>
+<p>.. image:: https://dl.dropbox.com/s/wf0e10isgs9580q/Screenshot%202016-01-27%2001.34.00.png :align: center :height: 300 :width: 450</p>
+<p>Today we will discuss two other very general AR methods of problem-solving called means end analysis and problem reduction.</p>
+<p>Like [INAUDIBLE] these two methods, means analysis and problem reduction, are really useful for very well-formed problems.</p>
+<p>Not all problems are well-formed. But some problems are. And then these methods are very useful. These three methods, generate-and-test, means-ends analysis, form reduction, together with semantic networks as a knowledge representation, form the basic unit of all fundamental topics in this course.</p>
+<p>We’ll begin with the notion of state spaces. Then talk about means-end analysis.</p>
+<p>Then we’ll illustrate means-end analysis as a matter for solving problems and then we’ll move onto the method of problem reduction.</p>
+</section>
+<section id="exercise-the-block-problem" class="level1">
+<h1>Exercise The Block Problem</h1>
+<p>.. image:: https://dl.dropbox.com/s/1zlv119zq9efmon/Screenshot%202016-01-27%2001.36.21.png :align: center :height: 300 :width: 450</p>
+<p>To understand a method of means and analysis. Let us look at this blocks word problem. This is a very famous problem in AI. It has occurred again and again. And almost every textbook in AI has this problem. You’re given a table on which there are three blocks. And A is on table, B is on table, and</p>
+<p>C is on A. This is the initial state. And you want to move these blocks, to the gold state. On this configuration, so that C is on table, B is on C and</p>
+<p>A is on B. The problem looks very simple listen, doesn’t it?</p>
+<p>Let’s introduce a couple of constraints.</p>
+<p>You may move only one block at a time, so you can’t pick both A and B together.</p>
+<p>And second, you may only move a block that has nothing on top of it. So, you cannot move block A in this configuration, because it has C on top of it.</p>
+<p>Let us also suppose that we’re given some operators in this world.</p>
+<p>These operators essentially move some object to some location. For example, we could move C to the table, or C onto B, or C onto A.</p>
+<p>Not all the operators may be applicable in the current state. C is already on A, but in principle, all these, all of these operators are available. Given these operators, and this initial state and this goal state, write a sequence of operations that will move the blocks from the initial state to the goal state.</p>
+</section>
+<section id="exercise-the-block-problem-1" class="level1">
+<h1>Exercise The Block Problem</h1>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>That’s a good answer, David, that’s a correct answer.</p>
+</blockquote>
+</blockquote>
+<p>Now the question becomes how can we make in AI agent that will come up with the similar sequence of operations? In particular, how does the matter of means-end analysis work on this problem and come up with a particular sequence of operations?</p>
+</section>
+<section id="state-spaces" class="level1">
+<h1>State Spaces</h1>
+<p>.. image:: https://dl.dropbox.com/s/gb0l97nvo1f84up/Screenshot%202016-01-27%2001.38.07.png :align: center :height: 300 :width: 450</p>
+<p>.. image:: https://dl.dropbox.com/s/u5sjf84e0mbwabl/Screenshot%202016-01-27%2001.39.25.png :align: center :height: 300 :width: 450 So, we can imagine problem-solving as occurring in a state space.</p>
+<p>Here is the initial state, here is the goal state. And the state space consists of all of the states that could be potentially produced from the initial state by iterative application of the various operators in this micro world. I want to come up with a path in the state space, takes me from initial state to the goal state. There is one path, this is not the only path, but this is one path to go from the initial state to the goal state. The question then becomes, how might an AI agent derive this path that may take it from the initial state to the goal state.</p>
+<p>Let us see how this notion of path finding applies to our blocks world problem.</p>
+<blockquote class="blockquote">
+<p>From the initial state, here it is one path of going to the goal state. First, we put C on the table. Then we put B on top C. And then we put A on top of B.</p>
+</blockquote>
+<p>Which is exactly the answer that David had given. This is one sequence, one path from the initial state to the goal state. The question then becomes, how does AI method know what operation to select in a given state?</p>
+<p>Consider this state, for example. There are several operations possible here.</p>
+<p>One could put C on top of B or B on top of A.</p>
+<p>How does the AI agent know which operation to select at this particular state?</p>
+</section>
+<section id="differences-in-state-spaces" class="level1">
+<h1>Differences in State Spaces</h1>
+<p>.. image:: https://dl.dropbox.com/s/s93r8pk129lb6hq/Screenshot%202016-01-27%2001.42.57.png :align: center :height: 300 :width: 450</p>
+<p>.. image:: https://dl.dropbox.com/s/rjxc0jbr2x8qy0t/Screenshot%202016-01-27%2001.44.00.png :align: center :height: 300 :width: 450</p>
+<p>One way of thinking about this is to talk in terms of differences. This chart illustrates the differences between different states and the goal state. So, for example, if the current state was this one then this red line illustrates the difference from the goal state. So we should pick an operator that will help reduce the difference between the current state and the goal state.</p>
+<p>So the reduction between the difference with the current state and the goal state is the end. The application of the operator is the means.</p>
+<p>That’s why it’s called the means-ends analysis. At any given state,</p>
+<p>I’m going to pick an operator that will help you deduce the difference between the current state and the goal state. Note in a way this problem is similar to the problem of part finding in robotics, where we have to design a robot that could go from one point to another point in some navigation space.</p>
+<blockquote class="blockquote">
+<p>From my office to your office, for example, if all our offices were in the same building. There too we would use the notion of distances between offices. Here we using the notion of distance in a metaphorical sense, in a figurative sense, not in a physical sense. So I’ll sometimes use the word difference instead of distance but it’s the same idea. We are trying to deduce the distance or the difference but in an abstract space. So going back to an example of going from this initial state to this goal state. I can look at initial state and see that there are three differences between the initial state and the goal state. First, A is on table here, but A should be on B.</p>
+</blockquote>
+<p>B is on table here, but B should be on C. And third, C is on top of A here, the C should be on top, on table there. So three differences. Here the number of operations are available to us. Nine operations in particular. Let us do a means- end analysis. We can apply an operator that would put C on table.</p>
+<p>In which case the difference between the new state and the goal state will be two. We could apply an operator that will put C on top of B, in that case the difference between the current state and the goal state will still be three. Or we can apply the operator putting B on top of C, in which case the distance between the current state and the goal state will be 2. Notice that the notion of reducing differences now leads to two possible choices. One could go with this state or with this one.</p>
+<p>Means-end analysis by itself does not help an AI agent decide between this course of action and that course of action. This is something that we will return to, both a little bit later in this lesson and even much more in detail when we come to planning in this course. For now, let us resume that we choose the top course of action just like they had done already there. So this chart illustrates the pot taken from the initial state to the goal state.</p>
+<p>And the important thing to notice here is that with each different move the distance between the current state and the goal state is decreasing, from three to two to one to zero. This is why means-end analysis comes up with this path because at each time it reduces a difference</p>
+</section>
+<section id="process-of-means-end-analysis" class="level1">
+<h1>Process of Means End Analysis</h1>
+<p>.. image:: https://dl.dropbox.com/s/wt3g5ys92sy6st7/Screenshot%202016-01-27%2001.45.03.png :align: center :height: 300 :width: 450</p>
+<p>We can summarize the means-ends analysis method like this.</p>
+<p>Compare the current state and the goal state. Find the differences between them. For each difference, look at what operators might be applicable. Select that operator that gets you closest to the goal state from the current state. We did this for the blocks and worlds problem. We also did this with regards to the business problem. But throughout those states in regards to business problem, which we’re not getting us close to the goal state. This is the means-ends analysis method in summary.</p>
+</section>
+<section id="exercise-block-problem-i" class="level1">
+<h1>Exercise Block Problem I</h1>
+<p>.. image:: https://dl.dropbox.com/s/hwsvq8c6x58nhwb/Screenshot%202016-01-27%2001.46.27.png :align: center :height: 300 :width: 450 To understand more deeply the properties of means and analysis, let us look at another, slightly more complicated example. In this example, there are four blocks instead of the three in the previous example. A, B,</p>
+<p>C, D. In the initial state, the blocks are arranged as shown here.</p>
+<p>The goal state is shown here on the right. The four blocks are arranged in a particular order. Now if you compare the configuration of blocks on the left with the configuration of blocks on the right, in the goal state, you can see there are three differences. First, A is on Table, where A is on B here. B is on C. That’s not a difference. C is on Table.</p>
+<p>C is on D here, D’s on B, D’s on Table here. So there are three differences.</p>
+<p>So, this is a heuristic measure of the difference between the initial state and the goal state. Once again, we’ll assume that the AI agent can move only one block at a time.</p>
+<p>Given the specification of the problem, what states are possible from the initial state? Please write down your answers in these boxes.</p>
+</section>
+<section id="exercise-block-problem-i-1" class="level1">
+<h1>Exercise Block Problem I</h1>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>That’s good David.</p>
+</blockquote>
+</blockquote>
+</section>
+<section id="exercise-block-problem-ii" class="level1">
+<h1>Exercise Block Problem II</h1>
+<p>.. image:: https://dl.dropbox.com/s/4hqap610bnzokqh/Screenshot%202016-01-27%2001.47.51.png :align: center :height: 300 :width: 450 Okay now for each of these states that is possible from the initial state what are the differences as compared to the goal state?</p>
+<p>Please write down your answers in these boxes.</p>
+</section>
+<section id="exercise-block-problem-ii-1" class="level1">
+<h1>Exercise Block Problem II</h1>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>Good, David. So in each state David is comparing the state with the goal state and finding differences between them.</p>
+</blockquote>
+</blockquote>
+</section>
+<section id="exercise-block-problem-iii" class="level1">
+<h1>Exercise Block Problem III</h1>
+<p>.. image:: https://dl.dropbox.com/s/av9b73lbnmbje4d/Screenshot%202016-01-27%2001.49.04.png :align: center :height: 300 :width: 450 Given these three choices which operation would means-end analysis choose?</p>
+</section>
+<section id="exercise-block-problem-iii-1" class="level1">
+<h1>Exercise Block Problem III</h1>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>That’s correct, David</p>
+</blockquote>
+</blockquote>
+</section>
+<section id="exercise-block-problem-iv" class="level1">
+<h1>Exercise Block Problem IV</h1>
+<p>.. image:: https://dl.dropbox.com/s/vea6bs88websymo/Screenshot%202016-01-27%2001.50.15.png :align: center :height: 300 :width: 450 Given this current state, we can apply means ends analysis veritably.</p>
+<p>Now, if we apply means on some of those to this particular state, the number of choices here is very large, so I will not go through all of them here.</p>
+<p>But I’d like you to write down the number of possible next states. As well as, how many of those states reduce the difference to the goal? Which is given here.</p>
+</section>
+<section id="exercise-block-problem-iv-1" class="level1">
+<h1>Exercise Block Problem IV</h1>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>That’s good, David.</p>
+</blockquote>
+</blockquote>
+</section>
+<section id="exercise-block-problem-v" class="level1">
+<h1>Exercise Block Problem V</h1>
+<p>.. image:: https://dl.dropbox.com/s/u6b81m2mmxi404q/Screenshot%202016-01-27%2001.51.54.png :align: center :height: 300 :width: 450 So, the operation of putting A on B will bring us to this state.</p>
+<p>Given this state, we can have, again, apply a means of analysis. Again, I’m not sure that all these states here, but</p>
+<p>I’d like you to find out how many possible states are there and how many of those states reduce the difference to the goal described.</p>
+</section>
+<section id="exercise-block-problem-v-1" class="level1">
+<h1>Exercise Block Problem V</h1>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>That’s right David and that means that means-ends analysis doesn’t not always take us to what’s the goal. Sometimes it can take us away from the goal.</p>
+</blockquote>
+</blockquote>
+<p>And sometimes means-end analysis can get caught in loops. Means-end analysis, like genetic and test, is an example of universal error methods.</p>
+<p>These universal error methods are applicalbe to very large classes of problems.</p>
+<p>However, they can rate few guarantees of success, and they’re often very costly. They’re costly in terms of computational efficiency.</p>
+<p>They neither provide any guarantees of computational efficiency, nor provide any guarantees of the optimality of the solution that they come up with.</p>
+<p>Their power lies in the fact that they can be applied to a very large class of problems. Later in this class, we’ll discuss problem-solving methods, which are very specialized problem-solving methods.</p>
+<p>Those methods are applicable to a smaller class of problems. However, they are more tuned to those problems and often are more efficient and sometimes, also provide guarantees over the optimality of the solution.</p>
+<p>Although means-end analysis did not work very for this problem. It infact works quite well for many other problems and therefore is an important AI method.</p>
+<p>Later in this class when we come to planning, we will look at more powerful specialized methods that can in fact address this class of problems quite well.</p>
+</section>
+<section id="assignment-means-ends-analysis" class="level1">
+<h1>Assignment Means-Ends Analysis</h1>
+<p>.. image:: https://dl.dropbox.com/s/7ul3stbfhgpl3bx/Screenshot%202016-01-27%2001.54.38.png :align: center :height: 300 :width: 450 So how do you use means ends analysis to solve Raven’s Progressive Matrices?</p>
+<p>What exactly is our goal in this context?</p>
+<p>You might think of the goal in different ways. We might think of it as, the goal is to solve the problem or in a different sense we might think of the goal as the transform sum frame into another frame. And then trace back and find what the transformation was? In that context how would you then measure distance? We noticed that distance is important in doing means ends analysis because that helps us decide what to do next. Once you have a measure of how to actually measure distance to your goal what are the individual operators or moves that you can take to actually move closer to your goal and how would you weight them to be able to decide what to do at any given time.</p>
+<p>In addition, what are the overall strengths of using means and analysis as a problem-solving approach in this context, and what are its limitations. Is it well suited for these problems, or are there perhaps other things that we can be doing that aren’t necessarily under this topic that would actually make the problem even easier.</p>
+</section>
+<section id="problem-reduction" class="level1">
+<h1>Problem Reduction</h1>
+<p>.. image:: https://dl.dropbox.com/s/517xm0r04cfv1k2/Screenshot%202016-01-27%2001.55.35.png :align: center :height: 300 :width: 450 Let us now turn to the third problem-solving method under this topic called problem reduction. The method of problem reduction actually is quite intuitive.</p>
+<p>I’m sure you use it all the time. Given the hard complex problem, reduce it.</p>
+<p>Decompose it into multiple easier, smaller, simpler problems. Consider, for example, computer programming or software design that I’m sure many of you do all the time. Given a hard part of the address, you decompose it with a series of smaller problems. How do I read the input? How do I process it?</p>
+<p>How do I write the output? That itself is a decomposition. In fact, one of the fundamental roles that knowledge plays is it tells you how to decompose a hard problem into simpler problems.</p>
+<p>Then once you have solutions to this simpler smaller problems.</p>
+<p>You can think about how to compose the sub-solutions to the sub-problems into a solution of the problem as a whole. That’s how problem reduction works.</p>
+</section>
+<section id="problem-reduction-in-the-block-problem" class="level1">
+<h1>Problem Reduction in the Block Problem</h1>
+<p>.. image:: https://dl.dropbox.com/s/vva9p6y5jbqdiyh/Screenshot%202016-01-27%2001.57.56.png :align: center :height: 300 :width: 450</p>
+<p>Let us start from where we left off when we finished [UNKNOWN] analysis.</p>
+<p>This was the current state, this was the goal state. As we saw from [UNKNOWN] analysis, achieving this goal state is not a very easy problem.</p>
+<p>However, we can think of this goal state as being composed of several sub goals, so D on top of table. C on top of D. B on top of C. A on top of B.</p>
+<p>Four sub goals here. Now, we can try to address this problem by looking at one sub goal at a time. Let us suppose that we have picked this sub goal,</p>
+<p>C on top of D. Give that sub goal, we can now start from this current state and try to achieve this sub goal. Now of course, one might ask the question, why did we pick the goal C over D, and not the goal, B over C, or the goal A over B?</p>
+<p>Well one reason is that, the difference between this state and that state had to do with C over D. But in general, problem reduction by itself does not tell us, what sub-goal to attack first. That is a problem, we’ll address later when we come to planning. Well now the major point is, that we can decompose the goal into several subgoals, and attack one subgoal at a time. Now that we have C over</p>
+<p>D as a subgoal, we really don’t carry about whether A is on B or B is on C. What we are focused on is the other two states, C on table, D on table, because those are the blocks that occur in the goal state. So let us now see how [INAUDIBLE] have been solved this sub problem [INAUDIBLE] goal C on D and D on Table.</p>
+</section>
+<section id="exercise-problem-reduction-i" class="level1">
+<h1>Exercise Problem Reduction I</h1>
+<p>.. image:: https://dl.dropbox.com/s/tnwwx1jl5id6p6d/Screenshot%202016-01-27%2001.58.27.png :align: center :height: 300 :width: 450 So given this is a current state, what successor states are possible if we were to apply means and analysis? Please fill in these boxes.</p>
+</section>
+<section id="exercise-problem-reduction-i-1" class="level1">
+<h1>Exercise Problem Reduction I</h1>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>That looks right, David.</p>
+</blockquote>
+</blockquote>
+</section>
+<section id="exercise-problem-reduction-ii" class="level1">
+<h1>Exercise Problem Reduction II</h1>
+<p>.. image:: https://dl.dropbox.com/s/t1zcfbhdw1pjxuh/Screenshot%202016-01-27%2001.59.36.png :align: center :height: 300 :width: 450 Let us now calculate the difference from each of the states to the goal state.</p>
+</section>
+<section id="exercise-problem-reduction-ii-1" class="level1">
+<h1>Exercise Problem Reduction II</h1>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>So note that both the state at the top and this state at the bottom have a equal amount of difference compared to goal state. We could’ve chosen either state to go further. For now, we going to go with the one at the bottom. The reason of course is that if I put A on D that will get in the way of solving the rest of the problem. For now, let us go with this state. Later on we will see how an AI agent will decide that this is not a good path to take and this is the better path to take.</p>
+</blockquote>
+</blockquote>
+</section>
+<section id="exercise-problem-reduction-iii" class="level1">
+<h1>Exercise Problem Reduction III</h1>
+<p>.. image:: https://dl.dropbox.com/s/qs3m1pme01li281/Screenshot%202016-01-27%2002.00.52.png :align: center :height: 300 :width: 450</p>
+<p>So if we make the move that we had at the end of the last shot, we’ll get this state. So now we need to go from this state to the goal state.</p>
+<p>Please write down what is the sequence of operators which might take us from the current state to the goal state.</p>
+</section>
+<section id="exercise-problem-reduction-iii-1" class="level1">
+<h1>Exercise Problem Reduction III</h1>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>That was the right answer David, thank you. You will note that we leaving several questions unanswered for now and that is fine, but you will also note that this problem reduction helps us make progress towards solving the problem.</p>
+</blockquote>
+</blockquote>
+</section>
+<section id="exercise-problem-reduction-iii-2" class="level1">
+<h1>Exercise Problem Reduction III</h1>
+<p>.. image:: https://dl.dropbox.com/s/zwf8x3vsbllv7y7/Screenshot%202016-01-27%2002.02.07.png :align: center :height: 300 :width: 450</p>
+<p>So the application of the last move in the previous shot will bring us to this state. In this state the the sub-goal C over D has been achieved. Now that we’ve achieved the first sub-goal, we can worry about achieving the other sub-goals.</p>
+<p>The other sub-goals, recall, were B over C and A over B. Given this as the current state and this as the goal state. Please write down the sequence of operations that will take us from the current state to the goal state.</p>
+</section>
+<section id="exercise-problem-reduction-iii-3" class="level1">
+<h1>Exercise Problem Reduction III</h1>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>That was correct, David. Now this particular problem might look very simple.</p>
+</blockquote>
+</blockquote>
+<p>Because for you and me as humans, going from this state to this state is almost trivial. But notice how many different questions arose in trying to analyze this problem. Clearly, you and I as humans must be addressing these issues.</p>
+<p>This kind of A.I anaylsis makes explicit what is usually tacit when humans solve this problem. And that is one of the powers of A.I.. Indeed we have left a lot of questions unanswered. But each unanswered question then requires an answer.</p>
+<p>Now we know that if you must develop methods that somehow will help to address those questions. Like genetic [x] tests and like [x] dialysis.</p>
+<p>Problem reduction is a universal method. It is applicable very large class of problems. Once again, problem reduction does not provide guarantee of successes.</p>
+</section>
+<section id="means-ends-analysis-for-ravens" class="level1">
+<h1>Means-Ends Analysis for Ravens</h1>
+<p>.. image:: https://dl.dropbox.com/s/33sle3hfa6yug2c/Screenshot%202016-01-27%2002.05.16.png :align: center :height: 300 :width: 450</p>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>That’s good analysis, David. Let’s go one step further.</p>
+</blockquote>
+</blockquote>
+<p>There’s also has generation test on it. We are generated solutions, that we can then test against the various choices that were given to us.</p>
+<p>So in this particular problem, you can see means-end analysis working, problem reduction working, and direct link test working.</p>
+<p>Often, solving a complex problem requires a combination of error techniques.</p>
+<p>At one point, one might use problem reduction, at another point, one might use direct link test, at a third point, one might use means-end analysis. Notice also, that the one single knowledge representation of semantic network, supports all three of these strategies.</p>
+<p>The coupling between the knowledge representation and semantic network, and any of these three strategies from reduction, means-end analysis, or generate-and-test, is weak. Late on we’ll come across methods, in which knowledge and the problem-solving method are closely coupled. The knowledge of folds certain inferences. And inferences, demand certain kinds of knowledge.</p>
+<p>This is why these methods are known as weak methods. Because the coupling between these universal methods, and the knowledge representation is weak.</p>
+</section>
+<section id="assignment-problem-reduction" class="level1">
+<h1>Assignment Problem Reduction</h1>
+<p>.. image:: https://dl.dropbox.com/s/wk9ubbux8qe06tv/Screenshot%202016-01-27%2002.08.07.png :align: center :height: 300 :width: 450 So how would you apply a problem reduction to Raven’s Progressive Matrices?</p>
+<p>Before we actually talk about how our agents would do it, we can think about how we would do it. When we are solving a matrix, where do the smaller or easier problems that we are actually breaking it down into?</p>
+<p>How are we solving those smaller problems, and how are we then combining them into an answer to the problem as a whole? Once we know how we’re doing it, how will your agent actually be able to do the same kind of reasoning process?</p>
+<p>How will it recognize when to split a problem in to smaller problems?</p>
+<p>How will it solve the smaller problems? And how will it then combine those in to an answer to the problem as whole? During this process think about, what exactly is it that makes these smaller problems easier for your agent to answer than just answering the problem as a whole?</p>
+<p>And how does that actually help you solve these problems better?</p>
+</section>
+<section id="wrap-up" class="level1">
+<h1>Wrap Up</h1>
+<p>.. image:: https://dl.dropbox.com/s/t0zssql1uuoqiqq/Screenshot%202016-01-27%2002.08.49.png :align: center :height: 300 :width: 450 So let’s wrap up what we’ve talked about today.</p>
+<p>We started off today by talking about state spaces and we used this to frame our discussion of mean-ends analysis. Means-ends analysis is a very general-purpose problem-solving method, that allows us to look at our goal and try to continually move towards it. We then use means-ends analysis to try and address a couple of different kinds of problems. But when we did so, we hit an obstacle. To overcome that obstacle, we used problem reduction.</p>
+<p>We can use problem reduction in a lot of other problem-solving contexts, but here we use it to specifically to overcome the obstacle we hit during means-ends analysis. Problem reduction occurs and we take a big hard problem and introduce it into smaller easier problems. By solving the smaller easier problems, we solve the big hard problem. Next time we’re going to talk about production systems, which are the last part of the fundamental areas of our course. But if you’re particularly interested in what we’ve talked about today, you may wish to jump forward to logic and planning. Those were built specifically on the types of the problems we talked about today. And in fact in planning, we’ll see a more robust way of solving the kinds of obstacles that we hit, during our exercise with means and analysis earlier in this lesson.</p>
+</section>
+<section id="the-cognitive-connection" class="level1">
+<h1>The Cognitive Connection</h1>
+<p>Let us examine the connection between methods like means ends analysis and problem reduction on one hand, and human cognition on the other. Methods like means ends analysis, problem reduction and even generate-and-test, are sometimes called weak methods.</p>
+<p>They are weak because they make only little use of knowledge. Later on, we’ll look at strong methods that are knowledge intensive. That will demand a lot of knowledge. The good thing about those knowledge intensive methods is, that they will actually use knowledge about the world, to come up with good solutions in an efficient manner. On the other hand, those knowledge intensive methods require knowledge, which is not always available. So humans, when they are working in a domain, in a world at which they are experts, tend to use those knowledge intensive methods because they know a lot about the world. But of course, you and I constantly work in worlds, in domains in which we are not experts. When we’re not an expert in our domain, a domain that might be unfamiliar to us, then we might well go with matters that are weak because they don’t require a lot of knowledge.</p>
+</section>
+<section id="final-quiz" class="level1">
+<h1>Final Quiz</h1>
+<p>.. image:: https://dl.dropbox.com/s/5o87264k5wb5w8a/Screenshot%202016-01-27%2002.10.54.png :align: center :height: 300 :width: 450</p>
+<p>We’re at the end of this lesson.</p>
+<p>Please summarize what you learned in this lesson, inside this box.</p>
+</section>
+<section id="final-quiz-1" class="level1">
+<h1>Final Quiz</h1>
+<p>And thank you for doing it.</p>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2016,
+  author = {Bochman, Oren},
+  title = {05 - {Means-End} {Analysis}},
+  date = {2016-01-23},
+  url = {https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/05-means-end-analysis/05-means-end-analysis.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2016" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2016. <span>“05 - Means-End Analysis.”</span> January 23,
+2016. <a href="https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/05-means-end-analysis/05-means-end-analysis.html">https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/05-means-end-analysis/05-means-end-analysis.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

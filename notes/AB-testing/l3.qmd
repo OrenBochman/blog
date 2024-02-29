@@ -1,0 +1,93 @@
+---
+title: Lesson 3 -  Choosing and Characterizing Metrics
+description: Notes from Udacity A/B Testing course
+date: 2023-01-01
+image: AB-Test-Sparrows.jpg
+categories: [a/b-testing,notes]
+title-block-banner: banner_blue_1.jpg
+---
+
+![udacity](/images/logos/udacity.png){.column-margin}
+
+
+Notes from Udacity A/B Testing course.
+
+One should think about how one intends to use these metrics before defining them.
+
+
+##  Definitions and Data Capture
+
+1.  Sanity Checking / Invariant Checking: to make sure the experiment is run properly.
+These metrics should remain unchanged between control and experiment groups, e.g. Is population the same? Is distribution the same?
+2. Evaluation:
+   a. High-level business metrics: revenue, market share, how many users
+   b. More detailed metrics that reflect the user’s experience with the product
+      - Set up a set of techniques to help dig into the user experience, e.g. user experience research — users are not finishing a class — dig into the reason- quit too difficult, video of class too long?
+      - For some experiences, might not have the information you need. E.g. (1) do students have improved skills — very nebulous and cannot measure it takes too long to get the information,(2) Do students get jobs after taking the class? —     It could be more than 6 months, and the experiment is too short for getting such information.
+3. How to Define Metrics
+    1. **High-level concepts**. A one-sentence summary that everyone can understand — e.g. active users, click-through-probability
+    2.  **Define the details**. What constitutes active users? The first page of the search results, or all the next pages? US only or globally? Removing spam or not? Latency — how long does it take a page to load: when does the first-byte load? Last byte load?
+    3. Take all these individual data measurements and **summarize** them into a single metric, e.g. use median, sum, average, count, etc.
+4. Single or multiple metrics?
+    - Depend on company culture and how comfortable people are with the data. If we want different teams to move towards the same goal, then we might want a single metric.
+    - If we have multiple metrics, we can create a composite metric — objective function or OEC (overall evaluation criteria - a weighted function that combines all these metrics)
+    - Do not suggest using composite metric because(1) hard to define and get agreements from different groups (2) can run into problems if you over-optimize looking into one thing and do not look at others (3) when the metric moves, people will come in and ask why it moves, and have to go back and check individual metric anyway
+    - Better to design a less optimal metric applicable to the whole suite of AB tests, than a perfect metric.
+5. Example — Funnel plot to create metrics
+    - There might be swirls — customers from the later layer of the funnel go back to the earlier step — e.g. students finished lesson 2 of a course and enrolled in a different course.
+    - Track steps across different platforms — phone vs. computer
+    - Track the progress of the funnel across platforms
+    - Keep the counts at key steps (e.g. visit home pages, enroll in courses), and calculate rates at other steps.
+6. Gathering Additional Data
+    - **User Experience Research (UER)**: 👍Good for brainstorming, can use special equipment. 😔 Want to validate results, often only a few users but can go very deep, special equipment — e.g. special camera to capture eye movement
+    - **Focus Groups**: 👍 Can show screenshots of images, walk through the demo and ask questions, including hypothesis questions, get feedback on the hypothesis. 😔 Run the risk of group thinking, more users but less deep
+    - **Surveys**: 👍 How many students get jobs after the course — whether the course contributes to them finding jobs, useful for metrics you cannot directly measure. 😔 Can’t directly compare to other results
+7. Filtering and Segmenting
+    a. External factors to consider: competitor clicking through your website on everything, someone malicious trying to mess up your metric, additional traffic caused by a new experiment,… Need to at least flag and identify these issues, and eventually filter them out
+    b. Internal factors to consider: some changes only impact a subset of your traffic (e.g. region), or only impact some platforms — then need to filter only the affected traffic/platform
+    - How to tell if the data is biased or not?
+    - Segmenting the data, and calculating the metric on these various disjoint segments (e.g. country, language, platform). See if the traffic is moved disproportionally across segments and makes sense.
+    - Look at **Day over Day** or **Week over Week** traffic pattern changes to identify things that are unusual.
+8. Summary statistics
+    - Sums and Counts — e.g. number of users who visit the website
+    - Distributional metrics — e.g. means, median, percentiles
+    - Rates or probabilities
+    - Ratio — range of different business models, but it is very hard to categorize
+    
+## Sensitivity & Robustness
+
+Metric should pick up the changes you care about (sensitivity), and do not pick up the changes that you do not care about (robustness).
+e.g. Mean is sensitive to outliers and heavily influenced by these observations. The Median is less sensitive and more robust, but if you only affect a fraction of users, even a large fraction like 20%, the median might not change.
+How to measure sensitivity and robustness?
+
+### Experiment 
+
+- Run experiments or use experiments already have. E.g. Latency — increase the quality of the video (increase the load time for users), and see if the metric responds to that. Can look back at the experiments run by your company earlier — see if these experiments move the metrics you are interested in
+- A/A experiment. Compare people seeing the same thing to each other. See if the metric picks up the difference between the two. Make sure you don’t call things significant that do not mean anything
+
+### Retrospective analysis (to test if the metric is over-sensitive and catch spurious differences)
+
+Look back at the changes on your website, and see if the metrics you are interested in move-in conjunction with these changes.
+
+Or can look at the history of the metrics and see if there is anything that causes these changes.
+
+Plot the distribution check mean/median/each quantile and see which one is more suitable
+
+Absolute change or relative change to compute the difference between the experiment and control:
+
+- Absolute difference: if you are getting started with the experiment and want to understand the possible metrics
+% change advantage: only need to pick one practical significance boundary to get stability over time (e.g. seasonality, shopping behavior)
+
+## Variability: Metrics’ distribution & variance (for sanity/invariability check, or how to size your experiment)
+
+Different metrics might have different variabilities. For some metrics, their variability is so high and it’s not practical to use them in the experiment even if the metric makes a lot of business or product sense.
+
+To calculate the variability, we need to understand the distribution of the underlying data and do the calculation by using analytical or empirical techniques.
+
+For median and ratios, the distribution of median depends on the distribution of the underlying data. We can use non-parametric methods — analyze the data without making assumptions on what the distribution is.
+
+Empirical Variances: For more complicated metrics, you might have to estimate the variance empirically than analytically. Use A/A test to estimate the empirical variance of the metrics. — Compare the difference so that the difference is driven by the underlying variability, such as system, user populations, etc. If you see a lot of variability in a metric in an A/A test, it might be too sensitive to use in the experiment.
+
+What if we don’t want to run a lot of A/A tests? 
+
+Use Bootstrapping! Run one A/A test — although it is just one experiment, it is calculated from a lot of individual data points (individual clicks and page views). Take a random sample of data points from each side of the experiment, and calculate the click-through probability based on that random sample as if it was a full experimental group. Record the difference in click-through probability, and use that as a simulated experiment. Repeat this process multiple times, record the results, and use them as if they were from an actual experiment.

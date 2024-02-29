@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2016-01-23">
+
+<title>Oren Bochman’s Blog - 03 - Semantic Networks</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - 03 - Semantic Networks">
+<meta name="twitter:description" content="Personal website, portfolio and blog">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/notes/cognitivie-ai-cs7637/03-semantic-networks/thumbnail_blog.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+        <li>
+    <a class="dropdown-item" href="../../../dnn.html">
+ <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../model-thinking.html">
+ <span class="dropdown-text">Model Thinking</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../xai.html">
+ <span class="dropdown-text">XAI</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rl.html">
+ <span class="dropdown-text">rl</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rhetoric.html">
+ <span class="dropdown-text">rhetoric</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../tfp.html">
+ <span class="dropdown-text">TFP</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../ab-testing.html">
+ <span class="dropdown-text">AB testing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../cognitiveai.html">
+ <span class="dropdown-text">cognitive AI</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">03 - Semantic Networks</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 23, 2016</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#semantic-networks" id="toc-semantic-networks" class="nav-link active" data-scroll-target="#semantic-networks">Semantic Networks</a></li>
+  <li><a href="#preview" id="toc-preview" class="nav-link" data-scroll-target="#preview">Preview</a></li>
+  <li><a href="#representations" id="toc-representations" class="nav-link" data-scroll-target="#representations">Representations</a></li>
+  <li><a href="#introduction-to-semantic-networks" id="toc-introduction-to-semantic-networks" class="nav-link" data-scroll-target="#introduction-to-semantic-networks">Introduction to Semantic Networks</a></li>
+  <li><a href="#exercise-constructing-semantic-nets-i" id="toc-exercise-constructing-semantic-nets-i" class="nav-link" data-scroll-target="#exercise-constructing-semantic-nets-i">Exercise Constructing Semantic Nets I</a></li>
+  <li><a href="#exercise-constructing-semantic-nets-i-1" id="toc-exercise-constructing-semantic-nets-i-1" class="nav-link" data-scroll-target="#exercise-constructing-semantic-nets-i-1">Exercise Constructing Semantic Nets I</a></li>
+  <li><a href="#exercise-constructing-semantic-nets-ii" id="toc-exercise-constructing-semantic-nets-ii" class="nav-link" data-scroll-target="#exercise-constructing-semantic-nets-ii">Exercise Constructing Semantic Nets II</a></li>
+  <li><a href="#exercise-constructing-semantic-nets-ii-1" id="toc-exercise-constructing-semantic-nets-ii-1" class="nav-link" data-scroll-target="#exercise-constructing-semantic-nets-ii-1">Exercise Constructing Semantic Nets II</a></li>
+  <li><a href="#structure-of-semantic-networks" id="toc-structure-of-semantic-networks" class="nav-link" data-scroll-target="#structure-of-semantic-networks">Structure of Semantic Networks</a></li>
+  <li><a href="#characteristics-of-good-representations" id="toc-characteristics-of-good-representations" class="nav-link" data-scroll-target="#characteristics-of-good-representations">Characteristics of Good Representations</a></li>
+  <li><a href="#discussion-good-representations---quiz" id="toc-discussion-good-representations---quiz" class="nav-link" data-scroll-target="#discussion-good-representations---quiz">Discussion: Good Representations - Quiz</a></li>
+  <li><a href="#discussion-good-representations" id="toc-discussion-good-representations" class="nav-link" data-scroll-target="#discussion-good-representations">Discussion: Good Representations</a></li>
+  <li><a href="#guards-and-prisoners" id="toc-guards-and-prisoners" class="nav-link" data-scroll-target="#guards-and-prisoners">Guards and Prisoners</a></li>
+  <li><a href="#semantic-networks-for-guards-and-prisoners" id="toc-semantic-networks-for-guards-and-prisoners" class="nav-link" data-scroll-target="#semantic-networks-for-guards-and-prisoners">Semantic Networks for “Guards and Prisoners”</a></li>
+  <li><a href="#solving-the-guards-and-prisoners-problem" id="toc-solving-the-guards-and-prisoners-problem" class="nav-link" data-scroll-target="#solving-the-guards-and-prisoners-problem">Solving the “Guards and Prisoners” Problem</a></li>
+  <li><a href="#exercise-guards-and-prisoners-i-quiz" id="toc-exercise-guards-and-prisoners-i-quiz" class="nav-link" data-scroll-target="#exercise-guards-and-prisoners-i-quiz">Exercise Guards and Prisoners I Quiz</a></li>
+  <li><a href="#exercise-guards-and-prisoners-i---answer" id="toc-exercise-guards-and-prisoners-i---answer" class="nav-link" data-scroll-target="#exercise-guards-and-prisoners-i---answer">Exercise Guards and Prisoners I - Answer</a></li>
+  <li><a href="#exercise-guards-and-prisoners-ii---quiz" id="toc-exercise-guards-and-prisoners-ii---quiz" class="nav-link" data-scroll-target="#exercise-guards-and-prisoners-ii---quiz">Exercise Guards and Prisoners II - Quiz</a></li>
+  <li><a href="#exercise-guards-and-prisoners-ii---answer" id="toc-exercise-guards-and-prisoners-ii---answer" class="nav-link" data-scroll-target="#exercise-guards-and-prisoners-ii---answer">Exercise Guards and Prisoners II - Answer</a></li>
+  <li><a href="#exercise-guards-and-prisoners-iii---quiz" id="toc-exercise-guards-and-prisoners-iii---quiz" class="nav-link" data-scroll-target="#exercise-guards-and-prisoners-iii---quiz">Exercise Guards and Prisoners III - Quiz</a></li>
+  <li><a href="#exercise-guards-and-prisoners-iii---answer" id="toc-exercise-guards-and-prisoners-iii---answer" class="nav-link" data-scroll-target="#exercise-guards-and-prisoners-iii---answer">Exercise Guards and Prisoners III - Answer</a></li>
+  <li><a href="#represent-reason-for-analogy-problems" id="toc-represent-reason-for-analogy-problems" class="nav-link" data-scroll-target="#represent-reason-for-analogy-problems">Represent Reason for Analogy Problems</a></li>
+  <li><a href="#exercise-represent-reason-for-ravens---quiz" id="toc-exercise-represent-reason-for-ravens---quiz" class="nav-link" data-scroll-target="#exercise-represent-reason-for-ravens---quiz">Exercise Represent Reason for Ravens - Quiz</a></li>
+  <li><a href="#exercise-represent-reason-for-ravens---answer" id="toc-exercise-represent-reason-for-ravens---answer" class="nav-link" data-scroll-target="#exercise-represent-reason-for-ravens---answer">Exercise Represent Reason for Ravens - Answer</a></li>
+  <li><a href="#exercise-how-do-we-choose-a-match" id="toc-exercise-how-do-we-choose-a-match" class="nav-link" data-scroll-target="#exercise-how-do-we-choose-a-match">Exercise How do we choose a match</a></li>
+  <li><a href="#exercise-how-do-we-choose-a-match-1" id="toc-exercise-how-do-we-choose-a-match-1" class="nav-link" data-scroll-target="#exercise-how-do-we-choose-a-match-1">Exercise How do we choose a match</a></li>
+  <li><a href="#choosing-matches-by-weights" id="toc-choosing-matches-by-weights" class="nav-link" data-scroll-target="#choosing-matches-by-weights">Choosing Matches by Weights</a></li>
+  <li><a href="#discussion-choosing-a-match-by-weight---quiz" id="toc-discussion-choosing-a-match-by-weight---quiz" class="nav-link" data-scroll-target="#discussion-choosing-a-match-by-weight---quiz">Discussion Choosing a Match by Weight - Quiz</a></li>
+  <li><a href="#discussion-choosing-a-match-by-weight---answer" id="toc-discussion-choosing-a-match-by-weight---answer" class="nav-link" data-scroll-target="#discussion-choosing-a-match-by-weight---answer">Discussion Choosing a Match by Weight - Answer</a></li>
+  <li><a href="#connections" id="toc-connections" class="nav-link" data-scroll-target="#connections">Connections</a></li>
+  <li><a href="#assignment-semantic-nets" id="toc-assignment-semantic-nets" class="nav-link" data-scroll-target="#assignment-semantic-nets">Assignment Semantic Nets</a></li>
+  <li><a href="#wrap-up" id="toc-wrap-up" class="nav-link" data-scroll-target="#wrap-up">Wrap Up</a></li>
+  <li><a href="#the-cognitive-connection" id="toc-the-cognitive-connection" class="nav-link" data-scroll-target="#the-cognitive-connection">The Cognitive Connection</a></li>
+  <li><a href="#final-quiz" id="toc-final-quiz" class="nav-link" data-scroll-target="#final-quiz">Final Quiz</a></li>
+  <li><a href="#final-quiz-1" id="toc-final-quiz-1" class="nav-link" data-scroll-target="#final-quiz-1">Final Quiz</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+<section id="semantic-networks" class="level1 page-columns page-full">
+<h1>Semantic Networks</h1>
+<p>A large part of this lesson explores solving two types of problems. By using a graph to visually represent the process, we end up with a semantic network. However, it seems that these networks even when implemented in a tool like networks are still unwieldy. Also, it seems that humans who can solve these problems can come up with networks. But how can a machine come up with a representation etc given just the picture? This is not discussed and we seem to imagine that the image processing task and <code>Semantic Networks</code> construction is easier than the analogy tasks that the class goes into detail about.</p>
+<ul>
+<li>The SN mixes representation at different levels using a single network, without making the levels and boundries explicit. For Raven’s matrices, we have :
+<ol type="1">
+<li>A representation of a single matrix - which is fairly complex and challanging to implement <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</li>
+<li>A representation of a transformation that mutates one matrix into another. <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></li>
+<li>A representation that a transformation is a valid hypothesis leading to a solution or that it fails due to some contradiction. <a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></li>
+<li>A representation for ranking the best of multiple valid hypotheses. <a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></li>
+</ol></li>
+</ul>
+<div class="no-row-height column-margin column-container"><p><sup>1</sup>&nbsp;How should we name the states and their constituent entities? How should we identify entities between states?</p><p><sup>2</sup>&nbsp;There are can be multiple competing alternatives for the transformation. We need to be able to encode these different transformations in our representation.</p><p><sup>3</sup>&nbsp;for a general AI one would expect being able to solve new problems with transformation that have not been seen in training AKA <code>zero-shot learning</code></p><p><sup>4</sup>&nbsp;We may have encoded a transformation that generates a solution that satisfies the analogy step but is not part of the solution. </p><p><sup>5</sup>&nbsp;Human rankings, AI rankings and possibly task specific rankings.</p></div><p>A second shortcoming that makes the SN unwieldy is that it does not seem to treat approach problem-solving in a general fashion. If we have solved a couple of problems using <code>SN</code> are we any closer to solving the third, particularly if they all belong to the same category like Raven’s matrices? But more abstractly there are books</p>
+<p>Also if we could encode more of the But there is no common ontology for different problems. The representation does not seem to let us split the annotation of a static state and the process that encodes the transformation between states.</p>
+<p>Solving Problems has a rich literature <span class="citation" data-cites="polya2014solve">(<a href="#ref-polya2014solve" role="doc-biblioref"><strong>polya2014solve?</strong></a>)</span> <span class="citation" data-cites="Dromey1982">(<a href="#ref-Dromey1982" role="doc-biblioref"><strong>Dromey1982?</strong></a>)</span> <span class="citation" data-cites="Bono2002">(<a href="#ref-Bono2002" role="doc-biblioref"><strong>Bono2002?</strong></a>)</span> <span class="citation" data-cites="Navas13TRIZ">(<a href="#ref-Navas13TRIZ" role="doc-biblioref"><strong>Navas13TRIZ?</strong></a>)</span> and I am confident that developing an ontology based on problem-solving would allow one to use vocabulary and semantics that will make Semantic networks more general purpose.</p>
+</section>
+<section id="preview" class="level1">
+<h1>Preview</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/87WyOz6tjgk" title="Lesson Preview" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Okay. Let’s get started with Knowledge PCI. Today we’ll talk about <strong>semantic networks</strong>. This is the kind of knowledge representation scheme. This is the first lesson in our fundamental topics part of the course. We’ll start talking about <strong>knowledge representations</strong>, then we’ll focus on semantic networks.</p>
+<p>We’ll illustrate how semantic networks can be used to address two-by-one matrix problems. You can think of this like a <strong>represent and reason</strong> modality.</p>
+<p>Represent the knowledge, represent the problem, then use that knowledge to address the problem. As simple as that. At the end, we’ll close this lesson by connecting this topic with human cognition and with modern research in AI.</p>
+</section>
+<section id="representations" class="level1">
+<h1>Representations</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/TPtlep1V8H8" title="Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>So what is a <strong>knowledge representation</strong>?</p>
+<ul>
+<li>The collage on this screen shows several knowledge representations that AI has developed. In each knowledge representation, there is a language. That language has a vocabulary.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="kbai-03-02.png" class="lightbox" data-glightbox="description: .lightbox-desc-1" data-gallery="quarto-lightbox-gallery-1" title="Representations"><img src="kbai-03-02.png" class="align-center figure-img" width="300" height="250" alt="Representations"></a></p>
+<figcaption>Representations</figcaption>
+</figure>
+</div>
+<p>Then, in addition to that language, in that knowledge representation, there’s some content. The content of some knowledge. Let’s take an example with which you’re probably already familiar. Consider the Newton’s second law of motion.</p>
+<p>So I can represent it as f is equal to m a. This is a knowledge representation.</p>
+<p>A very simple knowledge representation, in which there are two things.</p>
+<p>There is a language of algebraic equations, y s equal to b x, for example. And then there is the content of our knowledge of Newton’s second law of motion, force equals mass times acceleration.</p>
+<p>So the knowledge representation has two things, once again.</p>
+<p>The language, which has its vocabulary. For example, this sign of equality. And the content that goes into that representation expressed in that language.</p>
+<p>Let us not worry too much about all of the representations in this collage right now, we’ll get to them later. The idea here is to simply show that AI has developed not one, but many knowledge representations.</p>
+<p>Each representation has its own affordances and its own constraints.</p>
+</section>
+<section id="introduction-to-semantic-networks" class="level1">
+<h1>Introduction to Semantic Networks</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/TWGTJyK2BJA" title="Introduction to Semantic Networks" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-09 23-13-39.png" class="lightbox" data-glightbox="description: .lightbox-desc-2" data-gallery="quarto-lightbox-gallery-2" title="analogy task"><img src="Screenshot 2016-02-09 23-13-39.png" class="align-center figure-img" width="450" height="300" alt="analogy task"></a></p>
+<figcaption>analogy task</figcaption>
+</figure>
+</div>
+<p>The example above is adapted from Raven’s test of progressive matrices. For further information, see: <span class="citation" data-cites="John2003">(<a href="#ref-John2003" role="doc-biblioref"><strong>John2003?</strong></a>)</span></p>
+<p>To understand semantic networks as a knowledge representation, let us take an example. This is an example that we saw in a previous lesson.</p>
+<p>This is A is to B as C is to D, and we have to pick one of the six choices at the bottom that will go in D. How will we represent our knowledge of A,</p>
+<p>B, C and the six choices at the bottom? Let us begin with A and B.</p>
+<p>We’ll try to build semantics networks that can represent our knowledge of A and B. Inside A is a circle, I’ll label it x. Also inside x is a diamond, I’ll label it y. Here is a black dot, I’ll label it z.</p>
+<p>We can similarly label the objects in B. So inside A are three objects, x, y, and z. So the first thing we need to do in order to build a semantic network for representing our knowledge of A is to represent the object. So I have the object x, the object y, the object z, standing for the circle, the diamond and the black dot. Now that we have represented the objects in A, we want to represent the relationships between these objects. So I have the objects x, y, z, and we’ll try to represent the relationship between them by having links between the nodes representing the objects. These links can be labeled. So I may say that y is inside x because that is the relationship in the image A. Similarly I may say that z is above y because z is above y in the image A.</p>
+<p>I may also say that z is above x because z is above x in image A. In this way, a semantic network representation of the image A captures both the objects and the relationship between the objects. We can do exactly the same thing for the image B. The objects and the relationships between them, y is above x. Now that we have represented our knowledge of image A and our knowledge of image B we want to capture somehow the knowledge of the transformation from A to B because recall, A is to B as C is to D.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-09 23-16-27.png" class="lightbox" data-glightbox="description: .lightbox-desc-3" data-gallery="quarto-lightbox-gallery-3" title="semantic-net for analogy task"><img src="Screenshot 2016-02-09 23-16-27.png" class="align-center figure-img" width="450" height="300" alt="semantic-net for analogy task"></a></p>
+<figcaption>semantic-net for analogy task</figcaption>
+</figure>
+</div>
+<p>So we want to capture the relationship between A and B. The transformation from A to B. To do that, to capture the transformation from A to B, we’ll start building links between the objects in A and the objects in B. Now, for x and y they are straightforward for z, but there is no z in b.</p>
+<p>So we’ll have a dummy node here in b and we will see how we can label the link here so that we can capture the idea that z doesn’t occur in B. So we might say that x is unchanged because x the circle here is the same as the circle here.</p>
+<p>Y on the other hand has expanded. It was a small diamond here and it’s a much bigger diamond there. Z, the black dot, has disappeared all together, so, we have, let’s say, it’s deleted, it’s not there at B at all.</p>
+<p>I hope you can see from this example how we constructed a semantic network for the relationship between images A and B. There were three parts to it.</p>
+<p>The first part dealt with the objects in A and the object in B.</p>
+<p>The second dealt with the relationships between the objects in A and the relationship with the objects in B.</p>
+<p>The third-party dealt with the relationships between the objects in A and the relationships between the objects in B. In principle, we can construct semantic networks for much more complicated images, not just A and B.</p>
+<p>Here is another example of a semantic network for another set of images.</p>
+<p>Once again, we have the objects and the relationships. And then the relationship between the objects in the first image and that in the second image.</p>
+</section>
+<section id="exercise-constructing-semantic-nets-i" class="level1">
+<h1>Exercise Constructing Semantic Nets I</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/XsoPjrKKtRE" title="Introduction to Semantic Networks" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-09 23-17-32.png" class="lightbox" data-glightbox="description: .lightbox-desc-4" data-gallery="quarto-lightbox-gallery-4" title="image"><img src="Screenshot 2016-02-09 23-17-32.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Okay, very good. Here is C and I’ve just chosen one of the choices out of the six choices, five here. And so we’re going to try to build a semantic network for C and five, just the way we built it for A and B. So for C and five, I have already shown all the objects. Now, your task is to come up with labels with the links that are between these objects here, as well as labels for the link between the object for five.</p>
+</section>
+<section id="exercise-constructing-semantic-nets-i-1" class="level1">
+<h1>Exercise Constructing Semantic Nets I</h1>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-09 23-19-20.png" class="lightbox" data-glightbox="description: .lightbox-desc-5" data-gallery="quarto-lightbox-gallery-5" title="image"><img src="Screenshot 2016-02-09 23-19-20.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Now David made an important point here.</p>
+<p>He said that the vocabulary he’s using here inside and above is the same as the vocabulary that I had used inside and above here. And that’s a good point because we want to have a consistent vocabulary throughout the representation of the class of problems. So here we have decided that for representing, problems of this kind in semantic networks, we will use a vocabulary of inside and above and we will try to use it consistently.</p>
+</section>
+<section id="exercise-constructing-semantic-nets-ii" class="level1">
+<h1>Exercise Constructing Semantic Nets II</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/VqzRitPVAts" title="Exercise Constructing Semantic Nets II" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-09 23-20-01.png" class="lightbox" data-glightbox="description: .lightbox-desc-6" data-gallery="quarto-lightbox-gallery-6" title="image"><img src="Screenshot 2016-02-09 23-20-01.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Let’s go one step further. Now we have the semantic network for C, and the semantic network for 5. But we have yet to capture the knowledge of the transformation from C to 5. So we have to label the, these three links.</p>
+</section>
+<section id="exercise-constructing-semantic-nets-ii-1" class="level1">
+<h1>Exercise Constructing Semantic Nets II</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/0wPaL__jY5s" title="Exercise Constructing Semantic Nets II" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Good, that seems like a good answer.</p>
+</section>
+<section id="structure-of-semantic-networks" class="level1">
+<h1>Structure of Semantic Networks</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/ZuFhochfurM" title="Structure of Semantic Networks" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Now that we have seen some examples of semantic networks, let us try to characterize semantic networks as a knowledgeable presentation.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+A good KR will have:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>A lexicon</strong> with a vocabulary for encoding the <strong>presentation language</strong>.</li>
+<li>A <strong>structure</strong> that tells us about how the words of that vocabulary can be composed together into complex representations</li>
+<li><strong>semantics</strong> which tell us how the representation allows us to draw <strong>inferences</strong> so that we can in fact reason.</li>
+</ul>
+</div>
+</div>
+<p>In the case of a semantic network:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-01-24 16-17-08.png" class="lightbox" data-glightbox="description: .lightbox-desc-7" data-gallery="quarto-lightbox-gallery-7" title="semantic network"><img src="Screenshot 2016-01-24 16-17-08.png" class="align-center figure-img" width="300" height="250" alt="semantic network"></a></p>
+<figcaption>semantic network</figcaption>
+</figure>
+</div>
+<ul>
+<li>the basic <strong>lexicon</strong> consists of <strong>nodes that capture objects</strong>. So, x, y, z. What about this structural specification?</li>
+<li>the <strong>Structural specification</strong> here consists of links with directions that capture the relationships between the nodes. These links let us compose these nodes together into complex representations.</li>
+<li>the <strong>semantics</strong> are going the <strong>labels</strong> on these links which are then going to allow us to do, draw inferences and do reasoning over these representations.</li>
+</ul>
+</section>
+<section id="characteristics-of-good-representations" class="level1 page-columns page-full">
+<h1>Characteristics of Good Representations</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/Rel9lgL0ugY" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Now that we have seen semantic networks in action, we can ask ourselves the important question.</p>
+<p><strong>What makes a knowledge representation, a good representation?</strong></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+A good knowledge representation:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Makes <strong>relationships</strong> explicit</li>
+<li>Exposes natural <strong>constraints</strong></li>
+<li>Brings <strong>objects</strong> and <strong>relations</strong> together</li>
+<li>Excludes extraneous details <a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a></li>
+<li>Transparent, concise <a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>, complete, fast <a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>, computable <a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a>.</li>
+</ul>
+<p><span class="citation" data-cites="Winston92">(<a href="#ref-Winston92" role="doc-biblioref"><strong>Winston92?</strong></a>)</span></p>
+</div>
+</div>
+<div class="no-row-height column-margin column-container"><p><sup>9</sup>&nbsp;it allows you to draw from the inferences that need to be drawn</p></div><div class="no-row-height column-margin column-container"><p><sup>8</sup>&nbsp;it doesn’t have all the details that are not needed</p></div><div class="no-row-height column-margin column-container"><p><sup>7</sup>&nbsp;captures only what is needed</p></div><div class="no-row-height column-margin column-container"><p><sup>6</sup>&nbsp;by using the right level of abstraction</p></div></section>
+<section id="discussion-good-representations---quiz" class="level1">
+<h1>Discussion: Good Representations - Quiz</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/6lVXjRUdlLw" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p><strong>What is a good knowledge representation in everyday life ?</strong></p>
+<p>A Nutrition label</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-01-24 16-27-00.png" class="lightbox" data-glightbox="description: .lightbox-desc-8" data-gallery="quarto-lightbox-gallery-8" title="image"><img src="Screenshot 2016-01-24 16-27-00.png" class="align-center figure-img" width="300" height="250" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+</section>
+<section id="discussion-good-representations" class="level1">
+<h1>Discussion: Good Representations</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/W4QuMyOa-Yg" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>So note how this connects with the ability to make inferences.</p>
+<p>Nutritional labels capture some information that allows us to make good inferences, do not capture all the information</p>
+</section>
+<section id="guards-and-prisoners" class="level1">
+<h1>Guards and Prisoners</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/byYZx_fbqSE" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-09 23-26-16.png" class="lightbox" data-glightbox="description: .lightbox-desc-9" data-gallery="quarto-lightbox-gallery-9" title="image"><img src="Screenshot 2016-02-09 23-26-16.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Let us now look at a different problem, not a 2 by 1 matrix problem but a problem called the guards and prisoners problem. This problem goes by many names, <code>Cannibals and missionaries problem</code>, the <code>jealous husbands problem</code> and so on. It was first seen in a math text book about 880 and has been used by many people in AI for discussing problem representation.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Guards and Prisoners Problem:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>three guards and three prisoners, must cross to the other bank.</li>
+<li>the boat can only take one or two people at a time.</li>
+<li>prisoners may not outnumber the guards on either bank,</li>
+</ul>
+<p><span class="citation" data-cites="AMAREL1981">(<a href="#ref-AMAREL1981" role="doc-biblioref"><strong>AMAREL1981?</strong></a>)</span></p>
+</div>
+</div>
+</section>
+<section id="semantic-networks-for-guards-and-prisoners" class="level1">
+<h1>Semantic Networks for “Guards and Prisoners”</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/jaCInn35DmQ" title="Semantic Networks for Guards and Prisoner" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Let us try to construct a semantic network representation, for this guards and prisoners problem, and see how we can use it to, do the problem-solving. So in this representation, I’m going to say that each node is a state in the problem-solving. In this particular state, there happens to be one guard and one prisoner on the left side. The boat is on the right side, and two of the prisoners and two of the guards are also on the right side.</p>
+<p>So this is a node, one single node. So the node captured, the lexicon of the semantic network. Now, we’ll add the structural part. And the structural part has to do with the transformation. That is going connect different nodes, into a more complex sentence. We’ll label the links between the nodes, and these labels then, will capture some of the semantics of this representation, which will allow us to make interesting inferences, when it comes time to do the problem-solving. Here is a second node, and this node represents a different state in the problem-solving. In this case, there are two guards and two prisoners on the left side.</p>
+<p>The boat is also on the left side. There is one guard and one prisoner on the right side. So this now, is a, semantic network.</p>
+<p>A node, another node, a link between them and the link is labeled.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-46-23.png" class="lightbox" data-glightbox="description: .lightbox-desc-10" data-gallery="quarto-lightbox-gallery-10" title="image"><img src="Screenshot 2016-02-12 06-46-23.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Note that in this representation, I used icons to represent objects, as well as icons to represent labels of the links between the nodes.</p>
+<p>This is perfectly valid. You don’t have to use words. You can use icons, as long as you’re capturing the nodes and the objects inside each state, as well as the labels on the links between the different nodes.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+a String based representation:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>state []</li>
+<li>guards G</li>
+<li>prisoner P</li>
+<li>boat B</li>
+<li>river |</li>
+</ul>
+<p>[GGGPPPB|]-(GP)-&gt;[GGPP|BGP]</p>
+</div>
+</div>
+</section>
+<section id="solving-the-guards-and-prisoners-problem" class="level1">
+<h1>Solving the “Guards and Prisoners” Problem</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/2RZXMOMOVNY" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>There’s an old saying in AI, which goes like, if you have the right knowledge representation, problem-solving becomes very easy. Let’s see whether that also works here.</p>
+<p>We now have a knowledge representation for this problem of guards and prisoners.</p>
+<p>Does this knowledge representation immediately afford effective problem-solving?</p>
+<p>So, here we are in the first node, the first state. There are three guards and three prisoners in the boat, all in the left-hand side. Let us see what moves are possible from this initial state. Now, using this representation, we can quickly figure out that there are five possible moves from the initial state.</p>
+<p>And the first move, we move only guard to the right. On the second move, we move a guard and a prisoner to the right. In the third move, we can move two guards, or two prisoners. Or, in the fifth move, just one prisoner to the right.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-50-23.png" class="lightbox" data-glightbox="description: .lightbox-desc-11" data-gallery="quarto-lightbox-gallery-11" title="image"><img src="Screenshot 2016-02-12 06-50-23.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Five possible moves. Of course, we know that some of these moves are illegal and some of them are likely to be not very productive. Will the semantic network allow us to make inferences about which moves are productive and which moves are not productive? Let’s see further. So, let’s look at the legal moves first. So we can immediately make out from this representation, that the first move is not legal because we are not allowed to have more prisoners than guards on one side, of the river.</p>
+<p>Similarly, we know that the third move is illegal for the same reason.</p>
+<p>So, we can immediately rule out the first and the third moves. The fifth move, too, can be ruled out. Let’s see how. We have one prisoner on the other side.</p>
+<p>But the only way to go back would be to take the prisoner to the, back to the previous side. And if we do that, we reach the initial state.</p>
+<p>So we did not make any forward progress. Therefore, we can rule out this move as well. This leaves us with two possible moves that are both legal and productive. We have already removed the moves that were not legal and not productive. Later, we will see how AI programs can use various methods to figure out what moves are productive and what moves are unproductive.</p>
+<p>For the time being, let’s go along with our problem-solving.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-51-00.png" class="lightbox" data-glightbox="description: .lightbox-desc-12" data-gallery="quarto-lightbox-gallery-12" title="image"><img src="Screenshot 2016-02-12 06-51-00.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+</section>
+<section id="exercise-guards-and-prisoners-i-quiz" class="level1">
+<h1>Exercise Guards and Prisoners I Quiz</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/HcEEC4oQ6o0" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-53-19.png" class="lightbox" data-glightbox="description: .lightbox-desc-13" data-gallery="quarto-lightbox-gallery-13" title="image"><img src="Screenshot 2016-02-12 06-53-19.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Write the number of guards on the left coast in the top left box, just as a number zero, one, two, or three. The number of prisoners on the left coast in the bottom left box, the number of guards on the right coast in the top right box, and the number of prisoners on the right coast in the bottom right box.</p>
+</section>
+<section id="exercise-guards-and-prisoners-i---answer" class="level1">
+<h1>Exercise Guards and Prisoners I - Answer</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/crQtyihpICw" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-54-29.png" class="lightbox" data-glightbox="description: .lightbox-desc-14" data-gallery="quarto-lightbox-gallery-14" title="image"><img src="Screenshot 2016-02-12 06-54-29.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>So, in this semantic network, we don’t really care how we got into a state, just as long as we know what state we are in. And that makes sense in this problem-solving process. Once we are in this state, we don’t care if we got to it this way or this way. All we care about is the current state of the problem.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-55-07.png" class="lightbox" data-glightbox="description: .lightbox-desc-15" data-gallery="quarto-lightbox-gallery-15" title="image"><img src="Screenshot 2016-02-12 06-55-07.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+</section>
+<section id="exercise-guards-and-prisoners-ii---quiz" class="level1">
+<h1>Exercise Guards and Prisoners II - Quiz</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/dmp3WBJUu8c" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Let us take this problem-solving a little bit further. Now that we’re in this state, let us write down all the legal moves that can follow.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-56-21.png" class="lightbox" data-glightbox="description: .lightbox-desc-16" data-gallery="quarto-lightbox-gallery-16" title="image"><img src="Screenshot 2016-02-12 06-56-21.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>It will turn out that some of these legal moves will be unproductive, but first, let’s just write down the legal moves that can follow from here.</p>
+</section>
+<section id="exercise-guards-and-prisoners-ii---answer" class="level1">
+<h1>Exercise Guards and Prisoners II - Answer</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/kwS8N7f_sj0" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-57-21.png" class="lightbox" data-glightbox="description: .lightbox-desc-17" data-gallery="quarto-lightbox-gallery-17" title="image"><img src="Screenshot 2016-02-12 06-57-21.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>So the power of this semantic network as a representation is arising because it allows us to systematically solve this problem because it makes all the constraints, all the objects, all the relationships, all the moves very explicit.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-58-07.png" class="lightbox" data-glightbox="description: .lightbox-desc-18" data-gallery="quarto-lightbox-gallery-18" title="image"><img src="Screenshot 2016-02-12 06-58-07.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+</section>
+<section id="exercise-guards-and-prisoners-iii---quiz" class="level1">
+<h1>Exercise Guards and Prisoners III - Quiz</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/4VcHx9ZyXqs" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>We can continue this problem-solving process further and solve this guards and prisoners problem. I’ll not do that here, both because it will take a long time, and because the entire picture will not fit into the screen. But</p>
+<p>I would like you to do it yourself. And I want you to do it and tell me how many moves does it take to move all the guards and all the prisoners from one side to the other side of the river?</p>
+<p>Once you are done. Once you have solved the problem and moved all the guards and prisoners to the other side, write the number of moves here in this box.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-59-12.png" class="lightbox" data-glightbox="description: .lightbox-desc-19" data-gallery="quarto-lightbox-gallery-19" title="image"><img src="Screenshot 2016-02-12 06-59-12.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+</section>
+<section id="exercise-guards-and-prisoners-iii---answer" class="level1">
+<h1>Exercise Guards and Prisoners III - Answer</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/4VcHx9ZyXqs" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>So we’ve not yet talked about, how an AI method, can determine which states are productive and which states are unproductive.</p>
+<p>We’ll revisit this issue in the next couple lessons.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 06-59-57.png" class="lightbox" data-glightbox="description: .lightbox-desc-20" data-gallery="quarto-lightbox-gallery-20" title="image"><img src="Screenshot 2016-02-12 06-59-57.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+</section>
+<section id="represent-reason-for-analogy-problems" class="level1">
+<h1>Represent Reason for Analogy Problems</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/_yq6IwMF_HQ" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Now that we have seen how, the semantic network knowledge representation, enables problem-solving, let us return to that earlier problem that we were talking about. The problem of A is to B, as C is to 5.</p>
+<p>Recall that we have worked out the representations for both A is to B and C is to 5. The question now becomes, whether we can use this representation, to decide whether or not 5 is the correct answer. If we look at the two representations in detail, then we see part of the representation here, is the same as the representation here. Except that, this part is different from this part. Here we have y expanded and right here, we have s remain unchanged.</p>
+<p>So this may not be the best answer. Perhaps there is a better answer. Where the representation on the left, will exactly match representation on the right.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 07-00-43.png" class="lightbox" data-glightbox="description: .lightbox-desc-21" data-gallery="quarto-lightbox-gallery-21" title="image"><img src="Screenshot 2016-02-12 07-00-43.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+</section>
+<section id="exercise-represent-reason-for-ravens---quiz" class="level1">
+<h1>Exercise Represent Reason for Ravens - Quiz</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/727Q0bKHbGY" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 07-03-29.png" class="lightbox" data-glightbox="description: .lightbox-desc-22" data-gallery="quarto-lightbox-gallery-22" title="image"><img src="Screenshot 2016-02-12 07-03-29.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>So, let us do another exercise together. This time I have picked a different choice, choice 2 here. So now, we can build a representation for A is to B like earlier, and here is a representation of C is to 2.</p>
+<p>I would like you to fill out these boxes for the labels on the links here.</p>
+<p>And then answer whether or not two is the right answer for this problem.</p>
+</section>
+<section id="exercise-represent-reason-for-ravens---answer" class="level1">
+<h1>Exercise Represent Reason for Ravens - Answer</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/HGmWhc_1LxI" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>That sounds fair. In fact, we’ll come across something like this very soon.</p>
+</section>
+<section id="exercise-how-do-we-choose-a-match" class="level1">
+<h1>Exercise How do we choose a match</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/L7roYCQkq6Y" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Let us do another exercise. This is actually an exercise we’ve come across earlier, however this exercise has an interesting property.</p>
+<p>Often the world presents input to us, for which there is no one single right answer. Instead, there are multiple answers that could be right.</p>
+<p>The world is ambiguous. So, here we again have A is to B, C is to D, and we have six choices. So, what choice do you think is the right choice here?</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 07-05-35.png" class="lightbox" data-glightbox="description: .lightbox-desc-23" data-gallery="quarto-lightbox-gallery-23" title="image"><img src="Screenshot 2016-02-12 07-05-35.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+</section>
+<section id="exercise-how-do-we-choose-a-match-1" class="level1">
+<h1>Exercise How do we choose a match</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/IxD24QRm22M" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>That’s a great question. Let’s look at this in more detail.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 07-07-03.png" class="lightbox" data-glightbox="description: .lightbox-desc-24" data-gallery="quarto-lightbox-gallery-24" title="image"><img src="Screenshot 2016-02-12 07-07-03.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+</section>
+<section id="choosing-matches-by-weights" class="level1">
+<h1>Choosing Matches by Weights</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/ykLlqKW0nck" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 07-18-50.png" class="lightbox" data-glightbox="description: .lightbox-desc-25" data-gallery="quarto-lightbox-gallery-25" title="image"><img src="Screenshot 2016-02-12 07-18-50.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 07-19-47.png" class="lightbox" data-glightbox="description: .lightbox-desc-26" data-gallery="quarto-lightbox-gallery-26" title="image"><img src="Screenshot 2016-02-12 07-19-47.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>So let us look at the semantic network representation of the relationship between A and B. In one view of the transformation from A to B, we can think of q, the outer circle, as remaining unchanged, and p the inner circle, as getting deleted. Let’s look at another view of the transformation from A to B. In this view, we can think of p as getting expanded and q, the outer circle, as getting deleted.</p>
+<p>Both of these views are valid views. If both of these views are valid, then how would anyone decide? How would an AI agent decide which view to select?</p>
+<p>Let us suppose that the AI agent had a metric by which it could decide upon the ease of transformation from A to B.</p>
+<p>Let us suppose that, that metric assigned different weights to different kind of transformations. You will notice that transformations like scaling, rotation, reflection make for a fine transformations. In this scale, a larger value like 5 points, means more ease of transformation and greater similarity. A lower value means less ease of transformation and more difficult transformation and less similarity. Given the scale, let us calculate the weight of transformations for both transformation #1, and transformation #2. In transformation #1, you can see that p is getting deleted, which we gave a weight of 1. And q remains unchanged, which we gave a weight of 5. So the total weight here is 6.</p>
+<p>In case of transformation #2, the weight of p being expanded, we said will be 2, scaled. And, q getting deleted is 1, so the total weight is 3.</p>
+<p>If you prefer the first transformation over the second transformation, then we can see why someone will answer the square is the correct answer, and not the triangle. Let us return to this exercise. And now we can see why both 3 and 5 are legitimate answers. We can also see why an AI agent may prefer 5, given the similarity metric that we talked about in the last shot.</p>
+</section>
+<section id="discussion-choosing-a-match-by-weight---quiz" class="level1">
+<h1>Discussion Choosing a Match by Weight - Quiz</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/YqwInDRmypY" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 07-21-14.png" class="lightbox" data-glightbox="description: .lightbox-desc-27" data-gallery="quarto-lightbox-gallery-27" title="image"><img src="Screenshot 2016-02-12 07-21-14.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>What does everyone think about David’s answer?</p>
+<p>Did David give the right answer with two?</p>
+</section>
+<section id="discussion-choosing-a-match-by-weight---answer" class="level1">
+<h1>Discussion Choosing a Match by Weight - Answer</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/3LzMgZWLVp4" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 07-22-47.png" class="lightbox" data-glightbox="description: .lightbox-desc-28" data-gallery="quarto-lightbox-gallery-28" title="image"><img src="Screenshot 2016-02-12 07-22-47.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>What is everyone think? Is 2 the right answer here? Well, lets look at the choices. First note, that both 2 and 4 are legitimate answers.</p>
+<p>2 is legitimate because we can think of the transformation from</p>
+<p>A to B as a reflection around the vertical axis. And so if we think of the transformation from C to D, again as a reflection of the vertical axis, we’ll get 2. 4 is also a correct answer, because we can think of the transformation from A to B as a rotation of 180 degrees, and if we rotate C by 180 degrees we’ll get 4. However, if we look at our weights again, we gave reflection a higher weight than we gave rotation. And therefore, David is right, 2 indeed is the correct answer.</p>
+</section>
+<section id="connections" class="level1">
+<h1>Connections</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/IMeO17owiAc" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Before we end this lesson, I want to draw several connections.</p>
+<p>The first has to do with memory. We have often said that <strong>memory</strong> is an integral part of the cognitive systems architecture. One can imagine that A and B are stood in a memory. Then C and 1, and C and 2, and C and 3, and so on, are probes into the memory. And the question would then become, which one of these probes is most similar to what’s stored in memory? We may decide on that answer based on some <strong>similarity metric</strong>.</p>
+<p>We’ll revisit this exactly the same issue when we talk about <strong>case-based reasoning</strong> later on in this class. Another connection we can draw here has to do with reasoning. When we are talking about the transformation from A to B and then the transformation to from C to 1 of these choices, one question that arose was should we make the connection between the outer circle here and B?</p>
+<p>Or the inner circle and A and B. This is a <strong>correspondence problem.</strong> The correspondence problem is: given two situations, what object in one situation corresponds to what object in another situation? We will come across this problem again when we discuss analogical reason a little bit later.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 07-25-00.png" class="lightbox" data-glightbox="description: .lightbox-desc-29" data-gallery="quarto-lightbox-gallery-29" title="image"><img src="Screenshot 2016-02-12 07-25-00.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>The third connection has to do with cognition, of knowledge based AI as a whole. Notice that instead of just talking about properties of objects, like this is a circle and the size of the circle, our emphasis here has been on the relationships between the objects. The fact that this is inside the outer circle, or the fact that the outer circle remains the same here, the inner circle disappears. In knowledge-based AI and in cognition in general, the focus is always on relationships, not just on objects and the features of those objects.</p>
+</section>
+<section id="assignment-semantic-nets" class="level1">
+<h1>Assignment Semantic Nets</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/LyXZQFfN3L0" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-01-24 17-49-25.png" class="lightbox" data-glightbox="description: .lightbox-desc-30" data-gallery="quarto-lightbox-gallery-30" title="image"><img src="Screenshot 2016-01-24 17-49-25.png" class="align-center figure-img" width="300" height="250" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>The first assignment you can chose to do for this course is to talk about how these semantic networks can be used to represent Raven’s Progressive Matrices.</p>
+<p>We saw a few different problems in the first lesson. So take a look at how the semantic networks we’ve talked about today can be used to represent some of those other problems, and write your own kind of representation scheme.</p>
+<p>In addition to writing a representation scheme, also talk about how that representation scheme actually enables problem-solving. Remember what Ashok mentioned about the different qualities of a good knowledge representation that is complete. It captures information at the right level of abstraction, and it enables problem-solving. So write how your representation can enable problem-solving of two by one, two by two, and three-by-three problems. You don’t need to use the exact same representation scheme that we use, and in fact you can and should use your own. Also remember that your representation should not capture any details about what the actual answer to the problem is, but rather it should only capture what’s actually in the figures in the particular problem.</p>
+</section>
+<section id="wrap-up" class="level1">
+<h1>Wrap Up</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/J6lBh-RPTKI" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>So let’s recap what we’ve talked about today. We started off today by talking about one of the most important concepts in all of knowledge based AI, which are knowledge based representations. As we go forward in this class, we’ll see knowledge representations are really at the heart of nearly everything we’ll do. We then talked about semantic networks, which are a good particular kind of representation and we used those to talk about the different criteria for a good knowledge representation. What do good knowledge representations enable us to do and what to they help us avoid? We then talked about kind of an abstract class of problem-solving methods called <strong>Represent and Reason</strong>. Represent and reason really lies under all of knowledge based AI and it’s a way of representing knowledge and then reasoning over it.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-01-24 17-51-01.png" class="lightbox" data-glightbox="description: .lightbox-desc-31" data-gallery="quarto-lightbox-gallery-31" title="image"><img src="Screenshot 2016-01-24 17-51-01.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>We then talked a little bit about augmenting that with <strong>weight</strong>, which allows us to come to more nuanced and specific conclusions. In the next couple weeks, we are going to use these semantic networks to talk about a few different problem-solving methods. Next time, we’ll talk about <strong>generate and test</strong> and then we’ll move on to a couple slightly different ones called <strong>Means and Ends Analysis</strong> and <strong>Problem Reduction</strong>.</p>
+</section>
+<section id="the-cognitive-connection" class="level1">
+<h1>The Cognitive Connection</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/rprEQA1xm_U" title="Characteristics of Good Representations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>How is semantic networks connected with human cognition?</p>
+<p>Well we can make at least two connections immediately. First, semantic networks are kind of knowledge representation. We saw hive knowledge is presented as a semantic network. If the results of representation, then you can use the knowledge presentation to address the problem.</p>
+<p>We can now say similarly for human mind that human mind represents problems.</p>
+<p>It represents knowledge. Then it uses that knowledge to address the problem.</p>
+<p>So, representation then becomes the key. Second, and most specifically, semantic networks are related to spreading activation networks, which is a very popular theory of human memory. Let me give you an example.</p>
+<p>Supposing I told you a story consisting of just two sentences. John wanted to become rich. He got a gun. And notice that I did not tell you the entire story, but I’m sure you all made up a story based on what I told you.</p>
+<p>John wanted to become rich. He decided to rob a bank.</p>
+<p>He got a gun in order to rob the bank. But how did you end this story?</p>
+<p>How did it draw the inferences about robbing a bank which I did not tell you anything about? Imagine if you have a semantic network that consisted of a large number of nodes. So when I gave you the first sentence, John wanted to become rich, the nodes corresponding to John and wanted and become and rich, got activated, and the activation started spreading from those nodes.</p>
+<p>And when I said John, he got a gun, then the gun node also got activated and that activation also started spreading. As this activation spread, it merged. And a path they could walk on. And all the nodes on that pathway now become part of the story, and if you happen to have nodes like, rob a bank along the pathway, now you have understanding of story.</p>
+</section>
+<section id="final-quiz" class="level1">
+<h1>Final Quiz</h1>
+<p>Please write down what you learned in this lesson.</p>
+</section>
+<section id="final-quiz-1" class="level1">
+<h1>Final Quiz</h1>
+<p>Great. Thank you so much for your feedback.</p>
+
+
+<div class="hidden" aria-hidden="true">
+<span class="glightbox-desc lightbox-desc-1">Representations</span>
+<span class="glightbox-desc lightbox-desc-2">analogy task</span>
+<span class="glightbox-desc lightbox-desc-3">semantic-net for analogy task</span>
+<span class="glightbox-desc lightbox-desc-4">image</span>
+<span class="glightbox-desc lightbox-desc-5">image</span>
+<span class="glightbox-desc lightbox-desc-6">image</span>
+<span class="glightbox-desc lightbox-desc-7">semantic network</span>
+<span class="glightbox-desc lightbox-desc-8">image</span>
+<span class="glightbox-desc lightbox-desc-9">image</span>
+<span class="glightbox-desc lightbox-desc-10">image</span>
+<span class="glightbox-desc lightbox-desc-11">image</span>
+<span class="glightbox-desc lightbox-desc-12">image</span>
+<span class="glightbox-desc lightbox-desc-13">image</span>
+<span class="glightbox-desc lightbox-desc-14">image</span>
+<span class="glightbox-desc lightbox-desc-15">image</span>
+<span class="glightbox-desc lightbox-desc-16">image</span>
+<span class="glightbox-desc lightbox-desc-17">image</span>
+<span class="glightbox-desc lightbox-desc-18">image</span>
+<span class="glightbox-desc lightbox-desc-19">image</span>
+<span class="glightbox-desc lightbox-desc-20">image</span>
+<span class="glightbox-desc lightbox-desc-21">image</span>
+<span class="glightbox-desc lightbox-desc-22">image</span>
+<span class="glightbox-desc lightbox-desc-23">image</span>
+<span class="glightbox-desc lightbox-desc-24">image</span>
+<span class="glightbox-desc lightbox-desc-25">image</span>
+<span class="glightbox-desc lightbox-desc-26">image</span>
+<span class="glightbox-desc lightbox-desc-27">image</span>
+<span class="glightbox-desc lightbox-desc-28">image</span>
+<span class="glightbox-desc lightbox-desc-29">image</span>
+<span class="glightbox-desc lightbox-desc-30">image</span>
+<span class="glightbox-desc lightbox-desc-31">image</span>
+</div>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2016,
+  author = {Bochman, Oren},
+  title = {03 - {Semantic} {Networks}},
+  date = {2016-01-23},
+  url = {https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/03-semantic-networks/03-semantic-networks.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2016" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2016. <span>“03 - Semantic Networks.”</span> January 23,
+2016. <a href="https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/03-semantic-networks/03-semantic-networks.html">https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/03-semantic-networks/03-semantic-networks.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","loop":false,"openEffect":"zoom","descPosition":"bottom","selector":".lightbox"});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

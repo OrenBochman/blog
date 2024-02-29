@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2016-01-23">
+
+<title>Oren Bochman’s Blog - 04 - Generate &amp; Test</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - 04 - Generate &amp; Test">
+<meta name="twitter:description" content="Personal website, portfolio and blog">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/notes/cognitivie-ai-cs7637/04-generate-and-test/thumbnail_blog.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+        <li>
+    <a class="dropdown-item" href="../../../dnn.html">
+ <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../model-thinking.html">
+ <span class="dropdown-text">Model Thinking</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../xai.html">
+ <span class="dropdown-text">XAI</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rl.html">
+ <span class="dropdown-text">rl</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rhetoric.html">
+ <span class="dropdown-text">rhetoric</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../tfp.html">
+ <span class="dropdown-text">TFP</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../ab-testing.html">
+ <span class="dropdown-text">AB testing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../cognitiveai.html">
+ <span class="dropdown-text">cognitive AI</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">04 - Generate &amp; Test</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 23, 2016</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#generate-test" id="toc-generate-test" class="nav-link active" data-scroll-target="#generate-test">Generate &amp; Test</a></li>
+  <li><a href="#preview" id="toc-preview" class="nav-link" data-scroll-target="#preview">Preview</a></li>
+  <li><a href="#guards-and-prisoners" id="toc-guards-and-prisoners" class="nav-link" data-scroll-target="#guards-and-prisoners">Guards and Prisoners</a></li>
+  <li><a href="#exercise-generate-and-test-i---quiz" id="toc-exercise-generate-and-test-i---quiz" class="nav-link" data-scroll-target="#exercise-generate-and-test-i---quiz">Exercise generate-and-test I - Quiz</a></li>
+  <li><a href="#exercise-generate-and-test-i" id="toc-exercise-generate-and-test-i" class="nav-link" data-scroll-target="#exercise-generate-and-test-i">Exercise generate-and-test I</a></li>
+  <li><a href="#exercise-generate-and-test-ii---quiz" id="toc-exercise-generate-and-test-ii---quiz" class="nav-link" data-scroll-target="#exercise-generate-and-test-ii---quiz">Exercise generate-and-test II - Quiz</a></li>
+  <li><a href="#exercise-generate-and-test-ii---answer" id="toc-exercise-generate-and-test-ii---answer" class="nav-link" data-scroll-target="#exercise-generate-and-test-ii---answer">Exercise generate-and-test II - Answer</a></li>
+  <li><a href="#dumb-generators-dumb-testers" id="toc-dumb-generators-dumb-testers" class="nav-link" data-scroll-target="#dumb-generators-dumb-testers">Dumb Generators, Dumb Testers</a></li>
+  <li><a href="#smart-testers" id="toc-smart-testers" class="nav-link" data-scroll-target="#smart-testers">Smart Testers</a></li>
+  <li><a href="#smart-generators" id="toc-smart-generators" class="nav-link" data-scroll-target="#smart-generators">Smart Generators</a></li>
+  <li><a href="#discussion-smart-generators-and-testers---quiz" id="toc-discussion-smart-generators-and-testers---quiz" class="nav-link" data-scroll-target="#discussion-smart-generators-and-testers---quiz">Discussion Smart Generators and Testers - Quiz</a></li>
+  <li><a href="#discussion-smart-generators-and-testers---answer" id="toc-discussion-smart-generators-and-testers---answer" class="nav-link" data-scroll-target="#discussion-smart-generators-and-testers---answer">Discussion Smart Generators and Testers - Answer</a></li>
+  <li><a href="#generate-test-for-ravens-problems" id="toc-generate-test-for-ravens-problems" class="nav-link" data-scroll-target="#generate-test-for-ravens-problems">Generate Test for Ravens Problems</a></li>
+  <li><a href="#semantic-networks-for-generate-and-test" id="toc-semantic-networks-for-generate-and-test" class="nav-link" data-scroll-target="#semantic-networks-for-generate-and-test">Semantic Networks for generate-and-test</a></li>
+  <li><a href="#generate-test-for-ravens-problems-ii" id="toc-generate-test-for-ravens-problems-ii" class="nav-link" data-scroll-target="#generate-test-for-ravens-problems-ii">Generate Test for Ravens Problems II</a></li>
+  <li><a href="#assignment-generate-test" id="toc-assignment-generate-test" class="nav-link" data-scroll-target="#assignment-generate-test">Assignment Generate Test</a></li>
+  <li><a href="#wrap-up" id="toc-wrap-up" class="nav-link" data-scroll-target="#wrap-up">Wrap Up</a></li>
+  <li><a href="#the-cognitive-connection" id="toc-the-cognitive-connection" class="nav-link" data-scroll-target="#the-cognitive-connection">The Cognitive Connection</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="generate-test" class="level1">
+<h1>Generate &amp; Test</h1>
+</section>
+<section id="preview" class="level1">
+<h1>Preview</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/e03gj1dYtkY" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<ul>
+<li><p>We now focus on <strong>problem-solving methods</strong>.</p></li>
+<li><p><strong>Generate-and-test</strong> is a problem-solving method.</p></li>
+<li><p>The generate-and-test method in a way, is very simple: given a problem, generate potential solutions to it, and then test the solutions for the efficiency for addressing the problem.</p></li>
+<li><p>We will use this method in conjunction with semantic networks, or the prisoners and guards problem that we discussed last time.</p></li>
+</ul>
+</section>
+<section id="guards-and-prisoners" class="level1">
+<h1>Guards and Prisoners</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/dGUO-zTQtcA" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 09-13-15.png" class="lightbox" data-glightbox="description: .lightbox-desc-1" data-gallery="quarto-lightbox-gallery-1" title="image"><img src="Screenshot 2016-02-12 09-13-15.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Knowledge-based AI is a collection of three things.</p>
+<p>Knowledge representations, problem-solving techniques and architectures.</p>
+<p>We have already look at one knowledge representation, semantic networks.</p>
+<p>We have not so far looked at problem-solving methods or architectures.</p>
+<p>Today, I’d like to start by talking about the problem-solving method.</p>
+<p>Let us illustrate the problem-solving method of generate-and-test with the same examples that we have discussed earlier. When we were discussing this example in the case of semantic networks, we simply came up with various states and pruned some of them without saying about how an AI agent would know what states to prune. So imagine that we have a generator that takes the initial state and from that initial or current state, generates all the possible successive states. For now, imagine it’s not a very smart generator, it’s a dumb generator.</p>
+<p>So it generates all the possible states. So the generator test method not only has a generator but also has a tester. The tester looks at all the possible states the generator has generated and removes some of them. For now, let’s also assume that the tester is is dumb as well. And so the tester is removes only those states that are are clearly illegal based on the specific of the problem.</p>
+<p>Namely, that one cannot have more prisoners than guards on either back.</p>
+<p>So the first and the third states are removed by the tester.</p>
+</section>
+<section id="exercise-generate-and-test-i---quiz" class="level1">
+<h1>Exercise generate-and-test I - Quiz</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/uDBpi47mPcw" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 18-42-47.png" class="lightbox" data-glightbox="description: .lightbox-desc-2" data-gallery="quarto-lightbox-gallery-2" title="image"><img src="Screenshot 2016-02-12 18-42-47.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Let us continue with this exercise one step further. So now we have three successor states to the initial state. Given these three successor states, what states might the dumb generator generate next?</p>
+</section>
+<section id="exercise-generate-and-test-i" class="level1">
+<h1>Exercise generate-and-test I</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/dC4HTOOXfXo" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 18-43-21.png" class="lightbox" data-glightbox="description: .lightbox-desc-3" data-gallery="quarto-lightbox-gallery-3" title="image"><img src="Screenshot 2016-02-12 18-43-21.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>So from the top state we have three possible next states.</p>
+<p>We can move both of them, we can move just the prisoner, or we can move just the guard. From this one we can either move one prisoner or two prisoners, and from this one all we can really do is move the prisoner back over to the left. Remember that David is not generating these successive states.</p>
+<p>David is saying that the DOM generator will generate the successive states.</p>
+</section>
+<section id="exercise-generate-and-test-ii---quiz" class="level1">
+<h1>Exercise generate-and-test II - Quiz</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/dC4HTOOXfXo" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 18-44-24.png" class="lightbox" data-glightbox="description: .lightbox-desc-4" data-gallery="quarto-lightbox-gallery-4" title="image"><img src="Screenshot 2016-02-12 18-44-24.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>So now that we have all of these states that the generator has generated, given that we have a dump tester what states will the dump tester dismiss?</p>
+</section>
+<section id="exercise-generate-and-test-ii---answer" class="level1">
+<h1>Exercise generate-and-test II - Answer</h1>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 18-45-12.png" class="lightbox" data-glightbox="description: .lightbox-desc-5" data-gallery="quarto-lightbox-gallery-5" title="image"><img src="Screenshot 2016-02-12 18-45-12.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/Dvw5Z1-3OPA" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>So the only one of these six states that disobeys our one rule against having more prisoners than guards on either shore, is this state over here. So, that’s the only state that’s going to get thrown out. These five states are all legal according to our dumb testers understanding of the problem. So after we dismiss that state, though.</p>
+<p>We’ll notice that we only have two unique states, we have everyone on the left coast and one prisoner on the right coast. So like we did earlier, we can collapse these two down into only these two states. It won’t matter how we got there, once we’re there.</p>
+</section>
+<section id="dumb-generators-dumb-testers" class="level1">
+<h1>Dumb Generators, Dumb Testers</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/ekRawEYmMzM" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 18-46-00.png" class="lightbox" data-glightbox="description: .lightbox-desc-6" data-gallery="quarto-lightbox-gallery-6" title="image"><img src="Screenshot 2016-02-12 18-46-00.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Now we can continue to apply this method of generate-and-test iteratively. So we can apply it on this state and that state and see what successor states we get.</p>
+<p>If we do so, then we get a very large number of successor states. This is a problem of call many total explosion. While one was tasked with a small number of states, but the number of successor states keeps on increasing very rapidly.</p>
+<p>Now, the reason it is occurring here and it did not occur when we are talk, dealing with semantic networks is because here we have states like this one which have three guards and three prisoners on the same side of the bank, exactly the same state that was the initial state to begin with. This is because we have a dumb generator and a dumb tester. So this state never got pruned away, although this particular state is identical to the initial state that we started from. This method of generating test, even with a dumb generator and a dumb tester, if applied iteratively could finally lead to the goal state.</p>
+<p>In which case, we will have a path from the initial state all the way to the goal state, but this will be computationally very inefficient.</p>
+<p>This is because we have a dumb generator and a dumb tester. So the question now becomes, can we make a smarter generator and a smarter tester? Before we make a smarter generator and a smarter tester, we should note that generate-and-test is a very powerful problem-solving method.</p>
+</section>
+<section id="smart-testers" class="level1">
+<h1>Smart Testers</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/T65nfyLvd5g" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>A <strong>smart tester</strong> should detect and discard states that are : - identical to previously visited states - have <strong>no successer</strong> states and are not solutions. It detect and merge identical generated current states</p>
+<p>Note also that this particular state has no successor states, all successor states of this have been ruled out. Therefore this particular part clearly is not a good path to get to the gold state. If we notice also, that these two states are identical, then we can merge them. If we do so, then we get exactly the same kind of configuration of states that we had when we were dealing with the semantic network in the previous lesson. There is something to note here. We had this semantic network in the last lesson, but the knowledge representation of semantics network, while very useful, by itself and of itself doesn’t solve any problems.</p>
+<p>You need a problem-solving method that uses knowledge afforded by the knowledge representation to actually do the problem-solving. Generating test is one of those problem-solving methods. In general, when we do problem-solving or reasoning, then there is a coupling between a knowledge representation and a problem-solving method, like semantic networks and generating test.</p>
+<p>What we did so far had a dumb generator, but we made the testers smarter. The testers started looking for what states had been repeated. Alternatively, we can shift the balance of responsibility between them and make the generator smarter. Let’s see how that might happen.</p>
+</section>
+<section id="smart-generators" class="level1">
+<h1>Smart Generators</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/6PdhWjaitvc" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Instead of the generator generating all the successive states and then a tester finding out that this state, this state and this state are identical to the initial state. One could make the generator itself smarter and say that a generator will not even generate these three states, but it will know that it should not generate states that are already up here.</p>
+<p>This means that we can either provide the generator with some additional abilities or the tester with some additional abilities or both. If the generator was smarter, then it would not even generate these three states because they are nonproductive. I would exclude maybe the tester, the determinant of this state is illegal and therefore dismisses it.</p>
+<p>We could even go one step further and make the generator even smarter, so the generator will not generate this particular state. And thus, the balance within the generator and the tester can shift depending on where we try to put knowledge. For this problem, for this relatively simple and small problem, the balance will responsibility between the generator and test might look like a tree relationship. But imagine a problem in if there are a million such states. Then whether we have generated very smart or the tests are very smart or both can become a important issue.</p>
+<p>Despite that, genetic testing factors are a very popular method used in some schools of AI.</p>
+<p>Genetic algorithms, for instance, can be viewed as genetic</p>
+<p>Given a number of states, they try to find out all the potential successive states that are possible, given some simple rules of recombination. And then of a fitness function that acts as a tester.</p>
+<p>Genetic algorithms, therefore, are an effective method for a very large number of problems.</p>
+<p>They’re also a very inefficient method because neither the generator nor the testing generator algorithms are especially smart.</p>
+</section>
+<section id="discussion-smart-generators-and-testers---quiz" class="level1">
+<h1>Discussion Smart Generators and Testers - Quiz</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/TykwL-Qflbc" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 19-01-41.png" class="lightbox" data-glightbox="description: .lightbox-desc-7" data-gallery="quarto-lightbox-gallery-7" title="image"><img src="Screenshot 2016-02-12 19-01-41.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>What does everyone else think? Is David right about this?</p>
+</section>
+<section id="discussion-smart-generators-and-testers---answer" class="level1">
+<h1>Discussion Smart Generators and Testers - Answer</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/yPyulrkPyiM" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 19-02-25.png" class="lightbox" data-glightbox="description: .lightbox-desc-8" data-gallery="quarto-lightbox-gallery-8" title="image"><img src="Screenshot 2016-02-12 19-02-25.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>That sounds like a good answer, to me. So once again, we are back to the issue of where do we draw the balance of responsibility between the generator and the tester?</p>
+<p>The important thing to note from here however is that generation test when in doubt with the right kind of knowledge can be a powerful method.</p>
+</section>
+<section id="generate-test-for-ravens-problems" class="level1">
+<h1>Generate Test for Ravens Problems</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/wcw5ZZ1Uo0c" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 19-03-10.png" class="lightbox" data-glightbox="description: .lightbox-desc-9" data-gallery="quarto-lightbox-gallery-9" title="image"><img src="Screenshot 2016-02-12 19-03-10.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>Let us return to our problem from the intelligence test to see how generate-and-test might apply as a problem-solving method. Again, here is a problem that we encountered earlier. Notice that this is a more complicated problem than the guards and prisoners problem. Here is why.</p>
+<p>In case of the guards and prisoner problem, each transformation from one state to another, was a discrete transformation. One could take a certain number of guards to the other side. One could take a certain number of prisoners to the other side, or one could take a certain of number of guards and prisoners to the other side.</p>
+<p>In this case, if I look at the approximation between A and B, and I notice that the diamond inside the circle is now outside the circle and is larger. Now suppose I were to try the same transformation from C to D. So I can look at the circle inside the triangle, put it outside, and also make it larger. I notice that when I put it outside, I can put it outside right next to the triangle, a little bit farther, a little bit farther, a little bit farther away. I can make it the same size, or a little larger, or a lot larger. Increase its size by 50% or 51% or 52%.</p>
+<p>So this space of possibilities here is very large. So for problems of this kind, the need for a smarter generator and a smarter tester is critical, because this space of possibilities can become very large, very quickly.</p>
+</section>
+<section id="semantic-networks-for-generate-and-test" class="level1">
+<h1>Semantic Networks for generate-and-test</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/9NM5EFfUq60" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 19-04-11.png" class="lightbox" data-glightbox="description: .lightbox-desc-10" data-gallery="quarto-lightbox-gallery-10" title="image"><img src="Screenshot 2016-02-12 19-04-11.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>This is where the knowledge representation helps a lot. The semantic network knowledge representation provides a level of abstraction at which the problem gets represented and analyzed. So, although this particular diamond y could have been displaced here or a little bit further, it could have been of this size, maybe a little smaller, a little bit larger. The semantic network really doesn’t care about it.</p>
+<p>With the level of extraction which a semantic network is dealing, y gets expanded, and that is all that matters. An important point to note here is that any knowledge representation picks a level of extraction at which it represents the world. There’s a lot of power in it because that knowledge representation ignores things that are at a low level of detail. And therefore the problem-solving method doesn’t have to worry about those things. So it is not the knowledge representation alone that solves the problem, or the problem-solving method that solves the problem. <strong>It is the knowledge representation and the problem-solving method coupled together that solve the problem</strong>, that provide the reasoning.</p>
+</section>
+<section id="generate-test-for-ravens-problems-ii" class="level1">
+<h1>Generate Test for Ravens Problems II</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/kAOvfK8tLmI" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 19-05-14.png" class="lightbox" data-glightbox="description: .lightbox-desc-11" data-gallery="quarto-lightbox-gallery-11" title="image"><img src="Screenshot 2016-02-12 19-05-14.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>So let’s assume that we’re using semantic network as a representation for this particular class of problem.</p>
+<p>Given that, how would you apply generate and matter to this problem, David?</p>
+<p>So it sounds like would I would do is I would use the transformation between A and B, transfer that transformation to C and use it to generate my answer for D. I then take my answer for D and compare it against 1, 2, 3, 4, 5 and 6 and see which one most closely matched what I generated.</p>
+<p>If I wanted to make my tester and generator even smarter, I might say that in order to be the correct answer, it has to meet the generated answer with a certain level of confidence. And if it doesn’t meet that level of confidence, it should go back and see if there’s a different transformation we could have transferred.</p>
+<p>That would take care of the problem earlier where either the middle shape disappeared or the outer shape disappeared.</p>
+<p>That’s a good answer, David.</p>
+<p>It is another way of solving this problem using test and semantic networks.</p>
+<p>One could take one, put it under D. Generate the transformation from C to D and then test it against the transformation from A to B.</p>
+<p>One could do the same thing with 2, put 2 here into D, directly transformation tested against the transformation A to B.</p>
+<p>One could do this for all six choices and then find out, which one of these transformations is closest with the transformation from A to B.</p>
+<p>Thus, in this problem, one can use test methods in two very different ways, all of the knowledge representation ribbon is the same.</p>
+<p>So knowledge representation captures some knowledge about the world at a level of abstraction.</p>
+<p>It is coupled with problem solving methods, but more than one problem-solving method, more than one variation of a problem solving method might be applicable using technology representation.</p>
+</section>
+<section id="assignment-generate-test" class="level1">
+<h1>Assignment Generate Test</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/ClQvyiJz6as" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="Screenshot 2016-02-12 19-07-07.png" class="lightbox" data-glightbox="description: .lightbox-desc-12" data-gallery="quarto-lightbox-gallery-12" title="image"><img src="Screenshot 2016-02-12 19-07-07.png" class="align-center figure-img" width="450" height="300" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p>So how would you use generate-and-test to actually solve Raven’s Progressive Matrices?</p>
+<p>We’ve talked about this a little bit already, but take it a little</p>
+<p>bit further and talk about how you would actually implement the problem-solving approach you’ve seen today.</p>
+<p>We talked about a couple different ways of going about it.</p>
+<p>We talked about generating multiple answers and testing them against the answer options.</p>
+<p>Or generating one answer and testing it more intelligently against the different options available to you.</p>
+<p>So talk about which one you would do and how you would actually implement it.</p>
+<p>In doing so, make sure to think of three-by-three problems as well.</p>
+<p>With more transformations and more figures going on, it can be a lot more difficult to figure out what to generate, and the problem space can explode very quickly.</p>
+<p>Also make sure to think about how you’re actually going to infer the mapping between different figures in the problem.</p>
+<p>How do you know which shape in one frame maps up to a different shape in another frame?</p>
+<p>And then talk about how you would use that information to generate what you think the answer is.</p>
+</section>
+<section id="wrap-up" class="level1">
+<h1>Wrap Up</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/q1IUfRc6TFc" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<ul>
+<li>generate-and-test</li>
+<li>strong generators and</li>
+<li>strong testers</li>
+<li>generating tests an unconstrained domains</li>
+</ul>
+</section>
+<section id="the-cognitive-connection" class="level1">
+<h1>The Cognitive Connection</h1>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/x6wGlF4TRMA" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Let us examine the relationship between the method of generate and test, and human cognition. Humans use generate-and-test as the problem-solving method all the time.</p>
+<p>This is because we do not have complete or correct knowledge of the world. We do not have infinite computational resources. And we also do not always have recourse to a method of reasoning that is guaranteed to be correct. When you do not have these things, then you use your own test method. You come up with particular solutions to a problem, you test the solutions out. Beyond human cognition, I’m sure you’ve come across the notion of <strong>genetic algorithms</strong>. Genetic algorithms are inspired by the processes of biological evolution. Through operations like crossover and mutation, one can generate solutions that can then be tested against some fitness function. Genetic algorithm are a good example of the genetical test method. First, genetic solutions, then test them out. So this method of generating test is connected not only with human cognition, but dependently, also with biological evolution. It’s all over the place.</p>
+
+
+<div class="hidden" aria-hidden="true">
+<span class="glightbox-desc lightbox-desc-1">image</span>
+<span class="glightbox-desc lightbox-desc-2">image</span>
+<span class="glightbox-desc lightbox-desc-3">image</span>
+<span class="glightbox-desc lightbox-desc-4">image</span>
+<span class="glightbox-desc lightbox-desc-5">image</span>
+<span class="glightbox-desc lightbox-desc-6">image</span>
+<span class="glightbox-desc lightbox-desc-7">image</span>
+<span class="glightbox-desc lightbox-desc-8">image</span>
+<span class="glightbox-desc lightbox-desc-9">image</span>
+<span class="glightbox-desc lightbox-desc-10">image</span>
+<span class="glightbox-desc lightbox-desc-11">image</span>
+<span class="glightbox-desc lightbox-desc-12">image</span>
+</div>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2016,
+  author = {Bochman, Oren},
+  title = {04 - {Generate} \&amp; {Test}},
+  date = {2016-01-23},
+  url = {https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/04-generate-and-test/04-generate-and-test.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2016" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2016. <span>“04 - Generate &amp; Test.”</span> January
+23, 2016. <a href="https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/04-generate-and-test/04-generate-and-test.html">https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/04-generate-and-test/04-generate-and-test.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"openEffect":"zoom","loop":false,"selector":".lightbox","descPosition":"bottom","closeEffect":"zoom"});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

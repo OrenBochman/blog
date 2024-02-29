@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2023-01-01">
+<meta name="description" content="Notes from Udacity A/B Testing course">
+
+<title>Oren Bochman’s Blog - Lesson 5 - Analyzing Results</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+<style>
+
+      .quarto-title-block .quarto-title-banner {
+        background-image: url(banner_blue_1.jpg);
+background-size: cover;
+      }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Lesson 5 - Analyzing Results">
+<meta name="twitter:description" content="Notes from Udacity A/B Testing course">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/notes/AB-testing/AB-Test-Sparrows.jpg">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+        <li>
+    <a class="dropdown-item" href="../../dnn.html">
+ <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../model-thinking.html">
+ <span class="dropdown-text">Model Thinking</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../xai.html">
+ <span class="dropdown-text">XAI</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../rl.html">
+ <span class="dropdown-text">rl</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../rhetoric.html">
+ <span class="dropdown-text">rhetoric</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../tfp.html">
+ <span class="dropdown-text">TFP</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ab-testing.html">
+ <span class="dropdown-text">AB testing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../cognitiveai.html">
+ <span class="dropdown-text">cognitive AI</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Lesson 5 - Analyzing Results</h1>
+                  <div>
+        <div class="description">
+          Notes from Udacity A/B Testing course
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">a/b-testing</div>
+                <div class="quarto-category">notes</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 1, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lesson-5---analyzing-results" id="toc-lesson-5---analyzing-results" class="nav-link active" data-scroll-target="#lesson-5---analyzing-results">Lesson 5 - Analyzing Results</a>
+  <ul class="collapse">
+  <li><a href="#intro" id="toc-intro" class="nav-link" data-scroll-target="#intro">Intro</a></li>
+  <li><a href="#sanity-check" id="toc-sanity-check" class="nav-link" data-scroll-target="#sanity-check">Sanity Check</a></li>
+  <li><a href="#choosing-invariants" id="toc-choosing-invariants" class="nav-link" data-scroll-target="#choosing-invariants">Choosing Invariants</a></li>
+  <li><a href="#checking-invariants" id="toc-checking-invariants" class="nav-link" data-scroll-target="#checking-invariants">Checking Invariants</a></li>
+  <li><a href="#sanity-checking-wrap-up" id="toc-sanity-checking-wrap-up" class="nav-link" data-scroll-target="#sanity-checking-wrap-up">Sanity Checking: Wrap-up</a></li>
+  <li><a href="#a-single-metric" id="toc-a-single-metric" class="nav-link" data-scroll-target="#a-single-metric">A Single Metric</a>
+  <ul class="collapse">
+  <li><a href="#what-not-to-do-if-your-results-arent-significant" id="toc-what-not-to-do-if-your-results-arent-significant" class="nav-link" data-scroll-target="#what-not-to-do-if-your-results-arent-significant">What <em>not</em> to do if your results aren’t significant</a></li>
+  </ul></li>
+  <li><a href="#overview-of-how-not-to-run-an-ab-test-avoiding-repeated-significance-testing-errors-by-evan-miller" id="toc-overview-of-how-not-to-run-an-ab-test-avoiding-repeated-significance-testing-errors-by-evan-miller" class="nav-link" data-scroll-target="#overview-of-how-not-to-run-an-ab-test-avoiding-repeated-significance-testing-errors-by-evan-miller">Overview of <strong>How Not To Run an A/B Test: Avoiding Repeated Significance Testing Errors by Evan Miller</strong></a></li>
+  <li><a href="#single-metric-gotchas" id="toc-single-metric-gotchas" class="nav-link" data-scroll-target="#single-metric-gotchas">Single Metric: Gotchas</a></li>
+  <li><a href="#multiple-metrics" id="toc-multiple-metrics" class="nav-link" data-scroll-target="#multiple-metrics">Multiple Metrics</a>
+  <ul class="collapse">
+  <li><a href="#multiple-comparison-problem" id="toc-multiple-comparison-problem" class="nav-link" data-scroll-target="#multiple-comparison-problem">Multiple comparison problem</a></li>
+  <li><a href="#focus-on-business-goals" id="toc-focus-on-business-goals" class="nav-link" data-scroll-target="#focus-on-business-goals">Focus on Business Goals</a></li>
+  <li><a href="#whether-to-launch-an-experiment-or-not" id="toc-whether-to-launch-an-experiment-or-not" class="nav-link" data-scroll-target="#whether-to-launch-an-experiment-or-not">Whether to launch an experiment or not??</a></li>
+  <li><a href="#ramp-up-ab-test" id="toc-ramp-up-ab-test" class="nav-link" data-scroll-target="#ramp-up-ab-test">Ramp up A/B test</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="../../images/logos/udacity.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" data-glightbox="description: .lightbox-desc-1" title="udacity"><img src="../../images/logos/udacity.png" class="img-fluid figure-img" alt="udacity"></a></p>
+<figcaption>udacity</figcaption>
+</figure>
+</div></div><p>Notes from Udacity A/B Testing course.</p>
+<section id="lesson-5---analyzing-results" class="level1 page-columns page-full">
+<h1>Lesson 5 - Analyzing Results</h1>
+<section id="intro" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="intro">Intro</h2>
+
+<div class="no-row-height column-margin column-container"><div id="fig-intro" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-intro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/AyeKXinJ3W8" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-intro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Introduction
+</figcaption>
+</figure>
+</div></div><p>In <a href="#fig-intro" class="quarto-xref">Figure&nbsp;1</a> Caroline assumes you’ve already chosen metrics, designed, and sized your experiment. We now focus on <em>analyzing the results and drawing conclusions</em>.</p>
+<ul>
+<li>The process involves:
+<ul>
+<li><strong>Sanity checks</strong>: Verifying data integrity.</li>
+<li><strong>Evaluation</strong>: Handling single or multiple metrics to assess the change’s impact.</li>
+<li><strong>Analysis gotchas</strong>: Avoiding common pitfalls in interpreting results.</li>
+</ul></li>
+</ul>
+<p>Remember A/B testing is <em>iterative</em>, meaning insights from analysis may influence future steps in designing your test.</p>
+</section>
+<section id="sanity-check" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sanity-check">Sanity Check</h2>
+
+<div class="no-row-height column-margin column-container"><div id="fig-sanity-checks" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sanity-checks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/OVnlC_T3EpI" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sanity-checks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Sanity Check
+</figcaption>
+</figure>
+</div></div><p>In <a href="#fig-sanity-checks" class="quarto-xref">Figure&nbsp;2</a> Diane warns Caroline against jumping straight into analyzing click-through rates from her experiment. Diane quickly enumerates many ways experiments may go awary. Conducting <strong>sanity checks</strong> is crucial prior to analysis. These checks ensure the experiment has ran correctly and the data is reliable.</p>
+<p>Two main types of sanity checks are defined as:</p>
+<dl>
+<dt>Population sizing metrics</dt>
+<dd>
+<p>Verify that the experiment and control groups are comparable in size based on the diversion unit.</p>
+</dd>
+<dt>Invariant metrics</dt>
+<dd>
+<p>Metrics should not change due to the experiment itself. Analyzing their change helps identify potential issues.</p>
+</dd>
+</dl>
+<p>Only after passing these checks should you dive deeper into more complex analysis to interpret the experiment’s success or failure and make recommendations.</p>
+</section>
+<section id="choosing-invariants" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="choosing-invariants">Choosing Invariants</h2>
+
+<div class="no-row-height column-margin column-container"><div id="fig-choosing-invariants" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-choosing-invariants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/qCnbDgy2yHk" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-choosing-invariants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Choosing Invariants
+</figcaption>
+</figure>
+</div></div><p>In <a href="#fig-choosing-invariants" class="quarto-xref">Figure&nbsp;3</a> we get started with sanity checking our experiment results by picking the right invariant metrics. As Diane said, there are two types:</p>
+<ol type="1">
+<li>Population sizing metrics: These make sure the experiment and control groups are comparable in size, based on the diversion unit.</li>
+<li>Other invariant metrics: Any metrics that shouldn’t change due to the experiment itself.</li>
+</ol>
+<p>Now, I’ll describe two experiments. For each one, think about what metrics would stay the same, meaning they wouldn’t differ between the control and experiment groups.</p>
+<div id="exm-changing-course-order" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1</strong></span> Experiment 1: Changing course order</p>
+<p>Udacity is testing a new way of ordering courses in the course list to see if it affects enrollment. Each user ID is considered a single <em>unit of diversion</em>, since users might browse before enrolling.</p>
+</div>
+<div id="exm-changing-video-infrastructure" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2</strong></span> Experiment 2: Changing video infrastructure</p>
+<p>Udacity is implementing a new system to deliver videos faster. This time, each event (like a video play) is considered a unit of diversion.</p>
+</div>
+<p>Now, we should decide which of these metrics would be good invariant for each experiment:</p>
+<ul>
+<li>Number of signed-in users</li>
+<li>Number of cookies</li>
+<li>Number of events</li>
+<li>Click-through rate (CTR) on the “Start Now” button (This button takes users from the homepage to the course list.)</li>
+<li>Average time to complete a course</li>
+</ul>
+<p>Remember, an invariant metric should not change because of the experiment itself. Choose the ones that fit that criteria for each experiment</p>
+<div id="tbl-ex1" class="striped quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<div aria-describedby="tbl-ex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table-striped table">
+<thead>
+<tr class="header">
+<th>Invariant Metric</th>
+<th>course order</th>
+<th>video infrastructure</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>unit of diversion</td>
+<td>UID</td>
+<td>event</td>
+</tr>
+<tr class="even">
+<td># signed-in users</td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+</tr>
+<tr class="odd">
+<td># cookies</td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+</tr>
+<tr class="even">
+<td># events</td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+</tr>
+<tr class="odd">
+<td>CTR for “Start Now” button</td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+</tr>
+<tr class="even">
+<td>Avg. time to complete</td>
+<td><span class="emoji" data-emoji="o">⭕</span></td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl" id="tbl-ex1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Invariant Metrics for experiment 1 &amp; 2
+</figcaption>
+</figure>
+</div>
+<p>These are questions used the instructor to test the invariance for each metric.</p>
+<div id="tbl-metric-diag" class="striped quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<div aria-describedby="tbl-metric-diag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table-striped table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 45%">
+<col style="width: 18%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Question</th>
+<th></th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1.</td>
+<td>is the metric directly randomized?</td>
+<td><span class="math inline">\implies</span></td>
+<td>invariant</td>
+</tr>
+<tr class="even">
+<td>2.</td>
+<td>is the metric expected to be evenly split between the two groups?</td>
+<td><span class="math inline">\implies</span></td>
+<td>invariant</td>
+</tr>
+<tr class="odd">
+<td>3.</td>
+<td>is the metric measured before the test begins ?</td>
+<td><span class="math inline">\implies</span></td>
+<td>invariant</td>
+</tr>
+<tr class="even">
+<td>4.</td>
+<td>is the metric altered by the experiment ?</td>
+<td><span class="math inline">\implies</span></td>
+<td>not an invariant</td>
+</tr>
+<tr class="odd">
+<td>5.</td>
+<td>is the metric impossible to tracked?</td>
+<td><span class="math inline">\implies</span></td>
+<td>not an invariant</td>
+</tr>
+<tr class="even">
+<td>6.</td>
+<td>can the metric be assigned to different groups multiple times ?</td>
+<td><span class="math inline">\implies</span></td>
+<td>not an invariant</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl" id="tbl-metric-diag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Invariance diagnostics
+</figcaption>
+</figure>
+</div>
+<div id="exm-changing-sign-in-location" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3</strong></span> Experiment 3: Change Sign in to be on all pages</p>
+<p>Udacity changes the “sign in” button to be on all pages.</p>
+<p>The unit diversion is a cookie</p>
+</div>
+<div id="tbl-ex3" class="striped quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<div aria-describedby="tbl-ex3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table-striped table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 25%">
+<col style="width: 44%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Invariant Metric</th>
+<th>course order</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>unit of diversion</td>
+<td>cookie</td>
+<td></td>
+</tr>
+<tr class="even">
+<td># events</td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+<td>this, # cookeis # users are all good</td>
+</tr>
+<tr class="odd">
+<td>CTR for “Start Now” button</td>
+<td><span class="emoji" data-emoji="o">⭕</span></td>
+<td>this will change</td>
+</tr>
+<tr class="even">
+<td>Probability of enrolling</td>
+<td><span class="emoji" data-emoji="o">⭕</span></td>
+<td>should also change</td>
+</tr>
+<tr class="odd">
+<td>Sign-in rate</td>
+<td><span class="emoji" data-emoji="o">⭕</span></td>
+<td>this is the metric we are testing</td>
+</tr>
+<tr class="even">
+<td>Video load time</td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+<td>should not change</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl" id="tbl-ex3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Invariant Metrics for experiment 3
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="checking-invariants" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="checking-invariants">Checking Invariants</h2>
+
+<div class="no-row-height column-margin column-container"><div id="fig-checking-invariants" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-checking-invariants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/7CVlKQ3UjUI" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-checking-invariants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Checking Invariants
+</figcaption>
+</figure>
+</div></div><p>In <a href="#fig-checking-invariants" class="quarto-xref">Figure&nbsp;4</a> we get down to business and see how to check an invariant metric and ensure it’s similar between the control and experiment groups.</p>
+<p>Say you ran a two-week experiment with cookies as your diversion unit. The first sanity check: comparing the number of cookies in each group.</p>
+<p>Here’s the data:</p>
+<div id="tbl-results" class="quarto-layout-panel anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<div aria-describedby="tbl-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-results" style="flex-basis: 50.0%;justify-content: center;">
+<div id="tbl-week1" class="striped quarto-float anchored" data-tbl-cap-location="bottom">
+<figure class="quarto-float quarto-subfloat-tbl figure">
+<div aria-describedby="tbl-week1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table-striped table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Day</th>
+<th style="text-align: left;">control</th>
+<th style="text-align: left;">experiment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Mon</td>
+<td style="text-align: left;">5077</td>
+<td style="text-align: left;">4877</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tue</td>
+<td style="text-align: left;">5495</td>
+<td style="text-align: left;">4729</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wed</td>
+<td style="text-align: left;">5294</td>
+<td style="text-align: left;">5063</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Thu</td>
+<td style="text-align: left;">5446</td>
+<td style="text-align: left;">5035</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Fri</td>
+<td style="text-align: left;">5126</td>
+<td style="text-align: left;">5010</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sat</td>
+<td style="text-align: left;">3382</td>
+<td style="text-align: left;">3193</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sun</td>
+<td style="text-align: left;">2891</td>
+<td style="text-align: left;">3226</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-week1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Week 1 cookies for control &amp; experiment
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-results" style="flex-basis: 50.0%;justify-content: center;">
+<div id="tbl-week2" class="striped quarto-float anchored" data-tbl-cap-location="bottom">
+<figure class="quarto-float quarto-subfloat-tbl figure">
+<div aria-describedby="tbl-week2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table-striped table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Day</th>
+<th style="text-align: left;">control</th>
+<th style="text-align: left;">experiment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Mon</td>
+<td style="text-align: left;">5029</td>
+<td style="text-align: left;">5092</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tue</td>
+<td style="text-align: left;">5166</td>
+<td style="text-align: left;">5048</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wed</td>
+<td style="text-align: left;">4902</td>
+<td style="text-align: left;">4985</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Thu</td>
+<td style="text-align: left;">4923</td>
+<td style="text-align: left;">4805</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Fri</td>
+<td style="text-align: left;">4816</td>
+<td style="text-align: left;">4741</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sat</td>
+<td style="text-align: left;">3411</td>
+<td style="text-align: left;">2939</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sun</td>
+<td style="text-align: left;">3496</td>
+<td style="text-align: left;">3075</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-week2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Week 2 cookies for control &amp; experiment
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl" id="tbl-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Experiment 3 results
+</figcaption>
+</figure>
+</div>
+<p>Now, let’s look at the total number of cookies in each group. If that overall split seems balanced, that’s great. Otherwise, we’ll need to dig deeper into the day-by-day breakdown.</p>
+<p>The totals show:</p>
+<ul>
+<li>Control group: 64,454 cookies</li>
+<li>Experiment group: 61,818 cookies</li>
+</ul>
+<p>While the control group has more cookies, the question is: is this difference unexpected?</p>
+<p>Think about it this way: each cookie was randomly assigned to either group with a 50% chance. So, the real question is: is it surprising that out of the total cookies, 64,454 ended up in the control group?</p>
+<p>Let’s say that our <span class="math inline">H_0</span> null-hypothesis is that there is no difference between the groups. Or that the the probability for the data generating process is 0.5</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/05jVh4kUbHU" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Checking Invariants II</p>
+</div></div><ol type="1">
+<li>We can think about this IID draws from a Bernoulli distribution which we assume that p=0.5</li>
+<li>Sums of Bernoulli trials follow the Binomial distribution</li>
+<li>Since N = 126272 &gt;&gt; 20 We can approximated the Binomial with a Gaussian distribution.</li>
+<li>We can therefore test if the sd of the control and experiment are within CI for 95%</li>
+<li>To do so we should first apply a Z transform and check against the standard normal.</li>
+</ol>
+<p>for CI of .95 Z = 1.96 <span id="eq-binomial-ci"><span class="math display">
+CI = p \pm z \times SE = p \pm z \times \sqrt{\frac{p(1-p)}{N}} = 0.5 \pm 1.96 \times p \times 126272 ^{-2} \qquad
+\tag{1}</span></span></p>
+<div id="cell-CI-for-Binomial" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="CI-for-Binomial"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="CI-for-Binomial-1"><a href="#CI-for-Binomial-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="CI-for-Binomial-2"><a href="#CI-for-Binomial-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="CI-for-Binomial-3"><a href="#CI-for-Binomial-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="CI-for-Binomial-4"><a href="#CI-for-Binomial-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define parameters</span></span>
+<span id="CI-for-Binomial-5"><a href="#CI-for-Binomial-5" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="CI-for-Binomial-6"><a href="#CI-for-Binomial-6" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">126272</span></span>
+<span id="CI-for-Binomial-7"><a href="#CI-for-Binomial-7" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> <span class="fl">1.96</span>  <span class="co"># 95% confidence level</span></span>
+<span id="CI-for-Binomial-8"><a href="#CI-for-Binomial-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="CI-for-Binomial-9"><a href="#CI-for-Binomial-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate confidence interval bounds</span></span>
+<span id="CI-for-Binomial-10"><a href="#CI-for-Binomial-10" aria-hidden="true" tabindex="-1"></a>lower_bound <span class="op">=</span> p <span class="op">-</span> z <span class="op">*</span> (p <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p) <span class="op">/</span> N)<span class="op">**</span><span class="fl">0.5</span></span>
+<span id="CI-for-Binomial-11"><a href="#CI-for-Binomial-11" aria-hidden="true" tabindex="-1"></a>upper_bound <span class="op">=</span> p <span class="op">+</span> z <span class="op">*</span> (p <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p) <span class="op">/</span> N)<span class="op">**</span><span class="fl">0.5</span></span>
+<span id="CI-for-Binomial-12"><a href="#CI-for-Binomial-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="CI-for-Binomial-13"><a href="#CI-for-Binomial-13" aria-hidden="true" tabindex="-1"></a><span class="co"># lets create a df</span></span>
+<span id="CI-for-Binomial-14"><a href="#CI-for-Binomial-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="CI-for-Binomial-15"><a href="#CI-for-Binomial-15" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="CI-for-Binomial-16"><a href="#CI-for-Binomial-16" aria-hidden="true" tabindex="-1"></a>method <span class="op">=</span> <span class="st">'normal'</span></span>
+<span id="CI-for-Binomial-17"><a href="#CI-for-Binomial-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="CI-for-Binomial-18"><a href="#CI-for-Binomial-18" aria-hidden="true" tabindex="-1"></a><span class="co"># for experiment</span></span>
+<span id="CI-for-Binomial-19"><a href="#CI-for-Binomial-19" aria-hidden="true" tabindex="-1"></a>name<span class="op">=</span><span class="st">'experiment'</span></span>
+<span id="CI-for-Binomial-20"><a href="#CI-for-Binomial-20" aria-hidden="true" tabindex="-1"></a>count <span class="op">=</span> <span class="dv">61818</span></span>
+<span id="CI-for-Binomial-21"><a href="#CI-for-Binomial-21" aria-hidden="true" tabindex="-1"></a>proportion <span class="op">=</span> count<span class="op">/</span>N</span>
+<span id="CI-for-Binomial-22"><a href="#CI-for-Binomial-22" aria-hidden="true" tabindex="-1"></a>exeriment <span class="op">=</span> {<span class="st">'name'</span>:name, <span class="st">'count'</span>:count, <span class="st">'lb'</span>:lower_bound,<span class="st">'ub'</span>:upper_bound,<span class="st">"proportion"</span>:proportion}</span>
+<span id="CI-for-Binomial-23"><a href="#CI-for-Binomial-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="CI-for-Binomial-24"><a href="#CI-for-Binomial-24" aria-hidden="true" tabindex="-1"></a><span class="co"># for control</span></span>
+<span id="CI-for-Binomial-25"><a href="#CI-for-Binomial-25" aria-hidden="true" tabindex="-1"></a>name<span class="op">=</span><span class="st">'control'</span></span>
+<span id="CI-for-Binomial-26"><a href="#CI-for-Binomial-26" aria-hidden="true" tabindex="-1"></a>count <span class="op">=</span> <span class="dv">64454</span></span>
+<span id="CI-for-Binomial-27"><a href="#CI-for-Binomial-27" aria-hidden="true" tabindex="-1"></a>proportion <span class="op">=</span> count<span class="op">/</span>N</span>
+<span id="CI-for-Binomial-28"><a href="#CI-for-Binomial-28" aria-hidden="true" tabindex="-1"></a>control<span class="op">=</span> {<span class="st">'name'</span>:name, <span class="st">'count'</span>:count, <span class="st">'lb'</span>:lower_bound,<span class="st">'ub'</span>:upper_bound,<span class="st">"proportion"</span>:proportion}</span>
+<span id="CI-for-Binomial-29"><a href="#CI-for-Binomial-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="CI-for-Binomial-30"><a href="#CI-for-Binomial-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="CI-for-Binomial-31"><a href="#CI-for-Binomial-31" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame.from_records(data<span class="op">=</span>(exeriment,control),index<span class="op">=</span>[<span class="st">'1'</span>, <span class="st">'2'</span>])</span>
+<span id="CI-for-Binomial-32"><a href="#CI-for-Binomial-32" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="ci-for-binomial" class="cell-output cell-output-display" data-execution_count="1">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">name</th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">lb</th>
+<th data-quarto-table-cell-role="th">ub</th>
+<th data-quarto-table-cell-role="th">proportion</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>experiment</td>
+<td>61818</td>
+<td>0.497242</td>
+<td>0.502758</td>
+<td>0.489562</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>control</td>
+<td>64454</td>
+<td>0.497242</td>
+<td>0.502758</td>
+<td>0.510438</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-fig-ci" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>points <span class="op">=</span> alt.Chart(df).mark_point(filled<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">'black'</span>).encode(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  x<span class="op">=</span>alt.X(<span class="st">'name:N'</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  y<span class="op">=</span>alt.Y(<span class="st">'proportion:Q'</span>),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>error_bars <span class="op">=</span> alt.Chart(df).mark_errorbar().encode(</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  x <span class="op">=</span> alt.X(<span class="st">'name:N'</span>),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  y <span class="op">=</span> alt.Y(<span class="st">'lb:Q'</span>).scale(zero<span class="op">=</span><span class="va">False</span>).title(<span class="st">"lb"</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  y2<span class="op">=</span> alt.Y2(<span class="st">'ub:Q'</span>).title(<span class="st">"ub"</span>),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>points <span class="op">+</span> error_bars</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="fig-ci" class="cell-output cell-output-display quarto-figure quarto-figure-center quarto-float anchored" data-execution_count="2">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ci-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+
+<style>
+  #altair-viz-7d49e261afdf49ec9ecbc0b426888c16.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-7d49e261afdf49ec9ecbc0b426888c16.vega-embed details,
+  #altair-viz-7d49e261afdf49ec9ecbc0b426888c16.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-7d49e261afdf49ec9ecbc0b426888c16"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-7d49e261afdf49ec9ecbc0b426888c16") {
+      outputDiv = document.getElementById("altair-viz-7d49e261afdf49ec9ecbc0b426888c16");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.16.3?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.16.3"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "layer": [{"mark": {"type": "point", "color": "black", "filled": true}, "encoding": {"x": {"field": "name", "type": "nominal"}, "y": {"field": "proportion", "type": "quantitative"}}}, {"mark": {"type": "errorbar"}, "encoding": {"x": {"field": "name", "type": "nominal"}, "y": {"field": "lb", "scale": {"zero": false}, "title": "lb", "type": "quantitative"}, "y2": {"field": "ub", "title": "ub"}}}], "data": {"name": "data-2439f3b621d0ce92b3dce3019393daac"}, "$schema": "https://vega.github.io/schema/vega-lite/v5.16.3.json", "datasets": {"data-2439f3b621d0ce92b3dce3019393daac": [{"name": "experiment", "count": 61818, "lb": 0.4972421379031649, "ub": 0.502757862096835, "proportion": 0.48956221490116575}, {"name": "control", "count": 64454, "lb": 0.4972421379031649, "ub": 0.502757862096835, "proportion": 0.5104377850988343}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ci-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Binomial Confidence Intervals
+</figcaption>
+</figure>
+</div>
+</div>
+<p>so this is not an error in the calculation - we can plainly see that the two groups are significantly outside the CI. This means that we are not getting the same behavior for each group. Sanity test fails 🤡</p>
+<p>Further analysis shows that the control is getting more cookies daily.</p>
+<p>Note we can perform this analysis more directly under the Bayesian paradigm using a Beta prior and a Binomial Likelihood.</p>
+<p>Here is the instructors analysis:</p>
+<ul>
+<li>Given: Each cookie is randomly assigned to the control or experiment group with probability <span class="math inline">p = 0.5</span>. Use this to compute SD of binomial with probability 0.5 of success. Calculate the confidence interval. The observed fraction of control group is greater than the upper bound of CI =&gt; there is something wrong with the setup.</li>
+<li>Do day-by-day analysis. If control group samples are more on a lot of dates, not just a specific day, we can
+<ol type="1">
+<li>Talk to the engineers about experiment infrastructure, unit of diversion, etc.</li>
+<li>Try slicing to see if one particular slice is weird, e.g.&nbsp;country, language, platform.</li>
+<li>Check the age of cookies — does one group have more new cookies</li>
+<li>Retrospective analysis: recreate the experiment diversion from the data capture to understand the problem.</li>
+<li>Pre- and post-period: check invariant. If similar changes exist on the pre-period, it could be problems with the experiment infrastructure (e.g.&nbsp;cookie reset), setup (e.g.&nbsp;not filter correctly between groups), etc. If the changes are only observed in the post-period, the issue may be associated with the experiment itself such as data capture (e.g.&nbsp;capture correctly in trt but not in control). Learning effect may take time. If the issues are observed at the beginning of the experiment, might not be learning effect.</li>
+</ol></li>
+</ul>
+<div id="tbl-week2" class="striped quarto-float anchored" data-tbl-cap-location="bottom">
+<figure class="quarto-float quarto-float-tbl figure">
+<div aria-describedby="tbl-week2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table-striped table">
+<thead>
+<tr class="header">
+<th>Day</th>
+<th>control</th>
+<th>experiment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mon</td>
+<td>2451</td>
+<td>2404</td>
+</tr>
+<tr class="even">
+<td>Tue</td>
+<td>2475</td>
+<td>2507</td>
+</tr>
+<tr class="odd">
+<td>Wed</td>
+<td>2394</td>
+<td>2376</td>
+</tr>
+<tr class="even">
+<td>Thu</td>
+<td>2482</td>
+<td>2444</td>
+</tr>
+<tr class="odd">
+<td>Fri</td>
+<td>2374</td>
+<td>2504</td>
+</tr>
+<tr class="even">
+<td>Sat</td>
+<td>1704</td>
+<td>1612</td>
+</tr>
+<tr class="odd">
+<td>Sun</td>
+<td>1468</td>
+<td>1465</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl" id="tbl-week2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Another experiment
+</figcaption>
+</figure>
+</div>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/Mftti4FSjn4" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Checking Invariants II Solved</p>
+</div></div></section>
+<section id="sanity-checking-wrap-up" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sanity-checking-wrap-up">Sanity Checking: Wrap-up</h2>
+
+<div class="no-row-height column-margin column-container"><div id="fig-sanity-checking-wrapup" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sanity-checking-wrapup-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/rCAYdZk5O2E" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sanity-checking-wrapup-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Sanity Checking: Wrapup
+</figcaption>
+</figure>
+</div></div><p>In <a href="#fig-sanity-checking-wrapup" class="quarto-xref">Figure&nbsp;6</a> Diane point out that failing a sanity check in your experiment is like landing on “do not pass GO” in Monopoly. It means you shouldn’t proceed with analyzing the results until you understand why the check failed.</p>
+<p>Here’s what to do if your sanity check fails:</p>
+<ol type="1">
+<li>Debug the experiment setup:
+<ul>
+<li>Collaborate with engineers to check:
+<ul>
+<li>Technical issues: Is there something wrong with the experiment infrastructure or the way it’s set up?</li>
+<li>Diversion issues: Did the experiment assign users to groups correctly?</li>
+</ul></li>
+</ul></li>
+<li>Retrospective analysis:
+<ul>
+<li>Try recreating experiment diversion from the data to understand if the issue is inherent to the experiment itself.</li>
+</ul></li>
+<li>Utilize pre and post periods:
+<ul>
+<li>Compare the invariant metrics in the pre-period (before the experiment) to those in the experiment and post-period (after the experiment).
+<ul>
+<li>If the change only occurs in the experiment period, it points to an issue with the experiment itself (data capture, etc.).</li>
+</ul></li>
+</ul></li>
+<li>If the change occurs in both the pre-period and experiment, it suggests an infrastructure issue.</li>
+</ol>
+<p>Remember:</p>
+<ul>
+<li><p>Failing a sanity check doesn’t necessarily mean there’s a major problem, but it does require investigation before drawing conclusions.</p></li>
+<li><p>Even with passing checks, slight differences in metrics are expected due to random chance.</p></li>
+<li><p>Learning effects (users adapting over time) can also impact results. Look for a gradual increase in change over time, not an immediate significant change.</p></li>
+</ul>
+<p>If all checks pass, then you can move on to analyzing the experiment results.</p>
+<p>Note: when I run A/B test for clients at an advertising agency. I used tested framework like Google Analytics, VWO, Crazy Egg, and Firebase to run them and none of this was a major issue. However, many people have had test that run awry, so sanity tests are not such a bad idea.</p>
+</section>
+<section id="a-single-metric" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="a-single-metric">A Single Metric</h2>
+
+<div class="no-row-height column-margin column-container"><div id="fig-single-metric-intro" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-single-metric-intro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/StP9L9f70EU" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-single-metric-intro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Single Metric: Introduction
+</figcaption>
+</figure>
+</div></div><p>In <a href="#fig-single-metric-intro" class="quarto-xref">Figure&nbsp;7</a> Carey, explained how to analyze the results of an A/B experiment with a single evaluation metric.</p>
+<p><strong>The goal:</strong> Decide if the experiment had a statistically significant, positive impact on the metric, and estimate the size and direction of the change. This information helps you decide whether to recommend launching the experiment broadly.</p>
+<p><strong>Steps involved:</strong></p>
+<ol type="1">
+<li><p><strong>Characterize the metric:</strong> Understand its variability (covered in Lesson 3).</p></li>
+<li><p><strong>Estimate experiment parameters:</strong> Use the variability to determine how long to run the experiment and how many users to include (covered in Lesson 4).</p></li>
+<li><p><strong>Analyze for statistical significance:</strong></p>
+<ul>
+<li><p>Combine the information from steps 1 and 2 to estimate the variability for analyzing the experiment.</p></li>
+<li><p>Use statistical tests (like hypothesis tests) to assess if the observed change is statistically significant, meaning it’s unlikely due to random chance.</p></li>
+</ul></li>
+</ol>
+<p><strong>What to do if the results are not statistically significant:</strong></p>
+<ul>
+<li><p><strong>Further analysis:</strong></p>
+<ul>
+<li><p>Look for patterns by segmenting the data (e.g., by platform, day of the week). This might reveal bugs or suggest new hypotheses.</p></li>
+<li><p>Compare your results with other methods (e.g., non-parametric tests) to confirm or explore inconsistencies.</p></li>
+</ul></li>
+<li><p>Consider the possibility that the observed change, although not statistically significant, might still be valuable for the business.</p></li>
+</ul>
+<section id="what-not-to-do-if-your-results-arent-significant" class="level3">
+<h3 class="anchored" data-anchor-id="what-not-to-do-if-your-results-arent-significant">What <em>not</em> to do if your results aren’t significant</h3>
+<p>Carrie gave some ideas of what you can do if your results aren’t significant, but you were expecting they would be. One tempting idea is to run the experiment for a few more days and see if the extra data helps get you a significant result. However, this can lead to a much higher false positive rate than you expecting! See <a href="http://www.evanmiller.org/how-not-to-run-an-ab-test.html">How Not To Run an A/B Test by Evan Miller</a> for more details. Instead of running for longer when you don’t like the results, you should be sizing your experiment in advance to ensure that you will have enough power the first time you look at your results.</p>
+</section>
+</section>
+<section id="overview-of-how-not-to-run-an-ab-test-avoiding-repeated-significance-testing-errors-by-evan-miller" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="overview-of-how-not-to-run-an-ab-test-avoiding-repeated-significance-testing-errors-by-evan-miller">Overview of <strong>How Not To Run an A/B Test: Avoiding Repeated Significance Testing Errors by Evan Miller</strong></h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="ab_testing_meme_no_peeking.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" data-glightbox="description: .lightbox-desc-2" title="no peeking"><img src="ab_testing_meme_no_peeking.jpg" class="img-fluid figure-img" alt="no peeking"></a></p>
+<figcaption>no peeking</figcaption>
+</figure>
+</div></div><p>The blog post recommended in this lesson explains how “peeking” at A/B test results and stopping the experiment based on interim significance can lead to misleading conclusions.</p>
+<p>Here’s the key takeaway:</p>
+<p><strong>Problem:</strong></p>
+<ul>
+<li><p>A/B testing software will often displays “chance of beating original” or “statistical significance” during the experiment.</p></li>
+<li><p>These are estimates with a strong assumption of a fixed sample size set before starting the experiment.</p></li>
+<li><p>Experiment will switch between favouring A and B many times and as this happens it will loose and then regain statistical significance.</p></li>
+<li><p>If you <strong>Peek</strong> at the data and stopp the experiment early this not only violates the assumption of a fixed sample size it also inflates the reported significance level.</p></li>
+<li><p>Actually it is much worse is you stop early (e.g., when it first shows significance) you have <strong>cherry picked</strong> the result. The statistical significance isn’t just inflated it is meaningless.</p></li>
+</ul>
+<p><strong>Consequences:</strong></p>
+<ul>
+<li><p>You might wrongly conclude that an insignificant difference is actually significant (<strong>false positive</strong>).</p></li>
+<li><p>Think about it - it is like stopping the election when less than 10% of the votes are counted - there is little reason to think you really seen the big picture.</p></li>
+<li><p>The more you peek, the worse the problem gets.</p></li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<ul>
+<li>For experimenters:
+<ul>
+<li><strong>Fix the sample size in advance</strong> and stick to it, regardless of interim results.</li>
+<li><strong>Avoid peeking</strong> at the data or stopping early.</li>
+<li>Use the formula <code>n=16σ²/δ²</code> as a rule of thumb to estimate the required sample size, considering the desired effect size (<code>δ</code>) and expected variance (<code>σ²</code>). -For A/B testing software developers:</li>
+<li>Don’t show significance levels until the experiment ends.</li>
+<li>Instead, report the <strong>detectable effect size</strong> based on current data.</li>
+<li>Consider removing “current estimate” of the treatment effect.</li>
+</ul></li>
+<li>Advanced options:
+<ul>
+<li><strong>Sequential experiment design:</strong> Predefined checkpoints to decide on continuing the experiment while maintaining valid significance levels.</li>
+<li><strong>Bayesian experiment design:</strong> Allows stopping the experiment and making valid inferences at any time, potentially better suited for real-time web experiments.</li>
+</ul></li>
+</ul>
+<p><strong>Conclusion:</strong></p>
+<ul>
+<li>Don’t rely on preliminary significance indicators in A/B testing dashboards.</li>
+<li>Fix the sample size upfront and avoid peeking at data to ensure reliable results.</li>
+<li>Consider advanced techniques like <a href="https://www.evanmiller.org/sequential-ab-testing.html">sequential</a> or <a href="https://www.evanmiller.org/bayesian-ab-testing.html">Bayesian designs</a> for greater flexibility.</li>
+</ul>
+<p>A couple of comments:</p>
+<ol type="1">
+<li>Most people, data scientists, included don’t have a clue estimating statistical power, effect sizes the sample size required to reach significance for an a/b test. Given all that they have even less of a clue on the Practical significance of the test which is what matters in the business setting and what creates the costs for the loosing</li>
+<li>A Bayesian design is definitely better than the frequentist approach - particularly if it figures in the cost of testing each arm.</li>
+<li>The only thing in your favour is that you can get an easy win or two if you have not done any a/b testing. Afterwards it gets harder and harder to get a large effect size.</li>
+</ol>
+
+<div class="no-row-height column-margin column-container"><div id="fig-single-metric-example" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-single-metric-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/LCZG4wlEFXE" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-single-metric-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Single Metric: Example
+</figcaption>
+</figure>
+</div></div><div id="exm-changing-start-now" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4</strong></span> change color and placement of Start Now button</p>
+<ul>
+<li>metric: CTR</li>
+<li>Unit of diversion: cookie <span class="math display">d_{min}=0.01,\quad  \alpha=0.05,\quad \beta=0.2</span></li>
+</ul>
+</div>
+<div id="1d38d25a" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Xs_cont <span class="op">=</span> np.asarray([<span class="dv">196</span>, <span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">216</span>, <span class="dv">212</span>, <span class="dv">185</span>, <span class="dv">225</span>, <span class="dv">187</span>, <span class="dv">205</span>, <span class="dv">211</span>, <span class="dv">192</span>, <span class="dv">196</span>, <span class="dv">223</span>, <span class="dv">192</span>])</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Ns_cont <span class="op">=</span> np.asarray([<span class="dv">2029</span>, <span class="dv">1991</span>, <span class="dv">1951</span>, <span class="dv">1985</span>, <span class="dv">1973</span>, <span class="dv">2021</span>, <span class="dv">2041</span>, <span class="dv">1980</span>, <span class="dv">1951</span>, <span class="dv">1988</span>, <span class="dv">1977</span>, <span class="dv">2019</span>, <span class="dv">2035</span>, <span class="dv">2007</span>])</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>Xs_exp <span class="op">=</span> np.asarray([<span class="dv">179</span>, <span class="dv">208</span>, <span class="dv">205</span>, <span class="dv">175</span>, <span class="dv">191</span>, <span class="dv">291</span>, <span class="dv">278</span>, <span class="dv">216</span>, <span class="dv">225</span>, <span class="dv">207</span>, <span class="dv">205</span>, <span class="dv">200</span>, <span class="dv">297</span>, <span class="dv">299</span>])</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>Ns_exp <span class="op">=</span> np.asarray([<span class="dv">1971</span>, <span class="dv">2009</span>, <span class="dv">2049</span>, <span class="dv">2015</span>, <span class="dv">2027</span>, <span class="dv">1979</span>, <span class="dv">1959</span>, <span class="dv">2020</span>, <span class="dv">2049</span>, <span class="dv">2012</span>, <span class="dv">2023</span>, <span class="dv">1981</span>, <span class="dv">1965</span>, <span class="dv">1993</span>])</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> {</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"clicks_cont"</span>: Xs_cont,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"views_cont"</span>:  Ns_cont,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ctr_cont"</span>:    Xs_cont<span class="op">/</span>Ns_cont,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"clicks_exp"</span>:  Xs_exp,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"views_exp"</span>:   Ns_exp,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ctr_exp"</span>:    Xs_exp<span class="op">/</span>Ns_exp,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame.from_dict(data)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>d_min <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="fl">0.05</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>empirical_se   <span class="op">=</span> <span class="fl">0.062</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>epirical_views <span class="op">=</span> <span class="dv">5000</span> <span class="co"># per group</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>effect_size<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#sign_test= statsmodels.stats.descriptivestats.sign_test(df[], mu0=0)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">clicks_cont</th>
+<th data-quarto-table-cell-role="th">views_cont</th>
+<th data-quarto-table-cell-role="th">ctr_cont</th>
+<th data-quarto-table-cell-role="th">clicks_exp</th>
+<th data-quarto-table-cell-role="th">views_exp</th>
+<th data-quarto-table-cell-role="th">ctr_exp</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>196</td>
+<td>2029</td>
+<td>0.096599</td>
+<td>179</td>
+<td>1971</td>
+<td>0.090817</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>200</td>
+<td>1991</td>
+<td>0.100452</td>
+<td>208</td>
+<td>2009</td>
+<td>0.103534</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>200</td>
+<td>1951</td>
+<td>0.102512</td>
+<td>205</td>
+<td>2049</td>
+<td>0.100049</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>216</td>
+<td>1985</td>
+<td>0.108816</td>
+<td>175</td>
+<td>2015</td>
+<td>0.086849</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>212</td>
+<td>1973</td>
+<td>0.107451</td>
+<td>191</td>
+<td>2027</td>
+<td>0.094228</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>185</td>
+<td>2021</td>
+<td>0.091539</td>
+<td>291</td>
+<td>1979</td>
+<td>0.147044</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>225</td>
+<td>2041</td>
+<td>0.110240</td>
+<td>278</td>
+<td>1959</td>
+<td>0.141909</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>187</td>
+<td>1980</td>
+<td>0.094444</td>
+<td>216</td>
+<td>2020</td>
+<td>0.106931</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>205</td>
+<td>1951</td>
+<td>0.105074</td>
+<td>225</td>
+<td>2049</td>
+<td>0.109810</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>211</td>
+<td>1988</td>
+<td>0.106137</td>
+<td>207</td>
+<td>2012</td>
+<td>0.102883</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>192</td>
+<td>1977</td>
+<td>0.097117</td>
+<td>205</td>
+<td>2023</td>
+<td>0.101335</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>196</td>
+<td>2019</td>
+<td>0.097078</td>
+<td>200</td>
+<td>1981</td>
+<td>0.100959</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>223</td>
+<td>2035</td>
+<td>0.109582</td>
+<td>297</td>
+<td>1965</td>
+<td>0.151145</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>192</td>
+<td>2007</td>
+<td>0.095665</td>
+<td>299</td>
+<td>1993</td>
+<td>0.150025</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="single-metric-gotchas" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="single-metric-gotchas">Single Metric: Gotchas</h2>
+
+<div class="no-row-height column-margin column-container"><div id="fig-single-metric-gotchas" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-single-metric-gotchas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/WrfWFLiFeMU" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-single-metric-gotchas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Single Metric: Gotchas
+</figcaption>
+</figure>
+</div></div><p>In <a href="#fig-single-metric-gotchas" class="quarto-xref">Figure&nbsp;9</a> the instructor discusses Simpson’s Paradox</p>
+<p>We start with sime definitions</p>
+<dl>
+<dt>Conflicting results</dt>
+<dd>
+When statistical tests disagree, like sign test and hypothesis test, or results differ across subgroups, a closer look at the data is necessary.
+</dd>
+<dt>Simpson’s paradox</dt>
+<dd>
+This phenomenon occurs when a trend appears in the overall data but reverses direction when analyzed within subgroups.
+</dd>
+<dt>Subgroup analysis</dt>
+<dd>
+Examining data within relevant subgroups like departments, platforms, or user types can reveal hidden patterns.
+</dd>
+<dt>Confounding variables</dt>
+<dd>
+Variables not directly measured but influencing the observed relationship can lead to misleading interpretations.
+</dd>
+</dl>
+<p>The example is a well known result regarding admissions to Berkley University</p>
+<p>Example:</p>
+<p>Berkeley admissions: In aggregate, women had a lower acceptance rate than men. However, analyzing by department showed women had higher acceptance rates in some departments but applied more to lower acceptance departments, leading to the overall trend.</p>
+<p>Application:</p>
+<p>Experiment analysis: Similar to the Berkeley admissions example, experiment results can be misleading if analyzed without considering subgroup behavior.</p>
+<p>Further Learning:</p>
+<p>The speaker mentions an upcoming example of how Simpson’s paradox affects experiment analysis.</p>
+<p><strong>Remember:</strong></p>
+<ul>
+<li><p>Non-significant results don’t necessarily mean there’s no effect, but they require further investigation before drawing conclusions.</p></li>
+<li><p>See if there’s a significant difference. If not as expected, break/slice and check the results. It helps with debugging the experiment setup, and get new hypotheses.</p></li>
+<li><p><strong>Simpson Paradox</strong>. Although for each subgroup it seems that CTR has improved, the overall CTR was not improved. We cannot say the experiment is successful. Need to dig deeper to understand what caused the difference between new users and experienced users.</p></li>
+</ul>
+</section>
+<section id="multiple-metrics" class="level2">
+<h2 class="anchored" data-anchor-id="multiple-metrics">Multiple Metrics</h2>
+<ul>
+<li><p>Challenge: When evaluating multiple metrics simultaneously, random chance increases the likelihood of seeing seemingly significant differences that aren’t truly meaningful. (Lines 3-7)</p></li>
+<li><p>Mitigating factors:</p>
+<ul>
+<li>Repeatability: If the “significant” difference doesn’t occur again in repeated experiments (e.g., different days, data slices, or bootstrap analysis), it’s likely a chance finding. (Lines 8-11)</li>
+<li>Multiple Comparisons: This technique adjusts the significance level to account for the number of metrics tested, reducing the probability of false positives. (Lines 13-15)</li>
+</ul></li>
+<li><p>Applications:</p>
+<ul>
+<li>Exploratory Data Analysis (EDA): Multiple comparisons help identify consistently significant metrics and avoid overfitting to random noise. (Lines 19-21)</li>
+<li>Automatic Alerting: When setting up alerts based on significant changes in metrics, using multiple comparisons helps prevent false positives triggering alerts. (Lines 22-24)</li>
+</ul></li>
+</ul>
+<section id="multiple-comparison-problem" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-comparison-problem">Multiple comparison problem</h3>
+<p>As you test more metrics, it becomes more likely that one of them will show a statistically significant result by chance. - In other words, the probability of any false positive increases as you increase the number of metrics. - For example, when we measure 3 independent metrics at the same time, alpha = 0.05, the probability that at least one metric by chance is significant (False Positive) is</p>
+<pre><code>- $P(FP=0) = 0.95*0.95*0.95 = 0.857$ 
+- so $P(FP≥1) = 1-P(FP=0) = 1–0.857 = 0.143$
+- Solution: Use a higher confidence level for each metric</code></pre>
+<ul>
+<li><strong>Method 1</strong>: Set up an overall alpha and use it to calculate each individual alpha. Assume independence.</li>
+</ul>
+<p><span class="math display">\alpha_{overall} = 1 - ( 1 - \alpha_{individual})^n</span></p>
+<ul>
+<li><strong>Method 2</strong>: <strong>Bonferroni correction</strong>.</li>
+</ul>
+<p><span class="math inline">\alpha_{individual} = \alpha_{overall}/n</span></p>
+<p>A problem with <strong>Bonferroni correction</strong> is, if our metrics are correlated, they tend to move at the same time. In this way, the method is too conservative – it results in less significant difference.</p>
+<p><strong>Solution: 1</strong> Use <em>false discovery rate</em> $ FDR = E( ) $ instead of family-wise error rate (FWER, control probability that any metric shows a false positive)</p>
+<p><strong>Solution: 2️</strong> Use less conservative multiple comparison methods, e.g.&nbsp;closed testing procedure, Boole-Bonferroni bound, and Holm-Bonferroni method.</p>
+</section>
+<section id="focus-on-business-goals" class="level3">
+<h3 class="anchored" data-anchor-id="focus-on-business-goals">Focus on Business Goals</h3>
+<p>Overall evaluation criteria (OEC) should be established based on an understanding of what your company is doing and what the problems are. It should balance long-term and short-term benefits. Business analysis is needed to make the decision. Once you have some candidates of OEC, you can run a few experiments to see how they steer you (whether in the right direction).</p>
+</section>
+<section id="whether-to-launch-an-experiment-or-not" class="level3">
+<h3 class="anchored" data-anchor-id="whether-to-launch-an-experiment-or-not">Whether to launch an experiment or not??</h3>
+<ul>
+<li>Statistically and practically significant to justify the change?</li>
+<li>Do you understand what the change can do to the user experience?</li>
+<li>Is it worth the investment?</li>
+</ul>
+</section>
+<section id="ramp-up-ab-test" class="level3">
+<h3 class="anchored" data-anchor-id="ramp-up-ab-test">Ramp up A/B test</h3>
+<ul>
+<li>Start with 1% of the traffic and divert to experiment and increase that until the feature is fully launched.</li>
+<li>During the ramp-up process, effects may not be statistically significant even if they are significant before. Reason:
+<ul>
+<li>Seasonality such as school season, holiday, etc. 🌟
+<ul>
+<li>Solution: have a holdback group (launch the experiment to everyone except for a small holdback who doesn’t get the change, and you continue to compare them to the control)</li>
+</ul></li>
+<li>Novelty effect or change aversion: as users discover or change their adoption of your change, their behavior can change and measured effect can change — can do cohort analysis. 🌟
+<ul>
+<li>Solution: Pre- and post-period analysis with cohort analysis to understand the learning effect — i.e.&nbsp;how users adapt to the changes over time.</li>
+</ul></li>
+</ul></li>
+<li>Business-wise, need to consider the engineering cost of maintaining the change, if there are customer support or sales issue, opportunity cost, etc.</li>
+</ul>
+
+
+<div class="hidden" aria-hidden="true">
+<span class="glightbox-desc lightbox-desc-1">udacity</span>
+<span class="glightbox-desc lightbox-desc-2">no peeking</span>
+</div>
+</section>
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2023,
+  author = {Bochman, Oren},
+  title = {Lesson 5 - {Analyzing} {Results}},
+  date = {2023-01-01},
+  url = {https://orenbochman.github.io/blog//notes/AB-testing/l5.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2023" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2023. <span>“Lesson 5 - Analyzing Results.”</span>
+January 1, 2023. <a href="https://orenbochman.github.io/blog//notes/AB-testing/l5.html">https://orenbochman.github.io/blog//notes/AB-testing/l5.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"loop":false,"descPosition":"bottom","closeEffect":"zoom","openEffect":"zoom","selector":".lightbox"});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

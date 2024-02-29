@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2016-01-30">
+
+<title>Oren Bochman’s Blog - 06 - Production Systems</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - 06 - Production Systems">
+<meta name="twitter:description" content="Personal website, portfolio and blog">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/notes/cognitivie-ai-cs7637/06-production-systems/thumbnail_blog.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+        <li>
+    <a class="dropdown-item" href="../../../dnn.html">
+ <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../model-thinking.html">
+ <span class="dropdown-text">Model Thinking</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../xai.html">
+ <span class="dropdown-text">XAI</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rl.html">
+ <span class="dropdown-text">rl</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rhetoric.html">
+ <span class="dropdown-text">rhetoric</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../tfp.html">
+ <span class="dropdown-text">TFP</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../ab-testing.html">
+ <span class="dropdown-text">AB testing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../cognitiveai.html">
+ <span class="dropdown-text">cognitive AI</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">06 - Production Systems</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 30, 2016</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#production-systems" id="toc-production-systems" class="nav-link active" data-scroll-target="#production-systems">Production Systems</a></li>
+  <li><a href="#preview" id="toc-preview" class="nav-link" data-scroll-target="#preview">Preview</a></li>
+  <li><a href="#exercise-a-pitcher" id="toc-exercise-a-pitcher" class="nav-link" data-scroll-target="#exercise-a-pitcher">Exercise A Pitcher</a></li>
+  <li><a href="#exercise-a-pitcher-1" id="toc-exercise-a-pitcher-1" class="nav-link" data-scroll-target="#exercise-a-pitcher-1">Exercise A Pitcher</a></li>
+  <li><a href="#function-of-a-cognitive-architecture" id="toc-function-of-a-cognitive-architecture" class="nav-link" data-scroll-target="#function-of-a-cognitive-architecture">Function of a Cognitive Architecture</a></li>
+  <li><a href="#levels-of-cognitive-architectures" id="toc-levels-of-cognitive-architectures" class="nav-link" data-scroll-target="#levels-of-cognitive-architectures">Levels of Cognitive Architectures</a></li>
+  <li><a href="#exercise-levels-of-architectures" id="toc-exercise-levels-of-architectures" class="nav-link" data-scroll-target="#exercise-levels-of-architectures">Exercise Levels of Architectures</a></li>
+  <li><a href="#exercise-levels-of-architectures-1" id="toc-exercise-levels-of-architectures-1" class="nav-link" data-scroll-target="#exercise-levels-of-architectures-1">Exercise Levels of Architectures</a></li>
+  <li><a href="#assumptions-of-cognitive-architectures" id="toc-assumptions-of-cognitive-architectures" class="nav-link" data-scroll-target="#assumptions-of-cognitive-architectures">Assumptions of Cognitive Architectures</a></li>
+  <li><a href="#architecture-content-behavior" id="toc-architecture-content-behavior" class="nav-link" data-scroll-target="#architecture-content-behavior">Architecture Content Behavior</a></li>
+  <li><a href="#a-cognitive-architecture-for-production-systems" id="toc-a-cognitive-architecture-for-production-systems" class="nav-link" data-scroll-target="#a-cognitive-architecture-for-production-systems">A Cognitive Architecture for Production Systems</a></li>
+  <li><a href="#return-to-the-pitcher" id="toc-return-to-the-pitcher" class="nav-link" data-scroll-target="#return-to-the-pitcher">Return to the Pitcher</a></li>
+  <li><a href="#action-selection" id="toc-action-selection" class="nav-link" data-scroll-target="#action-selection">Action Selection</a></li>
+  <li><a href="#putting-content-in-the-architecture" id="toc-putting-content-in-the-architecture" class="nav-link" data-scroll-target="#putting-content-in-the-architecture">Putting Content in the Architecture</a></li>
+  <li><a href="#bringing-in-memory" id="toc-bringing-in-memory" class="nav-link" data-scroll-target="#bringing-in-memory">Bringing in Memory</a></li>
+  <li><a href="#exercise-production-system-in-action-i" id="toc-exercise-production-system-in-action-i" class="nav-link" data-scroll-target="#exercise-production-system-in-action-i">Exercise Production System in Action I</a></li>
+  <li><a href="#exercise-production-system-in-action-i-1" id="toc-exercise-production-system-in-action-i-1" class="nav-link" data-scroll-target="#exercise-production-system-in-action-i-1">Exercise Production System in Action I</a></li>
+  <li><a href="#exercise-production-system-in-action-ii" id="toc-exercise-production-system-in-action-ii" class="nav-link" data-scroll-target="#exercise-production-system-in-action-ii">Exercise Production System in Action II</a></li>
+  <li><a href="#exercise-production-system-in-action-ii-1" id="toc-exercise-production-system-in-action-ii-1" class="nav-link" data-scroll-target="#exercise-production-system-in-action-ii-1">Exercise Production System in Action II</a></li>
+  <li><a href="#exercise-system-in-action-iii" id="toc-exercise-system-in-action-iii" class="nav-link" data-scroll-target="#exercise-system-in-action-iii">Exercise System in Action III</a></li>
+  <li><a href="#exercise-system-in-action-iii-1" id="toc-exercise-system-in-action-iii-1" class="nav-link" data-scroll-target="#exercise-system-in-action-iii-1">Exercise System in Action III</a></li>
+  <li><a href="#chunking" id="toc-chunking" class="nav-link" data-scroll-target="#chunking">Chunking</a></li>
+  <li><a href="#exercise-chunking" id="toc-exercise-chunking" class="nav-link" data-scroll-target="#exercise-chunking">Exercise Chunking</a></li>
+  <li><a href="#exercise-chunking-1" id="toc-exercise-chunking-1" class="nav-link" data-scroll-target="#exercise-chunking-1">Exercise Chunking</a></li>
+  <li><a href="#fundamentals-of-learning" id="toc-fundamentals-of-learning" class="nav-link" data-scroll-target="#fundamentals-of-learning">Fundamentals of Learning</a></li>
+  <li><a href="#assignment-production-systems" id="toc-assignment-production-systems" class="nav-link" data-scroll-target="#assignment-production-systems">Assignment Production Systems</a></li>
+  <li><a href="#wrap-up" id="toc-wrap-up" class="nav-link" data-scroll-target="#wrap-up">Wrap Up</a></li>
+  <li><a href="#the-cognitive-connection" id="toc-the-cognitive-connection" class="nav-link" data-scroll-target="#the-cognitive-connection">The Cognitive Connection</a></li>
+  <li><a href="#final-quiz" id="toc-final-quiz" class="nav-link" data-scroll-target="#final-quiz">Final Quiz</a></li>
+  <li><a href="#final-quiz-1" id="toc-final-quiz-1" class="nav-link" data-scroll-target="#final-quiz-1">Final Quiz</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="production-systems" class="level1">
+<h1>Production Systems</h1>
+</section>
+<section id="preview" class="level1">
+<h1>Preview</h1>
+<p>Today, we’ll talk about production systems. I think you’re going to enjoy this because part of production systems is going to do with learning.</p>
+<p>And this is the first time in the course we’ll be talking about learning.</p>
+<p>Production systems are kind of cognitive architecture, in which knowledge is represented in the form of rules. This is the last topic under the fundamental topics part of the course. We’ll start by talking about cognitive architectures in general, then focus on production systems, then come to learning, a particular mechanism of learning called chunking.</p>
+</section>
+<section id="exercise-a-pitcher" class="level1">
+<h1>Exercise A Pitcher</h1>
+<p>To illustrate production systems, let us imagine that you are a baseball pitcher. This illustration is coming from a game between Atlanta Braves and the Arizona Diamondbacks. Here is a pitcher on the mound, and a pitcher has to decide, whether to pitch a ball to the batter, or whether to walk the batter.</p>
+<p>To be more specific, take a look at the story here in the left. Read it.</p>
+<p>And to decide what would the pitcher do. What would you do?</p>
+<p>What would an intelligent agent do? If you don’t know much about baseball, don’t worry about it. Part of the goal here is to see what someone who does not know about, a lot about baseball may do.</p>
+</section>
+<section id="exercise-a-pitcher-1" class="level1">
+<h1>Exercise A Pitcher</h1>
+<p>David, it’s clear that you know more about baseball than I do. So I assume that your answer is the right one. But notice what is happening here.</p>
+<p>David has a lot of knowledge about baseball, and he’s using tha knowledge to make a decision. How is he using his knowledge to make a decision?</p>
+<p>What is the architecture? What is the reasoning that leads him to make that specific decision? This is one of the things we’ll learn in this lesson.</p>
+<p>How might intelligent agents make complex decisions about the world?</p>
+</section>
+<section id="function-of-a-cognitive-architecture" class="level1">
+<h1>Function of a Cognitive Architecture</h1>
+<p>Before we talk about cognitive architectures in more detail, first let us characterize what is a cognitive agent.</p>
+<p>Now, there are many views of what a cognitive agent is. Here is one characterization of cognitive agent which is very popular in modern AI.</p>
+<p>A cognitive agent is a function that maps a perceptual history into an action.</p>
+<p>So it’s B asterisk map into A where the asterisk on P stands for the history percepts. So this characterization says that one of the major tasks of cognitive agents is to select actions. You’re driving a car.</p>
+<p>What action should you take next? You’re having lunch, what action should you do next?</p>
+<p>You’re conversing with someone, someone else, what action should you do next?</p>
+<p>All the time we are taking actions, we as humans. And the question is, what should we do next? We base that action in part on the history of percepts in that particular situation. So this characterization captures the basic notion of cognitive agent in a very concise manner.</p>
+</section>
+<section id="levels-of-cognitive-architectures" class="level1">
+<h1>Levels of Cognitive Architectures</h1>
+<p>We can build queries of knowledge-based AI at many levels of instructions.</p>
+<p>This is the scale here, low level to high-level. At one level, we can build queries at hardware level. So we can talk about a brain or transistor sort of microchip. At the next level, we can talk about the kinds of methods and the kinds of representations we have been talking about, means-ends analysis that has an algorithm associated with it, or semantic network that’s a knowledge representation in some symbolic form.</p>
+<p>At a yet higher level, we can talk about knowledge and tasks. So, the question here becomes what exactly is the task the decision maker has to make? What exactly is the knowledge the decision maker has?</p>
+<p>So, when David was giving his answer about what the pitcher might do in the situation I showed you earlier, David was clearly using a lot of knowledge, and he was trying to use this knowledge toward to a particular task. Now, in the history of AI, David Mark talked about three levels, the level of tasks, which he called the theory, the level of algorithms and the level of implementation. And we talked also about multiple levels.</p>
+<p>He was talking about the knowledge level, the symbol level and lower levels like the hardware. The various levels are connected with each other. So I might think that, the hardware level is a level for implementing what is happening at the algorithm level. And the algorithm level provides and architecture for implementing what is happening at the task level. In the opposite direction, I might think that the task level provides the content of what needs to be represented or manipulated at the algorithm level. And the algorithm and symbol level provide the content for what needs to be manipulated at processor, the hardware level. So as an example, one might say, we’re representing this in a form of a semantic network, fair enough. But, what exactly are you going to represent in a semantic network? That’s going to come from the knowledge level.</p>
+<p>It is the knowledge level that tells us, what is the content of the knowledge that is required to play baseball? Once you have the content of knowledge, you can perhaps implement it in many different ways. One way is through semantic network. Similarly, once you know what kind of decision you have to make, and what a decision-making process might look like overall, there might be many different methods of making that particular decision. Just like we can build a relationship between the task level and the algorithm level, a similar relationship exists between the algorithm level and the hardware level. This is an important point, so let me take another example.</p>
+<p>All of you are familiar with your standard smartphone. Let us suppose that I was coming from Mars, I was a Martian. And I did not know how your mobile phone works. So I would ask you, well, how, exactly, does your mobile phone work? And you might give an account of how the phone works at that level of distraction.</p>
+<p>There will be a legitimate account, you have somewhere else for give an account of how the smartphone works at a, at a level of tasks and knowledge. This person might say, well, a phone allows you to communicate with other people at long distances. How that is implemented is a different matter.</p>
+<p>Now you will see, I’m sure, that all three of these interpretations, all three of these descriptions are legitimate and valid.</p>
+<p>You will see also, that we really need all three of these levels of description.</p>
+<p>We do need to understand what this smartphone does, and that kind of knowledge it uses to do it. We do need to understand what kind of algorithm and knowledge presentations it uses, and what kind of hardware implements all of this. Now, you can do a similar kind of analysis for other kinds of devices.</p>
+<p>Let’s say, like your calculator. Could we do a similar kind of analysis for intelligent agents? Are these different layers also meaningful for analyzing what happens in cognitive systems, whether they are natural or artificial? And at what layer should we be building a theory?</p>
+<p>Our hypothesis is, that these three layers are also useful for trying to analyze how cognitive systems might work, but natural cognitive systems and artificial cognitive systems. Further, our hypothesis is that we want to build theories at all three of these different level, levels of abstraction, not at any one of them. In fact, their constraint’s flowing in both directions.</p>
+<p>If we know about what kind of tasks we want to do and what kind of knowledge we want to use, then that tells us something about what kind of algorithms we need to and what kind of knowledge representations we need.</p>
+<p>And that tells us something about what kind of hardware we need. In the other direction, if we know what kind of hardware we have that imposes constraints and provide for what kind algorithms and knowledge representations can be there, which then provides accordance within constraints. Well, what kinds of tasks can be done and what kind of knowledge can be used.</p>
+<p>In this class, we’ll be concerned mostly with the top two layers, although I allude occasionally to the third layer as well.</p>
+<p>A lot of work in AI is at the top two layers of abstraction.</p>
+</section>
+<section id="exercise-levels-of-architectures" class="level1">
+<h1>Exercise Levels of Architectures</h1>
+<p>Now we have talked about Watson as a possible example for cognitive system earlier. And now we have talked about various layers of abstraction at which we can analyze a cognitive system. So what do you think are the layers of analysis of Watson?</p>
+</section>
+<section id="exercise-levels-of-architectures-1" class="level1">
+<h1>Exercise Levels of Architectures</h1>
+<p>That was a good answer, David. So, again, the three layers. And note that in the task layer here, answering the inputted clue.</p>
+<p>Knowledge is also a part of it. Knowledge that Watson must have in order to answer that particular question.</p>
+<p>How that knowledge is implemented.</p>
+<p>What kind of presentations it uses, goes in the second layer.</p>
+</section>
+<section id="assumptions-of-cognitive-architectures" class="level1">
+<h1>Assumptions of Cognitive Architectures</h1>
+<p>The school of AI that works on cognitive architectures makes sort of fundamental assumptions about the nature of cognitive agents.</p>
+<ul>
+<li>First, that cognitive agents are goal oriented, or goal directed. They have goals and they take actions in the pursuit of those goals.</li>
+<li>Second, that these cognitive agents live in a rich, complex, dynamic environments.</li>
+<li>Third, this cognitive agent used knowledge of the world in order to pursue their goals in this rich complex dynamic environments.</li>
+<li>Fourth, that this knowledge is particular abstraction that captures the important things about the world that the level of abstraction and removes all the details. And at that level of abstraction, knowledge is captured in the form of symbols.</li>
+<li>Fifth, the cognitive agents are very flexible.</li>
+</ul>
+<p>The behavior is dependent upon the environment. As environment changes, so does the behavior. And sixth cognitive agents learn from their experiences.</p>
+<p>They’re constantly learning as they interact with the world.</p>
+</section>
+<section id="architecture-content-behavior" class="level1">
+<h1>Architecture Content Behavior</h1>
+<p>We can capture the basic intuition behind work on cognitive architectures by a simple equation, architecture plus content equals behavior.</p>
+<p>Let us look at this equation from two different perspectives.</p>
+<p>First, imagine that you want to design an intelligent machine that exhibits a particular kind of behavior. This equation says that, in order to do that, you have to design the right architecture, and then put the right kind of knowledge content into that architecture, to get the behavior that you want from it. That’s a complicated thing.</p>
+<p>But suppose that I could fix the architecture for you. In that case, if the architecture is fixed, I simply have to change the knowledge content to get different behaviors, which is a really powerful idea. From a different direction, suppose that we were trying to understand human behavior.</p>
+<p>Now we could say, again, that the architecture is fixed, we could say that, this behavior is arising because the knowledge content is different.</p>
+<p>We can map now, behavior to content because the architecture is fixed.</p>
+<p>That simplifies our understanding of how to design machines or how to understand human cognition. By the way, the same thing happens in computer architecture.</p>
+<p>I’m sure you have, are familiar with computer architecture.</p>
+<p>Computer architecture has stored programs in it, that’s the content, and that running of the stored program gives you different behaviors.</p>
+<p>The computer architecture doesn’t change, the stored program keeps on changing, to give you different kind of behaviors. Same idea with cognitive architectures.</p>
+<p>Keep the architecture constant, change the content. Now, of course, the big question will become, what is a good architecture? And that’s what we’ll examine later.</p>
+</section>
+<section id="a-cognitive-architecture-for-production-systems" class="level1">
+<h1>A Cognitive Architecture for Production Systems</h1>
+<p>So we have come across this high-level architecture for deliberation earlier.</p>
+<p>Today we will talk about a specific cognitive architecture for deliberation.</p>
+<p>This architecture is called SOAR. I should mention that SOAR not only covers deliberation, SOAR can also cover certain aspects of reaction, and some aspects of meta cognition. But we are going to focus mostly on the deliberation component and so on. SOAR was initiated by Allen Neville, John Lear, and Paul Rosenbloom. And John Lear and Paul Rosenbloom have been working on it for the last 30 years or so. The highest level consists of a long term memory and a working memory. The itself contains different kinds of knowledge.</p>
+<p>In particular SOAR talks about three kinds of knowledge. Procedural, semantic, and episodic. Episodic knowledge has to do with events.</p>
+<p>Specific instances of events, like, what did you have for dinner yesterday.</p>
+<p>Semantic knowledge has to do with generalizations in the form of concepts and models of the world. For example, your concept of a human being, or your model of how a plane flies in the air.</p>
+<p>Procedural has to do with how to do certain things. So as an example, how do you pour water from a jug into a tumbler. Notice that this makes an architecture.</p>
+<p>There are different components that are interacting with each other.</p>
+<p>This arrangement of components will afford certain processes of reasoning and learning. That’s exactly the kind of processes of reasoning and learning that we’ll look at next.</p>
+</section>
+<section id="return-to-the-pitcher" class="level1">
+<h1>Return to the Pitcher</h1>
+<p>Let us now go back to example of the baseball pitcher who has to decide on a action to take in a particular circumstance. So we can think of this pitcher as mapping a percept history into an action.</p>
+<p>Now imagine that this pitcher is embodying a production system. We are back to a very specific situation, and you can certainly read it again.</p>
+<p>Recall that David had given the answer, the pitcher will intentionally walk the batter. So we want to make the theory of how might the pitcher or internal and AI agent come to this decision. Recall the very specific situation that the pitcher is facing. And recall also that David had come up with this answer.</p>
+<p>So, here is a set of percepts, and here is an action. And the question is, how these percepts get mapped into this action? We are going to add one build a theory of how the human pitcher might be making these decisions, as well as a theory of how an AI agent could be built to make this decision.</p>
+<p>So let’s go back to the example of the pitcher having to decide on a action in a particular situation in the world. So the pitcher has several kinds of knowledge. Some of its knowledge is internal. It already has it. Some of it, it can perceive from the world around it. As an example, the pitcher can perceive the various objects here, such as the bases, first, second, third base.</p>
+<p>The pitcher can perceive the batter here. The pitcher can perceive the current state of the game. The specific score in the inning, the specific batter.</p>
+<p>The pitcher can perceive the positions of its own teammates. So, all these things the pitcher can perceive, and these then are become exact specific kinds of knowledge that each pitcher has. The pitcher also has internal knowledge.</p>
+<p>The pitcher has knowledge about his goals and objectives here.</p>
+</section>
+<section id="action-selection" class="level1">
+<h1>Action Selection</h1>
+<p>So imagine that Kris Medlen from Atlanta Braves is the pitcher.</p>
+<p>And Martin Prado from Arizona Diamondbacks is at the bat.</p>
+<p>Kris Medlen has the goal of finishing the inning without allowing any runs.</p>
+<p>How does Kris Medlen decide on an action? We may conceptualize Medlen’s decision making like the following. Medlen may look at various choices that are available to him. He may throw a pitch. Or he may choose to walk the batter.</p>
+<p>If he walks the batter, then there are additional possibilities that open up.</p>
+<p>He’ll need to face the next batter. If he chooses to pitch, then he’ll have to decide what kind of ball to throw. A slider, a fast ball, or a curve ball.</p>
+<p>If it was a slider, then there is a next set of possibilities open up.</p>
+<p>There might be a strike or a ball or a hit or he may just strike the batter out.</p>
+<p>Thus, Medlen is setting up a state space. Now, what we just did informally can be stated formally. So, we can imagine a number of states in the states space.</p>
+<p>The state space is a combination of all the states that can be achieved by applying various combinations of operators, starting from the initial state.</p>
+<p>Each state can be described in terms of some features, f1, f2, there could be more. Each feature can take on some values. For example, v1, there might be a range of values here. So initially, the picture is at state s0.</p>
+<p>And the pitcher wants to assume some state S101. And at a state S101 presumably the pitcher the pitcher’s goal has been accomplished. So we may think as the pitcher’s decision making as some kind of a part of its current state to this particular goal state. This is an abstract space. The pitcher has not yet made any action. The picture is still thinking. The picture is sitting up an abstract state space in his mind and exploding that state space.</p>
+</section>
+<section id="putting-content-in-the-architecture" class="level1">
+<h1>Putting Content in the Architecture</h1>
+<p>Okay, now in order to go further, let us start thinking in terms of, how we can put all of these precepts and goal, into some feature value language, so that we can store it inside Sole. It is one attempt at capturing all of this knowledge, so I can say that it’s the 7th inning.</p>
+<p>Inning is 7th.</p>
+<p>It’s the top of the 7th inning. It’s the top here. Runners are on 2nd and 3rd base. 2nd and 3rd base. And then so on and so forth. Note that at the bottom I have goal is to escape the inning.</p>
+<p>Which I think means in this particular context, to go to the next inning, without letting the batter score anymore points. So now that we have. Put all of this precepts coming from the world and the goal, into some kind of simple representation which has features and values in it, the fun is going to begin.</p>
+</section>
+<section id="bringing-in-memory" class="level1">
+<h1>Bringing in Memory</h1>
+<p>So, source working memory not contains all the things that we had in the previous shot. Some of these are percepts. Some the things are the pitcher’s internal goals. Let us see how the contents of the working memory, now invoke different kinds of knowledge from the long term memory.</p>
+<p>So, let us imagine that the procedural part of source long term memory contains the following rules. The procedural knowledge and source long term memory is represented in the form of rules.</p>
+<p>The system sometimes called production group. In fact, the term production systems comes from the term production group. So, each rule here is a production group. I’ve shown seven here, there could be more rules.</p>
+<p>Once again, these production rules are captured in the procedural knowledge, and soource long-term memory. Recall that one of the first things that the pitcher had to decide was whether the pitcher should throw a pitch or walk the batter.</p>
+<p>Therefore, we assume that there are some rules which allow the pitcher to make a decision between these two choices. Thus there is a rule here. If the goal is to escape, and I perceive two outs, and I perceive on the second, and I perceive a runner on the second and I perceive no runner on the first base, then I’m suggest a goal of intentionally walk batter. There is another rule.</p>
+<p>The second rule says, if the goal is to escape, and I perceive two outs and</p>
+<p>I perceive a runner on the first base. Or if perceived not out on the second, or if perceived no runners, then suggest the goal to get the batter out via pitching. And what might happen if I pick the goal of intentionally walking the batter? The goal is to intentionally walk the batter then suggest intentional walk operator. Now, this intentional walk operator corresponds to some action available to all. And similarly, the other rules. Let’s consider one other rule, rule number seven.</p>
+<p>If only one operator has been selected, then send the operator to the motor system and add the pitch thrown to the state. So, there is both now an action has been selected, and the action is going to be executed.</p>
+<p>As well as the state of the working memory is going to be changed, so it will say that now the pitch has been thrown. Before we go ahead, let me summarize what we just learned. Source long term memory consists of various kinds of knowledge. One kind of knowledge, the one that we are considering right now is procedural knowledge. Procedural knowledge is about how to do something.</p>
+<p>And so procedural knowledge is represented in the form of production rules.</p>
+<p>Each production rule is, is of the form, if something then something. There are antecedents and their consequence. These antecedents may be connected through various kind of relationships, like and, and or. The consequence too might be connected through various kind of relationships like and, and or. So I may have if some antecedent is true, and some other, other ante, antecedent is true, and so on, then do some consequent. Now that we understand a little bit about the representation of production rules. What about the content? What should be the content that we put into these production rules?</p>
+<p>Earlier we had said that cognitive architectures are goal oriented. So we’ll expect goals to appear in some of the production rules. Indeed, they do.</p>
+<p>R1, r2, r3, and so on. Earlier we had said that knowledge-based AI cognitive systems, use a lot of knowledge. And you can see how detailed and specific this knowledge is. In fact, the knowledge is so detailed and specific that in principle we can hope that as different percepts come from the world, some rule is available that will be useful for that set of percepts.</p>
+</section>
+<section id="exercise-production-system-in-action-i" class="level1">
+<h1>Exercise Production System in Action I</h1>
+<p>Okay, given these productions in the procedural part of sol’s long term memory.</p>
+<p>And given these are the contents of the working memory which capture the current set of percepts and the current goal. What operator do you think sol will select? Note that one of the choices here is none, the system cannot decide.</p>
+</section>
+<section id="exercise-production-system-in-action-i-1" class="level1">
+<h1>Exercise Production System in Action I</h1>
+<p>That was right, David. So note what happened.</p>
+<p>There were the contents of the working memory. Here were all the rules of a level in the procedural part of the long-term memory. And so then, match the contents of the working memory with the antecedents of the various productions. Depending on the match between the contents of the working memory, and the antecedents of the rules, some rules got activated, fired as some people say. Depending upon what rule got fired, that resulted in, perhaps, firing of additional rules. So as David said, if the rule number one got activated because the goal became intentionally walk the batter, that then lead to the activation of rule number three, which was to select the intentional-walk operator. In this way, given the set of contents of the working memory and a mapping between those contents and the antecedents of the various production rules that capture the procedure knowledge. Some rules get activated, and this activation continues until sort cannot activate any additional rules.</p>
+<p>At that point, sort has given an answer, based on the consequence of a rule that matches a motor action. Note that sort just provided an account of how the picture decided on a specific page, on a specific action. Note that, we’re started with the goal of providing an account of how the pitcher selects on an action or how an AI agent selects on an action.</p>
+<p>So what is the account? Based on the goal and the percents, match them with the antecedence of the rules that captured the procedural knowledge.</p>
+<p>And then, accept the consequent of some production that matches some motor action from some precepts we have gone to some action.</p>
+</section>
+<section id="exercise-production-system-in-action-ii" class="level1">
+<h1>Exercise Production System in Action II</h1>
+<p>Now let us consider another situation. Suppose that our pitcher actually was able to walk the batter. So, now, there are runners on the first, second, ands third bases. Not just on the second and third bases, but one on the first, also. So the picture succeeded in accomplishing it’s goal in the last shot.</p>
+<p>So the current situation then is discard, but this side of percept and this goal. The confidence of the working memory have just changed. Of course, the production rules capturing the pursuit of knowledge have not yet changed. So these are exactly the same productions that we had previously.</p>
+<p>Only the contents of the working memory has changed.</p>
+<p>We now have a runner at the first as well as the second and the third. And this exercise is very intrusting because it will lead us to a different set of conclusions. Given the set of precepts in this goal and the set of production rules, what operator do you think the picture will select?</p>
+</section>
+<section id="exercise-production-system-in-action-ii-1" class="level1">
+<h1>Exercise Production System in Action II</h1>
+<p>That was right, David. Thank you.</p>
+<p>Let’s summarize some of the things that David noted. So based on the contents of the working memory, some rules get activated. As these rules get activated, some consequences get established. As these consequences get established, they get written. These consequence get written on the working memory.</p>
+<p>So the contents of working memory are constantly changing. As the contents of the working memory change, new rules can get activated. So there is a constant interaction between the working memory and the long term memory. The contents of the working memory change quite rapidly.</p>
+<p>The contents of the long term memory change very, very slowly.</p>
+</section>
+<section id="exercise-system-in-action-iii" class="level1">
+<h1>Exercise System in Action III</h1>
+<p>Aha, so this situation keeps becoming more complicated David. Let’s think about what might happen if the manager of the Arizona Diamondbacks anticipated what the Atlanta Braves pitcher would do, and actually change the batter so the batter now is left handed? If the batter is left handed, then the percept is slightly different.</p>
+<p>The content of the pitcher’s working memory is slightly different.</p>
+<p>The production rules capturing the pursuit of knowledge are still the same. What do you think will happen now? What kind of decision will the pitcher make now?</p>
+</section>
+<section id="exercise-system-in-action-iii-1" class="level1">
+<h1>Exercise System in Action III</h1>
+<p>Good David. That was the correct answer. So note what has happened. So far, we had assumed that the match between the precepts, and the production rules capture on the procedural knowledge was such that given the percept, we’ll always have one rule which will tell us what action to take.</p>
+<p>It may take some time to get to this rule, some rules may need to be established and then only some other rules get established, then only we get the action. But nevertheless, this system would work. The difficulty now is, there is no rule, which tells us exactly what action to take.</p>
+</section>
+<section id="chunking" class="level1">
+<h1>Chunking</h1>
+<p>So for this situation source cognitive architectures selected not one goal but to.</p>
+<p>So this SOAR theory this is called an impasse.</p>
+<p>An impasse occurs when the decision maker cannot make a decision either because not enough knowledge is available or because multiple courses of action there are being selected and the agent cannot decide among them.</p>
+<p>In this case two actions have been selected and the agent cannot decide between them.</p>
+<p>Should the pitch throw a curve ball or a fast ball?</p>
+<p>At this point SOAR will attempt to learn a rule that might break the impasse.</p>
+<p>If the decision maker has a choice between the fast ball and the curve ball and it cannot decide it, might there be a way of learning a rule that decides between what to throw in a particular situation given the choice of the fast falling curve ball.</p>
+<p>For this now SOAR will invoke episodic knowledge.</p>
+<p>Let’s see how SOAR does that and how it can help SOAR learn the rule that results in the breaking of the impasse.</p>
+<p>So imagine that SOAR had episodic knowledge about the previous event, about the previous instance of an event.</p>
+<p>And this previous instance of an event in another game it was a fifth inning bottom of the fifth inning, if the weather was windy it was the same batter though, Parra, who bats left handed.</p>
+<p>It was a similar kind of situation and the pitcher threw a fastball and Parra hit a homerun out of it.</p>
+<p>Now we want to avoid that.</p>
+<p>The current pitcher wants to avoid it.</p>
+<p>So given this episodic knowledge about this even set occurred earlier, SOAR has learning mechanism that allows it to encapsulate knowledge from this event into the form of a production rule that can be used as part of the procedural knowledge.</p>
+<p>And the learned rule is, if two operators are suggested, and threw a fast ball is one of those operators, and the batter is Parra, then dismiss throw-fast-ball operator.</p>
+<p>This is the process of learning called chunking.</p>
+<p>So, chunking is a process, a learning technique that’s SOAR uses to learn rules that can break impasse.</p>
+<p>First note, that chunking is triggered when impasse occurs.</p>
+<p>In this situation, the impasse is that two rules got activated and there is no way of resolving between them.</p>
+<p>So the impasse imagery tells the process of chunking, what the goal of chunking is.</p>
+<p>Find a rule that can break the impasse.</p>
+<p>SOAR now searches for the episodic memory and finds an event that has some knowledge that may break the impulse.</p>
+<p>In particular, it looks like a perceptual current situation that we had in previous shot. And compared to the perceptions of previous situations, of the event memory, the episodic memory, and find that any information available of the current batter.</p>
+<p>If some information is available that tells, SOAR the result of some previous action that also occurs in the current impasse, then SOAR picks that event.</p>
+<p>So now it tries to encapsulate the result of the previous event, in the form of a rule.</p>
+<p>In this case, it wants to avoid the result of a homerun, and therefore it says dismiss that particular operator.</p>
+<p>If it wanted that particular result, it would have said throw that particular operator.</p>
+<p>We said earlier that in cognitive systems, reasoning, learning and memory are closely connected.</p>
+<p>Here is an example of that.</p>
+<p>We’re dealing with memory, procedural memory, we’re dealing with memory that can deal with procedural knowledge and episodic knowledge.</p>
+<p>Dealing with reasoning, decision making.</p>
+<p>We’re also dealing with learning, chunking.</p>
+<p>If you want to learn more about chunking then the reading by Lehman Leodon Rosenblum, and the further readings at the end of this lesson gives lot many more details.</p>
+</section>
+<section id="exercise-chunking" class="level1">
+<h1>Exercise Chunking</h1>
+<p>Let’s do one more exercise on the same problem. Note that, I have added one more rule into the procedural knowledge. This is the rule that was the result of chunking. If two operators are suggested, and throw-fast-ball operator suggested, and the batter is Parra. Then dismiss the throw-fast-ball operator. Okay, given these rules and the same situation, what do you think will be the operator that will be selected?</p>
+</section>
+<section id="exercise-chunking-1" class="level1">
+<h1>Exercise Chunking</h1>
+<p>So it looks like the entire goal of that chunking process was to help us figure out between these two operators which one we should actually select.</p>
+<p>We decided that, if a fast ball is suggested, which it was, and if two operators are suggested, which they were, and the batter is Parra, which it is, then to dismiss the throw-fast-ball operator. That means we only have one more operator suggested, throw-curve-ball. So that would be selected.</p>
+</section>
+<section id="fundamentals-of-learning" class="level1">
+<h1>Fundamentals of Learning</h1>
+<p>This is the first time we have come across the topic of learning in this course, so let us examine it a little bit more closely.</p>
+<p>We are all interested in asking the question, how do agents learn?</p>
+<p>But this question is not isolated from a series of other questions.</p>
+<p>What do agents learn? What is the source of their learning? When do they learn? And why do they learn at all? For the purpose of addressing what goal or what task? Now here is the fundamental stance that knowledge-based AI takes. It says that we’ll start with a theory of reasoning.</p>
+<p>That will help us address questions like, what to learn, when to learn, why to do learning? And only then will we go to the question, of how to do the learning. So, we reasoning first, and then backwards to learning.</p>
+<p>This happened in production systems.</p>
+<p>When the production system reach an impasse, then it said let’s learn in order to resolve this impasse from episodic knowledge. So once again, we are trying to build a unified theory of reasoning, memory, and learning where the demands of memory and reasoning constrain the processing of learning.</p>
+</section>
+<section id="assignment-production-systems" class="level1">
+<h1>Assignment Production Systems</h1>
+<p>So how would you use a production system to design an agent that can solve Raven’s Progressive Matrices. We could think about this kind of at two different levels. At one level we could imagine a production system that’s able to address any incoming problem. It has a set of rules for what to look for in a new problem and it knows how to reply when it finds those things. But on the other hand, we can also imagine production rules that are specific to a given problem. When the agent receives a new problem, it induces some production rules that govern the transformation between certain figures and then transfers that to other rows and columns. So in that way, it’s able to use that same kind of production system methodology to answer these problems, even though it doesn’t come into the problem with any production rules written in advance. So, inherent in this idea though, is the idea of learning from the problem that it receives. How is this learning going to take place? How is it actually going to write these production rules, based on a new problem? And what’s the benefit of doing it this way? What do we get out of actually having these production rules, that are written based on individual problems?</p>
+</section>
+<section id="wrap-up" class="level1">
+<h1>Wrap Up</h1>
+<p>So let’s wrap up our discussion for today and also wrap up the foundational unit of our course as a whole. We started off today by revisiting this notion of Cognitive architectures that we talked about at the very beginning of the course. We use that to contextual our discussion of Production systems, specifically those implemented in a framework called SOAR.</p>
+<p>As we saw, production systems enable action selection. They help us map percepts in the world into actions. Of course, this is only one of the many things that a production system can do. It can really map any kind of antecedent into any kind of consequent.</p>
+<p>But in our example, we saw how the production system for a pitcher can map percepts from a baseball game into pitch selection.</p>
+<p>We then talked about impasses and how when a production system hits an impasse, it can use chunking to learn a new rule to overcome that impasse.</p>
+<p>This is the first time we’ve encountered learning in our course, but learning is actually going to be foundational to everything we talk about from here on. This wraps up the fundamentals unit of our course.</p>
+<p>Next time we’re going to talk about frames, which we actually saw a little bit of today. Frames are going to become a knowledge representation that we’ll use throughout the rest of our course.</p>
+</section>
+<section id="the-cognitive-connection" class="level1">
+<h1>The Cognitive Connection</h1>
+<p>The connection between production systems and human cognition is both powerful and straightforward. In fact, production systems, right from the beginning were proposed as models of human cognition. We can look at it from several perspectives. First, the working memory in production system has a counterpart in human cognition in the form of short-term memory. Short-term memory and human cognition, at least for the verbal part, has a capacity for approximately seven plus or minus two elements.</p>
+<p>Working memory and production systems plays a similar role.</p>
+<p>Second, people have connected studies which they have given the same problems, both to humans and to cognitive architectures These problems typically are from closed worlds like arithmetic or algebra. At a consult, there are strong similarities between the behavior of programs like SOAR and the behavior of humans when they address problems in arithmetic and algebra.</p>
+<p>This, however, does not mean that we already have a very good complete model of human cognition. This is just the beginning. Humans engage in a very large number of problems, not just arithmetic or algebra problems in closed worlds.</p>
+<p>So there still remain a large number of questions open about how do you build a cognitive architecture that can capture human cognition at large in the open?</p>
+</section>
+<section id="final-quiz" class="level1">
+<h1>Final Quiz</h1>
+<p>So we are now at the final quiz for this particular lesson. What did you learn in this lesson?</p>
+</section>
+<section id="final-quiz-1" class="level1">
+<h1>Final Quiz</h1>
+<p>And thank you for doing it.</p>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2016,
+  author = {Bochman, Oren},
+  title = {06 - {Production} {Systems}},
+  date = {2016-01-30},
+  url = {https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/06-production-systems/06-production-systems.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2016" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2016. <span>“06 - Production Systems.”</span> January 30,
+2016. <a href="https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/06-production-systems/06-production-systems.html">https://orenbochman.github.io/blog//notes/cognitivie-ai-cs7637/06-production-systems/06-production-systems.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

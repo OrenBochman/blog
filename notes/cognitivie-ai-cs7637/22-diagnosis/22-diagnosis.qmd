@@ -8,6 +8,8 @@ title-block-banner: banner_black_3.jpg
 editor: 
   markdown: 
     wrap: sentence
+jupyter: python3
+
 ---
 
 ## Preview {#sec-preview}
@@ -305,7 +307,7 @@ The two together explain all the data and in addition, the set of these two hypo
 ![Confidence](image08.webp){#fig-8 .column-margin}
 
 
-The third criteria for choosing between competing hypotheses is that we want to pick those hypotheses in which we have more **confidence** . Some hypotheses are more likely than other and one may have more confidence in some hypotheses than in others.
+The third criteria for choosing between competing hypotheses is that we want to pick those hypotheses in which we have more **confidence** . Some hypothesis are more likely than other and one may have more confidence in some hypotheses than in others.
 
 As an example, in this particular scenario, $H_3$ may explain data items $D_1$ to $D_8$ and $H_5$ may explain more data elements from $D_1$ to $D_9$. So $H_5$ also explains $D_9$ that $H_3$ doesn't. However, we may have more confidence in $H_3$, and so we may pick $H_3$ instead of $H_5$.
 
@@ -341,62 +343,56 @@ def diagnoser(patient,illness):
   score = match - mismatch
   return match,mismatch,score 
 
-# next we find the best diagnosis for the for the patient 
-diag_score=0
-diagnosis=[]
-
-match,mismatch,score = diagnoser(patient, patient)
-print(f"expected score for solution: {score}")
-
-for illness in maladies.keys():
-  match,mismatch,score = diagnoser(patient, maladies[illness])
-  print(f"match:{match:<1}, missed:{mismatch:<2}, total:{score:<2} score for {illness}")
-  if score > diag_score:
-    diag_score = score
-    diagnosis = []
-  if score >= diag_score:
-    diagnosis.append(illness)
-
-print(diagnosis)  
+# next we find the expected coverage for a diagnosis given the patient 
+_,_,expected_score = diagnoser(patient, patient)
+print(f"expected score for patient : {expected_score}")
 
 def merge(keys,maladies):
   res = collections.defaultdict(int)
+  counter=0
   for illness in keys:
+    counter +=1
     for symptom in maladies[illness].keys():
       res[symptom] += maladies[illness][symptom]
+  for key in res.keys():
+    if res[key] > 1 :
+      res[key] = 1
+    if res[key] < -1 :
+      res[key] = -1
   return res
 
+diag_score=0
+diagnosis=[]
+
 maldies_set = set(maladies.keys())
-for key_pair in itertools.permutations(maldies_set,2):
-  #print(key_pair)
-  merged_spec = merge(key_pair,maladies)
-  match, mismatch, score = diagnoser(patient, merged_spec)
-  #print(f"match:{match:<1}, missed:{mismatch:<2}, total:{score:<2} score for {key_pair}")
-  if score > diag_score:
-    diag_score = score
-    diagnosis = []
-  if score >= diag_score:
-    diagnosis.append(key_pair)
-    print(f"match:{match:<1}, missed:{mismatch:<2}, total:{score:<2} score for {key_pair}")
-    print(merged_spec)
-    print(patient)
+for comb_len in range(3):
+  for keys in itertools.combinations(maldies_set,comb_len):
+    key_list = list(keys)
+    key_list.sort()
+    if key_list not in diagnosis:
+      #print(key_list)
+      merged_spec = merge(key_list,maladies)
+      match, mismatch, score = diagnoser(patient, merged_spec)
+      #print(f"match:{match:<1}, missed:{mismatch:<2}, total:{score:<2} score for {key_list}")
+      if score > diag_score:
+        diag_score = score
+        diagnosis = []
 
-#print(diagnosis)
-#print(maladies['Zetad'])
-#print(maladies['Epsicusus'])
-merged_spec = merge(('Zetad', 'Betatosis'),maladies)
-print(dict(merged_spec))
-print(patient )
+      if score >= diag_score:
+        diagnosis.append(key_list)
+        if score == expected_score:
+          status="full"
+        else:
+          status="partial"
+        print(f"{status:<5} diagnosis metrics: score:{score:<2} hits:{match:<1}, misses:{mismatch:<2}, for {key_list}")
 
-
+print(f'final diagnosis: {diagnosis}')
 ```
 
-The data in this particular exercise, a little bit more complicated than in the previous one.
-On the right-hand side, I've shown a set of diseases.
-What disease or subset of these diseases best explains the available data?
-
 Note that one can use alternative methods for the same problem.
+
 For example, one could use K-space reasoning.
+
 And for when we came across a problem very similar to this one previously.
 Suppose that the solution of that particular problem was ever labeled as a case.
 In that particular case, B was high, C was low, and H was low.
@@ -404,13 +400,23 @@ And the solution was Thetadesis.
 
 In the current problem, the additional symptom is that F is low.
 So case retrieval would first lead you to the conclusion of Thetadesis.
-Only to \[UNKNOWN\] this particular solution to also account for the additional symptom of F being low.
+But this particular solution should also account for the additional symptom of F being low.
 We could do that by adding Kappacide and Mutension to Thetadesis.
 Case based system thus would tend to focus the alternate set of hypotheses.
-One more point to note here then.
-Note that different methods can lead to different solutions.
-Given different methods, how might an AI agent decide which method to select?
-We'll return to this particular problem when we discuss meta reasoning.
+
+Different methods can lead to different solutions - particularly since we discussed
+a number of conflicting priorities between good solutions. This suggests that each 
+tradeoff between parsimony, coverage and completeness may give a different diagnosis.
+
+Given these different methods, how might an AI agent decide which method to select? 
+
+The basic method in ML is to create different loss functions representing different
+priorities. I chose one that prioritizes parsimony over confidence in the sense
+that when I merged hypothesis I allowed them to cancel opposing effects. However,
+we might not be certain this is how a set of hypothesis should interact. 
+
+We'll return to this particular problem when we discuss meta-reasoning.
+
 
 ## Completing the Process {#sec-completing-the-process}
 

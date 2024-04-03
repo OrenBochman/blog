@@ -1,0 +1,104 @@
+---
+draft: true
+title: mesa tests
+---
+
+So this is supposed to become a python Shiney app for the schelling model
+using mesa modeling environment.
+
+
+
+But I soon decided to just try to get the demo notebook from [here](https://github.com/projectmesa/mesa-examples/blob/main/examples/schelling/analysis.ipynb) running!
+
+
+## Schelling Segregation Model
+
+### Background
+
+The Schelling (1971) segregation model is a classic of agent-based modeling, demonstrating how agents following simple rules lead to the emergence of qualitatively different macro-level outcomes. Agents are randomly placed on a grid. There are two types of agents, one constituting the majority and the other the minority. All agents want a certain number (generally, 3) of their 8 surrounding neighbors to be of the same type in order for them to be happy. Unhappy agents will move to a random available grid space. While individual agents do not have a preference for a segregated outcome (e.g. they would be happy with 3 similar neighbors and 5 different ones), the aggregate outcome is nevertheless heavily segregated.
+
+## Implementation
+
+This is a demonstration of running a Mesa model in an IPython Notebook. The actual model and agent code are implemented in `model.py`, in the same directory as this notebook. 
+
+Below, we will import the model class, instantiate it, run it, and plot the time series of the number of happy agents.
+
+```
+$ # This will install the "mesa_models" package
+!pip install --quiet --upgrade mesa 
+!pip install -U -e git+https://github.com/projectmesa/mesa-examples#egg=mesa-models
+```
+
+```{python}
+import seaborn as sns
+
+import matplotlib.pyplot as plt
+import mesa_models 
+from mesa_models.schelling.model import Schelling   
+
+%matplotlib inline
+```
+
+Now we instantiate a model instance: a 10x10 grid, with an 80% change of an agent being placed in each cell, approximately 20% of agents set as minorities, and agents wanting at least 3 similar neighbors.
+
+
+
+```{python}
+
+#model = Schelling(height=10, width=10, homophily=0.8, radius=0.2, density=3, minority_pc=0.2, seed=None)
+
+# this model crashes
+#model = Schelling(10, 10, 0.8, 0.2, 3)
+
+# this should fix the bug from a change in the order of the variables
+model = Schelling(height=10, width=10,homophily=3,density=0.8,minority_pc=0.2)
+
+while model.running and model.schedule.steps < 100:
+    model.step()
+
+print(model.schedule.steps)  # Show how many steps have actually run
+```
+
+The model has a DataCollector object, which checks and stores how many agents are happy at the end of each step. It can also generate a pandas DataFrame of the data it has collected:
+
+
+```{python}
+model_out = model.datacollector.get_model_vars_dataframe()
+```
+
+
+
+
+```{python}
+model_out.head()
+```
+
+Finally, we can plot the 'happy' series:
+
+```{python}
+model_out.happy.plot()
+```
+
+For testing purposes, here is a table giving each agent's x and y values at each step.
+
+
+
+```python
+#| eval: False
+## the agent does not seem to have any tracking for x and y!?
+## so this fails
+x_positions = model.datacollector.get_agent_vars_dataframe()
+```
+
+```python
+x_positions.head()
+```
+
+
+## Effect of Homophily on segregation
+
+Now, we can do a parameter sweep to see how segregation changes with homophily.
+
+First, we create a function which takes a model instance and returns what fraction of agents are segregated -- that is, have no neighbors of the opposite type.
+
+

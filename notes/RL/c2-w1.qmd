@@ -1,0 +1,448 @@
+---
+date: 2024-03-01
+title: Sample-based Learning Methods
+subtitle: Monte-Carlo Methods for Prediction & Control
+description: In this module we learn about Sample based MC methods that allow learning from sampled episodes. We revise our initial algorithm to better handle exploration. In off policy RL we see methods to learn a policy using samples from another policy, corrected using importance sampleing.
+author: Oren Bochman
+draft: false
+categories:
+  - Coursera
+  - notes
+  - rl
+  - reinforcement learning
+  - Monte-Carlo methods
+  - Any visit Monte-Carlo prediction
+  - First visit Monte-Carlo prediction
+  - Monte-Carlo with Exploring Starts GPI
+  - Exploring Starts
+  - Monte-Carlo with Ɛ-soft GPI
+  - Ɛ-soft policies
+  - Off-policy learning
+  - Importance sampling
+reference-location: margin
+---
+
+```{=html}
+<style>
+
+.alg  {
+  border-left-color: pink;
+}
+
+.alg ul {
+    list-style-type: none; /* Remove bullets */
+}
+
+@counter-style repeating-emoji {
+  system: cyclic;
+  symbols: "🌰" "🥜" "🥔" "🥥"; // unicode code point
+  suffix: " ";
+}
+
+.tldr ul {
+  list-style-type: repeating-emoji;
+
+}
+
+
+</style>
+```
+::: {.callout-tip .tldr}
+## RLDR 🥜🥜🥜 {.unnumbered}
+
+![RL algorithms](img/alg_selector.jpeg){.column-margin group="slides"}
+
+-   In this module we will embrace the paradigm of "learning from experience".
+-   This is called Sample based Reinforcement Learning and it we will let us relax some strong of the requirements of dynamic programming, namely knowing the table of MDP dynamics.
+-   We will first use efficient Monte-Carlo ⚅🃁 methods for 🔮 prediction problem of estimating $v_\pi(S)$ value functions and action--value functions $q_\pi(a)$ from sampled episodes.
+-   We will revise our algorithm to better handle exploration using exploring starts and $\epsilon$--soft policies.
+-   We will adapt GPI algorithms for use with Mote-Carlo to solve the 🎮 control problem of policy improvement.
+-   With off policy learning learn a policy using samples from another policy, by corrected using importance sampling.
+:::
+
+::: callout-note
+## Reading {.unnumbered}
+
+-   [x] [RL Book§5.0-5.5 (pp.91-104)](http://incompleteideas.net/book/RLbook2020.pdf#page=91)
+:::
+
+::: callout-note
+## Definitions {.unnumbered}
+
+::: {#dfn-action-value}
+
+Action Value Function
+
+:   $q_\pi(a) \doteq \mathbb{E}[G_t \vert A_t=a] \space \forall a \in \{a_1 ... a_k\}$
+:::
+
+::: {#dfn-bootstrap}
+
+Bootstrapping
+
+:   "learning by guessing from a guess" or more formally
+
+    the process of updating an estimate of the value or action-value function based on other estimated values. It involves using the current estimate of the value function to update and improve the estimate itself.
+:::
+
+::: {#dfn-control}
+
+Control
+
+:   to approximate optimal policies using the DP approach of GPI
+:::
+
+::: {#dfn-epsilon-soft}
+
+Epsilon Soft Policy
+
+:   A policy in which each possible action is assigned at least $\epsilon / |A|$ probability.
+:::
+
+::: {#dfn-exploring-starts}
+
+Exploring Starts
+
+:   Learning the value or action values of a policy by starting in each action value state at least once.
+:::
+
+::: {#dfn-mc}
+
+Monte-Carlo Methods
+
+:   Estimation methods which relies on repeated random sampling. Also see [Monte-Carlo methods <i class="bi bi-wikipedia"></i>](https://en.wikipedia.org/wiki/Monte_Carlo_method)
+:::
+
+::: {#dfn-on-policy-learning}
+
+On-policy learning
+
+:   learning a policy $\pi$ by sampling from $\pi$
+:::
+
+::: {#dfn-off-policy-learning}
+
+Off-policy learning
+
+:   learning a policy $\pi$ by sampling from some other policy $\pi'$
+:::
+
+::: {#dfn-prediction}
+
+Prediction
+
+:   Estimating $v_\pi(s)$ is called policy evaluation in the DP literature.
+
+    We also refer to it as the Prediction problem [^1]
+:::
+
+::: {#dfn-return}
+
+Return ($G_t$)
+
+:   $G_0 \doteq R_1+ \gamma^1 R_2 + \cdots+ \gamma^n R_n$
+
+    i.e. the discounted sum of future rewards
+:::
+
+::: {#dfn-tqabular}
+
+Tabular methods
+
+:   RL methods for which the action-values can be represented by a table
+:::
+
+::: {#dfn-value}
+
+Value Function $v_\pi(s)$
+
+:   $v_\pi(s) \doteq \mathbb{E}[G_t|S_t=s]$
+
+    i.e. a state's value is its expected return
+:::
+:::
+
+[^1]: **Prediction** in the sense that we want to predict for $\pi$ how well it will preforms i.e. its expected returns for a state
+
+-   Sample based methods learning from experience, without having prior knowledge of the underlying MDP model.
+-   We will cover tabular methods in which the action-values can be represented by a table.
+
+## Lesson 1: Introduction to Monte-Carlo Methods
+
+::: callout-note
+## Lesson Learning Goals {.unnumbered}
+
+-   [x] Understand how [Monte-Carlo](#dfn-mc) can be used to estimate $v(s)$ value functions from sampled interaction
+-   [x] Identify problems that can be solved using [Monte-Carlo](#dfn-mc) methods
+-   [x] Use [Monte-Carlo](#dfn-mc) prediction to estimate the value function for a given policy.
+:::
+
+-   After completing the introduction we all think that MDPs and DP are the best?
+-   Alas, Martha burst this bubble, introducing some shortcomings of DP, namely they require us to know a model of the dynamics $p(s,a|s',r)$ and rewards $r$ of the MDP to estimate $v(s)$ or $q(a)$.
+
+![MC methods for Policy evaluation](img/rl-mc-methods.png){.column-margin group="slides"}
+
+let us now try to understand how [Monte-Carlo](#dfn-mc) can be used to estimate $v(s)$ value functions from sampled interaction.
+
+![12 dice](img/rl-mc-12-dice.png){.column-margin group="slides"}
+
+::: {#exm-dp-dice}
+### Rolling 12 Dice {.unnumbered}
+
+-   Say our MDP requires rolling 12 dice.
+    -   this is probably intractable to estimate theoretically using DP.
+    -   this is likely to be error prone (particularly and constitutionally).
+    -   this will be easy to estimate using MC methods
+:::
+
+-   For most MDPs knowing the dynamics and rewards is an unreasonably strong requirement.
+-   If we can treat this like a bandit problem we can try to use the long term avarages rewards to estimate value of a state
+
+![MC bandits](img/rl-mc-bandit.png){.column-margin group="slides"}
+
+more formally we can use the MC value prediction algorithm.
+
+![MC value prediction algorithm any visit](img/rl-mc-alg.png){.column-margin group="slides"}
+
+::: {#nte-mc-value-prediction-any-visit .callout-note .alg}
+### MC prediction any visit for estimating $V \approx v_\pi$ {#alg-mc-prediction-any-visit}
+
+-   Input: a policy $\pi$ to be evaluated
+-   Initialize:
+    -   $V(s) \in \mathbb{R}$, arbitrarily, $\forall s \in S$
+    -   Returns(s) an empty list, for all $s \in S$
+-   Loop forever (for each episode):
+    -   Generate an episode following $\pi: S_0, A_0, R_1, S_1, A_1, R_2,\ldots, S_{T-1}, A_{T-1}, R_T$
+    -   $G \leftarrow 0$
+    -   Loop for each step of episode, $t = T-1, T-2,..., 0$:
+        -   $G \leftarrow \gamma G + R_{t+1}$
+        -   Append $G$ to $Returns(S_t)$
+        -   $V(S_t) \leftarrow average(Returns(S_t))$
+:::
+
+![MC value prediction algorithm first visits](img/rl-mc-first-visit-prediction.png){.column-margin group="slides"}
+
+::: {#nte-mc-value-prediction-first-visit .callout-note .alg}
+### MC prediction fist visit for estimating $V \approx v_\pi$ {#alg-mc-prediction-first-visit}
+
+-   Input: a policy $\pi$ to be evaluated
+-   Initialize:
+    -   $V(s) \in \mathbb{R}$, arbitrarily, $\forall s \in S$
+    -   Returns(s) an empty list, for all $s \in S$
+-   Loop forever (for each episode):
+    -   Generate an episode following $\pi: S_0, A_0, R_1, S_1, A_1, R_2,\ldots, S_{T-1}, A_{T-1}, R_T$
+    -   $G \leftarrow 0$
+    -   Loop for each step of episode, $t = T-1, T-2,..., 0$:
+        -   $G \leftarrow \gamma G + R_{t+1}$
+        -   Unless $S_t$ appears in $S_0, S_1,\ldots,S_{t-1}$:
+            -   Append $G$ to $Returns(S_t)$
+            -   $V(S_t) \leftarrow average(Returns(S_t))$
+:::
+
+::: callout-caution
+### Any visit / First-visit
+
+The book uses presents a small variation called the *first visit MC method*, We considered the any-visit case. This estimates $v_\pi(s)$ using the average of the returns following an episode's first visit to $s$, whereas this the every-visit MC alg averages the returns following all visits to $s$
+
+Although it not so clear I added the line excluding the later visits in struckout
+:::
+
+What lies behind the algorithm is the following technique for efficently computing returns.
+
+![Efficient returns calculations](img/rl-mc-calc.png){.column-margin group="slides"}
+
+![incremental-update rule](img/rl-mc-incremental-updates.png){.column-margin group="slides"}
+
+this bring us to our second example:
+
+::: {#exm-black-jack-mdp}
+### Blackjack MDP
+
+![Blackjack example](img/rl-bj-example.png){.column-margin group="slides"}
+
+-   **Undiscounted** MDP where each game of blackjack corresponds to an episode with
+    -   Rewards:
+        -   r= -1 for a loss
+        -   r= 0 for a draw
+        -   r= 1 for a win
+    -   Actions : $a\in \{\text{Hit}, \text{Stick}\}$
+    -   States S:
+        -   player has a usable ace (Yes/No) [^2]
+        -   sum of cards (12-21)[^3]
+        -   The card the dealer's card shows (Ace-10)
+    -   Cards are dealt with replacement[^4]
+    -   Policy $\pi$:
+        -   if sum \< 20, stick
+        -   otherwise, hit
+:::
+
+[^2]: worth either 1 or 11
+
+[^3]: face card are worth 10
+
+[^4]: this is a big simplifying assumption
+
+In the programming assignment we will produce the following graphs
+
+![Blackjack outcomes](img/rl-bj-outcomes.png){.column-margin group="slides"}
+
+-   In real world settings we typical don't know theoretical functions like values, action values or rewards. Out best option is to sample reality in trial and error experiment of testing different interventions.
+-   However under certain conditions such samples may be enough to perform the [prediction task](#dfn-prediction) learn a [value function](#dfn-value) or the [action value function](#dfn-action-value) .
+-   We can these function to learn better policies from this experience.
+-   A second scenario involves historical samples collected from past interactions. We can use probabilistic methods like MCMC to estimate $q(a)$.
+
+we can use the MC prediction alg to estimate the expected returns for a state given a policy $\pi$
+
+::: callout-note
+The key limitations of *MC value estimation algorithm* is its requirement for episodic tasks and for completing such an episode before it starts. In some games an episode can be very long.
+:::
+
+::: callout-note
+## :bulb: Is this really so? :thinking:
+
+-   If we work in the Bayesian paradigm with some prior and use Bayesian updating.
+-   At every step we should have well defined means.
+-   So it seems one can perhaps do sample based on non-episodic tasks
+-   One more idea is to treat n_steps as an episode.
+-   Without episodic we most likely lose the efficient updating. :thinking:
+-   Perhaps we can use the online update rule for the mean.
+:::
+
+-   [ ] TODO - try to implement this as an algorithm.
+
+-   To ensure well-defined average sample returns, we define Monte Carlo methods only on episodic tasks that all eventually terminate - only on termination are value estimates and policies updated.
+
+Implications of MC Learning
+
+-   We don't need to keep a large mode of the environment.
+
+-   We estimate the values of each state independently of other states
+
+-   Computation for updating values or each state is independent of the size of the MDP\^\[in DP we had to solve $n\times n$ - simultaneous equations\]
+
+## Lesson 2: Monte Carlo for Control
+
+::: callout-note
+## Lesson Learning Goals
+
+-   [ ] Estimate action-value functions using [Monte Carlo](#dfn-mc)
+-   [ ] Understand the importance of maintaining exploration in Monte Carlo algorithms
+-   [x] Understand how to use [Monte Carlo](#dfn-mc) methods to implement a GPI algorithm.
+-   [x] Apply [Monte Carlo](#dfn-mc) with exploring starts to solve an MDP
+:::
+
+![action values](img/rl-mc-action-values.png){.column-margin group="slides"}
+
+![back off](img/rl-mc-backoff.png){.column-margin group="slides"}
+
+This back off diagram indicates that the value of a state S depends on the values of its actions.
+
+-   Recall that [control](#def-contol) is simply improving a policy using our action values estimate.
+-   Policy improvement is done by **Greedifing** a policy $\pi$ at a state $s$ by selecting the action $a$ with the highest action value. If we are missing some action values we can make the policy worse.
+-   We need to ensure that our RL algorithm engages the different actions of a state. There are two strategies:
+    -   Exploring starts
+    -   $\epsilon$-Soft strategies
+
+![exploring starts](img/rl-exploring-starts.png){.column-margin group="slides"}
+
+The following is the MC alg with exploring start for estimation.
+
+![exploring starts pseudocode](img/rl-exploring-starts-pseudocode.png){.column-margin group="slides"} We can recap how GPI looks:
+
+-   Keeping $\pi_0$ fixed we do evaluation of $q_\pi$ using MC--ES
+
+-   We improve $\pi_0$ by picking the actions with the highest values
+
+-   We stop when we don't improve $\pi$
+
+![exploring starts pseudocode](img/rl-monte-carlo-GPI-01.png){.column-margin group="slides"}
+
+Here, in the evaluation step, we estimate the action-values using MC prediction, with exploration driven by exploring Starts or an $\epsilon$-soft policy
+
+## Lesson 3: Exploration Methods for Monte Carlo
+
+::: callout-note
+## Lesson Learning Goals {.unnumbered}
+
+-   [x] Understand why Exploring Starts can be problematic in real problems
+-   [x] Describe an alternative exploration method for Monte Carlo control
+:::
+
+G1. Exploring start can be problematic as we may not able to say try all actions on all states.
+
+-   many actions or states it could be risky/unethical
+
+-   it could cost too much - we need too many experiments.
+
+Note: The Blackjack MDP can be improved using Exploring Starts since each initial state can be sampled. Recall there were 200 states.
+
+G2. A second approach to policy improvement is an generalization of both the $\epsilon$- greedy policy and the random uniform, which we learned for multi-armed bandits in the fundamentals. This is called $\epsilon$-soft.
+
+An $\epsilon$-soft policy is one for which state the each action has a probability of at least $\frac{\epsilon}{|A|}$
+
+The pro is we have never ending exploration
+
+The con is we can never reach a deterministic optimal policy - but we can get to a stochastic policy where the best choice is $1-\epsilon+\frac{\epsilon}{|A|}$
+
+![MC control with epsilon-soft policies](img/wk2-epsilon-soft-pseudocode.png)
+
+The Highlights indicate modification of the Exploring Starts alg
+
+1.  We can start with Uniform-random as its epsilon-soft.
+
+2.  Episode generation uses the current $\pi$ ($\epsilon$-soft policy) *before* it is improved.
+
+3.  We drop the first-visit check - this is an every-visit MC algorithm.
+
+4.  The new policy generated in each iteration is $\epsilon$-greedy w.r.t. the current action-value estimate, which is improved prior.
+
+5.  The optimal $\epsilon$-soft policy is an $\epsilon$-soft policy.
+
+## Lesson 4: Off-policy learning for prediction
+
+::: callout-note
+## Lesson Learning Goals {.unnumbered}
+
+-   [ ] Understand how off-policy learning can help deal with the exploration problem
+-   [ ] Produce examples of target policies and examples of behavior policies.
+-   [ ] Understand importance sampling
+-   [ ] Use importance sampling to estimate the expected value of a target distribution using samples from a different distribution.
+-   [ ] Understand how to use importance sampling to correct returns
+-   [ ] Understand how to modify the Monte Carlo prediction algorithm for off-policy learning.
+:::
+
+$$
+\begin{align*}
+  P(A_t, S_{t+1}, & A_{t+1}, ... ,S_T | S_t, A_{t:T-1} \sim \pi) \\
+  & = \pi(A_t|S_t)p(S_{t+1}|S_t, A_t)\pi(A_{t+1}, S_{t+1}) \cdot\cdot\cdot p(S_T|S_{T-1}, A_{T-1}) \\
+  & = \prod_{k=t}^{T-1} \pi(A_k|S_k)p(S_{k+1}|S_k, A_k)
+\end{align*}
+$$ {#eq-trajectory-probability}
+
+**Definition:** The importance sampling ratio (rho, $\rho$) is the relative probability of the trajectory under the target vs behavior policy:
+
+$$
+\begin{align}
+\rho_{t:T-1} & \doteq \frac{\prod_{k=t}^{T-1} \pi(A_k \mid S_k)p(S_{k+1} \mid S_k, A_k)}{\prod_{k=t}^{T-1} b(A_k \mid S_k)p(S_{k+1} \mid S_k, A_k)} \\
+             & = \prod_{k=t}^{T-1} \frac{\pi(A_k \mid S_k)}{b(A_k \mid S_k)}
+\end{align}
+$$ {#eq-importance-sampling}
+
+$$
+v_\pi(s) = \mathbb{E}_b[\rho_{t:T-1} \cdot G_t \mid S_t = s] \qquad
+$$ {#eq-value1}
+
+$$
+V(s) \doteq \frac{\displaystyle \sum_{t\in \mathscr T(s)}\rho_{t:T(t) - 1} \cdot G_t}{|\mathscr T (s)|} \qquad
+$$ {#eq-value2}
+
+$$
+V(s) \doteq \frac{\displaystyle \sum_{t\in \mathscr T(s)} \Big(\rho_{t:T(t) - 1} \cdot G_t\Big)}{\displaystyle \sum_{t\in \mathscr T(s)}\rho_{t:T(t) - 1}} \qquad
+$$ {#eq-value3}
+
+```{=html}
+<!-- TODO: add 
+
+### Emma Brunskill: Batch Reinforcement Learning
+-->
+```

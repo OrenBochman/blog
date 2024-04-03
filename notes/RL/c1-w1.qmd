@@ -1,0 +1,419 @@
+---
+date: 2024-05-02
+lastmod: 2022-05-07
+title: RL Fundamentals W1
+subtitle: The K-Armed Bandit Problem
+description: In these unit we define some key terms like rewards, states, action, value functions, action values functions. Then we consider at the the multi-armed bandit problem leading to exploration explotation dillema, the epsilon greedy algorithm.
+author: Oren Bochman
+draft: false
+categories:
+  - Coursera
+  - notes
+  - rl
+  - reinforcement learning
+  - the k-armed bandit problem
+  - bandit algorithms
+  - exploration 
+  - explotation
+  - epsilon greedy algorithm
+  - sample avarage method
+  
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+![RL algorithms](img/alg_selector.jpeg){.column-margin}
+
+The teachers are world class, researches from the best university for
+this subject. However, this high level comes with the following caveat:
+their delivery is always terse and precise. They frequently reference
+old material which you may not have *fully digested* yet. In fact I
+discovered to my 😱 horror how easy it is go through the material,
+quizzes and programming assignments scoring 100% but not connect the
+dots.
+
+::: callout-caution
+## Deceptively simple :bulb:
+
+[This course is **deceptively simple**]{.mark} - the chart in the margin
+provides a great summary of the material for the whole specialization.
+Only a handful of concepts are needed to master RL.
+
+-   This specialization is all about connecting dot.
+-   We revisit the same ideas over and over improving them in small but
+    significant ways.
+-   In this course and the more connections you make the better you will
+    remember material
+-   And the greater you facility to apply RL to new problems.
+:::
+
+The following are my tips for getting the most from this specialization
+
+::: callout-tip
+## Connecting The Dot to see the Forest For the Trees 🎄
+
+To connect the dots I :heart: recommend:
+
+1.  **Annotate** 🖊️ you e-copy of the book 📖
+2.  **Flash cards** 🗂️ are your 🧑‍🤝‍🧑 friends. We don't need too many but
+    they can help you keep the essentials (algorithms, definitions, some
+    formulas, a few diagrams) fresh in your mind.
+3.  **Review** 👁️ the videos/quizzes until nothing seems
+    surprising/confusing[^1].
+4.  **Review** 👁️ your notes every time you complete a part of the
+    specialization. Also a great idea if have an RL interview 💼
+5.  **Coding**: If you have time do extra RL coding
+    1.  Start with developing more environments, simple and complex ⛩️
+    2.  Implement more algorithms - from the course, the books ,
+        papers.⛩️
+    3.  The note books also try to teach you experiments and analysis
+        comparing algorithms performance. If you assimilate this part
+        you are really going to shine. ⛩️
+:::
+
+[^1]: The annotated book and flashcards will help here.\
+    This material is really logical - if you are surprised/confused you
+    never assimilated some part of the material. Once you do it should
+    become almost intuitive to reason about from scratch.
+
+::: callout-tip
+## Mathematical Mnemonics 😍
+
+As a Mathematics major I can attest that Mathematics becomes 10x easier
+so long as you can recall 🧠 the basic definitions and their notation.
+
+I have extracted the essentials from the text book below. Best to
+memorize these or at least keep a copy handy and you are well on your
+way to groking this course
+:::
+
+### Notation:
+
+-   $G_t$ **return** at time t, for a $(s_t,a_t,r_t...)$ sequence
+    discounted by $\gamma$.
+-   $r(s,a)$ - **expected immediate rewards** for action $a$ in state
+    $s$ AKA **reward** of a **Markov reward process**
+-   $\pi$ **policy** - a decision making rule for every state.
+-   $\pi_*$ **optimal policy** - which returns the maximum rewards.
+-   $p(s',r \vert s,a)$ - **transition probability** to state $s'$ with
+    reward $r$ from state $s$ via action $a$ AKA **four valued
+    dynamics** function.
+-   $p(s' \vert s,a)$ - **transition probability** to state $s'$ from
+    state $s$ via action $a$ AKA **Markov process transition matrix**
+-   $v_\pi(s)$ - state's **value** under policy $\pi$ which is its
+    expected return
+-   $q_\pi(s,a)$ - the **action value** in state $s$ under policy $\pi$
+
+## Week 1: The K-Armed Bandit Problem
+
+Read:
+
+-   [x] [RL
+    Book§2.1-7](http://incompleteideas.net/book/RLbook2020.pdf#page=47)
+    pp. 24-36 -\> before lessons.
+-   [x] [RL
+    Book§2.8](http://incompleteideas.net/book/RLbook2020.pdf#page=64)
+    pp. 42-43 -\> before assignments.
+
+### Lesson 1 The K-Armed Bandit
+
+::: callout-note
+### Goals
+
+-   [ ] Understand the temporal nature of the bandit problem
+-   [x] Define k-armed bandit
+-   [x] Define action-values
+-   [x] Define reward
+:::
+
+#### K-armed bandits 🐙
+
+In the **k-armed bandit** problem there is an **agent** who is given by
+the environment a **state** $s$ and must learn to find which of action
+$a$ from the possible set of **actions** $A$. leading to and has the
+greatest **expected reward**. This can be done using Bayesian updating
+starting from a uniform prior.
+
+Note: in the bandit there is only one state. So after we pull the arm
+nothing in the problem changes. In RL we will be intersted in more
+general problems in which actions will lead the agent to new states.
+
+![bandit](img/multi_armed_bandit.webm){.column-margin}
+
+::: {#exm-clinical-trials}
+## Using multi-armed bandit to randomize a medical trial
+
+-   agent is the doctor
+-   actions {blue, yellow, red} treatment
+-   k = 3
+-   the rewards are the health of the patients' blood pressure.
+-   a random trial in which a doctor need to pick one of three
+    treatments.
+-   q(a) is the mean of the blood pressure for the patient.
+:::
+
+![clinical trial](img/rl-clinical-trial.png){.column-margin}
+
+#### Action Values
+
+The **value** of an action is its **expected reward** which can be
+expressed mathematically as:
+
+$$
+q_*(a) \doteq \mathbb{E}[R_t  \vert  A_t=a] \space \forall a \in \{a_1 ... a_k\} \qquad
+$$ {#eq-action-value}
+
+where:
+
+-   $\doteq$ means definition
+-   $\mathbb{E}[r \vert a]$ means expectation of a reward given some
+    action a Since agents want to maximize rewards, recalling the
+    definition of expectations we can write this as:
+
+The goal of the agent is to maximize the expected reward which we can
+express mathematically as:
+
+$$
+ \arg\max_a q_*(a)=\sum p(r \vert a) \times r \qquad \text{Greedification}
+$$ {#eq-greedification}
+
+where:
+
+-   $\arg \max_a$ means the argument $a$ maximizes ...
+
+![decisions](img/rl-descion-problems.png){.column-margin}
+
+![why discuss bandits](img/rl-why-bandits.png){.column-margin}
+
+The bandits problem is the simplest setting for RL. More advanced
+algorithms will incorporate parts we use to solve this simple settings.
+
+## Lesson 2: What to learn: understanding Action Values
+
+::: callout-note
+### Goals
+
+1.  [x] Define action-value estimation methods. [\#](#L2G1)
+2.  [x] Define exploration and exploitation [\#](#L2G2)
+3.  [x] Select actions greedily using an action-value function
+    [\#](#L2G3)
+4.  [x] Define online learning [\#](#L2G4)
+5.  [x] Understand a simple online sample-average action-value
+    estimation method [\#](#L2G5)
+6.  [x] Define the general online update equation [\#](#L2G6)
+:::
+
+### What are action-value estimation methods? {#L2G1}
+
+![estimating action
+values](img/rl-clinical-trial-q(a).png){.column-margin}
+
+In Tabular RL settings The action value function is nothing more than a
+table with one {state, action} pair per row and its value. More
+generally it is a mapping from the pair to a reward.
+
+The higher the value of an action, the more likely it is to lead us to a
+better state which is closer to the objective. We can choose for each
+state the best or one of the best choices giving us a **plan** for
+transversing the state space to the goal state.
+
+$$
+Q_t(a) \doteq \frac{\text{sum of rewards when action a taken time } t}{\text{number of times action a was taken prior to } t} 
+$$
+
+The main idea of RL is that we can propagate values from an one adjacent
+state to another. We can start with the uniform stochastic policy and
+use it to estimate/learn the action values. Action values will decrease
+for actions leads to a dead end. And it will increase in the direction
+of the goal but only once the influence of the goal has propagated. A
+continuing theme in RL is trying to increase the efficiency for
+propagation of rewards across the action values.
+
+Knowing the minimum number of action needed to reach a goal can be an
+approximate indicator of the action value.
+
+A second idea is that once we have let the influence of dead end and the
+goals spread enough we may have enough information to improve the
+initial action value to a point where each action is the one of the best
+choices. [We call picking the one of the best action greedy selection
+and it leads to a deterministic policy.]{.mark} This is the optimal
+policy, it might not be unique since some actions might be tied in terms
+of their rewards. However for all of these we cannot do any better.
+
+### Exploration and Exploitation definition and dillema {#L2G2}
+
+In the bandit setting we can define:
+
+Exploration
+
+:   Testing any action that might be better than our best.
+
+Exploitation
+
+:   Using the best action.
+
+Should the doctor explore new treatments that might harm his patients or
+exploit the current treatment. In real life bacteria gain immunity to
+antibiotics so there is merit to exploring new treatments. However a new
+treatment can be harmful to a patients. Ideally we want to enjoy the
+benefits of the best treatment but to be open to new and better
+alternatives but we can only do one at a time.
+
+[Since neither option is ideal we call this the **dilemma of Exploration
+and Exploitation**]{.marked} What happens in practice depends on current
+interests. If we have reached a steady state we might prefer to exploit.
+
+If the problem landscape keeps changing we may want to keep exploring.
+
+### Defining Online learning ? {#L2G4}
+
+Online learning
+
+:   learning by updating the agent's value function or the action value
+    function step by step as an agent transverses the states seeking the
+    goal. Online learning is important to handle MDP which can change.
+
+One simple way an agent can use online learning is to try actions by
+random and keep track of the subsequent states. Eventually we should
+reach the goal state. If we repeat this many times we can estimate the
+expected rewards for each action.
+
+### Sample Average Method for estimating Action Values Incrementally {#L2G5}
+
+Action values help us make decision. Let's try and make estimate action
+values more formal using the following method:
+
+$$
+ q_t(a)=\frac{\text{sum or rewards when a taken prior to t}}{\text{number of times a taken prior to t}}=\frac{\sum_{t=1}^{t-1}}{t-1}R \qquad
+$$ {#eq-sample-average}
+
+![example](img/rl-sample-avarage-method.png){.column-margin}
+
+$$
+\begin{align}
+Q_{n+1} &= \frac{1}{n} \sum_{i=1}^n R_i \\& = \frac{1}{n} \Bigg(R_n + \sum_i^{n-1} R_i\Bigg) \\& = \frac{1}{n} \Bigg(R_n + (n-1) \frac{1}{(n-1)}\sum_i^{n-1} R_i\Bigg) \\&= \frac{1}{n} \Big(R_n + (n-1) Q_{n}\Big) \\&= \frac{1}{n} \Big(R_n + nQ_{n} -Q_{n} \Big) \\&= Q_n + \frac{1}{n} \Big[R_n - Q_{n}\Big]
+\end{align}
+$$ {#eq-sample-average-incremental-update-rule}
+
+### What are action-value estimation methods? {#L2G6}
+
+We can now state this in English as
+
+NewEstimate ← OldEstimate + StepSize (Target - OldEstimate)
+
+here:
+
+-   (Target - OldEstimate) is called the *error*.
+
+More generally we will use the update rule as:
+
+$$
+Q_{n+1} Q_n + \alpha \Big[R_n - Q_{n}\Big] \qquad a\in (0,1)
+$$ {#eq-general-incremental-update-rule}
+
+## Lesson 3: Exploration vs Exploitation
+
+::: callout-note
+### Goals
+
+-   Define $\epsilon$-greedy [\#](#L3G1)
+-   Compare the short-term benefits of exploitation and the long-term
+    benefits of exploration [\#](#L3G2)
+-   Understand optimistic initial values [\#](#L3G3)
+-   Describe the benefits of optimistic initial values for early
+    exploration [\#](#L3G4)
+-   Explain the criticisms of optimistic initial values [\#](#L3G5)
+-   Describe the upper confidence bound action selection method
+    [\#](#L3G6)
+-   Define optimism in the face of uncertainty [\#](#L3G7)
+:::
+
+### $\epsilon$-Greedy Policies {#L3G1}
+
+### Benefits of exploitation and exploration
+
+-   In the short term we can make gains using the best known course of
+    action.
+
+-   In the long term we would prefer to spend some resources on RD to
+    find the best course of action.
+
+### Optimistic initial values {#L3G3}
+
+The methods we have discussed are dependent on the initial action-value
+estimates, $Q_1(a)$. In the language of statistics, we call these
+methods biased by their initial estimates. For the sample-average
+methods, the bias disappears once all actions have been selected at
+least once. For methods with constant $\alpha$, the bias is permanent,
+though decreasing over time.
+
+Optimistic initial values
+
+:   Setting all initially action values greater than the algorithmicaly
+    available values in \[0,1\]
+
+### Benefits of optimistic initial values for early exploration {#L3G4}
+
+This has the effect of causing the alg to try to exploit them - only to
+find out that most\
+values are not so great. In effect we are avoiding early exploitation
+and forcing the algorithm to initially explore. In the short-term it
+will perform worse than epsilon greedy which tend to exploit. But as
+more of the state space is explored at least once the algorithm will
+beat an epsilon greedy policy which can take far longer to explore the
+space and find the best options.
+
+![The effect of optimistic initial action-value
+estimates](img/rl-optimistic-initial-conditions.png)
+
+### Criticisms of optimistic initial values {#L3G5}
+
+-   Optimistic initial values only drive early exploration. The agent
+    will not stop exploring once this is done.
+
+-   For a non-stationary problems - this is inasequate.
+
+We may not know what the maximum reward is in order to be able to set a
+higher initial optimistic reward.
+
+### The UCB action selection method {#L3G6}
+
+### Optimism in the face of uncertainty {#L3G7}
+
+Optimism in the face of uncertainty
+
+:   ???
+
+## Awesome RL resources
+
+Lets list some useful RL resources.
+
+**Books**
+
+-   Richard S. Sutton & Andrew G. Barto [RL An
+    Introduction](http://incompleteideas.net/book/RLbook2020.pdf)
+-   [Tor Latimore's](https://tor-lattimore.com/)
+    [Book](https://tor-lattimore.com/downloads/book/book.pdf) and
+    [Blog](https://banditalgs.com/) on Bandit Algorithms.
+
+**Courses & Tutorials**
+
+-   David Silver's 2015 [UCL
+    Course](https://www.davidsilver.uk/teaching/)
+    [Video](https://www.youtube.com/watch?v=2pWv7GOvuf0) and Slides.
+-   [Charles Isbell](https://faculty.cc.gatech.edu/~isbell/pubs/) and
+    [Michael Littman](https://www.littmania.com/) A free Udacity course
+    on RL, with some emphasis on game theory proofs, and some novel
+    algorithms like [Coco-Q: Learning in Stochastic Games with Side
+    Payments](http://proceedings.mlr.press/v28/sodomka13.pdf).
+-   **Contextual Bandits** [tutorial](https://hunch.net/~rwil/)
+    [video](https://vimeo.com/240429210) + papers from MS research
+    videos on contextual bandit algorithms.
+-   Interesting papers:
+    -   We discussed how Dynamic Programming can't handle games like
+        chess. Here are some RL methods that can.
+        -   [Muzero](https://www.nature.com/articles/s41586-020-03051-4.epdf?sharing_token=kTk-xTZpQOF8Ym8nTQK6EdRgN0jAjWel9jnR3ZoTv0PMSWGj38iNIyNOw_ooNp2BvzZ4nIcedo7GEXD7UmLqb0M_V_fop31mMY9VBBLNmGbm0K9jETKkZnJ9SgJ8Rwhp3ySvLuTcUr888puIYbngQ0fiMf45ZGDAQ7fUI66-u7Y%3D)
+        -   [MuZero](https://arxiv.org/abs/2202.06626) and
+        -   [EfficentZero](https://arxiv.org/abs/2111.00210)
+            [code](https://github.com/YeWR/EfficientZero)

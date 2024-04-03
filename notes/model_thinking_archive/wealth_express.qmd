@@ -1,0 +1,105 @@
+---
+title: agents
+format: html
+filters:
+  - shinylive
+jupyter: python3
+---
+
+
+:::{.column-screen-inset}
+```{shinylive-python}
+#| standalone: true
+#| viewerHeight: 620
+#| components: [ viewer]
+## file: wealth.py
+
+import micropip
+async def install_agentpy():    
+    await micropip.install("agentpy")
+install_agentpy()
+#package_list = micropip.list()
+#print(package_list)
+import agentpy as ap
+
+# Model design
+class WealthAgent(ap.Agent):
+    """ An agent with wealth """
+    def setup(self):
+        self.wealth = 1
+
+    def wealth_transfer(self):
+        if self.wealth > 0:
+            partner = self.model.agents.random()
+            partner.wealth += 1
+            self.wealth -= 1
+
+def gini(x):
+    """ Calculate Gini Coefficient """
+    x = np.array(x)
+    mad = np.abs(np.subtract.outer(x, x)).mean()  # Mean absolute difference
+    rmad = mad / np.mean(x)  # Relative mean absolute difference
+    return 0.5 * rmad
+
+class WealthModel(ap.Model):
+    """ A simple model of random wealth transfers """
+    def setup(self):
+        self.agents = ap.AgentList(self, self.p.agents, WealthAgent)
+    def step(self):
+        self.agents.wealth_transfer()
+    def update(self):
+        self.record('Gini Coefficient', gini(self.agents.wealth))
+    def end(self):
+        self.agents.record('wealth')
+
+## file: app.py
+from wealth import *
+from shiny.express import input, render, ui
+from shinywidgets import render_widget
+
+
+with ui.sidebar():    
+    ui.panel_title("Hello Shiny!")
+    ui.input_slider("n", "N", 0, 100, 20)
+    ui.input_slider("agents", "Agents", 0, 100, 100),
+    ui.input_slider("steps", "Steps", 0, 100, 100),
+    ui.input_slider("x", "y", 0, 10, 10),
+    ui.input_slider("y", "y", 0, 10, 10),
+    ui.input_selectize(
+        "var", "Select variable",
+        choices=["bill_length_mm", "body_mass_g"]
+    )
+
+@render.text
+def wealth_run():
+    model = WealthModel(parameters)
+    results = model.run()
+    return f"{results.info['completed_steps']}"
+
+
+
+@render.text
+def txt():
+    return f"n*2 is {input.n() * 2}"
+
+@render.plot
+def hist():
+    from matplotlib import pyplot as plt
+    from palmerpenguins import load_penguins
+
+    df = load_penguins()
+    df[input.var()].hist(grid=False)
+    plt.xlabel(input.var())
+    plt.ylabel("count")
+
+## file: requirements.txt
+pandas
+
+## file: fruit.csv
+id,name,count
+1,"apple",20
+2,"orange",12
+3,"grape",100
+
+```
+:::

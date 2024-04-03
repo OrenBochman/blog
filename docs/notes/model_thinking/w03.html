@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="dcterms.date" content="2023-08-03">
+
+<title>Oren Bochman’s Blog - Lesson 3 - Aggregation</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+<style>
+
+      .quarto-title-block .quarto-title-banner {
+        background-image: url(images/mt_seg_bg03.png);
+background-size: cover;
+      }
+</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+<meta name="twitter:title" content="Oren Bochman’s Blog - Lesson 3 - Aggregation">
+<meta name="twitter:description" content="Model Thinking">
+<meta name="twitter:image" content="https://orenbochman.github.io/blog/notes/model_thinking/thumbnail_blog.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+        <li>
+    <a class="dropdown-item" href="../../dnn.html">
+ <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../model-thinking.html">
+ <span class="dropdown-text">Model Thinking</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../xai.html">
+ <span class="dropdown-text">XAI</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../rl.html">
+ <span class="dropdown-text">rl</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../rhetoric.html">
+ <span class="dropdown-text">rhetoric</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../tfp.html">
+ <span class="dropdown-text">TFP</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../ab-testing.html">
+ <span class="dropdown-text">AB testing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../cognitiveai.html">
+ <span class="dropdown-text">cognitive AI</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Lesson 3 - Aggregation</h1>
+            <p class="subtitle lead">Model Thinking</p>
+                                <div class="quarto-categories">
+                <div class="quarto-category">model thinking</div>
+                <div class="quarto-category">Aggregation</div>
+                <div class="quarto-category">central limit theorem</div>
+                <div class="quarto-category">Six Sigma</div>
+                <div class="quarto-category">Conway’s game of life</div>
+                <div class="quarto-category">Cellular automata</div>
+                <div class="quarto-category">Langton’s Lambda</div>
+                <div class="quarto-category">Condorcet paradox</div>
+                <div class="quarto-category">Arrow Impossibility theorem</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta column-body">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 3, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-agg-introduction" id="toc-sec-agg-introduction" class="nav-link active" data-scroll-target="#sec-agg-introduction">Aggregation</a></li>
+  <li><a href="#sec-agg-central-limit-theorem" id="toc-sec-agg-central-limit-theorem" class="nav-link" data-scroll-target="#sec-agg-central-limit-theorem">Central limit theorem</a></li>
+  <li><a href="#sec-agg-empirical-rule" id="toc-sec-agg-empirical-rule" class="nav-link" data-scroll-target="#sec-agg-empirical-rule">The Empirical Rule</a></li>
+  <li><a href="#sec-agg-six-sigma" id="toc-sec-agg-six-sigma" class="nav-link" data-scroll-target="#sec-agg-six-sigma">Six sigma</a></li>
+  <li><a href="#sigma-models-and-methods" id="toc-sigma-models-and-methods" class="nav-link" data-scroll-target="#sigma-models-and-methods"><span class="math inline">6\sigma</span> Models and Methods :</a></li>
+  <li><a href="#sec-game-of-life" id="toc-sec-game-of-life" class="nav-link" data-scroll-target="#sec-game-of-life">Game of life</a></li>
+  <li><a href="#sec-cellular-automata" id="toc-sec-cellular-automata" class="nav-link" data-scroll-target="#sec-cellular-automata">Cellular automata</a></li>
+  <li><a href="#sec-agg-langton-lambda" id="toc-sec-agg-langton-lambda" class="nav-link" data-scroll-target="#sec-agg-langton-lambda">Langton’s Lambda</a></li>
+  <li><a href="#sec-preference-aggregation" id="toc-sec-preference-aggregation" class="nav-link" data-scroll-target="#sec-preference-aggregation">Preference Aggregation</a>
+  <ul class="collapse">
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full column-body" id="quarto-document-content">
+
+
+
+
+
+<blockquote class="blockquote">
+<p>More is different. — Physics Nobel Laureate <a href="https://en.wikipedia.org/wiki/Philip_W._Anderson">Phillip Anderson</a>, Nobel Memorial Prize Laureate</p>
+</blockquote>
+<div id="cau-bs-or-not" class="callout callout-style-default callout-caution no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution&nbsp;1: <span class="emoji" data-emoji="imp">👿</span> BS <span class="emoji" data-emoji="poop">💩</span> or 💰 for real?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Whenever we hear a physicist make a big claim, but not about physics, I get skeptical and may even play the devil’s advocate <span class="emoji" data-emoji="imp">👿</span>. Physicists are trained to be astute observers, and many are sharp thinkers.</p>
+<ol type="1">
+<li>Why isn’t he doing Physics?</li>
+<li>How does he even know that his methods can fit in the social science/etc paradigm?</li>
+<li>Is he making outrageous claims?</li>
+</ol>
+<p>Recall two sad truths about physics:</p>
+<ul>
+<li>Quantum theories frequently fail to aggregate to scales of human experience, AKA the classical limit.</li>
+<li>There isn’t a Quantum theory of gravity that aggregates to relativistic scales<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. And I never heard of other quantum theories that did.</li>
+</ul>
+<p>So physicists could stick to physics and determine how Aggregation works. That said, I must admit that Phillip W. Anderson knows what he is talking about—even if I don’t like how his point is presented.</p>
+</div>
+</div>
+</div>
+<div class="no-row-height column-margin column-container"><p><sup>1</sup>&nbsp;yet gravity is the oldest force physicists discovered.</p></div><p>Aggregation can capture the emergent properties of a system, which gets interesting when an emergent phenomenon diverges from the behaviors of its constituent parts. <mark>The key question is “How does more become different?”</mark></p>
+<p>The most prominent model for Aggregation is the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">Central Limit Theorem</a> that arises from the <a href="https://en.wikipedia.org/wiki/Law_of_large_numbers">Law of Large Numbers</a> with the requirements that we aggregate over many similar non-interacting units with bounded effects. This leads us to easy mean and variance estimates using the <a href="#sec-agg-empirical-rule">empirical rule</a>.</p>
+<p>Next, I would use more general statistical summary functions that we call <strong>population parameters</strong> if we can track the entire system or <strong>model statistics</strong> if we can only sample from the population. There may be different levels of aggregation possible for our model. Preferences and ordered relations can be challenging to aggregate in a way that maintains transitivity. However, it is relatively easy to aggregate demand patterns.</p>
+<section id="sec-agg-introduction" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-agg-introduction">Aggregation</h2>
+<div id="tip-aggregation-tldr" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;1: <span class="emoji" data-emoji="peanuts">🥜</span> Aggregation in a nutshell
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>more is different</li>
+<li><span class="emoji" data-emoji="bell">🔔</span> When small changes stack up, you are in the Central Limit Zone</li>
+<li><span class="emoji" data-emoji="dragon">🐉</span> Otherwise, you are in a danger zone <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></li>
+</ol>
+</div>
+</div>
+<div class="no-row-height column-margin column-container"><p><sup>2</sup>&nbsp;be very careful.</p></div><p>Aggregation can lead to unexpected results, and we refer to this phenomenon using “more is different” in deference to <span class="citation" data-cites="Anderson72MoreIsDifferent">(<a href="#ref-Anderson72MoreIsDifferent" role="doc-biblioref">Anderson 1972</a>)</span>.</p>
+<div id="exm-agg-water" class="theorem example page-columns page-full">
+<p><span class="theorem-title"><strong>Example 1</strong></span> Can we consider a single water molecule to be wet? Not if wetness is an emergent property of multiple water molecules.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> But, the three phases of water also require aggregation. So we are dealing with problematic definitions.</p>
+<div class="no-row-height column-margin column-container"><p><sup>3</sup>&nbsp;How does wetness arise? <span class="emoji" data-emoji="thought_balloon">💭</span> Isn’t two water molecules sharing an <a href="https://en.wikipedia.org/wiki/Hydrogen_bond">H bond</a>? Aren’t other liquids like mercury also wet? <span class="emoji" data-emoji="thinking">🤔</span> Once we figure that we are aggregate over h-bonds, we see this isn’t a case of more is different but an ecological fallacy <a href="https://en.wikipedia.org/wiki/Ecological_fallacy"><span class="emoji" data-emoji="x">❌</span></a></p></div></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_hydrogen_bonds_in_water.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" data-glightbox="description: .lightbox-desc-1" title="3D model hydrogen bonds in water source"><img src="images/mt_hydrogen_bonds_in_water.png" class="img-fluid figure-img" alt="3D model hydrogen bonds in water source"></a></p>
+<figcaption>3D model hydrogen bonds in water <a href="https://commons.wikimedia.org/wiki/File:3D_model_hydrogen_bonds_in_water.svg">source</a></figcaption>
+</figure>
+</div>
+<div id="exm-agg-neuron" class="theorem example page-columns page-full">
+<p><span class="theorem-title"><strong>Example 2</strong></span> Can a single neuron explain consciousness, cognition, or individual characteristics? <a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> No more than a single cogwheel could explain the working of a clock.</p>
+<div class="no-row-height column-margin column-container"><p><sup>4</sup>&nbsp;what are these phenomena :thought:, how are they measured <span class="emoji" data-emoji="thinking">🤔</span> ? An ant or a rat has brains but doesn’t exhibit consciousness, etc - so this is not just a consequence of neuron aggregation; this is another <a href="https://en.wikipedia.org/wiki/Ecological_fallacy"><span class="emoji" data-emoji="x">❌</span></a>.</p></div></div>
+<div id="exm-agg-schelling" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3</strong></span> Schelling’s model exhibits segregation for fairly tolerant individuals and mixing for highly intolerant ones. 💰💰</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_gas.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" data-glightbox="description: .lightbox-desc-2" title="Gas at high temperature source"><img src="images/mt_gas.jpg" class="img-fluid figure-img" alt="Gas at high temperature source"></a></p>
+<figcaption>Gas at high temperature <a href="https://commons.wikimedia.org/wiki/File:Gas-natural.jpg">source</a></figcaption>
+</figure>
+</div>
+<div id="exm-agg-temperature" class="theorem example">
+<p><span class="theorem-title"><strong>Example 4</strong></span> Atoms of gas have variable kinetic energy, but temperature and pressure are statistical aggregates for these, and one molecule has little bearing on the aggregate. 💰💰💰</p>
+</div>
+<p>Cellular automata show how complexity can arise from very simple rules. <a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
+<div class="no-row-height column-margin column-container"><p><sup>5</sup>&nbsp;This is surprising when you first learn about it <span class="emoji" data-emoji="thinking">🤔</span>, not so much afterwards. After all this is a rehash of any number of ideas - like <a href="https://en.wikipedia.org/wiki/Halting_problem">the halting problem</a>, <a href="https://en.wikipedia.org/wiki/Inverse_problem#:~:text=An%20inverse%20problem%20in%20science,measurements%20of%20its%20gravity%20field.">inverse problems</a>, and the axiom of choice - proving existence of arbitrary functions - without giving access to the rule. e.g., the function for all winning lottery tickets on a given day <span class="emoji" data-emoji="poop">💩</span> So complexity exists, but how is the game of life teaching us about aggregation?</p></div><div id="fig-agg-glider" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agg-glider-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="images/mt_Day_and_Night_-_Oscillator_16.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-3" data-glightbox="description: .lightbox-desc-3"><img src="images/mt_Day_and_Night_-_Oscillator_16.gif" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-agg-glider-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Cellular Automata: A period 16 oscillator <a href="https://commons.wikimedia.org/wiki/Category:Animations_of_cellular_automata#/media/File:Day_and_Night_-_Oscillator_16.gif">source</a>
+</figcaption>
+</figure>
+</div>
+<p>We considered Aggregation via the following mechanism:</p>
+<ol type="1">
+<li>Stacking small changes with the Central Limit theorem.</li>
+<li>Using a single to aggregate behavior in the game of life.</li>
+<li>Using a family of rules: how to aggregate using one-dimensional cellular automata models</li>
+<li>Preferences: how to aggregate preferences, e.g., to make collective choices.</li>
+</ol>
+<p>We model for the following reasons:</p>
+<ol type="1">
+<li>predict points</li>
+<li>understand data, e.g., using a bell-shaped curve</li>
+<li>understand patterns, e.g., the glider pattern in the game of life</li>
+<li>understand the class of outcome, e.g., using one-dimensional cellular automata models</li>
+<li>work through logic, e.g., difficulties arise with the aggregation of preferences.</li>
+</ol>
+</section>
+<section id="sec-agg-central-limit-theorem" class="level2">
+<h2 class="anchored" data-anchor-id="sec-agg-central-limit-theorem">Central limit theorem</h2>
+<p>A <strong>Probability Distribution</strong> lists a variable’s different outcomes, each with its likelihood of occurring.</p>
+<p>The <strong>Central Limit Theorem</strong> states that if we add up a large enough series of independent variables, the distribution will follow a normal distribution characterized by a bell–shaped curve. The most likely outcome, the mean <span class="math inline">μ</span>, is in the middle of the curve.</p>
+<p>We can simulate this process by flipping coins a large number of times.</p>
+<div id="exa-counting-heads">
+<p>When we toss a fair coin two times, how many heads will we see, and at what likelihood?</p>
+<table class="table">
+<caption>Binomial distribution for two coin flips</caption>
+<thead>
+<tr class="header">
+<th>Col1</th>
+<th>Col2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2H</td>
+<td><span class="math inline">1/4</span></td>
+</tr>
+<tr class="even">
+<td>1H</td>
+<td><span class="math inline">1/2</span></td>
+</tr>
+<tr class="odd">
+<td>0H</td>
+<td><span class="math inline">1/4</span></td>
+</tr>
+</tbody>
+</table>
+<p>When you flip a coin 4 times, the outcomes</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Col1</th>
+<th>Col2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4H</td>
+<td><span class="math inline">1/16</span></td>
+</tr>
+<tr class="even">
+<td>3H</td>
+<td><span class="math inline">4/16</span></td>
+</tr>
+<tr class="odd">
+<td>2H</td>
+<td><span class="math inline">6/16</span></td>
+</tr>
+<tr class="even">
+<td>1H</td>
+<td><span class="math inline">4/16</span></td>
+</tr>
+<tr class="odd">
+<td>0H</td>
+<td><span class="math inline">1/16</span></td>
+</tr>
+</tbody>
+</table>
+<p>And when we flip a coin N times:</p>
+<p>For N coin flips:</p>
+<p><span id="eq-binomial-distribution"><span class="math display">
+P(X=k)={n \choose k} p^k(1-p)^{n-k}\qquad
+\tag{1}</span></span></p>
+<p>Success in N coin flips follows a Binomial distribution.</p>
+<p><span id="eq-binomial-mean"><span class="math display">
+\mu=pN \qquad
+\tag{2}</span></span></p>
+<p><span id="eq-binomial-sigma"><span class="math display">
+\sigma = p \times (1-p) \times n \qquad
+\tag{3}</span></span></p>
+</div>
+<p>For <span class="math inline">N&gt;&gt;20</span>, the Binomial distribution becomes more like the Normal distribution.</p>
+</section>
+<section id="sec-agg-empirical-rule" class="level2">
+<h2 class="anchored" data-anchor-id="sec-agg-empirical-rule">The Empirical Rule</h2>
+<div id="fig-empirical-rule" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-empirical-rule-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="images/mt_bell_curve.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" data-glightbox="description: .lightbox-desc-4"><img src="images/mt_bell_curve.jpg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-empirical-rule-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Bell curve and empirical rule
+</figcaption>
+</figure>
+</div>
+<p>The standard deviation <span class="math inline">\sigma</span> parameter determines how the normal distribution curve is spread. We can use these values to build confidence intervals:</p>
+<table class="table">
+<caption>The Empirical Rule</caption>
+<thead>
+<tr class="header">
+<th>SD of Standard Normal</th>
+<th>% of Values</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\sigma</span></td>
+<td>68</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">2\sigma</span></td>
+<td>95</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">3\sigma</span></td>
+<td>99.7</td>
+</tr>
+</tbody>
+</table>
+<p>e.g., set the mean <span class="math inline">\mu</span> to 100, and the standard deviation <span class="math inline">\sigma</span> to 3, then for 95% of all cases, the outcome will fall in [94, 106].</p>
+<p>In a Binomial distribution where <span class="math inline">p = 1/2</span> like flipping coins, <span class="math inline">\sigma = (\sqrt{N})/2</span>, thus when <span class="math inline">N = 100</span>, the mean is <span class="math inline">100/2 = 50</span>, and the standard deviation <span class="math inline">\sigma=√100/2 = 5</span>.</p>
+<p>In general, Binomial distributions have a standard deviation of success for N trials:</p>
+<p><span class="math display">
+\sigma = \sqrt{(p(1-p)N)}
+</span> {eq-binom-sd}</p>
+<p>When <span class="math inline">p = \frac{1}{2}</span> then this simplifies to: <span class="math display">
+\sigma =  \frac{\sqrt{N}}{2}
+</span> {eq-binom-sd-std}</p>
+<p>We can now use this standard deviation to make statistical inferences. Airlines overbook to increase their profits, so they need to know the probability of someone not getting a seat. This allows them to estimate the expected cost of offering people a second ticket to take the next flight.</p>
+<div id="exm-plane-seats" class="theorem example">
+<p><span class="theorem-title"><strong>Example 5 (Flight Overbooking)</strong></span> &nbsp;</p>
+<div id="b60137a4" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>p<span class="op">=</span><span class="fl">0.9</span>           <span class="co"># show up rate</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>seats <span class="op">=</span> <span class="dv">380</span>     <span class="co"># seat on plane</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>tickets <span class="op">=</span> <span class="dv">400</span>   <span class="co"># tickets sold</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>mean <span class="op">=</span> <span class="dv">360</span>      <span class="co"># mean tickets sold</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>sigma <span class="op">=</span> <span class="bu">round</span>(math.sqrt(p<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p)<span class="op">*</span>tickets))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>lb99 <span class="op">=</span> mean <span class="op">-</span> <span class="dv">3</span><span class="op">*</span>sigma</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>ub99 <span class="op">=</span> mean <span class="op">+</span> <span class="dv">3</span><span class="op">*</span>sigma</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'mu=</span><span class="sc">{</span>mean<span class="sc">}</span><span class="ss">, sigma=</span><span class="sc">{</span>sigma<span class="sc">}</span><span class="ss">, 97.5 CI = [</span><span class="sc">{</span>lb99<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span>ub99<span class="sc">}</span><span class="ss">]'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>mu=360, sigma=6, 97.5 CI = [342,378]</code></pre>
+</div>
+</div>
+<ul>
+<li>A Boeing 747 has 380 seats</li>
+<li>There is a 0.9 show-up rate,</li>
+<li>let’s assume people show up independently of each other.</li>
+<li>400 tickets were sold. i.e.&nbsp;<span class="math inline">N = 400</span>,</li>
+<li>The mean <span class="math inline">μ = 360</span></li>
+<li>The standard deviation is <span class="math inline">\sigma = \sqrt{(0.9\times(1-0.9)\times 400)} = \sqrt{36} = 6</span>. we can now use the <a href="">Empircal rule</a> to estimate a 99.7 confidence interval:</li>
+<li>in 99.75% of cases, the number of passengers will be in [342, 378].</li>
+</ul>
+</div>
+<p><mark>The Central Limit theorem states that stacking IID random variables drawn from any distribution possessing finite mean and variance will aggregate to normal distribution</mark>. Much of the world’s predictability stems from exceptional events never being observed. Rare events called <strong>black swans</strong> are usually products of heavy-tailed distributions that cannot be aggregated using the central limit theorem.</p>
+<p>If the events are not independent the central limit may be inaccurate or even fail completely to model the aggregation</p>
+</section>
+<section id="sec-agg-six-sigma" class="level2">
+<h2 class="anchored" data-anchor-id="sec-agg-six-sigma">Six sigma</h2>
+<div id="fig-agg-six_sigma" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agg-six_sigma-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 44.4%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_six_sigma.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" data-glightbox="description: .lightbox-desc-5" title="Six Sigma logo source"><img src="images/mt_six_sigma.png" height="250" class="figure-img"></a></p>
+<figcaption>Six Sigma logo <a href="https://commons.wikimedia.org/wiki/File:Six_sigma-2.svg">source</a></figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 11.1%;justify-content: flex-start;">
+<p>&nbsp;</p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 44.4%;justify-content: flex-start;">
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout="[ [1], [1] ]">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_DMAIC.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" data-glightbox="description: .lightbox-desc-6" title="DMAIC source"><img src="images/mt_DMAIC.png" height="100" class="figure-img"></a></p>
+<figcaption>DMAIC <a href="https://en.wikipedia.org/wiki/Six_Sigma#/media/File:DMAICWebdingsI.png">source</a></figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_DMADV.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" data-glightbox="description: .lightbox-desc-7" title="DMADV source"><img src="images/mt_DMADV.png" height="100" class="figure-img"></a></p>
+<figcaption>DMADV <a href="https://en.wikipedia.org/wiki/Six_Sigma#/media/File:DMAICWebdingsI.png">source</a></figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_6_Sigma_Normal_distribution.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" data-glightbox="description: .lightbox-desc-8" title="Normal Distribution source"><img src="images/mt_6_Sigma_Normal_distribution.png" height="180" class="figure-img"></a></p>
+<figcaption>Normal Distribution <a href="https://commons.wikimedia.org/wiki/File:6_Sigma_Normal_distribution.svg">source</a></figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-agg-six_sigma-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Six Sigma
+</figcaption>
+</figure>
+</div>
+<p>The idea of managing variance beyond three times the variance to work with sigmas has been embraced in the Six Sigma project management and planning system.</p>
+<div id="cau-six-sigma" class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution&nbsp;2: Six sigma In a nutshell
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Six Sigma</strong> is a project management methodology, not an aggregation method.</p>
+<p>We will revisit it later when it is time to consider the tradeoffs between reducing variation as practiced in <strong>Six Sigma</strong> and increasing variation to speed up convergence in <strong>Replicator Dynamics</strong>.</p>
+</div>
+</div>
+<p>When I asked friends who worked at Motorola, they said that one department used it to win prizes in the company. Still, it never really caught on to become the ubiquitous management technique its proponents have touted.</p>
+<p>Even with extensive training, statistics can be challenging in most business scenarios. Recall that Ronald Fischer’s influential works were prescriptive how-to manuals that did little to impart their authors’ depth of knowledge. That said, even a little statistics can go a long way.</p>
+<p><a href="https://en.wikipedia.org/wiki/Six_Sigma">Six Sigma</a> is a quality control or process improvement methodology developed by engineer <a href="https://en.wikipedia.org/wiki/Bill_Smith_(Motorola_engineer)">Bill Smith</a> at Motorola. <span class="math inline">6\sigma</span> is applied within each of <a href="https://en.wikipedia.org/wiki/DMAIC">DMAIC</a> five steps for improving existing projects, and for planning new projects, <span class="math inline">6\sigma</span> <a href="https://en.wikipedia.org/wiki/Six_Sigma#DMADV">DMADV</a> is used.</p>
+<div id="tip-MINTO" class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip&nbsp;2: DMAIC v.s. Minto Pyramid with SCQA &amp; MECE tools
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>While the DMAIC framework is practical for organizing research, it has many drawbacks for reporting the results, particularly to executives.</p>
+<p>The eponymous Pyramid Method introduced in <span class="citation" data-cites="minto1996minto">(<a href="#ref-minto1996minto" role="doc-biblioref">Minto and Deutsch 1996</a>)</span> by Barbara Minto while working at McKinsey, the <a href="https://modelthinkers.com/mental-model/minto-pyramid-scqa">Minto pyramid</a>, and the following two methods can be used with it to structure storytelling for data analysis and to explain the use of Models.</p>
+<table class="table">
+<caption>SCQA &amp; MECE #{tbl-MINO-method}</caption>
+<thead>
+<tr class="header">
+<th>SCQA</th>
+<th>MECE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Situation,</td>
+<td>Mutably</td>
+</tr>
+<tr class="even">
+<td>Complication</td>
+<td>Exclusive</td>
+</tr>
+<tr class="odd">
+<td>Question</td>
+<td>Collectively</td>
+</tr>
+<tr class="even">
+<td>Answer</td>
+<td>Exhaustive</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><span class="math inline">6\sigma</span> assigns roles to practitioners:</p>
+<ul>
+<li><strong>Master Black Belts</strong>, are identified by the champions to act as Six Sigma mentors. They are expected to devote all their full time to Six Sigma, assisting the champions and guiding Black Belts and Green Belts. In addition to statistical tasks, they should ensure that Six Sigma is applied consistently across departments. <strong>Black Belts</strong> work under the Master Black Belt to apply <span class="math inline">6\sigma</span> to specific projects. Their responsibility is running <span class="math inline">6sigma</span> projects. Champions and Master Black Belts are tasked with identifying projects for <span class="math inline">6\sigma</span>. <strong>Green Belts</strong> are employees tasked with implementing Six Sigma alongside their other responsibilities. They operate under the supervision of Black Belts..</li>
+</ul>
+<p>The main idea is to control the process to reduce the defects to below 3.4 per million opportunities or six standard deviations.</p>
+<div id="exm-agg-six-sigma-bananas" class="theorem example">
+<p><span class="theorem-title"><strong>Example 6 (the 6 sigma banana store)</strong></span> &nbsp;</p>
+<ul>
+<li>Let the mean banana sales be <span class="math inline">\mu= 500 kg</span>,</li>
+<li>and the sd of <span class="math inline">\sigma= 10 kg</span>,</li>
+<li>How much stock of bananas is required to cope with a Six Sigma event?</li>
+</ul>
+<p>Six Sigma is 60 kg, so 560 kg of bananas are required.</p>
+</div>
+<p>Remember, we are talking about a 2-in-a-billion frequency for these defects. They will only manifest in huge-scale situations, like big factories.</p>
+<div id="exm-agg-six-sigma-washers" class="theorem example">
+<p><span class="theorem-title"><strong>Example 7 (washers)</strong></span> The required metal thickness is between 500 and 560 mm in production. Assuming the outcome is normally distributed, then:</p>
+<p><span class="math display">
+\mu=530
+</span></p>
+<p>Then <span class="math inline">\sigma</span> should be 5 or less. <span class="math display">
+\sigma = 560-500/2=30 \implies tolerance = 30/6 = 5 mm.
+</span></p>
+</div>
+<div id="exm-agg-six-sigma-tires" class="theorem example">
+<p><span class="theorem-title"><strong>Example 8 (tires)</strong></span> A production process creates tires with:</p>
+<ul>
+<li>an average diameter of <span class="math inline">\mu=20</span> inches and</li>
+<li>a standard deviation of <span class="math inline">sd=0.1</span> inch.</li>
+<li>What is the Six Sigma range?</li>
+</ul>
+<p><span class="math inline">20 \pm 6\times 0.1= [19.4,20.6]</span></p>
+</div>
+</section>
+<section id="sigma-models-and-methods" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sigma-models-and-methods"><span class="math inline">6\sigma</span> Models and Methods :</h2>
+<div id="nte-agg-six-sigma-extra" class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note&nbsp;1: Extra Content
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I was curious about the statistics used in this framework, so I researched Six Sigma, drawing on <span class="citation" data-cites="cano2012sixsigma">Cano, Moguerza, and Prieto Corcoba (<a href="#ref-cano2015qcr" role="doc-biblioref">2015</a>)</span> and using Wikipedia. This is my summary.</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Root_cause_analysis" title="Root cause analysis">Root cause analysis</a>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Five_whys">5 Whys</a> - a root cause analysis</li>
+<li>Cause &amp; effects diagram (also known as fishbone or <a href="https://en.wikipedia.org/wiki/Ishikawa_diagram" title="Ishikawa diagram">Ishikawa diagram</a>) - a root cause analysis</li>
+</ul></li>
+<li>Statistical and fitting tools
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Regression_analysis" title="Regression analysis">Regression analysis</a></li>
+<li><a href="https://en.wikipedia.org/wiki/General_linear_model" title="General linear model">General linear model</a> - Extends regression analysis.</li>
+<li><a href="https://en.wikipedia.org/wiki/Analysis_of_variance" title="Analysis of variance">ANOVA</a> - Analysis of variance is a regression that explains variation within and between groups.<br>
+</li>
+<li><a href="https://en.wikipedia.org/wiki/ANOVA_gauge_R&amp;R">ANOVA Gauge R&amp;R</a> ANOVA Gauge repeatability and reproducibility is a measurement systems analysis technique that uses an ANOVA random effects model to assess a measurement system.</li>
+<li><a href="https://en.wikipedia.org/wiki/Correlation" title="Correlation">Correlation</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Chi-squared_test" title="Chi-squared test">Chi-squared test</a> - hypothesis testing on contingency tables.</li>
+<li><a href="https://en.wikipedia.org/wiki/Design_of_experiments" title="Design of experiments">Design of experiments</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Stratified_sampling" title="Stratified sampling">Stratification</a></li>
+</ul></li>
+<li>Visualizations
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Scatter_diagram" title="Scatter diagram">Scatter diagram</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Histogram" title="Histogram">Histograms</a>/<a href="https://en.wikipedia.org/wiki/Pareto_analysis" title="Pareto analysis">Pareto analysis</a>/<a href="https://en.wikipedia.org/wiki/Pareto_chart" title="Pareto chart">Pareto chart</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Pick_chart" title="Pick chart">Pick chart</a>/<a href="https://en.wikipedia.org/wiki/Process_capability" title="Process capability">Process capability</a>/<a href="https://en.wikipedia.org/wiki/Rolled_throughput_yield" title="Rolled throughput yield">Rolled throughput yield</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Control_chart" title="Control chart">Control chart</a>/Control plan (also known as a swimlane map)/<a href="https://en.wikipedia.org/wiki/Run_chart" title="Run chart">Run charts</a></li>
+</ul></li>
+<li>TQM Methodologies
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Axiomatic_design" title="Axiomatic design">Axiomatic design</a> - a systems design methodology that uses matrix-based methods to analyze the transformation of customer needs into functional requirements.<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a></li>
+<li><a href="https://en.wikipedia.org/wiki/Business_Process_Mapping" title="Business Process Mapping">Business Process Mapping</a>/<a href="https://en.wikipedia.org/wiki/Check_sheet" title="Check sheet">Check sheet</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Cost%E2%80%93benefit_analysis">Cost–benefit analysis</a></li>
+<li><a href="https://en.wikipedia.org/wiki/CTQ_tree" title="CTQ tree">CTQ tree</a> Critical-to-quality trees are the key measurable characteristics of a product whose performance standards must be met to satisfy the customer.</li>
+<li><a href="https://en.wikipedia.org/wiki/Quality_Function_Deployment" title="Quality Function Deployment">Quality Function Deployment</a> (QFD)</li>
+<li><a href="https://en.wikipedia.org/wiki/Quantitative_marketing_research" title="Quantitative marketing research">Quantitative marketing research</a> through use of <a href="https://en.wikipedia.org/wiki/Enterprise_Feedback_Management" title="Enterprise Feedback Management">Enterprise Feedback Management</a> (EFM) systems</li>
+<li><a href="https://en.wikipedia.org/wiki/SIPOC" title="SIPOC">SIPOC</a> analysis (<strong>S</strong>uppliers, <strong>I</strong>nputs, <strong>P</strong>rocess, <strong>O</strong>utputs, <strong>C</strong>ustomers)</li>
+<li><a href="https://en.wikipedia.org/wiki/Taguchi_methods" title="Taguchi methods">Taguchi methods</a>/<a href="https://en.wikipedia.org/wiki/Taguchi_Loss_Function" title="Taguchi Loss Function">Taguchi Loss Function</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Value_stream_mapping" title="Value stream mapping">Value stream mapping</a></li>
+</ul></li>
+</ul>
+<p>If most of these are familiar, perhaps we should complete the black belt training on LinkedIn!</p>
+</div>
+</div>
+<div class="no-row-height column-margin column-container"><p><sup>6</sup>&nbsp;Axiomatic design - Wikipedia. https://en.wikipedia.org/wiki/Axiomatic_design</p></div></section>
+<section id="sec-game-of-life" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-game-of-life">Game of life</h2>
+<div id="fig-agg-game-of-life" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agg-game-of-life-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-agg-game-of-life" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-agg-conway" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-agg-conway-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="images/mt_john_conway.jpg" class="lightbox" data-gallery="fig-agg-game-of-life" data-glightbox="description: .lightbox-desc-9"><img src="images/mt_john_conway.jpg" data-ref-parent="fig-agg-game-of-life" height="200" class="figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-agg-conway-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) John Conway <a href="https://en.wikipedia.org/wiki/John_Horton_Conway#/media/File:John_H_Conway_2005_(cropped).jpg">source</a>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_glider.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-10" data-glightbox="description: .lightbox-desc-10" title="Glider pattern"><img src="images/mt_glider.jpg" height="200" class="figure-img"></a></p>
+<figcaption>Glider pattern</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-agg-game-of-life-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Conway’s Game of Life
+</figcaption>
+</figure>
+</div>
+<p><a href="https://en.wikipedia.org/wiki/John_Horton_Conway">John Conway’s</a> <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">game of life</a> is a model for artifical life that shows. In essense it aggregate activity stemming from a single rule at differnt location that can leads to surprisingly complex system.</p>
+<p>In the system thinking paradigm, the worldview is that all parts of the system under study are interconnected. In this paradigm, inferring how macro-behavior emerges from micro-motives is one of the main challenges for researchers. Viewed through this system-thinking prism, the game of life is a microcosm whose emergent complexity is an analog of the challenges of aggregation in the real world. ,</p>
+<p>The glider pattern shown above reconstructs shifted diagonally.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Boosting and Bagging
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Aggregating simple rules in series or parallel called bagging and boosting, results in complex rules c.f. <a href="">random forest</a> and <a href="">feed forward neural networks</a>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Turing Complete
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It is no surprise that the game of life is complex once we factor in that it is a complete system, that the grid is part of the initial grid, and that its evolution is all part of the system.</p>
+</div>
+</div>
+<p>The game of life is simulated on a grid whose cells can be either alive or dead.</p>
+<ul>
+<li>if a cell is off, it will only turn on if precisely 3 of the 8 cells in the <a href="https://en.wikipedia.org/wiki/Moore_neighborhood">Moore neighborhood</a> are on.</li>
+<li>if a cell is on, it will only stay on if 2 or 3 of the 8 neighbors in the Moore Neighborhood are on.</li>
+</ul>
+<div id="fig-agg-life_blinker" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agg-life_blinker-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_go_board.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-11" data-glightbox="description: .lightbox-desc-11" title="counting neighbors for x"><img src="images/mt_go_board.jpg" class="img-fluid figure-img"></a></p>
+<figcaption>counting neighbors for x</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_config_1.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-12" data-glightbox="description: .lightbox-desc-12" title="counting neighbors full"><img src="images/mt_config_1.jpg" class="img-fluid figure-img"></a></p>
+<figcaption>counting neighbors full</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-agg-life_blinker-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: counting neighbors
+</figcaption>
+</figure>
+</div>
+<p>In this case, x has two neighbors, so it will turn on in the next time step. Estimating the next step requires counting neighbors and applying the rules.</p>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_config_2a.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-13" data-glightbox="description: .lightbox-desc-13" title="Bliker horizontal state"><img src="images/mt_config_2a.jpg" class="img-fluid figure-img" alt="Bliker horizontal state"></a></p>
+<figcaption>Bliker horizontal state</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_config_2b.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-14" data-glightbox="description: .lightbox-desc-14" title="Blinker vertical state"><img src="images/mt_config_2b.jpg" class="img-fluid figure-img" alt="Blinker vertical state"></a></p>
+<figcaption>Blinker vertical state</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p>a period 2 blinker (oscillator)</p>
+</div>
+</div>
+</div>
+<p>The following rules use the 8 cells of the <a href="https://en.wikipedia.org/wiki/Moore_neighborhood">Moore neighborhood</a></p>
+<ol type="1">
+<li>A living cell with less than two neighbors dies.</li>
+<li>A living cell with two or three neighbors will stay alive.</li>
+<li>A living cell with more than three neighbors dies.</li>
+<li>A dead cell with exactly three live neighbors will spawn a live cell.</li>
+</ol>
+<p>note: this is called the B3/S23 rule c.f. <a href="https://conwaylife.com/wiki/Tutorials/Rules">rules</a> and many other rules exist.</p>
+<div id="fig-agg-life_3" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agg-life_3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_config_3a.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-15" data-glightbox="description: .lightbox-desc-15" title="Configuration 3a"><img src="images/mt_config_3a.jpg" class="img-fluid figure-img"></a></p>
+<figcaption>Configuration 3a</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_config_3b.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-16" data-glightbox="description: .lightbox-desc-16" title="Configuration 3b"><img src="images/mt_config_3b.jpg" class="img-fluid figure-img"></a></p>
+<figcaption>Configuration 3b</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-agg-life_3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6
+</figcaption>
+</figure>
+</div>
+<p>This allows us to consider different cell configurations. #1 with 2 cells on dies #2a with 3 cells on will flip into #2b then flip back into #2a. This is a <strong>blinker</strong> that oscillates between the two states. The game can also produce units that keep growing. c.f. #3a and #3b.</p>
+<p>We can use the NetLogo program to simulate the evolution of different patterns, such as the Beacon, Figure 8, and the F-Pimento.</p>
+<p>The beacon behaves like a blinker and moves back and forth between two states.</p>
+<div id="fig-agg-life_4" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agg-life_4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_beacon.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-17" data-glightbox="description: .lightbox-desc-17" title="Beacon"><img src="images/mt_beacon.jpg" class="img-fluid figure-img"></a></p>
+<figcaption>Beacon</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_figure8.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-18" data-glightbox="description: .lightbox-desc-18" title="Figure 8"><img src="images/mt_figure8.jpg" class="img-fluid figure-img"></a></p>
+<figcaption>Figure 8</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_fpimento.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-19" data-glightbox="description: .lightbox-desc-19" title="F-Pimento"><img src="images/mt_fpimento.jpg" class="img-fluid figure-img"></a></p>
+<figcaption>F-Pimento</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-agg-life_4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Additional Patterns
+</figcaption>
+</figure>
+</div>
+<p>The Figure 8 pattern is periodic, with a cycle length of 8 steps, generating a sequence of complex patterns. The F-Pimento pattern moves in space generating gliders.</p>
+<p>We could say that even simple brain cells, following basic rules, can give rise to complexity of thinking, remembering, and understanding.</p>
+<p>The Game of Life doesn’t spell out how our minds work, but it intimates that our thoughts may just be an aggregate of these simpler parts working together. A glider pattern is a cool example of this: it’s when a shape moves across the board, popping up again in a new spot after a few moves</p>
+<p>Like other dynamical systems, the game of life exhibits four classes of behavior.</p>
+<div class="page-columns page-full"><p> These are:</p><div class="no-row-height column-margin column-container"><img src="images/mt_class_outcome.jpg" class="img-fluid" alt="Classes of outcomes"></div></div>
+<p>stable cyclic random complex</p>
+<p>The game of life demonstrates that:</p>
+<p>Emergence - complex behaviors like guns and gliders arise from a few simple rules and initial conditions. Self Organization: Patterns appear without a designer. The logic of complex systems can be simple.</p>
+</section>
+<section id="sec-cellular-automata" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-cellular-automata">Cellular automata</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_rules.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-20" data-glightbox="description: .lightbox-desc-20" title="256 rules"><img src="images/mt_rules.jpg" class="img-fluid figure-img" alt="256 rules"></a></p>
+<figcaption>256 rules</figcaption>
+</figure>
+</div><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/mt_a_new_kind_of_science.png" class="img-fluid figure-img"></p>
+<figcaption>a new kind of science</figcaption>
+</figure>
+</div></div>
+<p><a href="https://en.wikipedia.org/wiki/John_von_Neumann">John von Neumann</a> a Hungarian-American mathematician and physicist introduced Cellular automata. The game of life is a type of cellular automata. We focused on one-dimensional cellular automata to see that the notions of complex systems we have just explored can be seen even when we restrict these rule-based systems to a single dimension. The restriction reduces the number of neighbors available in the rules. These automata are more straightforward to enumerate and study in detail. Some of this work is collected in <a href="https://www.wolframscience.com/nks/">A New Kind of Science</a> by the author <a href="https://en.wikipedia.org/wiki/Stephen_Wolfram">Stephen Wolfram</a>.</p>
+<p>The cellular automata models we considered were one-dimensional, which made their rules simpler than the ones used in the game of life.</p>
+<ul>
+<li>Cells have two neighbors, except those on the borders.</li>
+<li>This lets us write out all possible rules</li>
+<li>We can also track the model’s evolution along the vertical axis.</li>
+</ul>
+<p>So, think of it like a game where you have a cell that can be either on or off, and its fate is decided by its own current state along with the state of its neighbors on each side. Picture three cells in a row - together, they can end up in eight different combinations. Now, for each of these combinations, our middle cell has two choices: it can either light up (on) or stay dark (off).</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_rule_netlogo.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-22" data-glightbox="description: .lightbox-desc-22" title="Rule 30 in Netlogo"><img src="images/mt_rule_netlogo.jpg" class="img-fluid figure-img" alt="Rule 30 in Netlogo"></a></p>
+<figcaption>Rule 30 in Netlogo</figcaption>
+</figure>
+</div></div><p>This setup gives us 256 different ways (or rules) to determine what happens to our middle cell based on those three-cell setups. It’s kind of like flipping switches on or off depending on the pattern you see.</p>
+<p>We can keep track of these rules by assigning them numbers, kind of like naming each unique switch-flipping strategy. For the cell to turn on or off when all three cells are off, we decide if this situation is a “1” (turn on) or a “0” (stay off), and we do this for all eight combinations. In one of the scenarios we’re talking about, the pattern is called “00001110” in binary code, which translates to 30.</p>
+<p>The image shows what happens with this rule number 30 in action for the first few steps. We can simulate this rule using Netlogo, and it will show a complex pattern and behavior where the middle cell is tough to predict in advance.</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_rule_110.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-23" data-glightbox="description: .lightbox-desc-23" title="Rule numbering"><img src="images/mt_rule_110.jpg" class="img-fluid figure-img" alt="Rule numbering"></a></p>
+<figcaption>Rule numbering</figcaption>
+</figure>
+</div></div><p>Rule 110. creates an increasing triangle. If we simulate it in Netlogo, you will see a complex pattern of triangles nested in the main triangle, while cells to the right side are empty blank.</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_rule_110_random.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-24" data-glightbox="description: .lightbox-desc-24" title="Rule 110 with random start"><img src="images/mt_rule_110_random.jpg" class="img-fluid figure-img" alt="Rule 110 with random start"></a></p>
+<figcaption>Rule 110 with random start</figcaption>
+</figure>
+</div></div><p>Those models have four different types of outcomes:</p>
+<ul>
+<li>fixed state</li>
+<li>alternation</li>
+<li>randomness</li>
+<li>complexity</li>
+</ul>
+<p><mark>The question is why do rules go to a specific state? Or more specifically what creates chaos, what creates complexity and what creates order?</mark></p>
+<p>The fact that such simple models lead to such complexity has led physicists like <a href="https://en.wikipedia.org/wiki/John_Archibald_Wheeler">John Wheeler</a> to suggest in <span class="citation" data-cites="Wheeler1999InformationPQ">(<a href="#ref-Wheeler1999InformationPQ" role="doc-biblioref">Wheeler 1999</a>)</span> that reality itself may arise out of binary processes. This idea is called <a href="https://historyofinformation.com/detail.php?id=5041">it from bit</a></p>
+</section>
+<section id="sec-agg-langton-lambda" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-agg-langton-lambda">Langton’s Lambda</h2>
+<p><img src="images/mt_langton.png" class="img-fluid" alt="Christopher Langton">{column-margin}</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="images/mt_lambda_classes.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-25" data-glightbox="description: .lightbox-desc-25" title="Behavior classes versus Lambda"><img src="images/mt_lambda_classes.jpg" class="img-fluid figure-img" alt="Behavior classes versus Lambda"></a></p>
+<figcaption>Behavior classes versus Lambda</figcaption>
+</figure>
+</div></div><p>Langton’s Lambda <span class="math inline">\lambda</span> can tell what the outcomes look like. <mark>Langton asked a much simpler question: How many things go on?</mark> e.g., in rule 30, four cells out of eight switch on. Lambda is the percentage of cells that go on; in this case, <span class="math inline">\lambda = 4/8 = 1/2</span>. For rule 110, <span class="math inline">\lambda = 5/8</span>.</p>
+<p>Based on the Lambdas values, we will see differnt behavior:</p>
+<ul>
+<li>if <span class="math inline">\lambda = 0</span> then all cells die off;</li>
+<li>if <span class="math inline">\lambda = 1/8</span> then the system blinks;</li>
+<li>if <span class="math inline">\lambda = 1</span> then all cells switch on;</li>
+<li>if <span class="math inline">\lambda</span> is in [3/8, 5/8], most of the complex or random patterns will appear.</li>
+</ul>
+<p>Thus intermediate levels of codependence tend to create complexity and randomness. Pattern trading is an idea of tracking such intermediate levels of interdependence in markets, which present to complex patterns.</p>
+</section>
+<section id="sec-preference-aggregation" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-preference-aggregation">Preference Aggregation</h2>
+<p><strong>Preference aggregation</strong> follows a different mathematical structure. It differs from what we learned on aggregating numbers with the central limit theorem or even aggregating rules for cellular automata.</p>
+<p>We enumerate preferences through revealed actions [w03-5]. You can give people some money and ask them to buy something with it according to their preferences. One person may prefer apples to bananas and bananas to kiwi fruit. <strong>Preference orderings</strong> are the rankings of alternatives, such as fruit.</p>
+
+<div class="no-row-height column-margin column-container"><div id="tbl-irrational" class="quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-irrational-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: irrational fruit preferences
+</figcaption>
+<div aria-describedby="tbl-irrational-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table">
+<tbody>
+<tr class="odd">
+<td><span class="emoji" data-emoji="apple">🍎</span></td>
+<td><span class="math inline">&gt;</span></td>
+<td><span class="emoji" data-emoji="banana">🍌</span></td>
+</tr>
+<tr class="even">
+<td><span class="emoji" data-emoji="banana">🍌</span></td>
+<td><span class="math inline">&gt;</span></td>
+<td><span class="emoji" data-emoji="kiwi_fruit">🥝</span></td>
+</tr>
+<tr class="odd">
+<td><span class="emoji" data-emoji="apple">🍎</span></td>
+<td><span class="math inline">&lt;</span></td>
+<td><span class="emoji" data-emoji="kiwi_fruit">🥝</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div></div><p>How many preference orderings are there? If you have three options, e.g., apples, bananas, and kiwi fruit, there are eight options $$, but not all are rational. If you prefer A to B, and B to C, then you also prefer A to C. In this case preferring C to A is not rational. We consider a preference ordering rational if it is <strong>transitive</strong>.</p>
+<p>If you have three options, there are <span class="math inline">3 \times 2 \times 1 = 6</span> rational preference orderings, as follows :</p>
+<ul>
+<li><span class="math inline">A &gt; B &gt; C</span></li>
+<li><span class="math inline">A &gt; C &gt; B</span></li>
+<li><span class="math inline">B &gt; A &gt; C</span></li>
+<li><span class="math inline">B &gt; C &gt; A</span></li>
+<li><span class="math inline">C &gt; A &gt; B</span></li>
+<li><span class="math inline">C &gt; B &gt; A</span>.</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div id="tbl-prefernce-ordering" class="quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-prefernce-ordering-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Preference ordering
+</figcaption>
+<div aria-describedby="tbl-prefernce-ordering-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table">
+<tbody>
+<tr class="odd">
+<td><span class="emoji" data-emoji="apple">🍎</span></td>
+<td><span class="math inline">&gt;</span></td>
+<td><span class="emoji" data-emoji="banana">🍌</span></td>
+<td><span class="math inline">&gt;</span></td>
+<td><span class="emoji" data-emoji="kiwi_fruit">🥝</span></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><span class="emoji" data-emoji="banana">🍌</span></td>
+<td><span class="math inline">&gt;</span></td>
+<td><span class="emoji" data-emoji="kiwi_fruit">🥝</span></td>
+<td><span class="math inline">&gt;</span></td>
+<td><span class="emoji" data-emoji="apple">🍎</span></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><span class="emoji" data-emoji="kiwi_fruit">🥝</span></td>
+<td><span class="math inline">&gt;</span></td>
+<td><span class="emoji" data-emoji="apple">🍎</span></td>
+<td><span class="math inline">&gt;</span></td>
+<td><span class="emoji" data-emoji="banana">🍌</span></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div></div><p>The <a href="https://en.wikipedia.org/wiki/Condorcet_paradox">Condorcet Paradox</a> of aggregation states that if you aggregate individual preferences, you might get irrational preference orderings, even when individual preferences are rational.</p>
+<p>e.g.&nbsp;<span class="math inline">C &gt; B &gt; A &gt; C</span>,</p>
+<p>even when individual preferences are rational. This can happen when people have different preferences.</p>
+<p>e.g., person 1 has preference</p>
+<ul>
+<li><span class="math inline">A &gt; B &gt; C</span>, person 2 has a preference</li>
+<li><span class="math inline">B &gt; C &gt; A</span> and person 3 has a preference ordering</li>
+<li><span class="math inline">C &gt; A &gt; B</span>.</li>
+</ul>
+<p>In such a situation, the aggregate preference ordering is not apparent. A possible solution is to order the preferences pairwise. Persons 2 and 3 prefer kiwi fruit to apples, so the aggregate preference is <span class="math inline">C &gt; A</span>. Other aggregate preference are</p>
+<ul>
+<li><span class="math inline">B &gt; C</span> and</li>
+<li><span class="math inline">A &gt; B</span>. So we get</li>
+<li><span class="math inline">C &gt; A &gt; B &gt; C</span></li>
+</ul>
+<p>This may have consequences, when we want to aggregate votes. Even when individuals vote rationally, there is no guarantee that the collective outcome is rational. This surprising outcome introduced in <span class="citation" data-cites="arrow1950figgiculty">(<a href="#ref-arrow1950figgiculty" role="doc-biblioref">Arrow 1950</a>)</span> by Economics Nobel Laureate <a href="https://en.wikipedia.org/wiki/Kenneth_Arrow">Kenneth Arrow</a> is called the <a href="https://en.wikipedia.org/wiki/Arrow's_impossibility_theorem">Arrow Impossibility theorem</a> in Game theory and Economics of social welfare.</p>
+<p>Since collective outcomes may not be rational, people may vote strategically, or there may be all kinds of political games where voters try to manipulate the outcome of an election into the desired result by misrepresenting their preferences.</p>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
+<p>Note: this page is based on the following source:</p>
+<ul>
+<li><span class="citation" data-cites="page2017modelthinking">(<a href="#ref-page2017modelthinking" role="doc-biblioref">Page 2014</a>)</span> MOOC, Course material &amp; Transcripts.</li>
+<li>TA Notes by <span class="citation" data-cites="fisher2017modelthinking">(<a href="#ref-fisher2017modelthinking" role="doc-biblioref">Fisher 2014</a>)</span>.</li>
+<li>Student notes by in <span class="citation" data-cites="kleinikink2016naturalmoney">(<a href="#ref-kleinikink2016naturalmoney" role="doc-biblioref">Klein Ikink 2016</a>)</span> and <span class="citation" data-cites="groh2017model">(<a href="#ref-groh2017model" role="doc-biblioref">Groh 2017</a>)</span>.</li>
+</ul>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Anderson72MoreIsDifferent" class="csl-entry" role="listitem">
+Anderson, P. W. 1972. <span>“More Is Different.”</span> <em>Science</em> 177 (4047): 393–96. <a href="https://doi.org/10.1126/science.177.4047.393">https://doi.org/10.1126/science.177.4047.393</a>.
+</div>
+<div id="ref-arrow1950figgiculty" class="csl-entry" role="listitem">
+Arrow, Kenneth. 1950. <span>“A Difficulty in the Concept of Social Welfare.”</span> <em>Journal of Political Economy</em> 58: 328–46. <a href="https://doi.org/doi:10.1086/256963">https://doi.org/doi:10.1086/256963</a>.
+</div>
+<div id="ref-cano2015qcr" class="csl-entry" role="listitem">
+Cano, Emilio L., Javier M. Moguerza, and Mariano Prieto Corcoba. 2015. <em>Quality Control with r. An ISO Standards Approach</em>. Use r! Switzerland: Springer. <a href="https://doi.org/10.1007/978-3-319-24046-6">https://doi.org/10.1007/978-3-319-24046-6</a>.
+</div>
+<div id="ref-cano2012sixsigma" class="csl-entry" role="listitem">
+Cano, Emilio L., Javier M. Moguerza, and Andrés Redchuk. 2012. <em>Six Sigma with r. Statistical Engineering for Process Improvement</em>. Vol. 36. Use r! New York: Springer. <a href="https://doi.org/10.1007/978-1-4614-3652-2">https://doi.org/10.1007/978-1-4614-3652-2</a>.
+</div>
+<div id="ref-fisher2017modelthinking" class="csl-entry" role="listitem">
+Fisher, Steve. 2014. <span>“Model Thinking – TA Notes.”</span> <a href="https://www.coursera.org/learn/model-thinking" class="uri">https://www.coursera.org/learn/model-thinking</a>; Coursera. November 2014.
+</div>
+<div id="ref-groh2017model" class="csl-entry" role="listitem">
+Groh, Rainer. 2017. <span>“Model Thinking - Course Notes by Rainer Groh.”</span> <a href="https://aerospaceengineeringblog.com/wp-content/uploads/2017/11/ModelThinking.pdf" class="uri">https://aerospaceengineeringblog.com/wp-content/uploads/2017/11/ModelThinking.pdf</a>. November 2017.
+</div>
+<div id="ref-kleinikink2016naturalmoney" class="csl-entry" role="listitem">
+Klein Ikink, Bart. 2016. <span>“Model Thinking.”</span> <a href="https://naturalmoney.org/modelthinking-01.html" class="uri">https://naturalmoney.org/modelthinking-01.html</a>. March 2016.
+</div>
+<div id="ref-minto1996minto" class="csl-entry" role="listitem">
+Minto, B., and V. Deutsch. 1996. <em>The Minto Pyramid Principle: Logic in Writing, Thinking, and Problem Solving</em>. Minto International, Incorporated. <a href="https://www.google.com/books?id=rPJVAAAACAAJ">https://www.google.com/books?id=rPJVAAAACAAJ</a>.
+</div>
+<div id="ref-page2017modelthinking" class="csl-entry" role="listitem">
+Page, Scott E. 2014. <span>“Model Thinking [MOOC].”</span> <a href="https://www.coursera.org/learn/model-thinking" class="uri">https://www.coursera.org/learn/model-thinking</a>; Coursera. November 2014.
+</div>
+<div id="ref-Wheeler1999InformationPQ" class="csl-entry" role="listitem">
+Wheeler, John Archibald. 1999. <span>“Information, Physics, Quantum: The Search for Links.”</span> In. <a href="https://api.semanticscholar.org/CorpusID:118325979">https://api.semanticscholar.org/CorpusID:118325979</a>.
+</div>
+</div>
+
+
+<div class="hidden" aria-hidden="true">
+<span class="glightbox-desc lightbox-desc-1">3D model hydrogen bonds in water <a href="https://commons.wikimedia.org/wiki/File:3D_model_hydrogen_bonds_in_water.svg">source</a></span>
+<span class="glightbox-desc lightbox-desc-2">Gas at high temperature <a href="https://commons.wikimedia.org/wiki/File:Gas-natural.jpg">source</a></span>
+<span class="glightbox-desc lightbox-desc-3">Figure&nbsp;1: Cellular Automata: A period 16 oscillator <a href="https://commons.wikimedia.org/wiki/Category:Animations_of_cellular_automata#/media/File:Day_and_Night_-_Oscillator_16.gif">source</a></span>
+<span class="glightbox-desc lightbox-desc-4">Figure&nbsp;2: Bell curve and empirical rule</span>
+<span class="glightbox-desc lightbox-desc-5">Six Sigma logo <a href="https://commons.wikimedia.org/wiki/File:Six_sigma-2.svg">source</a></span>
+<span class="glightbox-desc lightbox-desc-6">DMAIC <a href="https://en.wikipedia.org/wiki/Six_Sigma#/media/File:DMAICWebdingsI.png">source</a></span>
+<span class="glightbox-desc lightbox-desc-7">DMADV <a href="https://en.wikipedia.org/wiki/Six_Sigma#/media/File:DMAICWebdingsI.png">source</a></span>
+<span class="glightbox-desc lightbox-desc-8">Normal Distribution <a href="https://commons.wikimedia.org/wiki/File:6_Sigma_Normal_distribution.svg">source</a></span>
+<span class="glightbox-desc lightbox-desc-9">Figure&nbsp;4&nbsp;(a): John Conway <a href="https://en.wikipedia.org/wiki/John_Horton_Conway#/media/File:John_H_Conway_2005_(cropped).jpg">source</a></span>
+<span class="glightbox-desc lightbox-desc-10">Glider pattern</span>
+<span class="glightbox-desc lightbox-desc-11">counting neighbors for x</span>
+<span class="glightbox-desc lightbox-desc-12">counting neighbors full</span>
+<span class="glightbox-desc lightbox-desc-13">Bliker horizontal state</span>
+<span class="glightbox-desc lightbox-desc-14">Blinker vertical state</span>
+<span class="glightbox-desc lightbox-desc-15">Configuration 3a</span>
+<span class="glightbox-desc lightbox-desc-16">Configuration 3b</span>
+<span class="glightbox-desc lightbox-desc-17">Beacon</span>
+<span class="glightbox-desc lightbox-desc-18">Figure 8</span>
+<span class="glightbox-desc lightbox-desc-19">F-Pimento</span>
+<span class="glightbox-desc lightbox-desc-20">256 rules</span>
+<span class="glightbox-desc lightbox-desc-21">a new kind of science</span>
+<span class="glightbox-desc lightbox-desc-22">Rule 30 in Netlogo</span>
+<span class="glightbox-desc lightbox-desc-23">Rule numbering</span>
+<span class="glightbox-desc lightbox-desc-24">Rule 110 with random start</span>
+<span class="glightbox-desc lightbox-desc-25">Behavior classes versus Lambda</span>
+</div>
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2023,
+  author = {Bochman, Oren},
+  title = {Lesson 3 - {Aggregation}},
+  date = {2023-08-03},
+  url = {https://orenbochman.github.io/blog//notes/model_thinking/w03.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2023" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2023. <span>“Lesson 3 - Aggregation.”</span> August 3,
+2023. <a href="https://orenbochman.github.io/blog//notes/model_thinking/w03.html">https://orenbochman.github.io/blog//notes/model_thinking/w03.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","descPosition":"bottom","loop":false,"openEffect":"zoom","closeEffect":"zoom"});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

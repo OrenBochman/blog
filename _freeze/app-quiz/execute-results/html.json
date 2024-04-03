@@ -1,0 +1,12 @@
+{
+  "hash": "1813052c890e07589b8601d327cd1aad",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: Quiz App\nformat: html\nfilters:\n  - shinylive\ndraft: true\n---\n\n::: callout-note\n## Test your understanding\n```{shinylive-python}\n#| standalone: true\n#| components: [viewer]\n#| layout: horizontal\n#| viewerHeight: 250\nfrom shiny import App, render, ui, reactive, req\nimport json\nfrom pathlib import Path\n\nwith open(Path(__file__).parent / \"questions.json\", \"r\") as file:\n    questions = json.load(file)\n\napp_ui = ui.page_fluid(ui.output_ui(\"question\"), ui.output_ui(\"validation\"))\n\n\ndef server(input, output, session):\n    q_num = reactive.Value(0)\n\n    question_keys = list(questions.keys())\n\n    @reactive.Calc\n    def current_q():\n        return questions[question_keys[q_num()]]\n\n    @output\n    @render.ui\n    def question():\n        return ui.div(\n            ui.h5(question_keys[q_num()], style=\"margin-bottom: 20px\"),\n            ui.input_radio_buttons(\n                \"question\",\n                \"\",\n                choices=current_q()[\"choices\"],\n                selected=\"\",\n            ),\n        )\n\n    @output\n    @render.ui\n    def validation():\n        req(input.question())\n        if input.question() == current_q()[\"answer\"]:\n            if q_num() == len(question_keys) - 1:\n                return ui.p(\"Correct! Quiz complete.\")\n            else:\n                return ui.div(\n                    ui.p(\"Correct!\"), ui.input_action_button(\"next\", \"Next Question\")\n                )\n        return ui.p(\"Not quite right, try again\")\n\n    @reactive.Effect\n    @reactive.event(input.next)\n    def next_question():\n        q_num.set(q_num.get() + 1)\n\n\napp = App(app_ui, server)\n## file: questions.json\n{\"What ui input is used for plots?\": {\"choices\": [\"ui.input_plot\", \"ui.plot_input\", \"ui.plotInput\"], \"answer\": \"ui.input_plot\"}, \"How do you remove a reacitve link??\": {\"choices\": [\"reactive.isolate\", \"req\", \"reactive.Effect\"], \"answer\": \"reactive.isolate\"}, \"What should you use to save an image of a plot to disk?\": {\"choices\": [\"reactive.Calc\", \"@ui.output_plot\", \"reactive.Effect\"], \"answer\": \"reactive.Effect\"}}\n```\n:::\n\n\n",
+    "supporting": [
+      "app-quiz_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

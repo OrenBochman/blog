@@ -1,0 +1,637 @@
+---
+date: 2023-08-03
+title: Lesson 3  - Aggregation
+categories: ["model thinking", "Aggregation", "central limit theorem", "Six Sigma", "Conway's game of life", "Cellular automata", "Langton’s Lambda", "Condorcet paradox","Arrow Impossibility theorem"]
+execute:
+    cache: false
+draft: False
+editor: 
+  markdown: 
+    wrap: sentence
+---
+
+> More is different.
+> --- Physics Nobel Laureate [Phillip Anderson](https://en.wikipedia.org/wiki/Philip_W._Anderson), Nobel Memorial Prize Laureate
+
+::: {#cau-bs-or-not .callout-caution collapse="true" icon="false"}
+### :imp: BS :poop: or 💰 for real? {.unlisted}
+
+Whenever we hear a physicist make a big claim, but not about physics, I get skeptical and may even play the devil's advocate :imp:.
+Physicists are trained to be astute observers, and many are sharp thinkers.
+
+1.  Why isn't he doing Physics?
+2.  How does he even know that his methods can fit in the social science/etc paradigm?
+3.  Is he making outrageous claims?
+
+Recall two sad truths about physics:
+
+-   Quantum theories frequently fail to aggregate to scales of human experience, AKA the classical limit.
+-   There isn't a Quantum theory of gravity that aggregates to relativistic scales[^1]. And I never heard of other quantum theories that did.
+
+So physicists could stick to physics and determine how Aggregation works.
+That said, I must admit that Phillip W. Anderson knows what he is talking about—even if I don't like how his point is presented.
+:::
+
+[^1]: yet gravity is the oldest force physicists discovered.
+
+Aggregation can capture the emergent properties of a system, which gets interesting when an emergent phenomenon diverges from the behaviors of its constituent parts.
+[The key question is "How does more become different?"]{.mark}
+
+The most prominent model for Aggregation is the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem) that arises from the [Law of Large Numbers](https://en.wikipedia.org/wiki/Law_of_large_numbers) with the requirements that we aggregate over many similar non-interacting units with bounded effects.
+This leads us to easy mean and variance estimates using the [empirical rule](#sec-agg-empirical-rule).
+
+Next, I would use more general statistical summary functions that we call **population parameters** if we can track the entire system or **model statistics** if we can only sample from the population.
+There may be different levels of aggregation possible for our model.
+Preferences and ordered relations can be challenging to aggregate in a way that maintains transitivity.
+However, it is relatively easy to aggregate demand patterns.
+
+## Aggregation {#sec-agg-introduction}
+
+::: {#tip-aggregation-tldr .callout-tip}
+### :peanuts: Aggregation in a nutshell {.unlisted .unnumbered}
+
+1.  more is different
+2.  :bell: When small changes stack up, you are in the Central Limit Zone
+3.  :dragon: Otherwise, you are in a danger zone [^2]
+:::
+
+[^2]: be very careful.
+
+Aggregation can lead to unexpected results, and we refer to this phenomenon using "more is different" in deference to [@Anderson72MoreIsDifferent].
+
+::: {#exm-agg-water}
+Can we consider a single water molecule to be wet?
+Not if wetness is an emergent property of multiple water molecules.[^3]
+But, the three phases of water also require aggregation.
+So we are dealing with problematic definitions.
+:::
+
+[^3]: How does wetness arise?
+    :thought_balloon: Isn't two water molecules sharing an [H bond](https://en.wikipedia.org/wiki/Hydrogen_bond)?
+    Aren't other liquids like mercury also wet?
+    :thinking: Once we figure that we are aggregate over h-bonds, we see this isn't a case of more is different but an ecological fallacy [:x:](https://en.wikipedia.org/wiki/Ecological_fallacy)
+
+![3D model hydrogen bonds in water [source](https://commons.wikimedia.org/wiki/File:3D_model_hydrogen_bonds_in_water.svg)](images/mt_hydrogen_bonds_in_water.png)
+
+::: {#exm-agg-neuron}
+Can a single neuron explain consciousness, cognition, or individual characteristics?
+[^4] No more than a single cogwheel could explain the working of a clock.
+:::
+
+[^4]: what are these phenomena :thought:, how are they measured :thinking: ?
+    An ant or a rat has brains but doesn't exhibit consciousness, etc - so this is not just a consequence of neuron aggregation; this is another [:x:](https://en.wikipedia.org/wiki/Ecological_fallacy).
+
+::: {#exm-agg-schelling}
+Schelling's model exhibits segregation for fairly tolerant individuals and mixing for highly intolerant ones.
+💰💰
+:::
+
+![Gas at high temperature [source](https://commons.wikimedia.org/wiki/File:Gas-natural.jpg)](images/mt_gas.jpg)
+
+::: {#exm-agg-temperature}
+Atoms of gas have variable kinetic energy, but temperature and pressure are statistical aggregates for these, and one molecule has little bearing on the aggregate.
+💰💰💰
+:::
+
+Cellular automata show how complexity can arise from very simple rules.
+[^5]
+
+[^5]: This is surprising when you first learn about it :thinking:, not so much afterwards.
+    After all this is a rehash of any number of ideas - like [the halting problem](https://en.wikipedia.org/wiki/Halting_problem), [inverse problems](https://en.wikipedia.org/wiki/Inverse_problem#:~:text=An%20inverse%20problem%20in%20science,measurements%20of%20its%20gravity%20field.), and the axiom of choice - proving existence of arbitrary functions - without giving access to the rule.
+    e.g., the function for all winning lottery tickets on a given day :poop: So complexity exists, but how is the game of life teaching us about aggregation?
+
+![Cellular Automata: A period 16 oscillator [source](https://commons.wikimedia.org/wiki/Category:Animations_of_cellular_automata#/media/File:Day_and_Night_-_Oscillator_16.gif)](images/mt_Day_and_Night_-_Oscillator_16.gif){#fig-agg-glider}
+
+We considered Aggregation via the following mechanism:
+
+1.  Stacking small changes with the Central Limit theorem.
+2.  Using a single to aggregate behavior in the game of life.
+3.  Using a family of rules: how to aggregate using one-dimensional cellular automata models
+4.  Preferences: how to aggregate preferences, e.g., to make collective choices.
+
+We model for the following reasons:
+
+1.  predict points
+2.  understand data, e.g., using a bell-shaped curve
+3.  understand patterns, e.g., the glider pattern in the game of life
+4.  understand the class of outcome, e.g., using one-dimensional cellular automata models
+5.  work through logic, e.g., difficulties arise with the aggregation of preferences.
+
+## Central limit theorem {#sec-agg-central-limit-theorem}
+
+A **Probability Distribution** lists a variable's different outcomes, each with its likelihood of occurring.
+
+The **Central Limit Theorem** states that if we add up a large enough series of independent variables, the distribution will follow a normal distribution characterized by a bell–shaped curve.
+The most likely outcome, the mean $μ$, is in the middle of the curve.
+
+We can simulate this process by flipping coins a large number of times.
+
+::: {#exa-counting-heads}
+When we toss a fair coin two times, how many heads will we see, and at what likelihood?
+
+| Col1 | Col2  |
+|------|-------|
+| 2H   | $1/4$ |
+| 1H   | $1/2$ |
+| 0H   | $1/4$ |
+
+: Binomial distribution for two coin flips
+
+When you flip a coin 4 times, the outcomes
+
+| Col1 | Col2   |
+|------|--------|
+| 4H   | $1/16$ |
+| 3H   | $4/16$ |
+| 2H   | $6/16$ |
+| 1H   | $4/16$ |
+| 0H   | $1/16$ |
+
+And when we flip a coin N times:
+
+For N coin flips:
+
+$$
+P(X=k)={n \choose k} p^k(1-p)^{n-k}\qquad
+$$ {#eq-binomial-distribution}
+
+Success in N coin flips follows a Binomial distribution.
+
+$$
+\mu=pN \qquad
+$$ {#eq-binomial-mean}
+
+$$ 
+\sigma = p \times (1-p) \times n \qquad
+$$ {#eq-binomial-sigma}
+:::
+
+For $N>>20$, the Binomial distribution becomes more like the Normal distribution.
+
+## The Empirical Rule {#sec-agg-empirical-rule}
+
+![Bell curve and empirical rule](images/mt_bell_curve.jpg){#fig-empirical-rule}
+
+The standard deviation $\sigma$ parameter determines how the normal distribution curve is spread.
+We can use these values to build confidence intervals:
+
+| SD of Standard Normal | \% of Values |
+|-----------------------|--------------|
+| $\sigma$              | 68           |
+| $2\sigma$             | 95           |
+| $3\sigma$             | 99.7         |
+
+: The Empirical Rule
+
+e.g., set the mean $\mu$ to 100, and the standard deviation $\sigma$ to 3, then for 95% of all cases, the outcome will fall in \[94, 106\].
+
+In a Binomial distribution where $p = 1/2$ like flipping coins, $\sigma = (\sqrt{N})/2$, thus when $N = 100$, the mean is $100/2 = 50$, and the standard deviation $\sigma=√100/2 = 5$.
+
+In general, Binomial distributions have a standard deviation of success for N trials:
+
+$$
+\sigma = \sqrt{(p(1-p)N)}
+$$ {eq-binom-sd}
+
+When $p = \frac{1}{2}$ then this simplifies to: $$
+\sigma =  \frac{\sqrt{N}}{2} 
+$$ {eq-binom-sd-std}
+
+We can now use this standard deviation to make statistical inferences.
+Airlines overbook to increase their profits, so they need to know the probability of someone not getting a seat.
+This allows them to estimate the expected cost of offering people a second ticket to take the next flight.
+
+::: {#exm-plane-seats}
+### Flight Overbooking
+
+```{python}
+import math
+p=0.9           # show up rate
+seats = 380     # seat on plane
+tickets = 400   # tickets sold
+mean = 360      # mean tickets sold
+sigma = round(math.sqrt(p*(1-p)*tickets))
+lb99 = mean - 3*sigma
+ub99 = mean + 3*sigma
+print(f'mu={mean}, sigma={sigma}, 97.5 CI = [{lb99},{ub99}]')
+```
+
+-   A Boeing 747 has `{python} seats` seats
+-   There is a `{python} p` show-up rate,
+-   let's assume people show up independently of each other.
+-   400 tickets were sold. i.e. $N = 400$,
+-   The mean $μ = `{python} mean`$
+-   The standard deviation is $\sigma = \sqrt{(0.9\times(1-0.9)\times 400)} = \sqrt{36} = 6$. we can now use the [Empircal rule]() to estimate a 99.7 confidence interval:
+-   in 99.75% of cases, the number of passengers will be in \[`{python} lb99`, `{python} ub99`\].
+:::
+
+[The Central Limit theorem states that stacking IID random variables drawn from any distribution possessing finite mean and variance will aggregate to normal distribution]{.mark}.
+Much of the world's predictability stems from exceptional events never being observed.
+Rare events called **black swans** are usually products of heavy-tailed distributions that cannot be aggregated using the central limit theorem.
+
+If the events are not independent the central limit may be inaccurate or even fail completely to model the aggregation
+
+## Six sigma {#sec-agg-six-sigma}
+
+::: {#fig-agg-six_sigma layout="[ [2,-.5, 2], [1] ]"}
+![Six Sigma logo [source](https://commons.wikimedia.org/wiki/File:Six_sigma-2.svg)](images/mt_six_sigma.png){height="250"}
+
+::: {layout="[ [1], [1] ]"}
+![DMAIC [source](https://en.wikipedia.org/wiki/Six_Sigma#/media/File:DMAICWebdingsI.png)](images/mt_DMAIC.png){height="100"}
+
+![DMADV [source](https://en.wikipedia.org/wiki/Six_Sigma#/media/File:DMAICWebdingsI.png)](images/mt_DMADV.png){height="100"}
+:::
+
+![Normal Distribution [source](https://commons.wikimedia.org/wiki/File:6_Sigma_Normal_distribution.svg)](images/mt_6_Sigma_Normal_distribution.png){height="180"}
+
+Six Sigma
+:::
+
+The idea of managing variance beyond three times the variance to work with sigmas has been embraced in the Six Sigma project management and planning system.
+
+::: {#cau-six-sigma .callout-caution}
+## Six sigma In a nutshell {.unlisted .unnumbered}
+
+**Six Sigma** is a project management methodology, not an aggregation method.
+
+We will revisit it later when it is time to consider the tradeoffs between reducing variation as practiced in **Six Sigma** and increasing variation to speed up convergence in **Replicator Dynamics**.
+:::
+
+When I asked friends who worked at Motorola, they said that one department used it to win prizes in the company.
+Still, it never really caught on to become the ubiquitous management technique its proponents have touted.
+
+Even with extensive training, statistics can be challenging in most business scenarios.
+Recall that Ronald Fischer's influential works were prescriptive how-to manuals that did little to impart their authors' depth of knowledge.
+That said, even a little statistics can go a long way.
+
+[Six Sigma](https://en.wikipedia.org/wiki/Six_Sigma) is a quality control or process improvement methodology developed by engineer [Bill Smith](https://en.wikipedia.org/wiki/Bill_Smith_(Motorola_engineer)) at Motorola.
+$6\sigma$ is applied within each of [DMAIC](https://en.wikipedia.org/wiki/DMAIC) five steps for improving existing projects, and for planning new projects, $6\sigma$ [DMADV](https://en.wikipedia.org/wiki/Six_Sigma#DMADV) is used.
+
+::: {#tip-MINTO .callout-important}
+## DMAIC v.s. Minto Pyramid with SCQA & MECE tools {.unlisted .unnumbered}
+
+While the DMAIC framework is practical for organizing research, it has many drawbacks for reporting the results, particularly to executives.
+
+The eponymous Pyramid Method introduced in [@minto1996minto] by Barbara Minto while working at McKinsey, the [Minto pyramid](https://modelthinkers.com/mental-model/minto-pyramid-scqa), and the following two methods can be used with it to structure storytelling for data analysis and to explain the use of Models.
+
+| SCQA         | MECE         |
+|--------------|--------------|
+| Situation,   | Mutably      |
+| Complication | Exclusive    |
+| Question     | Collectively |
+| Answer       | Exhaustive   |
+
+: SCQA & MECE #{tbl-MINO-method}
+:::
+
+$6\sigma$ assigns roles to practitioners:
+
+-   **Master Black Belts**, are identified by the champions to act as Six Sigma mentors. They are expected to devote all their full time to Six Sigma, assisting the champions and guiding Black Belts and Green Belts. In addition to statistical tasks, they should ensure that Six Sigma is applied consistently across departments. **Black Belts** work under the Master Black Belt to apply $6\sigma$ to specific projects. Their responsibility is running $6sigma$ projects. Champions and Master Black Belts are tasked with identifying projects for $6\sigma$. **Green Belts** are employees tasked with implementing Six Sigma alongside their other responsibilities. They operate under the supervision of Black Belts..
+
+The main idea is to control the process to reduce the defects to below 3.4 per million opportunities or six standard deviations.
+
+::: {#exm-agg-six-sigma-bananas}
+## the 6 sigma banana store
+
+-   Let the mean banana sales be $\mu= 500 kg$,
+-   and the sd of $\sigma= 10 kg$,
+-   How much stock of bananas is required to cope with a Six Sigma event?
+
+Six Sigma is 60 kg, so 560 kg of bananas are required.
+:::
+
+Remember, we are talking about a 2-in-a-billion frequency for these defects.
+They will only manifest in huge-scale situations, like big factories.
+
+::: {#exm-agg-six-sigma-washers}
+## washers
+
+The required metal thickness is between 500 and 560 mm in production.
+Assuming the outcome is normally distributed, then:
+
+$$
+\mu=530
+$$
+
+Then $\sigma$ should be 5 or less.
+$$
+\sigma = 560-500/2=30 \implies tolerance = 30/6 = 5 mm.
+$$
+:::
+
+::: {#exm-agg-six-sigma-tires}
+## tires
+
+A production process creates tires with:
+
+-   an average diameter of $\mu=20$ inches and
+-   a standard deviation of $sd=0.1$ inch.
+-   What is the Six Sigma range?
+
+$20 \pm 6\times 0.1= [19.4,20.6]$
+:::
+
+## $6\sigma$ Models and Methods :
+
+::: {#nte-agg-six-sigma-extra .callout-note}
+### Extra Content {.unlisted .unnumbered}
+
+I was curious about the statistics used in this framework, so I researched Six Sigma, drawing on [@cano2012sixsigma, @cano2015qcr] and using Wikipedia.
+This is my summary.
+
+-   [Root cause analysis](https://en.wikipedia.org/wiki/Root_cause_analysis "Root cause analysis")
+    -   [5 Whys](https://en.wikipedia.org/wiki/Five_whys) - a root cause analysis
+    -   Cause & effects diagram (also known as fishbone or [Ishikawa diagram](https://en.wikipedia.org/wiki/Ishikawa_diagram "Ishikawa diagram")) - a root cause analysis
+-   Statistical and fitting tools
+    -   [Regression analysis](https://en.wikipedia.org/wiki/Regression_analysis "Regression analysis")
+    -   [General linear model](https://en.wikipedia.org/wiki/General_linear_model "General linear model") - Extends regression analysis.
+    -   [ANOVA](https://en.wikipedia.org/wiki/Analysis_of_variance "Analysis of variance") - Analysis of variance is a regression that explains variation within and between groups.\
+    -   [ANOVA Gauge R&R](https://en.wikipedia.org/wiki/ANOVA_gauge_R&R) ANOVA Gauge repeatability and reproducibility is a measurement systems analysis technique that uses an ANOVA random effects model to assess a measurement system.
+    -   [Correlation](https://en.wikipedia.org/wiki/Correlation "Correlation")
+    -   [Chi-squared test](https://en.wikipedia.org/wiki/Chi-squared_test "Chi-squared test") - hypothesis testing on contingency tables.
+    -   [Design of experiments](https://en.wikipedia.org/wiki/Design_of_experiments "Design of experiments")
+    -   [Stratification](https://en.wikipedia.org/wiki/Stratified_sampling "Stratified sampling")
+-   Visualizations
+    -   [Scatter diagram](https://en.wikipedia.org/wiki/Scatter_diagram "Scatter diagram")
+    -   [Histograms](https://en.wikipedia.org/wiki/Histogram "Histogram")/[Pareto analysis](https://en.wikipedia.org/wiki/Pareto_analysis "Pareto analysis")/[Pareto chart](https://en.wikipedia.org/wiki/Pareto_chart "Pareto chart")
+    -   [Pick chart](https://en.wikipedia.org/wiki/Pick_chart "Pick chart")/[Process capability](https://en.wikipedia.org/wiki/Process_capability "Process capability")/[Rolled throughput yield](https://en.wikipedia.org/wiki/Rolled_throughput_yield "Rolled throughput yield")
+    -   [Control chart](https://en.wikipedia.org/wiki/Control_chart "Control chart")/Control plan (also known as a swimlane map)/[Run charts](https://en.wikipedia.org/wiki/Run_chart "Run chart")
+-   TQM Methodologies
+    -   [Axiomatic design](https://en.wikipedia.org/wiki/Axiomatic_design "Axiomatic design") - a systems design methodology that uses matrix-based methods to analyze the transformation of customer needs into functional requirements.[^6]
+    -   [Business Process Mapping](https://en.wikipedia.org/wiki/Business_Process_Mapping "Business Process Mapping")/[Check sheet](https://en.wikipedia.org/wiki/Check_sheet "Check sheet")
+    -   [Cost–benefit analysis](https://en.wikipedia.org/wiki/Cost%E2%80%93benefit_analysis)
+    -   [CTQ tree](https://en.wikipedia.org/wiki/CTQ_tree "CTQ tree") Critical-to-quality trees are the key measurable characteristics of a product whose performance standards must be met to satisfy the customer.
+    -   [Quality Function Deployment](https://en.wikipedia.org/wiki/Quality_Function_Deployment "Quality Function Deployment") (QFD)
+    -   [Quantitative marketing research](https://en.wikipedia.org/wiki/Quantitative_marketing_research "Quantitative marketing research") through use of [Enterprise Feedback Management](https://en.wikipedia.org/wiki/Enterprise_Feedback_Management "Enterprise Feedback Management") (EFM) systems
+    -   [SIPOC](https://en.wikipedia.org/wiki/SIPOC "SIPOC") analysis (**S**uppliers, **I**nputs, **P**rocess, **O**utputs, **C**ustomers)
+    -   [Taguchi methods](https://en.wikipedia.org/wiki/Taguchi_methods "Taguchi methods")/[Taguchi Loss Function](https://en.wikipedia.org/wiki/Taguchi_Loss_Function "Taguchi Loss Function")
+    -   [Value stream mapping](https://en.wikipedia.org/wiki/Value_stream_mapping "Value stream mapping")
+
+If most of these are familiar, perhaps we should complete the black belt training on LinkedIn!
+:::
+
+[^6]: Axiomatic design - Wikipedia.
+    https://en.wikipedia.org/wiki/Axiomatic_design
+
+## Game of life {#sec-game-of-life}
+
+::: {#fig-agg-game-of-life layout-ncol="2"}
+![John Conway [source](https://en.wikipedia.org/wiki/John_Horton_Conway#/media/File:John_H_Conway_2005_(cropped).jpg)](images/mt_john_conway.jpg){#fig-agg-conway height="200"}
+
+![Glider pattern](images/mt_glider.jpg){height="200"}
+
+Conway's Game of Life
+:::
+
+[John Conway's](https://en.wikipedia.org/wiki/John_Horton_Conway) [game of life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) is a model for artifical life that shows.
+In essense it aggregate activity stemming from a single rule at differnt location that can leads to surprisingly complex system.
+
+In the system thinking paradigm, the worldview is that all parts of the system under study are interconnected.
+In this paradigm, inferring how macro-behavior emerges from micro-motives is one of the main challenges for researchers.
+Viewed through this system-thinking prism, the game of life is a microcosm whose emergent complexity is an analog of the challenges of aggregation in the real world.
+,
+
+The glider pattern shown above reconstructs shifted diagonally.
+
+::: callout-tip
+## Boosting and Bagging
+
+Aggregating simple rules in series or parallel called bagging and boosting, results in complex rules c.f.
+[random forest]() and [feed forward neural networks]().
+:::
+
+::: callout-tip
+## Turing Complete
+
+It is no surprise that the game of life is complex once we factor in that it is a complete system, that the grid is part of the initial grid, and that its evolution is all part of the system.
+:::
+
+The game of life is simulated on a grid whose cells can be either alive or dead.
+
+-   if a cell is off, it will only turn on if precisely 3 of the 8 cells in the [Moore neighborhood](https://en.wikipedia.org/wiki/Moore_neighborhood) are on.
+-   if a cell is on, it will only stay on if 2 or 3 of the 8 neighbors in the Moore Neighborhood are on.
+
+::: {#fig-agg-life_blinker layout-ncol="2"}
+![counting neighbors for x](images/mt_go_board.jpg)
+
+![counting neighbors full](images/mt_config_1.jpg)
+
+counting neighbors
+:::
+
+In this case, x has two neighbors, so it will turn on in the next time step.
+Estimating the next step requires counting neighbors and applying the rules.
+
+::: {layout-ncol="2"}
+![Bliker horizontal state](images/mt_config_2a.jpg)
+
+![Blinker vertical state](images/mt_config_2b.jpg)
+
+a period 2 blinker (oscillator)
+:::
+
+The following rules use the 8 cells of the [Moore neighborhood](https://en.wikipedia.org/wiki/Moore_neighborhood)
+
+1.  A living cell with less than two neighbors dies.
+2.  A living cell with two or three neighbors will stay alive.
+3.  A living cell with more than three neighbors dies.
+4.  A dead cell with exactly three live neighbors will spawn a live cell.
+
+note: this is called the B3/S23 rule c.f.
+[rules](https://conwaylife.com/wiki/Tutorials/Rules) and many other rules exist.
+
+::: {#fig-agg-life_3 layout-ncol="2"}
+![Configuration 3a](images/mt_config_3a.jpg)
+
+![Configuration 3b](images/mt_config_3b.jpg)
+:::
+
+This allows us to consider different cell configurations.
+#1 with 2 cells on dies #2a with 3 cells on will flip into #2b then flip back into #2a.
+This is a **blinker** that oscillates between the two states.
+The game can also produce units that keep growing.
+c.f.
+#3a and #3b.
+
+We can use the NetLogo program to simulate the evolution of different patterns, such as the Beacon, Figure 8, and the F-Pimento.
+
+The beacon behaves like a blinker and moves back and forth between two states.
+
+::: {#fig-agg-life_4 layout-ncol="3"}
+![Beacon](images/mt_beacon.jpg)
+
+![Figure 8](images/mt_figure8.jpg)
+
+![F-Pimento](images/mt_fpimento.jpg)
+
+Additional Patterns
+:::
+
+The Figure 8 pattern is periodic, with a cycle length of 8 steps, generating a sequence of complex patterns.
+The F-Pimento pattern moves in space generating gliders.
+
+We could say that even simple brain cells, following basic rules, can give rise to complexity of thinking, remembering, and understanding.
+
+The Game of Life doesn't spell out how our minds work, but it intimates that our thoughts may just be an aggregate of these simpler parts working together. A glider pattern is a cool example of this: it's when a shape moves across the board, popping up again in a new spot after a few moves
+
+Like other dynamical systems, the game of life exhibits four classes of behavior.
+
+![Classes of outcomes](images/mt_class_outcome.jpg){.column-margin}
+These are:
+
+stable cyclic random complex
+
+The game of life demonstrates that:
+
+Emergence - complex behaviors like guns and gliders arise from a few simple rules and initial conditions.
+Self Organization: Patterns appear without a designer.
+The logic of complex systems can be simple.
+
+## Cellular automata {#sec-cellular-automata}
+
+![256 rules](images/mt_rules.jpg){.column-margin}
+
+[![a new kind of science](images/mt_a_new_kind_of_science.png){.column-margin}](https://www.wolframscience.com/nks/)
+
+[John von Neumann](https://en.wikipedia.org/wiki/John_von_Neumann) a Hungarian-American mathematician and physicist introduced  Cellular automata. The game of life is a type of cellular automata.
+We focused on one-dimensional cellular automata to see that the notions of complex systems we have just explored can be seen even when we restrict these rule-based systems to a single dimension.
+The restriction reduces the number of neighbors available in the rules.
+These automata are more straightforward to enumerate and study in detail.
+Some of this work is collected in [A New Kind of Science](https://www.wolframscience.com/nks/) by the author [Stephen Wolfram](https://en.wikipedia.org/wiki/Stephen_Wolfram).
+
+The cellular automata models we considered were one-dimensional, which made their rules simpler than the ones used in the game of life.
+
+-   Cells have two neighbors, except those on the borders.
+-   This lets us write out all possible rules
+-   We can also track the model's evolution along the vertical axis.
+
+
+So, think of it like a game where you have a cell that can be either on or off, and its fate is decided by its own current state along with the state of its neighbors on each side. Picture three cells in a row - together, they can end up in eight different combinations. Now, for each of these combinations, our middle cell has two choices: it can either light up (on) or stay dark (off).
+
+![Rule 30 in Netlogo](images/mt_rule_netlogo.jpg){.column-margin}
+
+This setup gives us 256 different ways (or rules) to determine what happens to our middle cell based on those three-cell setups. It's kind of like flipping switches on or off depending on the pattern you see.
+
+We can keep track of these rules by assigning them numbers, kind of like naming each unique switch-flipping strategy. For the cell to turn on or off when all three cells are off, we decide if this situation is a "1" (turn on) or a "0" (stay off), and we do this for all eight combinations. In one of the scenarios we're talking about, the pattern is called "00001110" in binary code, which translates to 30. 
+
+The image shows what happens with this rule number 30 in action for the first few steps. We can simulate this rule using Netlogo, and it will show a complex pattern and behavior where the middle cell is tough to predict in advance.
+
+![Rule numbering](images/mt_rule_110.jpg){.column-margin}
+
+Rule 110. creates an increasing triangle.
+If we simulate it in Netlogo, you will see a complex pattern of triangles nested in the main triangle, while cells to the right side are empty blank.
+
+![Rule 110 with random start](images/mt_rule_110_random.jpg){.column-margin}
+
+Those models have four different types of outcomes:
+
+-   fixed state
+-   alternation
+-   randomness
+-   complexity
+
+[The question is why do rules go to a specific state? Or more specifically what creates chaos, what creates complexity and what creates order?]{.mark}
+
+The fact that such simple models lead to such complexity has led physicists like [John Wheeler](https://en.wikipedia.org/wiki/John_Archibald_Wheeler) to suggest in [@Wheeler1999InformationPQ] that reality itself may arise out of binary processes.
+This idea is called [it from bit](https://historyofinformation.com/detail.php?id=5041)
+
+## Langton's Lambda {#sec-agg-langton-lambda}
+
+![Christopher Langton](images/mt_langton.png){column-margin}
+
+![Behavior classes versus Lambda](images/mt_lambda_classes.jpg){.column-margin}
+
+Langton's Lambda $\lambda$ can tell what the outcomes look like.
+[Langton asked a much simpler question: How many things go on?]{.mark}
+e.g., in rule 30, four cells out of eight switch on.
+Lambda is the percentage of cells that go on; in this case, $\lambda = 4/8 = 1/2$.
+For rule 110, $\lambda = 5/8$.
+
+Based on the Lambdas values, we will see differnt behavior:
+
+-   if $\lambda = 0$ then all cells die off;
+-   if $\lambda = 1/8$ then the system blinks;
+-   if $\lambda = 1$ then all cells switch on;
+-   if $\lambda$ is in \[3/8, 5/8\], most of the complex or random patterns will appear.
+
+Thus intermediate levels of codependence tend to create complexity and randomness.  Pattern trading is an idea of tracking such intermediate levels of interdependence in markets, which present to complex patterns.
+
+## Preference Aggregation {#sec-preference-aggregation}
+
+**Preference aggregation** follows a different mathematical structure.
+It differs from what we learned on aggregating numbers with the central limit theorem or even aggregating rules for cellular automata.
+
+We enumerate preferences through revealed actions \[w03-5\].
+You can give people some money and ask them to buy something with it according to their preferences.
+One person may prefer apples to bananas and bananas to kiwi fruit.
+**Preference orderings** are the rankings of alternatives, such as fruit.
+
+|          |     |              |
+|----------|-----|--------------|
+| :apple:  | $>$ | :banana:     |
+| :banana: | $>$ | :kiwi_fruit: |
+| :apple:  | $<$ | :kiwi_fruit: |
+
+: irrational fruit preferences {#tbl-irrational .column-margin}
+
+How many preference orderings are there?
+If you have three options, e.g., apples, bananas, and kiwi fruit, there are eight options \$\$, but not all are rational.
+If you prefer A to B, and B to C, then you also prefer A to C.
+In this case preferring C to A is not rational.
+We consider a preference ordering rational if it is **transitive**.
+
+If you have three options, there are $3 \times 2 \times 1 = 6$ rational preference orderings, as follows :
+
+-   $A > B > C$
+-   $A > C > B$
+-   $B > A > C$
+-   $B > C > A$
+-   $C > A > B$
+-   $C > B > A$.
+
+|              |     |              |     |              |     |
+|--------------|-----|--------------|-----|--------------|-----|
+| :apple:      | $>$ | :banana:     | $>$ | :kiwi_fruit: |     |
+| :banana:     | $>$ | :kiwi_fruit: | $>$ | :apple:      |     |
+| :kiwi_fruit: | $>$ | :apple:      | $>$ | :banana:     |     |
+
+: Preference ordering {#tbl-prefernce-ordering .column-margin}
+
+The [Condorcet Paradox](https://en.wikipedia.org/wiki/Condorcet_paradox) of aggregation states that if you aggregate individual preferences, you might get irrational preference orderings, even when individual preferences are rational.
+
+e.g. $C > B > A > C$,
+
+even when individual preferences are rational.
+This can happen when people have different preferences.
+
+e.g., person 1 has preference
+
+-   $A > B > C$, person 2 has a preference
+-   $B > C > A$ and person 3 has a preference ordering
+-   $C > A > B$.
+
+In such a situation, the aggregate preference ordering is not apparent.
+A possible solution is to order the preferences pairwise.
+Persons 2 and 3 prefer kiwi fruit to apples, so the aggregate preference is $C > A$.
+Other aggregate preference are
+
+-   $B > C$ and
+-   $A > B$. So we get
+-   $C > A > B > C$
+
+This may have consequences, when we want to aggregate votes.
+Even when individuals vote rationally, there is no guarantee that the collective outcome is rational.
+This surprising outcome introduced in [@arrow1950figgiculty] by Economics Nobel Laureate [Kenneth Arrow](https://en.wikipedia.org/wiki/Kenneth_Arrow) is called the [Arrow Impossibility theorem](https://en.wikipedia.org/wiki/Arrow's_impossibility_theorem) in Game theory and Economics of social welfare.
+
+Since collective outcomes may not be rational, people may vote strategically, or there may be all kinds of political games where voters try to manipulate the outcome of an election into the desired result by misrepresenting their preferences.
+
+### References
+
+Note: this page is based on the following source:
+
+-   [@page2017modelthinking] MOOC, Course material & Transcripts.
+-   TA Notes by [@fisher2017modelthinking].
+-   Student notes by in [@kleinikink2016naturalmoney] and [@groh2017model].
+
+::: {#refs}
+:::

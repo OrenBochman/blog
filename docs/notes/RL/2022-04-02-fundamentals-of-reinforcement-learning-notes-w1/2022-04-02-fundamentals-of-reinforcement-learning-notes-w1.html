@@ -304,7 +304,9 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#week-1-the-k-armed-bandit-problem" id="toc-week-1-the-k-armed-bandit-problem" class="nav-link" data-scroll-target="#week-1-the-k-armed-bandit-problem">Week 1: The K-Armed Bandit Problem</a>
   <ul class="collapse">
+  <li><a href="#lesson-1-the-k-armed-bandit" id="toc-lesson-1-the-k-armed-bandit" class="nav-link" data-scroll-target="#lesson-1-the-k-armed-bandit"><strong>LESSON 1</strong> The K-Armed Bandit</a></li>
   <li><a href="#lesson-2-what-to-learn-understanding-action-values" id="toc-lesson-2-what-to-learn-understanding-action-values" class="nav-link" data-scroll-target="#lesson-2-what-to-learn-understanding-action-values">LESSON 2: What to learn, understanding Action Values</a></li>
+  <li><a href="#lesson-3-exploration-vs-exploitation" id="toc-lesson-3-exploration-vs-exploitation" class="nav-link" data-scroll-target="#lesson-3-exploration-vs-exploitation">LESSON 3: Exploration vs Exploitation</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -357,14 +359,64 @@ img[src*='#logo'] {
 </style>
 <section id="fundamentals-of-reinforcement-learning" class="level1">
 <h1>Fundamentals of Reinforcement Learning</h1>
-<p><img src="../../../assets/img/articles/rl/alg_selector.jpeg" class="img-fluid" alt="rl algorithms"> One caveat fellow students who are checking out these notes. I have a habit of going off the reservation and covering in my notes additional material. In this case there are a number of sources I’ve come across. - David Silver’s Video Course and Slides. - Tor Latimore’s Book on Bandit Algorithms. - <a href="https://faculty.cc.gatech.edu/~isbell/pubs/">Charles Isbell</a> and <a href="https://www.littmania.com/">Michael Littman</a> A free Udacity course on RL, with some emphasis on game theory proofs, and some novel algorithms like <a href="http://proceedings.mlr.press/v28/sodomka13.pdf">Coco-Q: Learning in Stochastic Games with Side Payments</a>. - A number of videos + papers from MS research videos on contextual bandit algorithms. - I have been known to review papers as well,<a href="https://www.nature.com/articles/s41586-020-03051-4.epdf?sharing_token=kTk-xTZpQOF8Ym8nTQK6EdRgN0jAjWel9jnR3ZoTv0PMSWGj38iNIyNOw_ooNp2BvzZ4nIcedo7GEXD7UmLqb0M_V_fop31mMY9VBBLNmGbm0K9jETKkZnJ9SgJ8Rwhp3ySvLuTcUr888puIYbngQ0fiMf45ZGDAQ7fUI66-u7Y%3D">Muzero</a> <a href="https://arxiv.org/abs/2202.06626">MuZero</a> and <a href="https://arxiv.org/abs/2111.00210">EfficentZero</a> <a href="https://github.com/YeWR/EfficientZero">code</a> seem to be of interest.</p>
+<p><img src="../../../assets/img/articles/rl/alg_selector.jpeg" class="img-fluid" alt="rl algorithms"> One caveat fellow students who are checking out these notes. I have a habit of going off the reservation and covering in my notes additional material. In this case there are a number of sources I’ve come across.</p>
+<ul>
+<li>David Silver’s Video Course and Slides.</li>
+<li>Tor Latimore’s Book on Bandit Algorithms.</li>
+<li><a href="https://faculty.cc.gatech.edu/~isbell/pubs/">Charles Isbell</a> and <a href="https://www.littmania.com/">Michael Littman</a> A free Udacity course on RL, with some emphasis on game theory proofs, and some novel algorithms like <a href="http://proceedings.mlr.press/v28/sodomka13.pdf">Coco-Q: Learning in Stochastic Games with Side Payments</a>.</li>
+<li>A number of videos + papers from MS research videos on contextual bandit algorithms.</li>
+<li>I have been known to review papers as well, <a href="https://www.nature.com/articles/s41586-020-03051-4.epdf?sharing_token=kTk-xTZpQOF8Ym8nTQK6EdRgN0jAjWel9jnR3ZoTv0PMSWGj38iNIyNOw_ooNp2BvzZ4nIcedo7GEXD7UmLqb0M_V_fop31mMY9VBBLNmGbm0K9jETKkZnJ9SgJ8Rwhp3ySvLuTcUr888puIYbngQ0fiMf45ZGDAQ7fUI66-u7Y%3D">Muzero</a> <a href="https://arxiv.org/abs/2202.06626">MuZero</a> and <a href="https://arxiv.org/abs/2111.00210">EfficentZero</a> <a href="https://github.com/YeWR/EfficientZero">code</a> seem to be of interest.</li>
+</ul>
 <section id="week-1-the-k-armed-bandit-problem" class="level2">
 <h2 class="anchored" data-anchor-id="week-1-the-k-armed-bandit-problem">Week 1: The K-Armed Bandit Problem</h2>
-<p>Read: - [x] <a href="http://incompleteideas.net/book/RLbook2020.pdf#page=47">RL Book§2.1-7</a> pp.&nbsp;24-36 -&gt; before lessons. - [x] <a href="http://incompleteideas.net/book/RLbook2020.pdf#page=64">RL Book§2.8</a> pp.&nbsp;42-43 -&gt; before assignments. Notation: Mathematics is much easier if you recall the definitions and notation, here are the essentials at a glance. - <span class="math inline">\pi</span> <code>policy</code> - a decision making rule for every state. - <span class="math inline">\pi_*</span> <code>optimal policy</code> - which returns the maximum rewards. - <span class="math inline">G_t</span> <code>return</code> at time t, for a <span class="math inline">(s_t,a_t,r_t...)</span> sequence discounted by <span class="math inline">\gamma</span>. - <span class="math inline">p(s',r \vert s,a)</span> - <code>transition probability</code> to state <span class="math inline">s'</span> with reward <span class="math inline">r</span> from state <span class="math inline">s</span> via action <span class="math inline">a</span> AKA <code>four valued dynamics</code> - <span class="math inline">p(s' \vert s,a)</span> - <code>transition probability</code> to state <span class="math inline">s'</span> from state <span class="math inline">s</span> via action <span class="math inline">a</span> AKA <code>Markov process transition matrix</code> - <span class="math inline">r(s,a)</span> - <code>expected immediate rewards</code> for action <span class="math inline">a</span> in state <span class="math inline">s</span> AKA <code>reward</code> of a <code>Markov reward process</code> - <span class="math inline">v_\pi(s)</span> - state’s <code>value</code> under policy <span class="math inline">\pi</span> which is its expected return - <span class="math inline">q_\pi(s,a)</span> - the <code>action value</code> in state <span class="math inline">s</span> under policy <span class="math inline">\pi</span> ### <strong>LESSON 1</strong> The K-Armed Bandit - [ ] Understand the temporal nature of the bandit problem - [x] Define k-armed bandit - [x] Define action-values - [ ] Define reward #### K-armed bandits In the <code>k-armed bandit</code> problem there is an <code>agent</code> who is given by the environment a <code>state</code> <span class="math inline">s</span> and must decide on some <code>action</code> resulting in getting some <code>reward</code> and a new state <span class="math inline">s'</span> #### Action Values The <code>value</code> of an action is its <code>expected reward</code> which can be expressed mathematically as <span class="math display">
+<p>Read:</p>
+<ul class="task-list">
+<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=47">RL Book§2.1-7</a> pp.&nbsp;24-36 -&gt; before lessons.</label></li>
+<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=64">RL Book§2.8</a> pp.&nbsp;42-43 -&gt; before assignments.</label></li>
+</ul>
+<p>Notation:</p>
+<p>Mathematics is much easier if you recall the definitions and notation, here are the essentials at a glance.</p>
+<ul>
+<li><span class="math inline">\pi</span> <code>policy</code> - a decision making rule for every state.</li>
+<li><span class="math inline">\pi_*</span> <code>optimal policy</code> - which returns the maximum rewards.</li>
+<li><span class="math inline">G_t</span> <code>return</code> at time t, for a <span class="math inline">(s_t,a_t,r_t...)</span> sequence discounted by <span class="math inline">\gamma</span>.</li>
+<li><span class="math inline">p(s',r \vert s,a)</span> - <code>transition probability</code> to state <span class="math inline">s'</span> with reward <span class="math inline">r</span> from state <span class="math inline">s</span> via action <span class="math inline">a</span> AKA <code>four valued dynamics</code></li>
+<li><span class="math inline">p(s' \vert s,a)</span> - <code>transition probability</code> to state <span class="math inline">s'</span> from state <span class="math inline">s</span> via action <span class="math inline">a</span> AKA <code>Markov process transition matrix</code></li>
+<li><span class="math inline">r(s,a)</span> - <code>expected immediate rewards</code> for action <span class="math inline">a</span> in state <span class="math inline">s</span> AKA <code>reward</code> of a <code>Markov reward process</code></li>
+<li><span class="math inline">v_\pi(s)</span> - state’s <code>value</code> under policy <span class="math inline">\pi</span> which is its expected return</li>
+<li><span class="math inline">q_\pi(s,a)</span> - the <code>action value</code> in state <span class="math inline">s</span> under policy <span class="math inline">\pi</span></li>
+</ul>
+<section id="lesson-1-the-k-armed-bandit" class="level3">
+<h3 class="anchored" data-anchor-id="lesson-1-the-k-armed-bandit"><strong>LESSON 1</strong> The K-Armed Bandit</h3>
+<ul class="task-list">
+<li><label><input type="checkbox">Understand the temporal nature of the bandit problem</label></li>
+<li><label><input type="checkbox" checked="">Define k-armed bandit</label></li>
+<li><label><input type="checkbox" checked="">Define action-values</label></li>
+<li><label><input type="checkbox">Define reward</label></li>
+</ul>
+<section id="k-armed-bandits" class="level4">
+<h4 class="anchored" data-anchor-id="k-armed-bandits">K-armed bandits</h4>
+<p>In the <code>k-armed bandit</code> problem there is an <code>agent</code> who is given by the environment a <code>state</code> <span class="math inline">s</span> and must decide on some <code>action</code> resulting in getting some <code>reward</code> and a new state <span class="math inline">s'</span></p>
+</section>
+<section id="action-values" class="level4">
+<h4 class="anchored" data-anchor-id="action-values">Action Values</h4>
+<p>The <code>value</code> of an action is its <code>expected reward</code> which can be expressed mathematically as</p>
+<p><span class="math display">
   q_*(a) \doteq \mathbb{E}[R_t  \vert  A_t=a] \space \forall a \in \{a_1 ... a_k\}
-</span> where: - $$ means definition - <span class="math inline">\mathbb{E[r \vert a]}</span> means expectation of a reward given some action a Since agents want to maximize rewards, recalling the definition of expectations we can write this as: <span class="math display">
+</span> where:</p>
+<ul>
+<li>$$ means definition</li>
+<li><span class="math inline">\mathbb{E[r \vert a]}</span> means expectation of a reward given some action a Since agents want to maximize rewards, recalling the definition of expectations we can write this as:</li>
+</ul>
+<p><span class="math display">
 \arg\max_a q_*(a)=\sum p(r  \vert a)*r
-</span> where: - <span class="math inline">\arg \max_a</span> means the argument <span class="math inline">a</span> maximizes …</p>
+</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\arg \max_a</span> means the argument <span class="math inline">a</span> maximizes …</li>
+</ul>
+</section>
+</section>
 <section id="lesson-2-what-to-learn-understanding-action-values" class="level3">
 <h3 class="anchored" data-anchor-id="lesson-2-what-to-learn-understanding-action-values">LESSON 2: What to learn, understanding Action Values</h3>
 <ol type="1">
@@ -373,8 +425,11 @@ img[src*='#logo'] {
 <li>Select actions greedily using an action-value function</li>
 <li>Define online learning</li>
 <li>Understand a simple online sample-average action-value estimation method</li>
-<li>Define the general online update equation ### LESSON 3: Exploration vs Exploitation</li>
+<li>Define the general online update equation</li>
 </ol>
+</section>
+<section id="lesson-3-exploration-vs-exploitation" class="level3">
+<h3 class="anchored" data-anchor-id="lesson-3-exploration-vs-exploitation">LESSON 3: Exploration vs Exploitation</h3>
 <ul>
 <li>Define epsilon-greedy</li>
 <li>Compare the short-term benefits of exploitation and the long-term benefits of exploration</li>

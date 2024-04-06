@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="dcterms.date" content="2021-03-20">
-<meta name="description" content="Concepts, code snippets, slide commentaries for this week’s lesson of the Course notes from the deeplearning.ai natural language programming specialization.">
+<meta name="dcterms.date" content="2021-05-09">
+<meta name="description" content="review of the paper “Deep contextualized word representations” on dot product attention for the deeplearning.ai NLP specialization.">
 
-<title>Oren Bochman’s Blog - NLP with Attention Models Week 1 NLP with Attention Models</title>
+<title>Oren Bochman’s Blog - Review of Deep contextualized word representations</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,63 +23,32 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../../">
-<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
-<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
-<script src="../../../site_libs/quarto-html/quarto.js"></script>
-<script src="../../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -127,10 +96,53 @@ cookieconsent.run({
   
 <style>html{ scroll-behavior: smooth; }</style>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
 
-<meta name="twitter:title" content="Oren Bochman’s Blog - NLP with Attention Models Week 1 NLP with Attention Models">
-<meta name="twitter:description" content="Concepts, code snippets, slide commentaries for this week’s lesson of the Course notes from the deeplearning.ai natural language programming specialization.">
-<meta name="twitter:image" content="https://orenbochman.github.io/notes/deeplearning.ai-nlp-c4/2021-03-20-deeplearning.ai-nlp-c4w1-attention-models/thumbnail_blog.png">
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Review of Deep contextualized word representations">
+<meta name="twitter:description" content="review of the paper “Deep contextualized word representations” on dot product attention for the deeplearning.ai NLP specialization.">
+<meta name="twitter:image" content="https://orenbochman.github.io/notes/deeplearning.ai-nlp-c4/img/literature-review-open-book.jpg">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -142,10 +154,10 @@ cookieconsent.run({
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../images/logo.png" alt="" class="navbar-logo">
     </a>
-    <a class="navbar-brand" href="../../../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Oren Bochman’s Blog</span>
     </a>
   </div>
@@ -156,7 +168,7 @@ cookieconsent.run({
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../../about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -167,35 +179,43 @@ cookieconsent.run({
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
         <li>
-    <a class="dropdown-item" href="../../../dnn.html">
+    <a class="dropdown-item" href="../../notes.html">
+ <span class="dropdown-text">All Notes</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../nlp.html">
+ <span class="dropdown-text">NLP Specilization</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../dnn.html">
  <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../../model-thinking.html">
+    <a class="dropdown-item" href="../../model-thinking.html">
  <span class="dropdown-text">Model Thinking</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../../xai.html">
+    <a class="dropdown-item" href="../../xai.html">
  <span class="dropdown-text">XAI</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../../rl.html">
+    <a class="dropdown-item" href="../../rl.html">
  <span class="dropdown-text">rl</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../../rhetoric.html">
+    <a class="dropdown-item" href="../../rhetoric.html">
  <span class="dropdown-text">rhetoric</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../../tfp.html">
+    <a class="dropdown-item" href="../../tfp.html">
  <span class="dropdown-text">TFP</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../../ab-testing.html">
+    <a class="dropdown-item" href="../../ab-testing.html">
  <span class="dropdown-text">AB testing</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../../cognitiveai.html">
+    <a class="dropdown-item" href="../../cognitiveai.html">
  <span class="dropdown-text">cognitive AI</span></a>
   </li>  
     </ul>
@@ -225,12 +245,12 @@ cookieconsent.run({
     </ul>
   </li>
   <li class="nav-item compact">
-    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../../index.xml"> <i class="bi bi-rss" role="img">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+    <a class="nav-link" href="../../archive.html"> <i class="bi bi-archive" role="img">
 </i> 
 <span class="menu-text">Archive</span></a>
   </li>  
@@ -251,33 +271,20 @@ cookieconsent.run({
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">NLP with Attention Models Week 1 NLP with Attention Models</h1>
+      <h1 class="title">Review of Deep contextualized word representations</h1>
                   <div>
         <div class="description">
-          Concepts, code snippets, slide commentaries for this week’s lesson of the Course notes from the deeplearning.ai natural language programming specialization.
+          review of the paper “Deep contextualized word representations” on dot product attention for the deeplearning.ai NLP specialization.
         </div>
       </div>
                           <div class="quarto-categories">
                 <div class="quarto-category">NLP</div>
-                <div class="quarto-category">coursera</div>
+                <div class="quarto-category">Coursera</div>
                 <div class="quarto-category">notes</div>
-                <div class="quarto-category">deeplearning.ai</div>
-                <div class="quarto-category">course notes</div>
-                <div class="quarto-category">DeepLearningAlgorithms</div>
-                <div class="quarto-category">transformer</div>
-                <div class="quarto-category">teacher forcing</div>
-                <div class="quarto-category">positional encoding</div>
-                <div class="quarto-category">seq2seq</div>
-                <div class="quarto-category">word alignment</div>
+                <div class="quarto-category">paper</div>
                 <div class="quarto-category">attention</div>
-                <div class="quarto-category">dot product attention</div>
-                <div class="quarto-category">NLP</div>
-                <div class="quarto-category">translation task</div>
-                <div class="quarto-category">bibliography</div>
-                <div class="quarto-category">beam search</div>
-                <div class="quarto-category">MBR</div>
-                <div class="quarto-category">BLEU</div>
-                <div class="quarto-category">ROUGE</div>
+                <div class="quarto-category">deep learning</div>
+                <div class="quarto-category">literature review</div>
               </div>
                   </div>
   </div>
@@ -295,7 +302,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">March 20, 2021</p>
+        <p class="date">May 9, 2021</p>
       </div>
     </div>
     
@@ -310,16 +317,18 @@ cookieconsent.run({
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#natural-language-processing-with-attention-models" id="toc-natural-language-processing-with-attention-models" class="nav-link active" data-scroll-target="#natural-language-processing-with-attention-models">Natural Language Processing with Attention Models</a>
+  <li><a href="#dot-product-attention" id="toc-dot-product-attention" class="nav-link active" data-scroll-target="#dot-product-attention">Dot-Product Attention</a>
   <ul class="collapse">
-  <li><a href="#how-to-duplicate-or-delete-input-in-trax-neural-networks" id="toc-how-to-duplicate-or-delete-input-in-trax-neural-networks" class="nav-link" data-scroll-target="#how-to-duplicate-or-delete-input-in-trax-neural-networks">How to duplicate or delete input in Trax neural networks?</a></li>
-  </ul></li>
-  <li><a href="#this-is-equivalent-to-sampling-from-a-softmax-with-temperature." id="toc-this-is-equivalent-to-sampling-from-a-softmax-with-temperature." class="nav-link" data-scroll-target="#this-is-equivalent-to-sampling-from-a-softmax-with-temperature.">This is equivalent to sampling from a softmax with temperature.</a></li>
-  <li><a href="#get-log-probabilities-from-the-last-token-output" id="toc-get-log-probabilities-from-the-last-token-output" class="nav-link" data-scroll-target="#get-log-probabilities-from-the-last-token-output">get log probabilities from the last token output</a>
+  <li><a href="#neural-machine-translation" id="toc-neural-machine-translation" class="nav-link" data-scroll-target="#neural-machine-translation">§2 Neural Machine Translation:</a></li>
+  <li><a href="#overview-of-attention" id="toc-overview-of-attention" class="nav-link" data-scroll-target="#overview-of-attention">§3 Overview of attention</a></li>
+  <li><a href="#global-attention" id="toc-global-attention" class="nav-link" data-scroll-target="#global-attention">§3.1 Global attention</a>
   <ul class="collapse">
-  <li><a href="#beam-search" id="toc-beam-search" class="nav-link" data-scroll-target="#beam-search">Beam Search</a></li>
+  <li><a href="#dot-product-attention-1" id="toc-dot-product-attention-1" class="nav-link" data-scroll-target="#dot-product-attention-1">Dot product attention:</a></li>
+  <li><a href="#general-attention" id="toc-general-attention" class="nav-link" data-scroll-target="#general-attention">General attention:</a></li>
+  <li><a href="#concatenative-attention" id="toc-concatenative-attention" class="nav-link" data-scroll-target="#concatenative-attention">Concatenative attention:</a></li>
   </ul></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#local-attention" id="toc-local-attention" class="nav-link" data-scroll-target="#local-attention">§3.2 Local Attention</a></li>
+  </ul></li>
   </ul>
 </nav>
 </nav>
@@ -334,182 +343,198 @@ cookieconsent.run({
 
 
 
-<p><img src="notes-formulas.jpg" class="img-fluid"> :::{.logo} <img src="logo_deeplearning_ai.png" class="img-fluid" alt="deeplearning.ai"> :::</p>
-<section id="natural-language-processing-with-attention-models" class="level1">
-<h1>Natural Language Processing with Attention Models</h1>
-<p>Notes for: NLP with Attention Models Week 1 ### Week’s Learning Objectives: - Explain how an Encoder/Decoder model works - Apply word alignment for machine translation - Train a Neural Machine Translation model with Attention - Develop intuition for how teacher forcing helps a translation model checks its predictions - Use <strong><a href="https://en.wikipedia.org/wiki/BLEU">BLEU</a></strong> score and <strong><a href="https://en.wikipedia.org/wiki/ROUGE_(metric)">ROUGE</a></strong> score to evaluate machine-generated text quality - Describe several decoding methods including <a href="">MBR</a> and <a href="">Beam search</a> ## TLDR: Neural Network engineering ### How do we learn to <strong>align</strong> two sequences? Using an <code>tl.attention</code> layer. While it does not reorder the input, attention works by by assigning to each item of the input a subset of the input. ### How do we ustilize arbitrary functions on a Trax Neuarl Net?</p>
-<p>Using a <a href="https://trax-ml.readthedocs.io/en/latest/notebooks/layers_intro.html?highlight=fn#With-the-Fn-layer-creating-function.">functional layers</a></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Addition(): <span class="co"># this is a a closure</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        layer_name <span class="op">=</span> <span class="st">"Addition"</span>  <span class="co"># the name </span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Custom function for the custom layer</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">def</span> func(x, y):</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> x <span class="op">+</span> y</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> tl.Fn(layer_name, func) <span class="co"># returning an tl.Fn object with name and function</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<section id="how-to-duplicate-or-delete-input-in-trax-neural-networks" class="level3">
-<h3 class="anchored" data-anchor-id="how-to-duplicate-or-delete-input-in-trax-neural-networks">How to duplicate or delete input in Trax neural networks?</h3>
-<p>Simple serial architectures map input to output. When a more complex setup is needed like in the deep imagenets by google this is done using a <code>tl.Select</code> combinator. This is actually something I’ve seen in some papers on image processing papers before residual architectures became more popular - which is also covered in the next item. ~<del>python tl.Select([0,1,0,1])</del>~ which pops items 0,1 from the stack and pushes them in twice. This replicating the inputs on the stack. Now lets suppose a layer gets 3 tensors + the output of anther layer. Which means there will be 4 tensors on the stack. To ignore say the second item we use select. But we also want to consume a layer’s output so we can idicate this using the second parameter which tell the select it has three in coming tensors. ~<del>python tl.Select([0,2],n_in=3)</del>~ ### How to make a residual connections in a Trax Neural Nets? Use the <code>tl.Residual</code> combinator. ~<del>python tl.Residual( tl.The_Layer_To_Bypass() )</del>~ ### How to sample sequence states with noise AKA <strong>Temprature Based Sampling</strong> ? Use <code>tl.logsoftmax_sample()</code> to create <strong>Temprature Based Sampling</strong> or <strong>Greedy Decoding</strong> based on the <code>temprature</code> parameter.</p>
-<p>Setting tempature to 0 will return the maximal likelyhood estimate - this is called <strong>Greedy Decoding</strong>. Larger values will add noise to the distribution allowing sampling of items with lower probabilities. the implementation is like this: ~~~python def logsoftmax_sample(log_probs, temperature=1.0):<br>
-“““Returns a sample from a log-softmax output, with temperature. Args: log_probs: Logarithms of probabilities (often coming from LogSofmax) temperature: For scaling before sampling (1.0 = default, 0.0 = pick argmax)”“”</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/logo_deeplearning_ai.png" class="lightbox" data-glightbox="description: .lightbox-desc-1" data-gallery="quarto-lightbox-gallery-1" title="deeplearning.ai"><img src="img/logo_deeplearning_ai.png" class="img-fluid figure-img" alt="deeplearning.ai"></a></p>
+<figcaption>deeplearning.ai</figcaption>
+</figure>
+</div>
+<section id="dot-product-attention" class="level1">
+<h1>Dot-Product Attention</h1>
+<p><strong>Dot-Product attention</strong> is the first of three attention mechanisms covered in the course and the simplest covered in this paper. Dot-Product Attention is a good fit, in an engineering sense, for a encoder-decoder architecture with tasks where the source source sequence is fully available at the start and the tasks is mapping or transformation the source sequence to an output sequence like in alignment, or translation.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/paper-eata-01-nmt.png" class="lightbox" data-glightbox="description: .lightbox-desc-2" data-gallery="quarto-lightbox-gallery-2" title="rnn"><img src="img/paper-eata-01-nmt.png" class="img-fluid figure-img" alt="rnn"></a></p>
+<figcaption>rnn</figcaption>
+</figure>
+</div>
+The first assignment in the course using encoder decoder LSTM model with attention is so similar to the setup disused in this paper, I would not be surprised if it may well have inspired it.
+<hr>
+<p>This is a review of the paper in which scaled dot product attention was introduced in 2015 by <em>Minh-Thang Luong, Hieu Pham, Christopher D. Manning</em> in <a href="https://arxiv.org/pdf/1508.04025v5.pdf">Effective Approaches to Attention-based Neural Machine Translation</a> which is available at <a href="https://paperswithcode.com/paper/effective-approaches-to-attention-based">papers with code</a>. In this paper they tried to take the attention mechanism being used in other tasks and to distill it to its essence and at the same time to also find a more general form.</p>
+<center>
+<table class="table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Global Attention</th>
+<th style="text-align: center;">Local Attention</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><img src="img/paper-eata-02-attention-global.png" class="img-fluid"></td>
+<td style="text-align: center;"><img src="img/paper-eata-03-attention-local.png" class="img-fluid"></td>
+</tr>
+</tbody>
+</table>
+</center>
+They also came up with a interesting way to visualize the alignment’s attention mechanism. <img src="img/c4w2-22-alignment-visulization.png" class="img-fluid" alt="alignment-visulization">
+<hr>
+<p>So to recap: Luong et all were focused on alignment problem in NMT. When they try to tackle it using attention as function of the content and a function of its location. They came up with a number of ways to distill and generalize the attention mechanism.</p>
+<hr>
+<!--more-->
+<hr>
+<p><img src="img/dcwr-page-001.png" class="img-fluid" alt="page 1"> Attention was just another engineering technique to improve alignment and it had not yet taken center stage in the models, as it would in <a href="img/https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> (Vaswani et al, 2017).I find it useful to garner the concepts and intuition which inspired these researchers to adapt attention and how they come up with this form of attention. The abstract begins with: &gt; “An attentional mechanism has lately been used to improve neural machine translation (NMT) by selectively focusing on parts of the source sentence during translation.” which was covered in last lesson. The abstract continues with: &gt; “This paper examines two simple and effective classes of attentional mechanism: a <strong>global</strong> approach which always attends to <strong>all</strong> source words and a <strong>local</strong> one that only looks at a <strong>subset</strong> of source words at a time.” talks about</p>
+<hr>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/dcwr-page-002.png" class="lightbox" data-glightbox="description: .lightbox-desc-3" data-gallery="quarto-lightbox-gallery-3" title="page 2"><img src="img/dcwr-page-002.png" class="img-fluid figure-img" alt="page 2"></a></p>
+<figcaption>page 2</figcaption>
+</figure>
+</div>
+<section id="neural-machine-translation" class="level2">
+<h2 class="anchored" data-anchor-id="neural-machine-translation">§2 Neural Machine Translation:</h2>
+<p>This section provides a summary of the the NMT task using 4 equations: In particular they note that in the decoder the conditional probability of the target given the source is of the form: <span class="math display"> log \space p(y \vert x) = \sum_{j=1}^m log \space p (y_j \vert y_{&lt;j} , s) </span> Where <span class="math inline">x_i</span> are the <em>source</em> sentence and <span class="math inline">y_i</span> are the <em>target</em> sentence. <span class="math display"> p (y_j \vert y{&lt;j} , s) = softmax (g(h_j)) </span> Here, <span class="math inline">h_j</span> is the RNN hidden unit, abstractly computed as: <span class="math display"> h_j = f(h_{j-1},s) </span> Our training objective is formulated as follows <span class="math display">
+J_t=\sum_{(x,y)\in D} -log \space p(x \vert y)
+</span></p>
+<p>With D being our parallel training corpus.</p>
+<hr>
+</section>
+<section id="overview-of-attention" class="level2">
+<h2 class="anchored" data-anchor-id="overview-of-attention">§3 Overview of attention</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/./page-003.png" class="lightbox" data-glightbox="description: .lightbox-desc-4" data-gallery="quarto-lightbox-gallery-4" title="page 3"><img src="img/./page-003.png" class="img-fluid figure-img" alt="page 3"></a></p>
+<figcaption>page 3</figcaption>
+</figure>
+</div>
+<p>Next they provide a recap of the attention mechanism to set their starting point: &gt;Specifically, given the target hidden state <span class="math inline">h_t</span> and the source-side context vector <span class="math inline">c_t</span>, we employ a simple concatenation layer to combine the information from both vectors to produce an attentional hidden state as follows:</p>
+<p><span class="math display">
+\bar{h}_t = tanh(W_c[c_t;h_t])
+</span></p>
+<blockquote class="blockquote">
+<p>The attentional vector <span class="math inline">\bar{h}_t</span> is then fed through the softmax layer to produce the predictive distribution formulated as:</p>
+</blockquote>
+<p><span class="math display">
+p(y_t|y{&lt;t}, x) = softmax(W_s\bar{h}_t)
+</span></p>
+</section>
+<section id="global-attention" class="level2">
+<h2 class="anchored" data-anchor-id="global-attention">§3.1 Global attention</h2>
+<p>This is defined in §3.1 of the paper as:</p>
+<p><span class="math display">
+\begin{align}
+   a_t(s) &amp; = align(h_t,\bar{h}_s)  \newline
+   &amp; = \frac{ e^{score(h_t,\bar{h}_s)} }{ \sum_{s'} e^{score(h_t,\bar{h}_s)} } \newline
+   &amp; = softmax(score(h_t,\bar{h}_s))
+\end{align}
+</span></p>
+<p>where <span class="math inline">h_t</span> and <span class="math inline">h_s</span> are the target and source sequences and <span class="math inline">score()</span> which is referred to as a <em>content-based</em> function as one of three alternative forms provided:</p>
+<section id="dot-product-attention-1" class="level3">
+<h3 class="anchored" data-anchor-id="dot-product-attention-1">Dot product attention:</h3>
+<p><span class="math display">
+score(h_t,\bar{h}_s)=h_t^T\bar{h}_s
+</span> This form combines the source and target using a dot product. Geometrically this essentially a projection operation.</p>
+</section>
+<section id="general-attention" class="level3">
+<h3 class="anchored" data-anchor-id="general-attention">General attention:</h3>
+<p><span class="math display">
+score(h_t,\bar{h}_s)=h_t^TW_a\bar{h}_s
+</span></p>
+<p>this form combines the source and target using a dot product after applying a learned attention weights to the source. Geometrically this is a projection of the target on a linear transformation of the source or <strong>scaled dot product attention</strong> as it is now known</p>
+</section>
+<section id="concatenative-attention" class="level3">
+<h3 class="anchored" data-anchor-id="concatenative-attention">Concatenative attention:</h3>
+<p><span class="math display"> score(h_t,\bar{h}_s)=v_a^T tanh(W_a [h_t;\bar{h}_s]) </span> This is a little puzzling <span class="math inline">v_a^T</span> is not accounted for and seems to be a learned attention vector which is projected onto the linearly weighted combination of the hidden states of the encoder and decoder. they also mention having considered using a <em>location based function</em> location :</p>
+<p><span class="math display"> a_t = softmax(W_a h_t) </span></p>
+which is just a linear transform of the hidden target state <span class="math inline">h_t</span>
+<hr>
 </section>
 </section>
-<section id="this-is-equivalent-to-sampling-from-a-softmax-with-temperature." class="level1">
-<h1>This is equivalent to sampling from a softmax with temperature.</h1>
-<p>u = np.random.uniform(low=1e-6, high=1.0 - 1e-6, size=log_probs.shape) g = -np.log(-np.log(u)) return np.argmax(log_probs + g * temperature, axis=-1) ~~~ ## Additional coding notes: ### How to use numpy to reshape a test tesnsor so it has a (size 0) batch dimenion at the front? This is needed when inspecting single test inputs instead of working with a batch. The model is expecting to process batches of inputs like it saw during training - we therefore need to add a dimension at the start. ~<del>python padded_with_batch = fastnp.expand_dims(fastnp.array(padded),axis=0)</del>~ ~~~python</p>
+<section id="local-attention" class="level2">
+<h2 class="anchored" data-anchor-id="local-attention">§3.2 Local Attention</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/dcwr-page-004.png" class="lightbox" data-glightbox="description: .lightbox-desc-5" data-gallery="quarto-lightbox-gallery-5" title="page 4"><img src="img/dcwr-page-004.png" class="img-fluid figure-img" alt="page 4"></a></p>
+<figcaption>page 4</figcaption>
+</figure>
+</div>
+<p>in §3.2 they consider a local attention mechanism. This is a resource saving modification of global attention using the simple concept of applying the mechanism within a fixed sized window. &gt; We propose a local attentional mechanism that chooses to focus only on a small subset of the source positions per target word. This model takes inspiration from the tradeoff between the soft and hard attentional models proposed by Xu et al.&nbsp;(2015) to tackle the image caption generation task. &gt; Our local attention mechanism selectively focuses on a small window of context and is differentiable. … In concrete details, the model first generates an aligned position <span class="math inline">p_t</span> for each target word at time <span class="math inline">t</span>. The context vector <span class="math inline">c_t</span> is then derived as a weighted average over the set of source hidden states within the window <span class="math inline">[p_t−D, p_t+D]</span>; Where <span class="math inline">D</span> is empirically selected. The <em>big idea</em> here is to use a fixed window size for this step to conserve resources when translating paragraphs or documents - a laudable notion for times where LSTM gobbled up resources in proportion to the sequence length… They also talk about <em>monotonic alignment</em> where <span class="math inline">p_t=t</span> and <em>predictive alignment</em></p>
+<p><span class="math display">
+p_t=S\cdot sigmoid(v_p^Ttanh(W_ph_t))
+</span></p>
+<p><span class="math display">
+a_t(s)=align(h_t,\bar{h}_s)e^{(-\frac{(s-p_t)^2}{s\sigma^2})}
+</span></p>
+<p>with align() as defined above and <span class="math display">\sigma=\frac{D}{2}
+</span></p>
+<hr>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/dcwr-page-005.png" class="lightbox" data-glightbox="description: .lightbox-desc-6" data-gallery="quarto-lightbox-gallery-6" title="page 5"><img src="img/dcwr-page-005.png" class="img-fluid figure-img" alt="page 5"></a></p>
+<figcaption>page 5</figcaption>
+</figure>
+</div>
+The rest of the paper has details about the experiment and is of less interest
+<hr>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/dcwr-page-006.png" class="lightbox" data-glightbox="description: .lightbox-desc-7" data-gallery="quarto-lightbox-gallery-7" title="page 6"><img src="img/dcwr-page-006.png" class="img-fluid figure-img" alt="page 6"></a></p>
+<figcaption>page 6</figcaption>
+</figure>
+</div>
+<hr>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/dcwr-page-007.png" class="lightbox" data-glightbox="description: .lightbox-desc-8" data-gallery="quarto-lightbox-gallery-8" title="page 7"><img src="img/dcwr-page-007.png" class="img-fluid figure-img" alt="page 7"></a></p>
+<figcaption>page 7</figcaption>
+</figure>
+</div>
+<hr>
+<p><img src="img/dcwr-page-008.png" class="img-fluid" alt="page 8"> In §5.4 In alignment quality</p>
+<hr>
+<p><img src="img/dcwr-page-009.png" class="img-fluid" alt="page 9"> some sample translations</p>
+<hr>
+<p><img src="img/dcwr-page-010.png" class="img-fluid" alt="page 10"> the references</p>
+<hr>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/dcwr-page-011.png" class="lightbox" data-glightbox="description: .lightbox-desc-9" data-gallery="quarto-lightbox-gallery-9" title="page 11"><img src="img/dcwr-page-011.png" class="img-fluid figure-img" alt="page 11"></a></p>
+<figcaption>page 11</figcaption>
+</figure>
+</div>
+This is appendix A which shows the visualization of alignment weights.
+<hr>
+
+
+<div class="hidden" aria-hidden="true">
+<span class="glightbox-desc lightbox-desc-1">deeplearning.ai</span>
+<span class="glightbox-desc lightbox-desc-2">rnn</span>
+<span class="glightbox-desc lightbox-desc-3">page 2</span>
+<span class="glightbox-desc lightbox-desc-4">page 3</span>
+<span class="glightbox-desc lightbox-desc-5">page 4</span>
+<span class="glightbox-desc lightbox-desc-6">page 5</span>
+<span class="glightbox-desc lightbox-desc-7">page 6</span>
+<span class="glightbox-desc lightbox-desc-8">page 7</span>
+<span class="glightbox-desc lightbox-desc-9">page 11</span>
+</div>
 </section>
-<section id="get-log-probabilities-from-the-last-token-output" class="level1">
-<h1>get log probabilities from the last token output</h1>
-<p>log_probs = output[0,-1,:] ~~~ ### How to use calculate <code>Jaccard Similarity</code> which is the intersection over union? ~~~python def jaccard_similarity(candidate, reference): “““Returns the Jaccard similarity between two token lists Args: candidate (list of int): tokenized version of the candidate translation reference (list of int): tokenized version of the reference translation Returns: float: overlap between the two token lists”“”</p>
-<pre><code># convert the lists to a set to get the unique tokens
-can_unigram_set, ref_unigram_set = set(candidate), set(reference)  
-
-# get the set of tokens common to both candidate and reference
-joint_elems = can_unigram_set.intersection(ref_unigram_set)
-
-# get the set of all tokens found in either candidate or reference
-all_elems = can_unigram_set.union(ref_unigram_set)
-
-# divide the number of joint elements by the number of all elements
-overlap = len(joint_elems) / len(all_elems)
-
-return overlap</code></pre>
-<pre><code>
-# Video 1: Intro
-This course is called Natural Language Processing with Attention Models. By the end of the course, we will have reached the cutting edge of today's practical NLP methods. We will use a powerful technique called **attention** to build several different models. Some of the things you build using the attention mechanism, you build a powerful language translation model. You also build an algorithm capable of summarizing texts. You build a model that can actually answer questions about the piece of text, and you build a chat bot that you can actually have a conversation with.   
-We will also have another look at sentiment analysis.
-    
-When it comes to modern deep learning, there's a sort of new normal, which is to say, most people aren't actually building and training models from scratch. Instead, it's more common to download a pre-trained model and then tweak it and find units for your specific use case. In this course, we show you how to build the models from scratch, but we also provide you custom pre-trained models that we created just for you. By training them continuously for weeks on the most powerful TPU clusters that are currently only available to researchers as Google.
-
-# Video 2: Seq2Seq  
-### Outline:$
-- Introduction to Neural Machine Translation 
-- Seq2Seq model and its shortcomings 
-- Solution for the information bottleneck  
-The sequential nature of models you learned in the previous course (RNNs, LSTMs, GRUs) does not allow for speed ups within training examples, which becomes critical at longer sequence lengths, as memory constraints limit batching across examples. (because you can run different batches or examples in parallel or even different directions)
-![screenshot_of_outline_slide](c4w1_screenshot_01.png)
-In other words, if you rely on sequences and you need to know the beginning of a text before being able to compute something about the ending of it, then you can not use parallel computing. You would have to wait until the initial computations are complete. This is not good, because if your text is too long, then 
-1. it will take a long time for you to process it and 
-2. you will lose a good amount of information mentioned earlier in the text as you approach the end.  
-## Seq2Seq model 
-- Introduced by Google in 2014
-- Maps variable-length sequences to fixed-length memory
-- LSTMs and GRUs are typically used to overcome the vanishing gradient problem 
-![encoder decoder architecture](c4w1_screenshot_03.png)
-Therefore, attention mechanisms have become critical for sequence modeling in various tasks, allowing modeling of dependencies without caring too much about their distance in the input or output sequences. 
-in this encoder decoder architecture the yellow block in the middle is the final hidden state produced by the encoder. It is essentials a compressed representation of the sequence in this case the english sentence. The problem with RNN is they tend to have a bias for representing more recent data.
-One approach to overcome this issue is to provide the decoder with the attention layer. 
-
-# Video 3: Alignment
-Alignment is an old problem and there are a number of papers on learning to align and translate which helped put attention mechanism into focus.
-- [NEURAL MACHINE TRANSLATION BY JOINTLY LEARNING TO ALIGN AND TRANSLATE](https://arxiv.org/pdf/1409.0473) 2016
-- [Jointly Learning to Align and Translate with Transformer Models](https://arxiv.org/abs/1909.02074) 2019
-berliner = citizen of berlin 
-berliner = jelly doughnut
-
-Not all words translate precisely to another word.
-Adding an attention layers allows the model to give different words more importance when translating another word.
-This is a good task for an attention layer
-Developing intuition about alignment:
-also check out this page [Deep Learning: The Good, the Bad and the Ugly
-](http://phdopen.mimuw.edu.pl/index.php?page=l18w5) in a 2017 talk, Lukasz Kaiser referred to [K,V] as a memory.
-We want to manage information better in our model.
-We keep the information in a memory consisting of keys and values. (It needs to be differentiable so we can use it with back propagation)
-    
-Then we put in the query a sequence and in the keys another sequence (depending on the task they may be the same say for summarization or different for alignment or translation) 
-By combining Q K using a Softmax we get a vector of probabilities each position in the memory is relevant. weight matrix to apply to the values in the memory.
-- get all of the available hidden states ready for  the encoder and do the same for the first hidden states of the decoder. (In the example, there are two encoder hidden states, shown by blue dots, and one decoder hidden states.)
-- Next, score each of the encoder hidden states by getting its dot product between each encoder state and decoder hidden states. 
-A higher score means that the hidden state will have more influence on the output. 
-Then you will run scores through softmax, so each score is transformed to a number between 0 and 1, this gives you your attention distribution. 
-- Take each encoder hidden state, and multiply it by its softmax score, which is a number between 0 and 1, this results in the alignments vector. 
-- Add up everything in the alignments vector to arrive at 
-    what's called the context vector. 
-    
-## W1V4: Attention
-    
-The attention mechanism uses encoded representations of both the input or the encoder hidden states and the outputs or the decoder hidden states. The keys and values are pairs. Both of dimension NN, where NN is the input sequence length and comes from the encoder hidden states.
-Keys and values have their own respective matrices, but the matrices have the same shape and are often the same. While the queries come from the decoder hidden states. One way you can think of it is as follows. Imagine that you are translating English into German. You can represent the word embeddings in the English language as keys and values. The queries will then be the German equivalent. You can then calculate the dot product between the query and the key. Note that similar vectors have higher dot products and non-similar vectors will have lower dot products. The intuition here is that you want to identify the corresponding words in the queries that are similar to the keys. This would allow your model to "look" or focus on the right place when translating each word.
-We then run a softmax:
-$$ softmax(QK^T )  $$
-That allows us to get a distribution of numbers between 0 and 1. 
-We then would multiply the output by V. Remember V in this example was the same as our keys, corresponding to the English word embeddings. Hence the equation becomes
-$$ softmax(QK^T )V  $$
-    
-In the matrix, the lighter square shows where the model is actually looking when making the translation of that word. This mapping should not necessarily be one to one. The lighting just tells you to what extent is each word contributing to the input that will be fed into the decoder. As you can see several words can contribute to translating another word, depending on the weights (output) of the softmax that will be used to create the new input. 
-a picture of attention in translation with English to German An important thing to keep in mind is that the model should be flexible enough to connect each English word with its relevant German word, even if they do not appear in the same position in their respective sentences. In other words, it should be flexible enough to handle differences in grammar and word ordering in different languages.
-    In a situation like the one I just mentioned, where the grammar of foreign language requires a difference word order than the other, the attention is so flexible enough to find the connection. The first four tokens, the agreements on the, are pretty straightforward, but then the grammatical structure between French and English changes. Now instead of looking at the corresponding fifth token to translate the French word zone, the attention knows to look further down at the eighth token, which corresponds to the English word area, glorious and necessary. It's pretty amazing, was a little matrix multiplication can do.
-    So attention is a layer of calculations that let your model focus on the most important parts of the sequence for each step. Queries, values, and keys are representations of the encoder and decoder hidden states. And they're used to retrieve information inside the attention layer by calculating the similarity between the decoder queries and the encoder key- value pairs. 
-    
-## Evaluation metrics for machine translation   
-### BLEU
-- The BLEU score was by Kishore Papineni, et al. In their 2002 paper titled [BLEU: a Method for Automatic Evaluation of Machine Translation][BLEU: a Method for Automatic Evaluation of Machine Translation]
-- The closer the BLEU score is to 1, the better a model preforms. 
-- The closer to 0, the worse it does.   
-To get the BLEU score, the candidates and the references are usually based on an average of uni, bi, tri or even four-gram precision. For example using uni-grams:
-![screenshot_of_outline_slide](c4w1_screenshot_10.png)
-You would sum over the unique n-gram counts in the candidate and divide by the total number of words in the candidate.
-The same concept could apply to unigrams, bigrams, etc. One issue with the BLEU score is that it does not take into account semantics, so it does not take into account the order of the n-grams in the sentence.   
-$$BLEU = BP\Bigl(\prod_{i=1}^{4}precision_i\Bigr)^{(1/4)}$$
-with the Brevity Penalty and precision defined as:
-$$BP = min\Bigl(1, e^{(1-({ref}/{cand}))}\Bigr)$$
-$$precision_i = \frac {\sum_{snt \in{cand}}\sum_{i\in{snt}}min\Bigl(m^{i}_{cand}, m^{i}_{ref}\Bigr)}{w^{i}_{t}}$$
-where:
-- $m^{i}_{cand}$, is the count of i-gram in candidate matching the reference translation.
-- $m^{i}_{ref}$, is the count of i-gram in the reference translation.
-- $w^{i}_{t}$, is the total number of i-grams in candidate translation.
-## ROUGE    
-Another similar method for evaluation is the ROUGE score which calculates precision and recall for machine texts by counting the n-gram overlap between the machine texts and a reference text.  Here is an example that calculates recall: 
-![recall in ROUGE](c4w1_screenshot_11.png)
-$$ Rouge_{recall} = \sum  \frac{(\{prediction \space ngrams\} \cap \{ test \space ngrams\})}{\vert{ test \space unigrams}\vert } $$
-Rouge also allows you to compute precision as follows: 
-![precision in ROUGE](c4w1_screenshot_12.png)
-$$ ROUGE_{precision} = \sum \frac{(\{prediction  ngrams\} \cap \{ test ngrams\})}{\vert\{ vocab\}\vert} $$
-The ROUGE-N refers to the overlap of N-grams between the actual system and the reference summaries. 
-Recall and precision can be combined using the [F-score](https://en.wikipedia.org/wiki/F-score) metric.
-$$ F_{score}= 2 *\frac{(precision * recall)}{(precision + recall)} $$
-
-# Decoding
-## Random sampling
-Random sampling for decoding involves drawing a word from the softmax distribution. To explore the latent space it is possible to introduce a temperature variable which controls the randomness of the sample.
-~~~python
-def logsoftmax_sample(log_probs, temperature=1.0):  
-  """Returns a sample from a log-softmax output, with temperature.
-  Args:
-    log_probs: Logarithms of probabilities (often coming from LogSofmax)
-    temperature: For scaling before sampling (1.0 = default, 0.0 = pick argmax)
-  """
-  # This is equivalent to sampling from a softmax with temperature.
-  u = np.random.uniform(low=1e-6, high=1.0 - 1e-6, size=log_probs.shape)
-  g = -np.log(-np.log(u))
-  return np.argmax(log_probs + g * temperature, axis=-1)</code></pre>
-<section id="beam-search" class="level2">
-<h2 class="anchored" data-anchor-id="beam-search">Beam Search</h2>
-<p>The <a href="https://en.wikipedia.org/wiki/Beam_search">beam search</a> algorithm is a limited (best-first search). The parameter for the beam width limits the choices considered at each step. <img src="c4w1_screenshot_15.png" class="img-fluid" alt="Beam Search"> ## Minimum Bayes Risk (MBR) Minimum Bayes Risk (MBR) Compares many samples against one another. To implement MBR: - Generate several random samples. - Compare each sample against all the others and assign a similarity score (e.g.&nbsp;ROUGE). - Select the sample with the highest similarity: the golden one. <img src="c4w1_screenshot_16.png" class="img-fluid" alt="MBR"> ## Summary - Maximal Probability is a baseline - but not a very good one if the data is noisy. - Random sampling with temperature is better. - Beam search uses conditional probabilities and the parameter. - MBR (Minimum Bayes Risk) takes several samples and compares them against each other to find the golden one. note: although not mentioned in the next week’s notes Beam Search can be used to improve the summarization task. MBR may be used to extract a golden summary from a number of samples. ROUGE-N is the preferred metric for evaluating summarization</p>
-</section>
-</section>
-<section id="references" class="level1">
-<h1>References</h1>
-<ul>
-<li><a href="https://www.aclweb.org/anthology/P02-1040.pdf">BLEU: a Method for Automatic Evaluation of Machine Translation</a> (Kishore Papineni et allm 2002)</li>
-<li><a href="https://arxiv.org/abs/1910.10683">Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer</a> (Raffel et al, 2019) -​ <a href="https://arxiv.org/pdf/1802.05365.pdf">Deep contextualized word representations</a> (Peters et al, 2018)</li>
-<li><a href="http://jalammar.github.io/illustrated-transformer/">The Illustrated Transformer</a> (Alammar, 2018) ::: {.callout-note} add citations for rogue, MBR and Beam search. :::</li>
-</ul>
-
-
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2021,
   author = {Bochman, Oren},
-  title = {NLP with {Attention} {Models} {Week} 1 {NLP} with {Attention}
-    {Models}},
-  date = {2021-03-20},
-  url = {https://orenbochman.github.io//notes/deeplearning.ai-nlp-c4/2021-03-20-deeplearning.ai-nlp-c4w1-attention-models/2021-03-20-deeplearning.ai-nlp-c4w1-attention-models.html},
+  title = {Review of {Deep} Contextualized Word Representations},
+  date = {2021-05-09},
+  url = {https://orenbochman.github.io//notes/deeplearning.ai-nlp-c4/2021-05-09-review of-deep-contextualized-word-representations.html},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2021" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2021. <span>“NLP with Attention Models Week 1 NLP with
-Attention Models.”</span> March 20, 2021. <a href="https://orenbochman.github.io//notes/deeplearning.ai-nlp-c4/2021-03-20-deeplearning.ai-nlp-c4w1-attention-models/2021-03-20-deeplearning.ai-nlp-c4w1-attention-models.html">https://orenbochman.github.io//notes/deeplearning.ai-nlp-c4/2021-03-20-deeplearning.ai-nlp-c4w1-attention-models/2021-03-20-deeplearning.ai-nlp-c4w1-attention-models.html</a>.
+Bochman, Oren. 2021. <span>“Review of Deep Contextualized Word
+Representations.”</span> May 9, 2021. <a href="https://orenbochman.github.io//notes/deeplearning.ai-nlp-c4/2021-05-09-review of-deep-contextualized-word-representations.html">https://orenbochman.github.io//notes/deeplearning.ai-nlp-c4/2021-05-09-review
+of-deep-contextualized-word-representations.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1175,17 +1200,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
  Copyright 2024, Oren Bochman
   </li>  
     <li class="nav-item">
-    <a class="nav-link" href="../../../about.html">
+    <a class="nav-link" href="../../about.html">
 <p>About</p>
 </a>
   </li>  
     <li class="nav-item">
-    <a class="nav-link" href="../../../license.html">
+    <a class="nav-link" href="../../license.html">
 <p>License</p>
 </a>
   </li>  
     <li class="nav-item">
-    <a class="nav-link" href="../../../trademark.html">
+    <a class="nav-link" href="../../trademark.html">
 <p>Trademark</p>
 </a>
   </li>  
@@ -1196,9 +1221,34 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+<script>var lightboxQuarto = GLightbox({"loop":false,"closeEffect":"zoom","selector":".lightbox","descPosition":"bottom","openEffect":"zoom"});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
 
 
 
 
-<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

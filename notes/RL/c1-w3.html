@@ -2,15 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.4.554">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="dcterms.date" content="2022-05-02">
-<meta name="description" content="Fundamentals of Reinforcement Learning Course Notes Week 3 - Value Functions and Bellman Equations">
+<meta name="dcterms.date" content="2022-05-04">
+<meta name="description" content="In week 3 we learn about Value Functions and Bellman Equations, which are the key technology behind all the algorithms we will learn. We learn the definition of policies and value functions, as well as Bellman equations.">
 
-<title>Oren Bochman’s Blog - RL Fundamentals W3 - Value Functions &amp; Bellman Equations</title>
+<title>Oren Bochman’s Blog - Value Functions &amp; Bellman Equations</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,7 +23,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -140,14 +160,14 @@ window.Quarto = {
 };
 </script>
 
-<meta name="twitter:title" content="Oren Bochman’s Blog - RL Fundamentals W3 - Value Functions &amp; Bellman Equations">
-<meta name="twitter:description" content="Fundamentals of Reinforcement Learning Course Notes Week 3 - Value Functions and Bellman Equations">
+<meta name="twitter:title" content="Oren Bochman’s Blog - Value Functions &amp; Bellman Equations">
+<meta name="twitter:description" content="In week 3 we learn about Value Functions and Bellman Equations, which are the key technology behind all the algorithms we will learn. We learn the definition of policies and value functions, as well as Bellman equations.">
 <meta name="twitter:image" content="https://orenbochman.github.io/notes/RL/thumbnail_blog.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="floating nav-fixed">
+<body class="floating nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -271,10 +291,11 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">RL Fundamentals W3 - Value Functions &amp; Bellman Equations</h1>
+      <h1 class="title">Value Functions &amp; Bellman Equations</h1>
+            <p class="subtitle lead">RL Fundamentals</p>
                   <div>
         <div class="description">
-          Fundamentals of Reinforcement Learning Course Notes Week 3 - Value Functions and Bellman Equations
+          In week 3 we learn about Value Functions and Bellman Equations, which are the key technology behind all the algorithms we will learn. We learn the definition of policies and value functions, as well as Bellman equations.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -304,7 +325,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">May 2, 2022</p>
+        <p class="date">May 4, 2022</p>
       </div>
     </div>
     
@@ -319,12 +340,28 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#fundamentals-of-reinforcement-learning" id="toc-fundamentals-of-reinforcement-learning" class="nav-link active" data-scroll-target="#fundamentals-of-reinforcement-learning">Fundamentals of Reinforcement Learning</a></li>
-  <li><a href="#week-3-value-functions-and-bellman-equations" id="toc-week-3-value-functions-and-bellman-equations" class="nav-link" data-scroll-target="#week-3-value-functions-and-bellman-equations">Week 3: Value Functions and Bellman Equations/</a>
+  <li><a href="#lesson-1-policies-and-value-functions" id="toc-lesson-1-policies-and-value-functions" class="nav-link active" data-scroll-target="#lesson-1-policies-and-value-functions">Lesson 1: Policies and Value Functions</a>
   <ul class="collapse">
-  <li><a href="#lesson-1-policies-and-value-functions" id="toc-lesson-1-policies-and-value-functions" class="nav-link" data-scroll-target="#lesson-1-policies-and-value-functions">Lesson 1: Policies and Value Functions</a></li>
+  <li><a href="#sec-policy-definition" id="toc-sec-policy-definition" class="nav-link" data-scroll-target="#sec-policy-definition">Policy Definition</a></li>
+  <li><a href="#sec-stochastic-vs-deterministic" id="toc-sec-stochastic-vs-deterministic" class="nav-link" data-scroll-target="#sec-stochastic-vs-deterministic">Stochastic vs Deterministic Policies</a></li>
+  <li><a href="#sec-value-functions" id="toc-sec-value-functions" class="nav-link" data-scroll-target="#sec-value-functions">Value Functions</a>
+  <ul class="collapse">
+  <li><a href="#sec-state-value-functions" id="toc-sec-state-value-functions" class="nav-link" data-scroll-target="#sec-state-value-functions">State-value functions <span class="math inline">V_\pi</span></a></li>
+  <li><a href="#sec-action-value-functions" id="toc-sec-action-value-functions" class="nav-link" data-scroll-target="#sec-action-value-functions">Action-value functions <span class="math inline">Q_\pi</span></a></li>
+  <li><a href="#relationship-between-value-functions-and-policies" id="toc-relationship-between-value-functions-and-policies" class="nav-link" data-scroll-target="#relationship-between-value-functions-and-policies">Relationship between Value Functions and Policies</a></li>
+  </ul></li>
   <li><a href="#lesson-2-bellman-equations" id="toc-lesson-2-bellman-equations" class="nav-link" data-scroll-target="#lesson-2-bellman-equations">Lesson 2: Bellman Equations</a></li>
+  <li><a href="#sec-bellman-equation-state-value-functions" id="toc-sec-bellman-equation-state-value-functions" class="nav-link" data-scroll-target="#sec-bellman-equation-state-value-functions">Bellman Equation for State-Value Functions</a></li>
+  <li><a href="#sec-bellman-equation-action-value-functions" id="toc-sec-bellman-equation-action-value-functions" class="nav-link" data-scroll-target="#sec-bellman-equation-action-value-functions">Bellman Equation for Action-Value Functions</a></li>
+  <li><a href="#bellman-equations" id="toc-bellman-equations" class="nav-link" data-scroll-target="#bellman-equations">Bellman Equations</a></li>
+  <li><a href="#example-gridworld" id="toc-example-gridworld" class="nav-link" data-scroll-target="#example-gridworld">Example: Gridworld</a>
+  <ul class="collapse">
   <li><a href="#lesson-3-optimality-optimal-policies-value-functions" id="toc-lesson-3-optimality-optimal-policies-value-functions" class="nav-link" data-scroll-target="#lesson-3-optimality-optimal-policies-value-functions">Lesson 3: Optimality (Optimal Policies &amp; Value Functions)</a></li>
+  </ul></li>
+  <li><a href="#sec-optimal-policy" id="toc-sec-optimal-policy" class="nav-link" data-scroll-target="#sec-optimal-policy">Optimal Policy</a></li>
+  <li><a href="#bellman-optimality-equation-for-state-value-functions" id="toc-bellman-optimality-equation-for-state-value-functions" class="nav-link" data-scroll-target="#bellman-optimality-equation-for-state-value-functions">Bellman Optimality Equation for State-Value Functions</a></li>
+  <li><a href="#bellman-optimality-equation-for-action-value-functions" id="toc-bellman-optimality-equation-for-action-value-functions" class="nav-link" data-scroll-target="#bellman-optimality-equation-for-action-value-functions">Bellman Optimality Equation for Action-Value Functions</a></li>
+  <li><a href="#optimal-value-functions" id="toc-optimal-value-functions" class="nav-link" data-scroll-target="#optimal-value-functions">Optimal Value Functions</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -334,91 +371,318 @@ window.Quarto = {
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
 
 
 
 
 
-<section id="fundamentals-of-reinforcement-learning" class="level2">
-<h2 class="anchored" data-anchor-id="fundamentals-of-reinforcement-learning">Fundamentals of Reinforcement Learning</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/alg_selector.jpeg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" data-glightbox="description: .lightbox-desc-1" title="rl algorithms"><img src="img/alg_selector.jpeg" class="img-fluid figure-img" alt="rl algorithms"></a></p>
+<p><a href="img/alg_selector.jpeg" class="lightbox" data-glightbox="description: .lightbox-desc-1" data-gallery="quarto-lightbox-gallery-1" title="rl algorithms"><img src="img/alg_selector.jpeg" class="img-fluid figure-img" alt="rl algorithms"></a></p>
 <figcaption>rl algorithms</figcaption>
 </figure>
 </div>
-</section>
-<section id="week-3-value-functions-and-bellman-equations" class="level2">
-<h2 class="anchored" data-anchor-id="week-3-value-functions-and-bellman-equations">Week 3: Value Functions and Bellman Equations/</h2>
-<ul>
-<li>Read:
-<ul class="task-list">
-<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=47">RL Book§2.1-7</a> pp.&nbsp;24-36 -&gt; before lessons.</label></li>
-<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=64">RL Book§2.8</a> pp.&nbsp;42-43 -&gt; before assignments.</label></li>
-</ul></li>
-</ul>
-<p>Once the problem is formulated as an MDP, finding the optimal policy is more efficient when using value functions. This week, we learn the definition of policies and value functions, as well as Bellman equations, which is the key technology that all of our algorithms will use.</p>
+<p><a href="https://en.wikipedia.org/wiki/Decision_theory">Decision theory</a> is the branch of Mathematics dealing with the analysis of decisions by a single agent. <a href="https://en.wikipedia.org/wiki/Game_theory">Game theory</a> is the branch of Mathematics dealing with the analysis of decisions by multiple agents. The introduction of a second agent makes the problem more complex and introduces the notion of strategic behavior. Decision theory is in many ways a simplification of game theory. In <span class="citation" data-cites="silver2015">(<a href="#ref-silver2015" role="doc-biblioref">Silver 2015</a>)</span>, Dave Silver responded to a question that a simple way of viewing MARL is that each agents are an independent decision maker.</p>
+<p>Once the problem is formulated as an MDP, finding the optimal policy is more efficient when using value functions.</p>
+<p>This week, we learn the definition of <em>policies</em> and <em>value functions</em>, as well as <em>Bellman equations</em>, which are the key technology behind all the algorithms we will learn.</p>
+<p>For someone with a background in game theory, the concept of a policy <span class="math inline">\pi</span> is not new in game theory, we call this a strategy and it is a mapping from states to actions. i.e.&nbsp;an assignment of some action to each state representing the best action that an agent should take in that state.</p>
+<p>A second familiar concept is the value function. In game theory, we call this the payoff for an action. The payoffs are typically assigned to the terminal states of the game and can be backpropagated to non-terminal states using the laws of probability. Here we are interested in the expected value of the rewards that an agent can expect to receive when following a policy <span class="math inline">\pi</span> from a given state <span class="math inline">s</span>.</p>
 <p>I found the Policy and values functions somewhat families due to some background in game theory and markov processes.</p>
-<p>I found the Bellman equations more of a challenge. I think the main issue is the unfamiliarity with the notation which make the material look like gibberish. However as I made myself more familiar with the notation, these equations express a rather simple idea.</p>
+<p>I found the Bellman equations more of a challenge. I think the main issue is the unfamiliarity with the notation which make the material look like gibberish. However, the more I made myself more familiar with the notation, I came to see that these equations express a rather simple idea.</p>
 <p>We describe a MDP as a linear process in time. However, it is really a tree of possible actions. What the Bellman equations express is that if we want to estimate the value <span class="math inline">v_\pi(s)</span> of a state or more specifically the value of an action <span class="math inline">q_\pi(s,a)</span> what we do is consider the immediate rewards and then we have have a copy of pretty much the same tree. As we move forward in time we will end up making ever smaller (discounted) corrections to our best assessment.</p>
-<section id="lesson-1-policies-and-value-functions" class="level3">
-<h3 class="anchored" data-anchor-id="lesson-1-policies-and-value-functions">Lesson 1: Policies and Value Functions</h3>
+<section id="lesson-1-policies-and-value-functions" class="level1 page-columns page-full">
+<h1>Lesson 1: Policies and Value Functions</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Read
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox">Recognize that a policy is a distribution over actions for each possible state</label></li>
-<li><label><input type="checkbox">Describe the similarities and differences between stochastic and deterministic policies</label></li>
+<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=58">@sutton2018reinforcement§3.5-7, pp.&nbsp;58-67</a></label></li>
+<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=68">@sutton2018reinforcement§3.8, pp.&nbsp;68-69</a></label></li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox">Recognize that a policy is a distribution over actions for each possible state <a href="#sec-policy-definition">#</a></label></li>
+<li><label><input type="checkbox">Describe the similarities and differences between stochastic and deterministic policies <a href="#sec-stochastic-vs-deterministic">#</a></label></li>
 <li><label><input type="checkbox">Identify the characteristics of a well-defined policy</label></li>
 <li><label><input type="checkbox">Generate examples of valid policies for a given MDP</label></li>
-<li><label><input type="checkbox">Describe the roles of state-value and action-value functions in reinforcement learning</label></li>
+<li><label><input type="checkbox">Describe the roles of state-value and action-value functions in reinforcement learning <a href="#sec-value-functions">#</a></label></li>
 <li><label><input type="checkbox">Describe the relationship between value functions and policies</label></li>
 <li><label><input type="checkbox">Create examples of valid value functions for a given MDP</label></li>
 </ul>
-</section>
-<section id="lesson-2-bellman-equations" class="level3">
-<h3 class="anchored" data-anchor-id="lesson-2-bellman-equations">Lesson 2: Bellman Equations</h3>
-<ul class="task-list">
-<li><label><input type="checkbox">Derive the Bellman equation for state-value functions</label></li>
-<li><label><input type="checkbox">Derive the Bellman equation for action-value functions</label></li>
-<li><label><input type="checkbox">Understand how Bellman equations relate current and future values</label></li>
-<li><label><input type="checkbox">Use the Bellman equations to compute value functions the state value function is <span class="math inline">v(s)</span></label></li>
+</div>
+</div>
+<section id="sec-policy-definition" class="level2">
+<h2 class="anchored" data-anchor-id="sec-policy-definition">Policy Definition</h2>
+<ul>
+<li>A policy <span class="math inline">\pi</span> is a distribution over actions for each possible state.</li>
+<li>It is denoted by <span class="math inline">\pi(a|s)</span>, which is the probability of taking action <span class="math inline">a</span> in state <span class="math inline">s</span> under policy <span class="math inline">\pi</span>.</li>
 </ul>
+</section>
+<section id="sec-stochastic-vs-deterministic" class="level2">
+<h2 class="anchored" data-anchor-id="sec-stochastic-vs-deterministic">Stochastic vs Deterministic Policies</h2>
+<ul>
+<li>A policy can be deterministic or stochastic.</li>
+<li>A deterministic policy is a policy that selects a single action in each state.
+<ul>
+<li>For example, the greedy policy selects the action with the highest value</li>
+</ul></li>
+<li>A stochastic policy is a policy that selects actions with some probability that can be conditioned on the state.
+<ul>
+<li>For example the uniform policy selects each action with equal probability.</li>
+</ul></li>
+</ul>
+</section>
+<section id="sec-value-functions" class="level2">
+<h2 class="anchored" data-anchor-id="sec-value-functions">Value Functions</h2>
+<ul>
+<li>We generally want to evaluate the value of each state or better yet the value of each action in each state before we create the policy. To do this we define two types of value functions:</li>
+</ul>
+<section id="sec-state-value-functions" class="level3">
+<h3 class="anchored" data-anchor-id="sec-state-value-functions">State-value functions <span class="math inline">V_\pi</span></h3>
+<p>The state-value function <span class="math inline">v_{\pi}(s)</span> is the expected return when starting in state <span class="math inline">s</span> and following policy <span class="math inline">\pi</span> thereafter.</p>
+<p><span id="eq-state-value-function"><span class="math display">
+v_\pi(s) \dot = \mathbb{E_\pi}[G_t|S_t = s] \quad \text{for policy} \quad \pi \qquad
+\tag{1}</span></span></p>
+</section>
+<section id="sec-action-value-functions" class="level3">
+<h3 class="anchored" data-anchor-id="sec-action-value-functions">Action-value functions <span class="math inline">Q_\pi</span></h3>
+<p>The action-value function <span class="math inline">q_{\pi}(s,a)</span> is the expected return when starting in state <span class="math inline">s</span>, taking action <span class="math inline">a</span>, and following policy <span class="math inline">\pi</span> thereafter.</p>
+<p><span id="eq-action-value-function"><span class="math display">
+q_\pi(s,a) \dot = \mathbb{E_\pi}[G_t|S_t = s, A_t = a] \quad \text{for policy} \quad \pi \qquad
+\tag{2}</span></span></p>
+</section>
+<section id="relationship-between-value-functions-and-policies" class="level3">
+<h3 class="anchored" data-anchor-id="relationship-between-value-functions-and-policies">Relationship between Value Functions and Policies</h3>
+<p>In the short term, the value functions are more useful than the return G</p>
+<ul>
+<li>The return G is not immediately available</li>
+<li>The return G can be non-deterministic.</li>
+</ul>
+<p>The value functions are deterministic and can be computed from the MDP.</p>
+</section>
+</section>
+<section id="lesson-2-bellman-equations" class="level2">
+<h2 class="anchored" data-anchor-id="lesson-2-bellman-equations">Lesson 2: Bellman Equations</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Goals
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Derive the Bellman equation for state-value functions <a href="#sec-bellman-equation-state-value-functions">#</a></label></li>
+<li><label><input type="checkbox" checked="">Derive the Bellman equation for action-value functions <a href="#sec-bellman-equation-action-value-functions">#</a></label></li>
+<li><label><input type="checkbox" checked="">Understand how Bellman equations relate current and future values</label></li>
+<li><label><input type="checkbox" checked="">Use the Bellman equations to compute value functions the state value function is <span class="math inline">v(s)</span></label></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="sec-bellman-equation-state-value-functions" class="level2">
+<h2 class="anchored" data-anchor-id="sec-bellman-equation-state-value-functions">Bellman Equation for State-Value Functions</h2>
+<p>The Bellman equation for state-value functions is a recursive equation that decomposes the value of a state into the immediate reward and the discounted value of the successor state.</p>
+<p><span id="eq-bellman-state-value-function"><span class="math display">
+\begin{align}
+  v_\pi(s) &amp;= \mathbb{E_\pi}[G_t|S_t=s] \newline
+           &amp;= \mathbb{E_\pi}[R_{t+1} + \gamma G_{t+1}|S_t=s] \newline
+           &amp;= \mathbb{E_\pi}[R_{t+1} + \gamma v_\pi(S_{t+1})|S_t=s] \newline
+           &amp;= \sum_a \pi(a|s) \sum_{s'} \sum_r p(s',r|s,a) (r + \gamma \mathbb{E_\pi}[G_{t+1}|S_{t+1}=s']) \newline
+           &amp;= \sum_a \pi(a|s) \sum_{s'} \sum_r p(s',r|s,a) (r + \gamma v_\pi(s'))
+\end{align}
+\tag{3}</span></span></p>
+</section>
+<section id="sec-bellman-equation-action-value-functions" class="level2">
+<h2 class="anchored" data-anchor-id="sec-bellman-equation-action-value-functions">Bellman Equation for Action-Value Functions</h2>
+<p>The Bellman equation for action-value functions is a recursive equation that decomposes the value of a state-action pair into the immediate reward and the discounted value of the successor state-action pair.</p>
+<p><span id="eq-bellman-action-value-function"><span class="math display">
+\begin{align}
+  q_\pi(s,a) &amp; \dot = \mathbb{E_\pi}[G_t|S_t=s, A_t=a] \newline
+             &amp;= \sum_{s'} \sum_r p(s',r|s,a) (r + \gamma \mathbb{E_\pi}[G_{t+1}|S_{t+1}=s']) \newline
+             &amp; = \sum_{s'} \sum_r p(s',r|s,a) (r + \gamma \sum_{a'} \pi(a'|s') \mathbb{E_\pi}[G_{t+1}|S_{t+1}=s', A_{t+1}=a']) \newline
+             &amp;= \sum_{s'} \sum_r p(s',r|s,a) (r + \gamma \sum_{a'} \pi(a'|s') q_\pi(s',a'))
+\end{align}
+\tag{4}</span></span></p>
+</section>
+<section id="bellman-equations" class="level2">
+<h2 class="anchored" data-anchor-id="bellman-equations">Bellman Equations</h2>
+<p>the bellman equations capture the relationship between the current value and the future value. The Bellman equations are a set of equations that express the relationship between the value of a state and the value of its successor states. The Bellman equations are used to compute the value functions of a Markov Decision Process (MDP).</p>
+</section>
+<section id="example-gridworld" class="level2">
+<h2 class="anchored" data-anchor-id="example-gridworld">Example: Gridworld</h2>
+<table class="table">
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>B</td>
+</tr>
+<tr class="even">
+<td>C</td>
+<td>D</td>
+</tr>
+</tbody>
+</table>
+<p>In the 2x2 gridworld example, the agent can move up, down, left, or right. The agent receives a reward of 0 for each step taken unless it gets to location B for which it gets +5. The agent receives will return to the current cell if it bumping into the wall.</p>
+<p>We will use the uniform random policy where the agent selects each action with equal probability.</p>
+<p>gamma = 0.7</p>
+<p>lets calculate the value of each state using the Bellman equation.</p>
 <p><span class="math display">
 \begin{align}
-  v(s) &amp;= E(r|s) \newline &amp;= \sum_r p(r|s) \times r \newline &amp;= \sum_r p(r_t|s_t) \times [r_t+ \sum \gamma^{t+1} \times r_{t+1}]
-  \end{align}
+v_\pi(A) &amp;= \sum_a \pi(a|A) \sum_{s'} \sum_r p(s',r|A,a) (r + \gamma v(s')) \newline
+     &amp;= \sum_a \pi(a|A) (r + 0.7 v_\pi(s')) \newline
+     &amp;= 0.25 \times (0.7 \times v(A)) + 0.25 \times (5 + 0.7 \times v(B)) + 0.25 \times (0.7 \times v(C)) + 0.25 \times (0.7 \times v(A))
+\end{align}
 </span></p>
-</section>
+<p><span class="math display">
+\begin{align}
+v_\pi(B) &amp;=
+     &amp;= 0.25 \times (0.7 \times v(A)) + 0.5 \times (5 + 0.7 \times v(B)) + 0.25 \times (0.7 \times v(D)) \newline
+\end{align}
+</span> <span class="math display">
+\begin{align}
+v_\pi(C) &amp;=
+     &amp;= 0.25 \times (0.7 \times v(A)) + 0.5 \times (0.7 \times v(B)) + 0.25 \times (0.7 \times v(C)) \newline
+\end{align}
+</span></p>
+<p><span class="math display">
+\begin{align}
+v_\pi(D) &amp;=
+     &amp;= 0.25 \times (0.7 \times v(B)) + 0.5 \times (0.7 \times v(C)) + 0.25 \times (0.7 \times v(D)) \newline
+\end{align}
+</span></p>
+<p>we can solve these equations to get the value of each state.</p>
+<p>theses are</p>
+<p><span class="math display">
+\begin{align}
+v_\pi(A) &amp;= 4.2 \newline
+v_\pi(B) &amp;= 6.1 \newline
+v_\pi(C) &amp;= 2.2 \newline
+v_\pi(D) &amp;= 4.2 \newline
+\end{align}
+</span></p>
+<p>We can use the Bellman equation to calculate the value of each state in the Gridworld. The value of each state is the expected return when starting in that state and following the policy <span class="math inline">\pi</span> thereafter. The value of each state is calculated by summing the immediate reward and the discounted value of the successor states.</p>
+<p>For larger MDP the Bellman equations are not practical method to calculate the value of each state. Instead, we will use algorithms based on the Bellman equations to estimate the value of each state.</p>
 <section id="lesson-3-optimality-optimal-policies-value-functions" class="level3">
 <h3 class="anchored" data-anchor-id="lesson-3-optimality-optimal-policies-value-functions">Lesson 3: Optimality (Optimal Policies &amp; Value Functions)</h3>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Goals
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox">Define an optimal policy</label></li>
-<li><label><input type="checkbox">Understand how a policy can be at least as good as every other policy in every state</label></li>
-<li><label><input type="checkbox">Identify an optimal policy for given MDPs</label></li>
+<li><label><input type="checkbox">Define an optimal policy <a href="#sec-optimal-policy">#</a></label></li>
+<li><label><input type="checkbox">Understand how a policy can be at least as good as every other policy in every state.</label></li>
+<li><label><input type="checkbox">Identify an optimal policy for given MDPs.</label></li>
 <li><label><input type="checkbox">Derive the Bellman optimality equation for state-value functions</label></li>
 <li><label><input type="checkbox">Derive the Bellman optimality equation for action-value functions</label></li>
 <li><label><input type="checkbox">Understand how the Bellman optimality equations relate to the previously introduced Bellman equations</label></li>
 <li><label><input type="checkbox">Understand the connection between the optimal value function and optimal policies</label></li>
 <li><label><input type="checkbox">Verify the optimal value function for given MDPs</label></li>
 </ul>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-optimal-policy" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-optimal-policy">Optimal Policy</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-optimal-policy.png" class="lightbox" data-glightbox="description: .lightbox-desc-2" data-gallery="quarto-lightbox-gallery-2" title="Bellman Optimality Equation"><img src="img/rl-optimal-policy.png" class="img-fluid figure-img" alt="Bellman Optimality Equation"></a></p>
+<figcaption>Bellman Optimality Equation</figcaption>
+</figure>
+</div></div><ul>
+<li>A policy <span class="math inline">pi_1</span> is better than a policy <span class="math inline">\pi_2</span> if <span class="math inline">v_{\pi_1}(s) \geq v_{\pi_2}(s)</span> for all states <span class="math inline">s</span>.</li>
+<li>Given any two policies <span class="math inline">\pi</span> and <span class="math inline">\pi'</span>, if we pick the action that maximizes the value function, from either at every state, we will get a new policy that is at least as good as both <span class="math inline">\pi</span> and <span class="math inline">\pi'</span>.</li>
+<li>There is always at least one deterministic optimal policy for any MDP.</li>
+<li>An optimal policy <span class="math inline">\pi^*</span> is a policy that is at least as good as every other policy in every state.</li>
+<li>The optimal policy is denoted by <span class="math inline">\pi^*</span> and is defined as:</li>
+</ul>
+<p><span id="eq-optimal-policy"><span class="math display">
+\pi^* \dot = \arg \max_{\pi} v_{\pi}(s) \quad \forall s\in S
+\tag{5}</span></span></p>
+</section>
+<section id="bellman-optimality-equation-for-state-value-functions" class="level2">
+<h2 class="anchored" data-anchor-id="bellman-optimality-equation-for-state-value-functions">Bellman Optimality Equation for State-Value Functions</h2>
+<p>The Bellman optimality equation for state-value functions is a recursive equation that decomposes the value of a state into the immediate reward and the discounted value of the successor state under the optimal policy.</p>
+<p><span id="eq-bellman-optimality-state-value-function"><span class="math display">
+\begin{align}
+v_*(s) &amp; \dot = \max_{\pi} v_{\pi}(s) \quad \forall s \in S\newline
+       &amp; = \max_a \mathbb{E}[R_{t+1} + \gamma v_*(S_{t+1})|S_t=s, A_t=a] \newline
+       &amp; = \max_a \sum_{s'} \sum_r p(s',r|s,a) (r + \gamma v_*(s'))
+\end{align}
+\tag{6}</span></span></p>
+</section>
+<section id="bellman-optimality-equation-for-action-value-functions" class="level2">
+<h2 class="anchored" data-anchor-id="bellman-optimality-equation-for-action-value-functions">Bellman Optimality Equation for Action-Value Functions</h2>
+<p>The Bellman optimality equation for action-value functions is a recursive equation that decomposes the value of a state-action pair into the immediate reward and the discounted value of the successor state-action pair under the optimal policy.</p>
+<p><span id="eq-bellman-optimality-action-value-function"><span class="math display">
+\begin{align}
+q_*(s,a) &amp; \dot = \max_{\pi} q_{\pi}(s,a) \quad \forall s \in S, \forall a \in A \newline
+         &amp; = \mathbb{E}[R_{t+1} + \gamma \max_{a'} q_*(S_{t+1}, a')|S_t=s, A_t=a] \newline
+         &amp; = \sum_{s'} \sum_r p(s',r|s,a) (r + \gamma \max_{a'} q_*(s',a'))
+\end{align}
+\tag{7}</span></span></p>
+<p>Martha asks the question: “How can <span class="math inline">\Pi_3</span> have better strictly better values than both <span class="math inline">\Pi_1</span> and <span class="math inline">\Pi_2</span> in all states if all we did is take the best action in each state from either <span class="math inline">\Pi_1</span> or <span class="math inline">\Pi_2</span>?”</p>
+<p>this is because if for example we found a fast path through a bottleneck for any state that is before the bottleneck will have a higher value in the other policies which may have had longer paths through the bottleneck.</p>
+</section>
+<section id="optimal-value-functions" class="level2">
+<h2 class="anchored" data-anchor-id="optimal-value-functions">Optimal Value Functions</h2>
+<ul>
+<li><p>The optimal value function <span class="math inline">v_*(s)</span> is the expected return when starting in state <span class="math inline">s</span> and following the optimal policy thereafter.</p></li>
+<li><p>The optimal action-value function <span class="math inline">q_*(s,a)</span> is the expected return when starting in state <span class="math inline">s</span>, taking action <span class="math inline">a</span>, and following the optimal policy thereafter.</p></li>
+</ul>
 
 
 <div class="hidden" aria-hidden="true">
 <span class="glightbox-desc lightbox-desc-1">rl algorithms</span>
+<span class="glightbox-desc lightbox-desc-2">Bellman Optimality Equation</span>
 </div>
+
 </section>
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2022,
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-silver2015" class="csl-entry" role="listitem">
+Silver, David. 2015. <span>“Lectures on Reinforcement Learning.”</span> <span class="smallcaps">url:</span>&nbsp;<a href="https://www.davidsilver.uk/teaching/" class="uri">https://www.davidsilver.uk/teaching/</a>.
+</div>
+</div></section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2022,
   author = {Bochman, Oren},
-  title = {RL {Fundamentals} {W3} - {Value} {Functions} \&amp; {Bellman}
-    {Equations}},
-  date = {2022-05-02},
+  title = {Value {Functions} \&amp; {Bellman} {Equations}},
+  date = {2022-05-04},
   url = {https://orenbochman.github.io//notes/RL/c1-w3.html},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2022" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2022. <span>“RL Fundamentals W3 - Value Functions &amp;
-Bellman Equations.”</span> May 2, 2022. <a href="https://orenbochman.github.io//notes/RL/c1-w3.html">https://orenbochman.github.io//notes/RL/c1-w3.html</a>.
+Bochman, Oren. 2022. <span>“Value Functions &amp; Bellman
+Equations.”</span> May 4, 2022. <a href="https://orenbochman.github.io//notes/RL/c1-w3.html">https://orenbochman.github.io//notes/RL/c1-w3.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1105,7 +1369,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","loop":false,"selector":".lightbox","closeEffect":"zoom","openEffect":"zoom"});
+<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","selector":".lightbox","closeEffect":"zoom","loop":false,"openEffect":"zoom"});
 window.onload = () => {
   lightboxQuarto.on('slide_before_load', (data) => {
     const { slideIndex, slideNode, slideConfig, player, trigger } = data;

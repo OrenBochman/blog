@@ -2,15 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.4.554">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="dcterms.date" content="2024-05-02">
-<meta name="description" content="In these unit we define some key terms like rewards, states, action, value functions, action values functions. Then we consider at the the multi-armed bandit problem leading to exploration explotation dillema, the epsilon greedy algorithm.">
+<meta name="dcterms.date" content="2022-05-02">
+<meta name="description" content="In week 1 we define some key concepts like rewards, states, action, value functions, action values functions. We consider the the multi-armed bandit problem, leading to exploration explotation dillema, and the epsilon greedy algorithm.">
 
-<title>Oren Bochman’s Blog - RL Fundamentals W1</title>
+<title>Oren Bochman’s Blog - The K-Armed Bandit Problem</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,7 +23,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -46,6 +100,8 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
+<link href="../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
 <script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -140,8 +196,8 @@ window.Quarto = {
 };
 </script>
 
-<meta name="twitter:title" content="Oren Bochman’s Blog - RL Fundamentals W1">
-<meta name="twitter:description" content="In these unit we define some key terms like rewards, states, action, value functions, action values functions. Then we consider at the the multi-armed bandit problem leading to exploration explotation dillema, the epsilon greedy algorithm.">
+<meta name="twitter:title" content="Oren Bochman’s Blog - The K-Armed Bandit Problem">
+<meta name="twitter:description" content="In week 1 we define some key concepts like rewards, states, action, value functions, action values functions. We consider the the multi-armed bandit problem, leading to exploration explotation dillema, and the epsilon greedy algorithm.">
 <meta name="twitter:image" content="https://orenbochman.github.io/notes/RL/thumbnail_blog.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
@@ -271,11 +327,11 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">RL Fundamentals W1</h1>
-            <p class="subtitle lead">The K-Armed Bandit Problem</p>
+      <h1 class="title">The K-Armed Bandit Problem</h1>
+            <p class="subtitle lead">RL Fundamentals</p>
                   <div>
         <div class="description">
-          In these unit we define some key terms like rewards, states, action, value functions, action values functions. Then we consider at the the multi-armed bandit problem leading to exploration explotation dillema, the epsilon greedy algorithm.
+          In week 1 we define some key concepts like rewards, states, action, value functions, action values functions. We consider the the multi-armed bandit problem, leading to exploration explotation dillema, and the epsilon greedy algorithm.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -306,7 +362,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">May 2, 2024</p>
+        <p class="date">May 2, 2022</p>
       </div>
     </div>
     
@@ -321,27 +377,31 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#notation" id="toc-notation" class="nav-link active" data-scroll-target="#notation">Notation:</a></li>
-  <li><a href="#week-1-the-k-armed-bandit-problem" id="toc-week-1-the-k-armed-bandit-problem" class="nav-link" data-scroll-target="#week-1-the-k-armed-bandit-problem">Week 1: The K-Armed Bandit Problem</a>
+  <li><a href="#intro" id="toc-intro" class="nav-link active" data-scroll-target="#intro">Intro</a></li>
+  <li><a href="#sec-lesson-k-armed-bandit" id="toc-sec-lesson-k-armed-bandit" class="nav-link" data-scroll-target="#sec-lesson-k-armed-bandit">Lesson 1: The K-Armed Bandit</a>
   <ul class="collapse">
-  <li><a href="#lesson-1-the-k-armed-bandit" id="toc-lesson-1-the-k-armed-bandit" class="nav-link" data-scroll-target="#lesson-1-the-k-armed-bandit">Lesson 1 The K-Armed Bandit</a></li>
+  <li><a href="#sec-k-armed-bandit" id="toc-sec-k-armed-bandit" class="nav-link" data-scroll-target="#sec-k-armed-bandit">K-armed bandits 🐙</a></li>
+  <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">Temporal nature of the bandit problem</a></li>
   </ul></li>
-  <li><a href="#lesson-2-what-to-learn-understanding-action-values" id="toc-lesson-2-what-to-learn-understanding-action-values" class="nav-link" data-scroll-target="#lesson-2-what-to-learn-understanding-action-values">Lesson 2: What to learn: understanding Action Values</a>
+  <li><a href="#sec-lesson-action-values" id="toc-sec-lesson-action-values" class="nav-link" data-scroll-target="#sec-lesson-action-values">Lesson 2: What to learn: understanding Action Values</a>
   <ul class="collapse">
   <li><a href="#L2G1" id="toc-L2G1" class="nav-link" data-scroll-target="#L2G1">What are action-value estimation methods?</a></li>
-  <li><a href="#L2G2" id="toc-L2G2" class="nav-link" data-scroll-target="#L2G2">Exploration and Exploitation definition and dillema</a></li>
+  <li><a href="#L2G2" id="toc-L2G2" class="nav-link" data-scroll-target="#L2G2">Exploration and Exploitation definition and dilemma</a></li>
   <li><a href="#L2G4" id="toc-L2G4" class="nav-link" data-scroll-target="#L2G4">Defining Online learning ?</a></li>
   <li><a href="#L2G5" id="toc-L2G5" class="nav-link" data-scroll-target="#L2G5">Sample Average Method for estimating Action Values Incrementally</a></li>
   <li><a href="#L2G6" id="toc-L2G6" class="nav-link" data-scroll-target="#L2G6">What are action-value estimation methods?</a></li>
   </ul></li>
-  <li><a href="#lesson-3-exploration-vs-exploitation" id="toc-lesson-3-exploration-vs-exploitation" class="nav-link" data-scroll-target="#lesson-3-exploration-vs-exploitation">Lesson 3: Exploration vs Exploitation</a>
+  <li><a href="#sec-lesson-exploration-exploitation" id="toc-sec-lesson-exploration-exploitation" class="nav-link" data-scroll-target="#sec-lesson-exploration-exploitation">Lesson 3: Exploration vs Exploitation</a>
   <ul class="collapse">
-  <li><a href="#L3G1" id="toc-L3G1" class="nav-link" data-scroll-target="#L3G1"><span class="math inline">\epsilon</span>-Greedy Policies</a></li>
-  <li><a href="#benefits-of-exploitation-and-exploration" id="toc-benefits-of-exploitation-and-exploration" class="nav-link" data-scroll-target="#benefits-of-exploitation-and-exploration">Benefits of exploitation and exploration</a></li>
-  <li><a href="#L3G3" id="toc-L3G3" class="nav-link" data-scroll-target="#L3G3">Optimistic initial values</a></li>
-  <li><a href="#L3G4" id="toc-L3G4" class="nav-link" data-scroll-target="#L3G4">Benefits of optimistic initial values for early exploration</a></li>
-  <li><a href="#L3G5" id="toc-L3G5" class="nav-link" data-scroll-target="#L3G5">Criticisms of optimistic initial values</a></li>
-  <li><a href="#L3G6" id="toc-L3G6" class="nav-link" data-scroll-target="#L3G6">The UCB action selection method</a></li>
+  <li><a href="#sec-epsilon-greedy-policies" id="toc-sec-epsilon-greedy-policies" class="nav-link" data-scroll-target="#sec-epsilon-greedy-policies">Ɛ-Greedy Policies</a></li>
+  <li><a href="#sec-benefits-of-exploitation-and-exploration" id="toc-sec-benefits-of-exploitation-and-exploration" class="nav-link" data-scroll-target="#sec-benefits-of-exploitation-and-exploration">Benefits of Exploitation &amp; Exploration</a></li>
+  <li><a href="#sec-optimistic-initial-values" id="toc-sec-optimistic-initial-values" class="nav-link" data-scroll-target="#sec-optimistic-initial-values">Optimistic initial values</a></li>
+  <li><a href="#sec-benefits-of-optimistic-initial-values-for-early-exploration" id="toc-sec-benefits-of-optimistic-initial-values-for-early-exploration" class="nav-link" data-scroll-target="#sec-benefits-of-optimistic-initial-values-for-early-exploration">Benefits of optimistic initial values for early exploration</a></li>
+  <li><a href="#sec-the-ucb-action-selection-method" id="toc-sec-the-ucb-action-selection-method" class="nav-link" data-scroll-target="#sec-the-ucb-action-selection-method">The UCB action selection method</a></li>
+  <li><a href="#Sec-Thompson-Sampling" id="toc-Sec-Thompson-Sampling" class="nav-link" data-scroll-target="#Sec-Thompson-Sampling">Thompson Sampling</a>
+  <ul class="collapse">
+  <li><a href="#Sec-Thompson-Sampling-Algorithm" id="toc-Sec-Thompson-Sampling-Algorithm" class="nav-link" data-scroll-target="#Sec-Thompson-Sampling-Algorithm">Thompson Sampling Algorithm</a></li>
+  </ul></li>
   <li><a href="#L3G7" id="toc-L3G7" class="nav-link" data-scroll-target="#L3G7">Optimism in the face of uncertainty</a></li>
   </ul></li>
   <li><a href="#awesome-rl-resources" id="toc-awesome-rl-resources" class="nav-link" data-scroll-target="#awesome-rl-resources">Awesome RL resources</a></li>
@@ -365,7 +425,9 @@ window.Quarto = {
 <p><a href="img/alg_selector.jpeg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" data-glightbox="description: .lightbox-desc-1" title="RL algorithms"><img src="img/alg_selector.jpeg" class="img-fluid figure-img" alt="RL algorithms"></a></p>
 <figcaption>RL algorithms</figcaption>
 </figure>
-</div></div><p>The teachers are world class, researches from the best university for this subject. However, this high level comes with the following caveat: their delivery is always terse and precise. They frequently reference old material which you may not have <em>fully digested</em> yet. In fact I discovered to my 😱 horror how easy it is go through the material, quizzes and programming assignments scoring 100% but not connect the dots.</p>
+</div></div><section id="intro" class="level1">
+<h1>Intro</h1>
+<p>The teachers are world class, researches from the best university for this subject. However, this high level comes with the following caveat: their delivery is always terse and precise. They frequently reference old material which you may not have <em>fully digested</em> yet. In fact I discovered to my 😱 horror how easy it is go through the material, quizzes and programming assignments scoring 100% but not connect the dots.</p>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -378,9 +440,9 @@ Deceptively simple <span class="emoji" data-emoji="bulb">💡</span>
 <div class="callout-body-container callout-body">
 <p><mark>This course is <strong>deceptively simple</strong></mark> - the chart in the margin provides a great summary of the material for the whole specialization. Only a handful of concepts are needed to master RL.</p>
 <ul>
-<li>This specialization is all about connecting dot.</li>
-<li>We revisit the same ideas over and over improving them in small but significant ways.</li>
-<li>In this course and the more connections you make the better you will remember material</li>
+<li>This specialization is all about connecting the dots.</li>
+<li>We revisit the same ideas over and over improving them in small but significant ways by relaxing the assumptions. e.g.&nbsp;from bandits with one state we move to MDP with many states and get the ability to formulate plans. From Dynamic programming with a fully specified model we move to model free settings where we might not be able to efficiently learn a model. From tabular methods where we treat each state as a separate entity we we move to function approximation and deep learning where we can generalize from one state to many others.</li>
+<li>In this course and the more connections you make the better you will understand and remember material.</li>
 <li>And the greater you facility to apply RL to new problems.</li>
 </ul>
 </div>
@@ -400,13 +462,13 @@ Connecting The Dot to see the Forest For the Trees 🎄
 <ol type="1">
 <li><strong>Annotate</strong> 🖊️ you e-copy of the book 📖</li>
 <li><strong>Flash cards</strong> 🗂️ are your 🧑‍🤝‍🧑 friends. We don’t need too many but they can help you keep the essentials (algorithms, definitions, some formulas, a few diagrams) fresh in your mind.</li>
-<li><strong>Review</strong> 👁️ the videos/quizzes until nothing seems surprising/confusing<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</li>
+<li><strong>Review</strong> 👁️ the videos/quizzes until nothing seems surprising/confusing <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</li>
 <li><strong>Review</strong> 👁️ your notes every time you complete a part of the specialization. Also a great idea if have an RL interview 💼</li>
 <li><strong>Coding</strong>: If you have time do extra RL coding
 <ol type="1">
 <li>Start with developing more environments, simple and complex ⛩️</li>
-<li>Implement more algorithms - from the course, the books , papers.⛩️</li>
-<li>The note books also try to teach you experiments and analysis comparing algorithms performance. If you assimilate this part you are really going to shine. ⛩️</li>
+<li>Implement more algorithms - from the course, the books, papers.⛩️</li>
+<li>The notebooks also try to teach you experiments and analysis comparing algorithms performance. If you assimilate this part you are really going to shine. ⛩️</li>
 </ol></li>
 </ol>
 </div>
@@ -422,31 +484,38 @@ Mathematical Mnemonics 😍
 </div>
 <div class="callout-body-container callout-body">
 <p>As a Mathematics major I can attest that Mathematics becomes 10x easier so long as you can recall 🧠 the basic definitions and their notation.</p>
-<p>I have extracted the essentials from the text book below. Best to memorize these or at least keep a copy handy and you are well on your way to groking this course</p>
-</div>
-</div>
-<section id="notation" class="level3">
-<h3 class="anchored" data-anchor-id="notation">Notation:</h3>
+<p>I have extracted the essentials from the text book below. Best to memorize these or at least keep a copy handy and you are well on your way to grokking this course</p>
 <ul>
-<li><span class="math inline">G_t</span> <strong>return</strong> at time t, for a <span class="math inline">(s_t,a_t,r_t...)</span> sequence discounted by <span class="math inline">\gamma</span>.</li>
-<li><span class="math inline">r(s,a)</span> - <strong>expected immediate rewards</strong> for action <span class="math inline">a</span> in state <span class="math inline">s</span> AKA <strong>reward</strong> of a <strong>Markov reward process</strong></li>
+<li><span class="math inline">G_t</span> <strong>return</strong> at time t, for a <span class="math inline">(s_t,a_t,r_t...)</span> sequence discounted by <span class="math inline">\gamma\in(0,1)</span>.</li>
+<li><span class="math inline">r(s,a)</span> - <strong>expected immediate rewards</strong> for action <span class="math inline">a</span> in state <span class="math inline">s</span></li>
 <li><span class="math inline">\pi</span> <strong>policy</strong> - a decision making rule for every state.</li>
 <li><span class="math inline">\pi_*</span> <strong>optimal policy</strong> - which returns the maximum rewards.</li>
 <li><span class="math inline">p(s',r \vert s,a)</span> - <strong>transition probability</strong> to state <span class="math inline">s'</span> with reward <span class="math inline">r</span> from state <span class="math inline">s</span> via action <span class="math inline">a</span> AKA <strong>four valued dynamics</strong> function.</li>
 <li><span class="math inline">p(s' \vert s,a)</span> - <strong>transition probability</strong> to state <span class="math inline">s'</span> from state <span class="math inline">s</span> via action <span class="math inline">a</span> AKA <strong>Markov process transition matrix</strong></li>
-<li><span class="math inline">v_\pi(s)</span> - state’s <strong>value</strong> under policy <span class="math inline">\pi</span> which is its expected return</li>
-<li><span class="math inline">q_\pi(s,a)</span> - the <strong>action value</strong> in state <span class="math inline">s</span> under policy <span class="math inline">\pi</span></li>
+<li><span class="math inline">v_\pi(s)</span> - state’s <strong>value</strong> under policy <span class="math inline">\pi</span> which is its expected return.</li>
+<li><span class="math inline">q_\pi(s,a)</span> - the <strong>action value</strong> in state <span class="math inline">s</span> under policy <span class="math inline">\pi</span>.</li>
 </ul>
+</div>
+</div>
 </section>
-<section id="week-1-the-k-armed-bandit-problem" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="week-1-the-k-armed-bandit-problem">Week 1: The K-Armed Bandit Problem</h2>
-<p>Read:</p>
+<section id="sec-lesson-k-armed-bandit" class="level1 page-columns page-full">
+<h1>Lesson 1: The K-Armed Bandit</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Read:
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=47">RL Book§2.1-7</a> pp.&nbsp;24-36 -&gt; before lessons.</label></li>
-<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=64">RL Book§2.8</a> pp.&nbsp;42-43 -&gt; before assignments.</label></li>
+<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=47">@sutton2018reinforcement§2.1-7, pp.&nbsp;25-36</a></label></li>
+<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=47">@sutton2018reinforcement§2.8, pp.&nbsp;42-43</a></label></li>
 </ul>
-<section id="lesson-1-the-k-armed-bandit" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="lesson-1-the-k-armed-bandit">Lesson 1 The K-Armed Bandit</h3>
+</div>
+</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -458,17 +527,40 @@ Goals
 </div>
 <div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox">Understand the temporal nature of the bandit problem</label></li>
-<li><label><input type="checkbox" checked="">Define k-armed bandit</label></li>
-<li><label><input type="checkbox" checked="">Define action-values</label></li>
-<li><label><input type="checkbox" checked="">Define reward</label></li>
+<li><label><input type="checkbox">Understand the temporal nature of the bandit problem <a href="#sec-k-armed-bandit">#</a></label></li>
+<li><label><input type="checkbox" checked="">Define k-armed bandit problem <a href="#l1g2">#</a></label></li>
+<li><label><input type="checkbox" checked="">Define action-values and the greedy action selection method <a href="#sec-l1g3">#</a></label></li>
+<li><label><input type="checkbox" checked="">Define reward, time steps, and value functions <a href="#l1g4">#</a></label></li>
 </ul>
 </div>
 </div>
-<section id="k-armed-bandits" class="level4 page-columns page-full">
-<h4 class="anchored" data-anchor-id="k-armed-bandits">K-armed bandits 🐙</h4>
-<p>In the <strong>k-armed bandit</strong> problem there is an <strong>agent</strong> who is given by the environment a <strong>state</strong> <span class="math inline">s</span> and must learn to find which of action <span class="math inline">a</span> from the possible set of <strong>actions</strong> <span class="math inline">A</span>. leading to and has the greatest <strong>expected reward</strong>. This can be done using Bayesian updating starting from a uniform prior.</p>
-<p>Note: in the bandit there is only one state. So after we pull the arm nothing in the problem changes. In RL we will be intersted in more general problems in which actions will lead the agent to new states.</p>
+<blockquote class="blockquote">
+<p>In reinforcement learning, the agent generates its own training data by interacting with the world. The agent must learn the consequences of his own actions through trial and error, rather than being told the correct action – <span class="citation" data-cites="white2020fundamental">(<a href="#ref-white2020fundamental" role="doc-biblioref">Matha White 2020</a>)</span></p>
+</blockquote>
+<section id="sec-k-armed-bandit" class="level2">
+<h2 class="anchored" data-anchor-id="sec-k-armed-bandit">K-armed bandits 🐙</h2>
+<p>In the <strong>k-armed bandit</strong> problem there is an <strong>agent</strong> who is assigned a <strong>state</strong> <span class="math inline">s</span> by the environment and must learn which action <span class="math inline">a</span> from the possible set of <strong>actions</strong> <span class="math inline">A</span> leads to the goal state through a signal based on the greatest <strong>expected reward</strong>.</p>
+<p>One way this can be achieved is using a Bayesian updating scheme starting from a uniform prior.</p>
+</section>
+<section id="sec-l1g1" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-l1g1">Temporal nature of the bandit problem</h2>
+<p>The <strong>bandit problem</strong> cam be static problem with a fixed reward distribution. However, more generally it is a <strong>temporal</strong> problem when the rewards distribution changes over time and agent must learn to adapt to these changes.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Difference between bandits and RL
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In the typical <strong>bandit setting</strong> there is only one state. So after we pull the arm nothing in the problem changes.</p>
+<p>Bandits problems where agents can discriminate between states are called <em>contextual bandits.</em></p>
+<p>However, bandits embody one of the main themes of RL - that of estimating an expected reward for different actions.</p>
+<p>In the more general <strong>RL setting</strong> we will be interested in more general problems where actions will lead the agent to new states and the goal is some specific state we need to reach.</p>
+</div>
+</div>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -476,7 +568,7 @@ Goals
 <figcaption>bandit</figcaption>
 </figure>
 </div></div><div id="exm-clinical-trials" class="theorem example">
-<p><span class="theorem-title"><strong>Example 1 (Using multi-armed bandit to randomize a medical trial)</strong></span> &nbsp;</p>
+<p><span class="theorem-title"><strong>Example 1 (Using Multi-armed bandit to randomize a medical trial)</strong></span> &nbsp;</p>
 <ul>
 <li>agent is the doctor</li>
 <li>actions {blue, yellow, red} treatment</li>
@@ -492,12 +584,14 @@ Goals
 <p><a href="img/rl-clinical-trial.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" data-glightbox="description: .lightbox-desc-3" title="clinical trial"><img src="img/rl-clinical-trial.png" class="img-fluid figure-img" alt="clinical trial"></a></p>
 <figcaption>clinical trial</figcaption>
 </figure>
-</div></div></section>
-<section id="action-values" class="level4 page-columns page-full">
-<h4 class="anchored" data-anchor-id="action-values">Action Values</h4>
+</div></div><section id="sec-l1g3" class="level4">
+<h4 class="anchored" data-anchor-id="sec-l1g3">Action Values and Greedy Action Selection</h4>
 <p>The <strong>value</strong> of an action is its <strong>expected reward</strong> which can be expressed mathematically as:</p>
 <p><span id="eq-action-value"><span class="math display">
-q_*(a) \doteq \mathbb{E}[R_t  \vert  A_t=a] \space \forall a \in \{a_1 ... a_k\} \qquad
+\begin{align}
+q_{\star}(a) &amp; \doteq \mathbb{E}[R_t  \vert  A_t=a] \space \forall a \in \{a_1 ... a_k\} \newline
+             &amp; = \sum_r p(r|a)r \qquad \text{(action value)}
+\end{align}
 \tag{1}</span></span></p>
 <p>where:</p>
 <ul>
@@ -506,30 +600,49 @@ q_*(a) \doteq \mathbb{E}[R_t  \vert  A_t=a] \space \forall a \in \{a_1 ... a_k\}
 </ul>
 <p>The goal of the agent is to maximize the expected reward which we can express mathematically as:</p>
 <p><span id="eq-greedification"><span class="math display">
-\arg\max_a q_*(a)=\sum p(r \vert a) \times r \qquad \text{Greedification}
+\arg\max_a q(a)=\sum_r p(r \vert a) \times r \qquad \text{(Greedification)}
 \tag{2}</span></span></p>
 <p>where:</p>
 <ul>
-<li><span class="math inline">\arg \max_a</span> means the argument <span class="math inline">a</span> maximizes …</li>
+<li><span class="math inline">\arg \max_a</span> means the argument <span class="math inline">a</span> maximizes - so the agent is looking for the action that maximizes the expected reward and the outcome is an action.</li>
 </ul>
+</section>
+<section id="l1g4" class="level4 page-columns page-full">
+<h4 class="anchored" data-anchor-id="l1g4">Reward, Return, and Value Functions</h4>
+<p>The <strong>reward</strong> <span class="math inline">r</span> is the immediate feedback from the environment after the agent takes an action.</p>
+<p>The <strong>return</strong> <span class="math inline">G_t</span> is the total discounted reward from time-step <span class="math inline">t</span>.</p>
+<p>The <strong>value function</strong> <span class="math inline">v(s)</span> of an MRP is the expected return starting from state <span class="math inline">s</span>.</p>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="img/rl-descion-problems.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" data-glightbox="description: .lightbox-desc-4" title="decisions"><img src="img/rl-descion-problems.png" class="img-fluid figure-img" alt="decisions"></a></p>
 <figcaption>decisions</figcaption>
 </figure>
-</div><div class="quarto-figure quarto-figure-center">
+</div></div><p>example of decisions under uncertainty:</p>
+<ul>
+<li>movie recommendation.</li>
+<li>clinical trials.</li>
+<li>music recommendation.</li>
+<li>food ordering at a restaurant.</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="img/rl-why-bandits.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" data-glightbox="description: .lightbox-desc-5" title="why discuss bandits"><img src="img/rl-why-bandits.png" class="img-fluid figure-img" alt="why discuss bandits"></a></p>
 <figcaption>why discuss bandits</figcaption>
 </figure>
-</div></div>
-<p>The bandits problem is the simplest setting for RL. More advanced algorithms will incorporate parts we use to solve this simple settings.</p>
+</div></div><p>It best to consider issues and algorithms design choices in the simplest setting first. The bandit problem is the simplest setting for RL. More advanced algorithms will incorporate parts we use to solve this simple settings.</p>
+<ul>
+<li>maximizing rewards.</li>
+<li>balancing exploration and exploitation.</li>
+<li>estimating expected rewards for different actions.</li>
+</ul>
+<p>are all problems we will encounter in bothe the bandit and the more general RL setting.</p>
 </section>
 </section>
 </section>
-<section id="lesson-2-what-to-learn-understanding-action-values" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="lesson-2-what-to-learn-understanding-action-values">Lesson 2: What to learn: understanding Action Values</h2>
+<section id="sec-lesson-action-values" class="level1 page-columns page-full">
+<h1>Lesson 2: What to learn: understanding Action Values</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -558,17 +671,43 @@ Goals
 <p><a href="img/rl-clinical-trial-q(a).png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" data-glightbox="description: .lightbox-desc-6" title="estimating action values"><img src="img/rl-clinical-trial-q(a).png" class="img-fluid figure-img" alt="estimating action values"></a></p>
 <figcaption>estimating action values</figcaption>
 </figure>
-</div></div><p>In Tabular RL settings The action value function is nothing more than a table with one {state, action} pair per row and its value. More generally it is a mapping from the pair to a reward.</p>
-<p>The higher the value of an action, the more likely it is to lead us to a better state which is closer to the objective. We can choose for each state the best or one of the best choices giving us a <strong>plan</strong> for transversing the state space to the goal state.</p>
-<p><span class="math display">
-Q_t(a) \doteq \frac{\text{sum of rewards when action a taken time } t}{\text{number of times action a was taken prior to } t}
-</span></p>
+</div></div><p>In Tabular RL settings The action value function <span class="math inline">q</span> is nothing more than a table with one {state, action} pair per row and its value. More generally, like when we will consider function approximation in course 3, it is a mapping from {state, action} pair to a expected reward.</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>State s</th>
+<th>Action a</th>
+<th>Action value q(s,a)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>red treatment</td>
+<td>0.25</td>
+</tr>
+<tr class="even">
+<td>0</td>
+<td>yellow treatment</td>
+<td>0.75</td>
+</tr>
+<tr class="odd">
+<td>0</td>
+<td>blue treatment</td>
+<td>0.5</td>
+</tr>
+</tbody>
+</table>
+<p>The higher the action value <span class="math inline">q(a)</span> of an action <strong>a</strong>, the more likely it is to lead us to a better state which is closer to the objective. We can choose for each state the best or one of the best choices giving us a <strong>plan</strong> for navigating the state space to the goal state.</p>
+<p><span id="eq-sample-average"><span class="math display">
+Q_t(a) \doteq \frac{\text{sum of rewards for action a taken time } t}{\text{number of times action a was taken prior to } t} = \frac{\sum_{i=1}^{t-1} R_i}{t-1} \qquad
+\tag{3}</span></span></p>
 <p>The main idea of RL is that we can propagate values from an one adjacent state to another. We can start with the uniform stochastic policy and use it to estimate/learn the action values. Action values will decrease for actions leads to a dead end. And it will increase in the direction of the goal but only once the influence of the goal has propagated. A continuing theme in RL is trying to increase the efficiency for propagation of rewards across the action values.</p>
 <p>Knowing the minimum number of action needed to reach a goal can be an approximate indicator of the action value.</p>
 <p>A second idea is that once we have let the influence of dead end and the goals spread enough we may have enough information to improve the initial action value to a point where each action is the one of the best choices. <mark>We call picking the one of the best action greedy selection and it leads to a deterministic policy.</mark> This is the optimal policy, it might not be unique since some actions might be tied in terms of their rewards. However for all of these we cannot do any better.</p>
 </section>
 <section id="L2G2" class="level3">
-<h3 class="anchored" data-anchor-id="L2G2">Exploration and Exploitation definition and dillema</h3>
+<h3 class="anchored" data-anchor-id="L2G2">Exploration and Exploitation definition and dilemma</h3>
 <p>In the bandit setting we can define:</p>
 <dl>
 <dt>Exploration</dt>
@@ -580,9 +719,8 @@ Q_t(a) \doteq \frac{\text{sum of rewards when action a taken time } t}{\text{num
 <p>Using the best action.</p>
 </dd>
 </dl>
-<p>Should the doctor explore new treatments that might harm his patients or exploit the current treatment. In real life bacteria gain immunity to antibiotics so there is merit to exploring new treatments. However a new treatment can be harmful to a patients. Ideally we want to enjoy the benefits of the best treatment but to be open to new and better alternatives but we can only do one at a time.</p>
-<p><span class="marked">Since neither option is ideal we call this the <strong>dilemma of Exploration and Exploitation</strong></span> What happens in practice depends on current interests. If we have reached a steady state we might prefer to exploit.</p>
-<p>If the problem landscape keeps changing we may want to keep exploring.</p>
+<p>Should the doctor explore new treatments that might harm his patients or exploit the current treatment. In real life bacteria gain immunity to antibiotics so there is merit to exploring new treatments. However, a new treatment can be harmful to some patients. Ideally we want to enjoy the benefits of the best treatment but to be open to new and better alternatives but we can only do one at a time.</p>
+<p><span class="marked">Since exploitation is by definition mutually exclusive with exploration we must choose one and give up the benefits of the other. This is the <strong>dilemma of Exploration and Exploitation</strong>.</span> How an agent resolves this dilemma in practice depends on the agent’s preferences and the type of state space it inhabits, if it has just started or encounters a <strong>changing landscape,</strong> it should make an effort to explore, on the other hand if it has explored enough to be certain of a global maximum it would prefer to exploit.</p>
 </section>
 <section id="L2G4" class="level3">
 <h3 class="anchored" data-anchor-id="L2G4">Defining Online learning ?</h3>
@@ -597,9 +735,10 @@ Q_t(a) \doteq \frac{\text{sum of rewards when action a taken time } t}{\text{num
 <section id="L2G5" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="L2G5">Sample Average Method for estimating Action Values Incrementally</h3>
 <p>Action values help us make decision. Let’s try and make estimate action values more formal using the following method:</p>
-<p><span id="eq-sample-average"><span class="math display">
-q_t(a)=\frac{\text{sum or rewards when a taken prior to t}}{\text{number of times a taken prior to t}}=\frac{\sum_{t=1}^{t-1}}{t-1}R \qquad
-\tag{3}</span></span></p>
+<p><span class="math display">
+q_t(a)=\frac{\text{sum or rewards when a taken prior to t}}{\text{number of times a taken prior to t}}
+       =\frac{\sum_{t=1}^{t-1} R_i \mathbb{I}_{A_i=a}}{\sum_{t=1}^{t-1}\mathbb{I}_{A_i=a} } \qquad
+</span></p>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -614,20 +753,29 @@ Q_{n+1} &amp;= \frac{1}{n} \sum_{i=1}^n R_i \\&amp; = \frac{1}{n} \Bigg(R_n + \s
 </section>
 <section id="L2G6" class="level3">
 <h3 class="anchored" data-anchor-id="L2G6">What are action-value estimation methods?</h3>
-<p>We can now state this in English as</p>
-<p>NewEstimate ← OldEstimate + StepSize (Target - OldEstimate)</p>
+<p>We can now state this in English as:</p>
+<p><span class="math display">
+\text{New Estimate} \leftarrow \text{Old Estimate} + \text{Step Size } \times [\text{Target} - \text{Old Estimate}] \qquad
+</span></p>
 <p>here:</p>
 <ul>
+<li>step size can be adaptive - changing over time. but typically it is constant and in the range (0,1) to avoid divergence.</li>
+<li>for the sample average method the step size is <span class="math inline">\frac{1}{n}</span> where n is the number of times the action has been taken.</li>
 <li>(Target - OldEstimate) is called the <em>error</em>.</li>
 </ul>
 <p>More generally we will use the update rule as:</p>
 <p><span id="eq-general-incremental-update-rule"><span class="math display">
-Q_{n+1} Q_n + \alpha \Big[R_n - Q_{n}\Big] \qquad a\in (0,1)
+Q_{n+1} = Q_n + \alpha \Big[R_n - Q_{n}\Big] \qquad a\in (0,1)
 \tag{5}</span></span></p>
+<div id="simple-epsilon-greedy-bandit-algorithm" class="pseudocode-container" data-pseudocode-index="1" data-line-number="true" data-comment-delimiter="#" data-alg-title="Algorithm" data-line-number-punc=":" data-indent-size="1.2em" data-no-end="false">
+<div class="pseudocode">
+\begin{algorithm} \caption{Simple Bandit($\epsilon$)}\begin{algorithmic} \State $Q(a) \leftarrow 0\ \forall a\ $ \Comment{ $\textcolor{blue}{initialize\ action\ values}$} \State $N(a) \leftarrow 0\ \forall a\ $ \Comment{ $\textcolor{blue}{initialize\ counter\ for\ actions\ taken}$} \For{$t = 1, 2, \ldots \infty$} \State $A_t \leftarrow \begin{cases} \arg\max_a Q(a) &amp; \text{with probability } 1 - \epsilon \\ \text{a random action} &amp; \text{with probability } \epsilon \end{cases}$ \State $R_t \leftarrow \text{Bandit}(A_t)$ \State $N(A_t) \leftarrow N(A_t) + 1$ \State $Q(A_t) \leftarrow Q(A_t) + \frac{1}{N(A_t)}[R_t - Q(A_t)]$ \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
 </section>
 </section>
-<section id="lesson-3-exploration-vs-exploitation" class="level2">
-<h2 class="anchored" data-anchor-id="lesson-3-exploration-vs-exploitation">Lesson 3: Exploration vs Exploitation</h2>
+<section id="sec-lesson-exploration-exploitation" class="level1 page-columns page-full">
+<h1>Lesson 3: Exploration vs Exploitation</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -639,79 +787,291 @@ Goals
 </div>
 <div class="callout-body-container callout-body">
 <ul>
-<li>Define <span class="math inline">\epsilon</span>-greedy <a href="#L3G1">#</a></li>
-<li>Compare the short-term benefits of exploitation and the long-term benefits of exploration <a href="#L3G2">#</a></li>
-<li>Understand optimistic initial values <a href="#L3G3">#</a></li>
-<li>Describe the benefits of optimistic initial values for early exploration <a href="#L3G4">#</a></li>
-<li>Explain the criticisms of optimistic initial values <a href="#L3G5">#</a></li>
+<li>Define <span class="math inline">\epsilon</span>-greedy <a href="#sec-epsilon-greedy-policies">#</a></li>
+<li>Compare the short-term benefits of exploitation and the long-term benefits of exploration <a href="#sec-benefits-of-exploitation-and-exploration">#</a></li>
+<li>Understand optimistic initial values <a href="#sec-optimistic-initial-values">#</a></li>
+<li>Describe the benefits of optimistic initial values for early exploration <a href="#sec-benefits-of-optimistic-initial-values-for-early-exploration">#</a></li>
+<li>Explain the criticisms of optimistic initial values <a href="#sec-criticisms-of-optimistic-initial-values">#</a></li>
 <li>Describe the upper confidence bound action selection method <a href="#L3G6">#</a></li>
 <li>Define optimism in the face of uncertainty <a href="#L3G7">#</a></li>
 </ul>
 </div>
 </div>
-<section id="L3G1" class="level3">
-<h3 class="anchored" data-anchor-id="L3G1"><span class="math inline">\epsilon</span>-Greedy Policies</h3>
-</section>
-<section id="benefits-of-exploitation-and-exploration" class="level3">
-<h3 class="anchored" data-anchor-id="benefits-of-exploitation-and-exploration">Benefits of exploitation and exploration</h3>
+<p>the following is a Bernoulli greedy algorithm</p>
+<div id="alg-greedy-bandit" class="pseudocode-container" data-pseudocode-index="2" data-line-number="true" data-comment-delimiter="#" data-alg-title="Algorithm" data-line-number-punc=":" data-indent-size="1.2em" data-no-end="false">
+<div class="pseudocode">
+\begin{algorithm} \caption{BernGreedy(K, α, β)}\begin{algorithmic} \For{$t = 1, 2, . . .$} \State \State \Comment{ estimate model} \For{$k = 1, . . . , K$} \State $\hat\theta_k \leftarrow a_k / (α_k + β_k)$ \EndFor \State \Comment{ select and apply action:} \State $x_t \leftarrow \arg\max_k \hat{\theta}_k$ \State Apply $x_t$ and observe $r_t$ \State \Comment{ update distribution:} \State $(α_{x_t}, β_{x_t}) \leftarrow (α_{x_t} + r_t, β_{x_t} + 1 − r_t)$ \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
+<section id="sec-epsilon-greedy-policies" class="level2">
+<h2 class="anchored" data-anchor-id="sec-epsilon-greedy-policies">Ɛ-Greedy Policies</h2>
+<p>The Ɛ-greedy policy uses a simple huristic to balance exploration with exploitation. The idea is to choose the best action with probability <span class="math inline">1-\epsilon</span> and to choose a random action with probability <span class="math inline">\epsilon</span>.</p>
+<div id="alg-epsilon-greedy" class="pseudocode-container" data-pseudocode-index="3" data-line-number="true" data-comment-delimiter="#" data-alg-title="Algorithm" data-line-number-punc=":" data-indent-size="1.2em" data-no-end="false">
+<div class="pseudocode">
+\begin{algorithm} \caption{EpsilonGreedy(K, α, β)}\begin{algorithmic} \For{$t = 1, 2, \ldots $} \State p = random() \If {$p &lt; \epsilon$} \State select radom action $x_t \qquad$ \Comment{explore} \Else \State select $x_t = \arg\max_k \hat{\theta}_k \qquad$ \Comment{exploit} \EndIf \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The problem with Ɛ-greedy policies
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ul>
-<li><p>In the short term we can make gains using the best known course of action.</p></li>
-<li><p>In the long term we would prefer to spend some resources on RD to find the best course of action.</p></li>
+<li>A problem with Ɛ-greedy is that it is not optimal in the long run.</li>
+<li>Even after it has found the best course of action it will continue to explore with probability <span class="math inline">\epsilon</span>.</li>
+<li>This is because the policy is not adaptive.</li>
+<li>One method is too reduce <span class="math inline">\epsilon</span> over time. However unless there is a feedback from the environment this will likely stop exploring too soon or too late thus providing sub-optimal returns.</li>
 </ul>
+</div>
+</div>
+<p>The following is a simple implementation of the Ɛ-greedy algorithm in Python from <a href="https://www.geeksforgeeks.org/epsilon-greedy-algorithm-in-reinforcement-learning/?ref=ml_lbp">geeksforgeeks.org</a></p>
+<div id="4c541ae0" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import required libraries </span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Action class </span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Actions: </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, m): </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.m <span class="op">=</span> m </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.mean <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.N <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Choose a random action </span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> choose(<span class="va">self</span>):  </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.random.randn() <span class="op">+</span> <span class="va">self</span>.m </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Update the action-value estimate </span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> update(<span class="va">self</span>, x): </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.N <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.mean <span class="op">=</span> (<span class="dv">1</span> <span class="op">-</span> <span class="fl">1.0</span> <span class="op">/</span> <span class="va">self</span>.N)<span class="op">*</span><span class="va">self</span>.mean <span class="op">+</span> <span class="fl">1.0</span> <span class="op">/</span> <span class="va">self</span>.N <span class="op">*</span> x </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_experiment(m1, m2, m3, eps, N): </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  actions <span class="op">=</span> [Actions(m1), Actions(m2), Actions(m3)] </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  data <span class="op">=</span> np.empty(N) </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N): </span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># epsilon greedy </span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> np.random.random() </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> p <span class="op">&lt;</span> eps: </span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>      j <span class="op">=</span> np.random.choice(<span class="dv">3</span>) </span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>      j <span class="op">=</span> np.argmax([a.mean <span class="cf">for</span> a <span class="kw">in</span> actions]) </span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> actions[j].choose() </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    actions[j].update(x) </span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># for the plot </span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    data[i] <span class="op">=</span> x </span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  cumulative_average <span class="op">=</span> np.cumsum(data) <span class="op">/</span> (np.arange(N) <span class="op">+</span> <span class="dv">1</span>) </span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="co"># plot moving average ctr </span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  plt.plot(cumulative_average) </span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  plt.plot(np.ones(N)<span class="op">*</span>m1) </span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  plt.plot(np.ones(N)<span class="op">*</span>m2) </span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  plt.plot(np.ones(N)<span class="op">*</span>m3) </span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  plt.xscale(<span class="st">'log'</span>) </span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  plt.show() </span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> a <span class="kw">in</span> actions: </span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(a.mean) </span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> cumulative_average </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="3d2b2450" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>c_1 <span class="op">=</span> run_experiment(<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">0.1</span>, <span class="dv">100000</span>) </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#print(c_1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="c1-w1_files/figure-html/cell-3-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="c1-w1_files/figure-html/cell-3-output-1.png" width="571" height="412" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.9810161481670723
+2.015900250053772
+2.9963081681309482</code></pre>
+</div>
+</div>
+<div id="0759e759" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>c_05 <span class="op">=</span> run_experiment(<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">0.05</span>, <span class="dv">100000</span>) </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#print(c_05)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="c1-w1_files/figure-html/cell-4-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="c1-w1_files/figure-html/cell-4-output-1.png" width="571" height="412" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.994224243872051
+2.019511641627614
+2.99928682621995</code></pre>
+</div>
+</div>
+<div id="fd51f8f1" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>c_01 <span class="op">=</span> run_experiment(<span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">0.01</span>, <span class="dv">100000</span>) </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#print(c_01)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="c1-w1_files/figure-html/cell-5-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="c1-w1_files/figure-html/cell-5-output-1.png" width="571" height="412" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1.0088532181785204
+1.9418683744016174
+2.9992527722465008</code></pre>
+</div>
+</div>
+<div id="d1c13f42" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># log scale plot </span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>plt.plot(c_1, label <span class="op">=</span><span class="st">'eps = 0.1'</span>) </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>plt.plot(c_05, label <span class="op">=</span><span class="st">'eps = 0.05'</span>) </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>plt.plot(c_01, label <span class="op">=</span><span class="st">'eps = 0.01'</span>) </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>plt.legend() </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">'log'</span>) </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>plt.show() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="c1-w1_files/figure-html/cell-6-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="c1-w1_files/figure-html/cell-6-output-1.png" width="571" height="412" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
-<section id="L3G3" class="level3">
-<h3 class="anchored" data-anchor-id="L3G3">Optimistic initial values</h3>
-<p>The methods we have discussed are dependent on the initial action-value estimates, <span class="math inline">Q_1(a)</span>. In the language of statistics, we call these methods biased by their initial estimates. For the sample-average methods, the bias disappears once all actions have been selected at least once. For methods with constant <span class="math inline">\alpha</span>, the bias is permanent, though decreasing over time.</p>
+<section id="sec-benefits-of-exploitation-and-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="sec-benefits-of-exploitation-and-exploration">Benefits of Exploitation &amp; Exploration</h2>
+<ul>
+<li>In the short term we may maximize rewards following the best known course of action. However this may represent a local maximum.</li>
+<li>In the long term agents that explore differnt options and keep uncovering better options until they find the best course of action corresponding to the global maximum.</li>
+</ul>
+<p>To get the best of both worlds we need to balance exploration and exploitation ideally using a policy that uses feedback to adapt to its environment.</p>
+</section>
+<section id="sec-optimistic-initial-values" class="level2">
+<h2 class="anchored" data-anchor-id="sec-optimistic-initial-values">Optimistic initial values</h2>
 <dl>
 <dt>Optimistic initial values</dt>
 <dd>
 <p>Setting all initially action values greater than the algorithmicaly available values in [0,1]</p>
 </dd>
 </dl>
+<p>The methods we have discussed are dependent on the initial action-value estimates, <span class="math inline">Q_1(a)</span>. In the language of statistics, we call these methods biased by their initial estimates. For the sample-average methods, the bias disappears once all actions have been selected at least once. For methods with constant <span class="math inline">\alpha</span>, the bias is permanent, though decreasing over time.</p>
+<div id="alg-optimitc-greedy-bandit" class="pseudocode-container" data-pseudocode-index="4" data-line-number="true" data-comment-delimiter="#" data-alg-title="Algorithm" data-line-number-punc=":" data-indent-size="1.2em" data-no-end="false">
+<div class="pseudocode">
+\begin{algorithm} \caption{OptimisticBernGreedy(K, α, β)}\begin{algorithmic} \For{$t = 1, 2, . . .$} \State \State \Comment{ estimate model} \For{$k = 1, . . . , K$} \State $\hat\theta_k \leftarrow 1 \qquad$ \Comment{optimistic initial value} \EndFor \State \Comment{ select and apply action:} \State $x_t \leftarrow \arg\max_k \hat{\theta}_k$ \State Apply $x_t$ and observe $r_t$ \State \Comment{ update distribution:} \State $(α_{x_t}, β_{x_t}) \leftarrow (α_{x_t} + r_t, β_{x_t} + 1 − r_t)$ \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
 </section>
-<section id="L3G4" class="level3">
-<h3 class="anchored" data-anchor-id="L3G4">Benefits of optimistic initial values for early exploration</h3>
-<p>This has the effect of causing the alg to try to exploit them - only to find out that most<br>
-values are not so great. In effect we are avoiding early exploitation and forcing the algorithm to initially explore. In the short-term it will perform worse than epsilon greedy which tend to exploit. But as more of the state space is explored at least once the algorithm will beat an epsilon greedy policy which can take far longer to explore the space and find the best options.</p>
+<section id="sec-benefits-of-optimistic-initial-values-for-early-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="sec-benefits-of-optimistic-initial-values-for-early-exploration">Benefits of optimistic initial values for early exploration</h2>
+<p>Setting the initial action values to be higher than the true values has the effect of causing various bandit algorithm to try to exploit them - only to find out that most values are not as rewarding as it was led to expect.</p>
+<p>What happens is that the algorithm will initially explore more than it would have otherwise. Possibly even trying all the actions at least once.</p>
+<p>In the short-term it will perform worse than Ɛ- greedy which tend to exploit. But as more of the state space is explored at least once the algorithm will beat an Ɛ-greedy policy which can take far longer to explore the space and find the optimal options.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-optimistic-initial-conditions.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" data-glightbox="description: .lightbox-desc-8" title="The effect of optimistic initial action-value estimates"><img src="img/rl-optimistic-initial-conditions.png" class="img-fluid figure-img" alt="The effect of optimistic initial action-value estimates"></a></p>
+<p><a href="img/rl-optimistic-initial-conditions.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12" data-glightbox="description: .lightbox-desc-12" title="The effect of optimistic initial action-value estimates"><img src="img/rl-optimistic-initial-conditions.png" class="img-fluid figure-img" alt="The effect of optimistic initial action-value estimates"></a></p>
 <figcaption>The effect of optimistic initial action-value estimates</figcaption>
 </figure>
 </div>
-</section>
-<section id="L3G5" class="level3">
-<h3 class="anchored" data-anchor-id="L3G5">Criticisms of optimistic initial values</h3>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Criticisms of optimistic initial values
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ul>
-<li><p>Optimistic initial values only drive early exploration. The agent will not stop exploring once this is done.</p></li>
-<li><p>For a non-stationary problems - this is inasequate.</p></li>
+<li>Optimistic initial values only drive early exploration. The agent will stop exploring once this is done.</li>
+<li>For a non-stationary problems - this is inadequate.</li>
+<li>In a real world problems the maximum reward is an unknown quantity.</li>
 </ul>
-<p>We may not know what the maximum reward is in order to be able to set a higher initial optimistic reward.</p>
+</div>
+</div>
 </section>
-<section id="L3G6" class="level3">
-<h3 class="anchored" data-anchor-id="L3G6">The UCB action selection method</h3>
+<section id="sec-the-ucb-action-selection-method" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-the-ucb-action-selection-method">The UCB action selection method</h2>
+<p>UCB is an acronym for Upper Confidence Bound. The idea behind it is to select the action that has the highest upper confidence bound. This has the advantage over epsilon greedy that it will explore more in the beginning and then exploit more as the algorithm progresses.</p>
+<p>the upper confidence bound is defined as:</p>
+<p><span id="eq-ucb"><span class="math display">
+A_t = \arg\max\_a \Bigg[
+  \underbrace{Q_t(a)}_{exploitation} +
+  \underbrace{c \sqrt{\frac{\ln t}{N_t(a)} }}_{exploration}
+\Bigg] \qquad
+\tag{6}</span></span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">Q_t(a)</span> is the action value</li>
+<li><span class="math inline">c</span> is a constant that determines the degree of exploration</li>
+<li><span class="math inline">N_t(a)</span> is the number of times action <span class="math inline">a</span> has been selected prior to time <span class="math inline">t</span></li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl_wk1_ucb.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13" data-glightbox="description: .lightbox-desc-13" title="ucb intuition"><img src="img/rl_wk1_ucb.png" class="img-fluid figure-img" alt="ucb intuition"></a></p>
+<figcaption>ucb intuition</figcaption>
+</figure>
+</div></div><p>The idea is we the action for which the action value plus the highest possible uncertainty give the highest sum. We are being optemistic in assuming this choice will give the highest reward. In reality any value in the confidence interval could be the true value. Each time we select an action we reduce the uncertainty in the exploration term and we also temper our optimism of the upper confidence bound by the number of times we have selected the action. This means that we will prefer to visit the actions that have not been visited as often.</p>
+<p>The main advantage of UCB is that it is more efficient than epsilon greedy in the long run. If we measure the cost of learning in terms of the regret - the difference between the expected reward of the optimal action and the expected reward of the action we choose. UCB has a lower regret than epsilon greedy. The downside is that it is more complex and requires more computation.</p>
+<div id="alg-brn-UCB" class="pseudocode-container" data-pseudocode-index="5" data-line-number="true" data-comment-delimiter="#" data-alg-title="Algorithm" data-line-number-punc=":" data-indent-size="1.2em" data-no-end="false">
+<div class="pseudocode">
+\begin{algorithm} \caption{UCB(K, α, β)}\begin{algorithmic} \For{$t = 1, 2, . . .$} \For { $k = 1, . . . , K$ } \State \Comment{ $\textcolor{blue}{compute\ UCBs}$} \State $U_k = \hat\theta_k + c \sqrt{\frac{\ln t}{N_k}}$ \EndFor \State \Comment{ $\textcolor{blue}{select\ and\ apply\ action}$} \State $x_t \leftarrow \arg\max_k h(x,U_x)$ \State Apply xt and observe $y_t$ and $r_t$ \State \Comment{ $\textcolor{blue}{estimate\ model}$} \For{$k = 1, . . . , K$} \State $\hat\theta_k \leftarrow a_k / (α_k + β_k)$ \EndFor \State \Comment{ select and apply action:} \State $x_t \leftarrow \arg\max_k \hat{\theta}_k$ \State Apply $x_t$ and observe $r_t$ \State \Comment{ update distribution:} \State $(α_{x_t}, β_{x_t}) \leftarrow (α_{x_t} + r_t, β_{x_t} + 1 − r_t)$ \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
+<p>Note we can model UCB using an urn model.</p>
 </section>
-<section id="L3G7" class="level3">
-<h3 class="anchored" data-anchor-id="L3G7">Optimism in the face of uncertainty</h3>
+<section id="Sec-Thompson-Sampling" class="level2">
+<h2 class="anchored" data-anchor-id="Sec-Thompson-Sampling">Thompson Sampling</h2>
+<p>Thompson sampling is basically like UCB but taking the Bayesian approach to the bandit problem. We start with a prior distribution over the action values and then update this distribution as we take actions. The action we choose is then sampled from the posterior distribution. This has the advantage that it is more robust to non-stationary problems than UCB. The downside is that it is more computationally expensive.</p>
+<section id="Sec-Thompson-Sampling-Algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="Sec-Thompson-Sampling-Algorithm">Thompson Sampling Algorithm</h3>
+<p>The algorithm is as follows:</p>
+<div id="alg-bernoulli-thompson-sampling" class="pseudocode-container" data-pseudocode-index="6" data-line-number="true" data-comment-delimiter="#" data-alg-title="Algorithm" data-line-number-punc=":" data-indent-size="1.2em" data-no-end="false">
+<div class="pseudocode">
+\begin{algorithm} \caption{BernTS(K, α, β)}\begin{algorithmic} \For{$t = 1, 2, . . .$} \State \State \Comment{ sample model} \For{$k = 1, . . . , K$} \State Sample $\hat\theta_k \sim beta(α_k, β_k)$ \EndFor \State \Comment{ select and apply action:} \State $x_t \leftarrow \arg\max_k \hat{\theta}_k$ \State Apply $x_t$ and observe $r_t$ \State \Comment{ update distribution:} \State $(α_{x_t}, β_{x_t}) \leftarrow (α_{x_t} + r_t, β_{x_t} + 1 − r_t)$ \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
+<ul>
+<li><a href="https://web.stanford.edu/~bvr/pubs/TS_Tutorial.pdf">this is a tutorial on Thompson Sampling</a></li>
+</ul>
+</section>
+</section>
+<section id="L3G7" class="level2">
+<h2 class="anchored" data-anchor-id="L3G7">Optimism in the face of uncertainty</h2>
 <dl>
 <dt>Optimism in the face of uncertainty</dt>
 <dd>
-<p>???</p>
+<p>This is a heuristic to ensure initial exploration of all actions by assuming that untried actions have a high expected reward. We then try to exploit them but end up successively downgrading their expected reward when they do not match our initial optimistic assessment.</p>
 </dd>
 </dl>
+<p>The downside to this approach is when the space of action is continuous so we can never get to the benefits of exploration.</p>
 </section>
 </section>
-<section id="awesome-rl-resources" class="level2">
-<h2 class="anchored" data-anchor-id="awesome-rl-resources">Awesome RL resources</h2>
-<p>Lets list some useful RL resources.</p>
+<section id="awesome-rl-resources" class="level1">
+<h1>Awesome RL resources</h1>
+<p>Let’s list some useful RL resources.</p>
 <p><strong>Books</strong></p>
 <ul>
 <li>Richard S. Sutton &amp; Andrew G. Barto <a href="http://incompleteideas.net/book/RLbook2020.pdf">RL An Introduction</a></li>
 <li><a href="https://tor-lattimore.com/">Tor Latimore’s</a> <a href="https://tor-lattimore.com/downloads/book/book.pdf">Book</a> and <a href="https://banditalgs.com/">Blog</a> on Bandit Algorithms.</li>
+<li><a href="https://sites.ualberta.ca/~szepesva/">Csaba Szepesvari</a>’s <a href="https://www.ualberta.ca/~szepesva/papers/RLAlgsInMDPs.pdf">Book</a></li>
 </ul>
 <p><strong>Courses &amp; Tutorials</strong></p>
 <ul>
-<li>David Silver’s 2015 <a href="https://www.davidsilver.uk/teaching/">UCL Course</a> <a href="https://www.youtube.com/watch?v=2pWv7GOvuf0">Video</a> and Slides.</li>
+<li><a href="http://www0.cs.ucl.ac.uk/staff/d.silver/web/Home.html">David Silver’s</a> 2015 <a href="https://www.davidsilver.uk/teaching/">UCL Course on RL</a> <a href="https://www.youtube.com/watch?v=2pWv7GOvuf0">Video</a> and Slides.</li>
 <li><a href="https://faculty.cc.gatech.edu/~isbell/pubs/">Charles Isbell</a> and <a href="https://www.littmania.com/">Michael Littman</a> A free Udacity course on RL, with some emphasis on game theory proofs, and some novel algorithms like <a href="http://proceedings.mlr.press/v28/sodomka13.pdf">Coco-Q: Learning in Stochastic Games with Side Payments</a>.</li>
 <li><strong>Contextual Bandits</strong> <a href="https://hunch.net/~rwil/">tutorial</a> <a href="https://vimeo.com/240429210">video</a> + papers from MS research videos on contextual bandit algorithms.</li>
 <li>Interesting papers:
@@ -734,26 +1094,32 @@ values are not so great. In effect we are avoiding early exploitation and forcin
 <span class="glightbox-desc lightbox-desc-5">why discuss bandits</span>
 <span class="glightbox-desc lightbox-desc-6">estimating action values</span>
 <span class="glightbox-desc lightbox-desc-7">example</span>
-<span class="glightbox-desc lightbox-desc-8">The effect of optimistic initial action-value estimates</span>
+<span class="glightbox-desc lightbox-desc-12">The effect of optimistic initial action-value estimates</span>
+<span class="glightbox-desc lightbox-desc-13">ucb intuition</span>
 </div>
+
 </section>
 
 
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-white2020fundamental" class="csl-entry" role="listitem">
+Matha White, Adam White. 2020. <span>“Fundmnentrals on Reinforcement Learning.”</span> University of Alberta; <span class="smallcaps">url:</span>&nbsp;<a href="https://www.coursera.org/learn/fundamentals-of-reinforcement-learning/" class="uri">https://www.coursera.org/learn/fundamentals-of-reinforcement-learning/</a>.
+</div>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>The annotated book and flashcards will help here.<br>
-This material is really logical - if you are surprised/confused you never assimilated some part of the material. Once you do it should become almost intuitive to reason about from scratch.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>The annotated book and flashcards will help here. This material is really logical - if you are surprised/confused you never assimilated some part of the material. Once you do it should become almost intuitive to reason about from scratch.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
+</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2022,
   author = {Bochman, Oren},
-  title = {RL {Fundamentals} {W1}},
-  date = {2024-05-02},
+  title = {The {K-Armed} {Bandit} {Problem}},
+  date = {2022-05-02},
   url = {https://orenbochman.github.io//notes/RL/c1-w1.html},
   langid = {en}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2024. <span>“RL Fundamentals W1.”</span> May 2, 2024. <a href="https://orenbochman.github.io//notes/RL/c1-w1.html">https://orenbochman.github.io//notes/RL/c1-w1.html</a>.
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2022" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2022. <span>“The K-Armed Bandit Problem.”</span> May 2,
+2022. <a href="https://orenbochman.github.io//notes/RL/c1-w1.html">https://orenbochman.github.io//notes/RL/c1-w1.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1440,7 +1806,31 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","selector":".lightbox","openEffect":"zoom","loop":false});
+    <script type="text/javascript">
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let pseudocodeOptions = {
+          indentSize: el.dataset.indentSize || "1.2em",
+          commentDelimiter: el.dataset.commentDelimiter || "//",
+          lineNumber: el.dataset.lineNumber === "true" ? true : false,
+          lineNumberPunc: el.dataset.lineNumberPunc || ":",
+          noEnd: el.dataset.noEnd === "true" ? true : false,
+          titlePrefix: el.dataset.algTitle || "Algorithm"
+        };
+        pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+      });
+    })(document);
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        titleSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+        titlePrefix = el.dataset.algTitle;
+        titleIndex = el.dataset.chapterLevel ? el.dataset.chapterLevel + "." + el.dataset.pseudocodeIndex : el.dataset.pseudocodeIndex;
+        titleSpan.innerHTML = titlePrefix + " " + titleIndex + " ";
+      });
+    })(document);
+    </script>
+  
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","closeEffect":"zoom","openEffect":"zoom","loop":false,"descPosition":"bottom"});
 window.onload = () => {
   lightboxQuarto.on('slide_before_load', (data) => {
     const { slideIndex, slideNode, slideConfig, player, trigger } = data;

@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+
+<title>Oren Bochman’s Blog - urn using numpy</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - urn using numpy">
+<meta name="twitter:description" content="Personal website, portfolio and blog">
+<meta name="twitter:image" content="https://orenbochman.github.io/posts/2024/2024-05-01-Signals/thumbnail_blog.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+        <li>
+    <a class="dropdown-item" href="../../../notes.html">
+ <span class="dropdown-text">All Notes</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../nlp.html">
+ <span class="dropdown-text">NLP Specilization</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../dnn.html">
+ <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../model-thinking.html">
+ <span class="dropdown-text">Model Thinking</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../xai.html">
+ <span class="dropdown-text">XAI</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rl.html">
+ <span class="dropdown-text">rl</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rhetoric.html">
+ <span class="dropdown-text">rhetoric</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../tfp.html">
+ <span class="dropdown-text">TFP</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../ab-testing.html">
+ <span class="dropdown-text">AB testing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../cognitiveai.html">
+ <span class="dropdown-text">cognitive AI</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">urn using numpy</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-basic-urn-model" id="toc-the-basic-urn-model" class="nav-link active" data-scroll-target="#the-basic-urn-model">The Basic Urn model</a>
+  <ul class="collapse">
+  <li><a href="#ehrenfest-urn-model" id="toc-ehrenfest-urn-model" class="nav-link" data-scroll-target="#ehrenfest-urn-model">Ehrenfest Urn Model</a></li>
+  </ul></li>
+  <li><a href="#the-multiurn-model" id="toc-the-multiurn-model" class="nav-link" data-scroll-target="#the-multiurn-model">The MultiUrn model</a></li>
+  <li><a href="#note-i-think-the-expected-reward-chould-be-less-then-one---since-the-expected-reward-is-the-probability-of-the-reciever-signal-given-the-sender-signal" id="toc-note-i-think-the-expected-reward-chould-be-less-then-one---since-the-expected-reward-is-the-probability-of-the-reciever-signal-given-the-sender-signal" class="nav-link" data-scroll-target="#note-i-think-the-expected-reward-chould-be-less-then-one---since-the-expected-reward-is-the-probability-of-the-reciever-signal-given-the-sender-signal">note I think the expected reward chould be less then one - since the expected reward is the probability of the reciever signal given the sender signal</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+<p>Let’s create one of the most fundumental models in probability theory - the urn model.</p>
+<p>Urn models gor back to the 17th century and were first introduced by Jacob Bernoulli in his book Ars Conjectandi (1713).</p>
+<p>The urn model is a simple model that describes the process of drawing balls from an urn.</p>
+<p>The urn contains balls of different colors, and the goal is to study the probabilities of drawing balls of different colors.</p>
+<p>Although basic urn models can be represented with draws from well known distributions an the urn model is useful concrete form for thinking about probability particularly when implementing simple reinforcement learning algorithms or model with Bayesian updating.</p>
+<p>Some more complex processess in probability theory can be set up as urn model making this a useful model to understand.</p>
+<p>When it comes to implementing agents, we can quickly set them up for reinforcement or Bayesian learning by equipping the agnet with such an urn model.</p>
+<p>In python we can implement the urn model using a numpy array to represent the balls in the urn and their counts.</p>
+<section id="the-basic-urn-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-basic-urn-model">The Basic Urn model</h2>
+<div id="c28a3f8e" class="cell" data-require="altair, numpy, matplotlib, seaborn, pandas" data-results="hold" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Urn():</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">''' classic urn model using np array of ball counts</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">      for two valls this is a simple binomial distribution</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">      for more balls this is a multinomial distribution</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">  '''</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, ball_names<span class="op">=</span>[<span class="st">'white'</span>,<span class="st">'black'</span>], init<span class="op">=</span><span class="st">'ones'</span>, weights<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">'''initialize the urn with ball names and weights'''</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.ball_names <span class="op">=</span> ball_names</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> weights <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>      <span class="cf">assert</span> <span class="bu">type</span>(weights) <span class="op">==</span> np.ndarray, <span class="st">"Weights must be a numpy array."</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>      <span class="cf">assert</span> weights.shape[<span class="dv">0</span>] <span class="op">==</span> (<span class="bu">len</span>(<span class="va">self</span>.ball_names)), <span class="ss">f"Weight shape </span><span class="sc">{</span>weights<span class="sc">.</span>shape<span class="sc">}</span><span class="ss"> not the same as the number of balls. </span><span class="sc">{</span><span class="bu">len</span>(<span class="va">self</span>.ball_names)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>      <span class="va">self</span>.weights <span class="op">=</span> weights</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> init <span class="op">==</span> <span class="st">'ones'</span>:</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._weights <span class="op">=</span> np.ones((<span class="va">self</span>.ball_colors))</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>      <span class="cf">elif</span> init <span class="op">==</span> <span class="st">'zeros'</span>:</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._weights <span class="op">=</span> np.zeros((<span class="va">self</span>.ball_colors))</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>      <span class="cf">elif</span> init <span class="op">==</span> <span class="st">'random'</span>:</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._weights <span class="op">=</span> np.random.rand(<span class="va">self</span>.ball_colors)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span>:</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Initialization parameter must be 'ones', 'zeros', or 'random'."</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">@property</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> ball_names(<span class="va">self</span>):</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">self</span>._ball_names</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">@ball_names.setter</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> ball_names(<span class="va">self</span>, ball_names):</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">type</span>(ball_names) <span class="op">==</span> <span class="bu">list</span>, <span class="st">"Ball names must be a list."</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>._ball_names <span class="op">=</span> ball_names</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>._num_balls <span class="op">=</span> <span class="bu">len</span>(ball_names)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">@property</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> ball_colors(<span class="va">self</span>):</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">len</span>(<span class="va">self</span>.ball_names)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">@property</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> weights(<span class="va">self</span>):</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">self</span>._weights</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">@weights.setter</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> weights(<span class="va">self</span>, weights):</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">type</span>(weights) <span class="op">==</span> np.ndarray, <span class="st">"Weights must be a numpy array."</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="co">#assert weights.shape == (self.ball_colors), "Weights must have the same shape as the number of balls and columns."</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>._weights <span class="op">=</span> weights</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> draw(<span class="va">self</span>,n<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="co">''' draw a ball from the urn with replacement'''</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    row_idx <span class="op">=</span> np.random.choice(<span class="va">self</span>.ball_colors, p<span class="op">=</span><span class="va">self</span>.weights<span class="op">/</span><span class="va">self</span>.weights.<span class="bu">sum</span>(), size<span class="op">=</span>n)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> []</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>      result.append(<span class="va">self</span>.ball_names[row_idx[i]])</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="45d3d3fa" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#some examples</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>urn <span class="op">=</span> Urn()</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(urn.draw(<span class="dv">10</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(urn.draw(<span class="dv">10</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(urn.draw(<span class="dv">10</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>urn.weights <span class="op">=</span> np.array([<span class="fl">1.</span>, <span class="fl">9.</span>])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(urn.draw(<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['white', 'white', 'white', 'white', 'black', 'black', 'black', 'black', 'white', 'black']
+['black', 'white', 'black', 'black', 'black', 'white', 'white', 'white', 'black', 'black']
+['black', 'black', 'black', 'black', 'white', 'black', 'black', 'white', 'black', 'black']
+['white', 'black', 'black', 'white', 'black', 'black', 'black', 'black', 'black', 'black']</code></pre>
+</div>
+</div>
+<div id="74ac7948" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>urn <span class="op">=</span> Urn(ball_names<span class="op">=</span>[<span class="st">'red'</span>,<span class="st">'blue'</span>,<span class="st">'green'</span>], weights<span class="op">=</span>np.array([<span class="fl">3.</span>, <span class="fl">9.</span>, <span class="fl">1.</span>]))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'balls'</span>: urn.draw(<span class="dv">1000</span>)})</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#alt.renderers.enable("html")</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>alt.Chart(df).mark_bar().encode(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">'balls'</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">'count()'</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>).properties(width<span class="op">=</span><span class="dv">200</span>, height<span class="op">=</span><span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+
+<style>
+  #altair-viz-979c58939d2c48b09752b22839abad98.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-979c58939d2c48b09752b22839abad98.vega-embed details,
+  #altair-viz-979c58939d2c48b09752b22839abad98.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-979c58939d2c48b09752b22839abad98"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-979c58939d2c48b09752b22839abad98") {
+      outputDiv = document.getElementById("altair-viz-979c58939d2c48b09752b22839abad98");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.16.3?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.16.3"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-faa77774476fe02fc0b97c5e259680ed"}, "mark": {"type": "bar"}, "encoding": {"x": {"field": "balls", "type": "nominal"}, "y": {"aggregate": "count", "type": "quantitative"}}, "height": 200, "width": 200, "$schema": "https://vega.github.io/schema/vega-lite/v5.16.3.json", "datasets": {"data-faa77774476fe02fc0b97c5e259680ed": [{"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "green"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "green"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "red"}, {"balls": "blue"}, {"balls": "blue"}, {"balls": "green"}, {"balls": "blue"}, {"balls": "red"}, {"balls": "blue"}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<div id="6490abb1" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(urn.draw(<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['green', 'blue', 'blue', 'blue', 'red', 'blue', 'red', 'red', 'green', 'blue']</code></pre>
+</div>
+</div>
+<div id="3b137424" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Polya(Urn):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">''' Polya urn model'''</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> draw(<span class="va">self</span>,n<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">''' draw a ball from the urn with replacement and add a new ball of the same color'''</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> []</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      row_idx <span class="op">=</span> np.random.choice(<span class="va">self</span>.ball_colors, p<span class="op">=</span><span class="va">self</span>.weights<span class="op">/</span><span class="va">self</span>.weights.<span class="bu">sum</span>(), size<span class="op">=</span>n)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      result.append(<span class="va">self</span>.ball_names[row_idx[i]])</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>      <span class="va">self</span>.weights[row_idx[i]] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Hypergeometric(Urn):</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">''' Hypergeometric urn model'''</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> draw(<span class="va">self</span>,n<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">''' draw a ball from the urn without replacement'''</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> []</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>      row_idx <span class="op">=</span> np.random.choice(<span class="va">self</span>.ball_colors, p<span class="op">=</span><span class="va">self</span>.weights<span class="op">/</span><span class="va">self</span>.weights.<span class="bu">sum</span>(), size<span class="op">=</span>n)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>      result.append(<span class="va">self</span>.ball_names[row_idx[i]])</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>      <span class="va">self</span>.weights[row_idx[i]] <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Polya(Urn):</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="co">''' </span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co">    The polya urn model is a generalization of the urn model where c is the number of balls of the same color added to the urn</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co">    for c=0 the polya urn model we get drawing with replacement reulting in binomial and multinomial distributions.</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="co">    for c=1 the polya urn model we get drawing with replacement and adding a new ball of the same color resulting in a  BetaBinomial and Dirichlet distributions.</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="co">    for c=-1 the polya urn model we get drawing withot replacement resulting in a  the hypergeometric distribution.</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co">  '''</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> init(<span class="va">self</span>,ball_names<span class="op">=</span>[<span class="st">'white'</span>,<span class="st">'black'</span>], init<span class="op">=</span><span class="st">'ones'</span>, weights<span class="op">=</span><span class="va">None</span>, c<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="co">'''initialize the urn with ball names and weights'''</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">super</span>().<span class="fu">__init__</span>(ball_names, init, weights)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.c <span class="op">=</span> c</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> draw(<span class="va">self</span>,n<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    <span class="co">''' draw a ball from the urn with replacement and add a new ball of the same color'''</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> []</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>      row_idx <span class="op">=</span> np.random.choice(<span class="va">self</span>.ball_colors, p<span class="op">=</span><span class="va">self</span>.weights<span class="op">/</span><span class="va">self</span>.weights.<span class="bu">sum</span>(), size<span class="op">=</span>n)</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>      result.append(<span class="va">self</span>.ball_names[row_idx[i]])</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>      <span class="va">self</span>.weights[row_idx[i]] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Hoppe(Polya):</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>  <span class="co">''' Hoppe urn model'''</span></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,ball_names<span class="op">=</span>[<span class="st">'0'</span>], init<span class="op">=</span><span class="st">'ones'</span>, weights<span class="op">=</span><span class="va">None</span>, c<span class="op">=</span><span class="dv">1</span>, mutator_mass<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>    <span class="co">'''initialize the urn with ball names and weights'''</span></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>    <span class="bu">super</span>().<span class="fu">__init__</span>(ball_names, init, weights, c)</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.mutator_mass <span class="op">=</span> mutator_mass</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> weights <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>      <span class="cf">assert</span> <span class="bu">type</span>(weights) <span class="op">==</span> np.ndarray, <span class="st">"Weights must be a numpy array."</span></span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>      <span class="cf">assert</span> weights.shape[<span class="dv">0</span>] <span class="op">==</span> (<span class="bu">len</span>(<span class="va">self</span>.ball_names)), <span class="ss">f"Weight shape </span><span class="sc">{</span>weights<span class="sc">.</span>shape<span class="sc">}</span><span class="ss"> not the same as the number of balls. </span><span class="sc">{</span><span class="bu">len</span>(<span class="va">self</span>.ball_names)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>      <span class="va">self</span>.weights <span class="op">=</span> weights</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> init <span class="op">==</span> <span class="st">'ones'</span>:</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._weights <span class="op">=</span> np.ones((<span class="va">self</span>.ball_colors))</span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>      <span class="cf">elif</span> init <span class="op">==</span> <span class="st">'zeros'</span>:</span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._weights <span class="op">=</span> np.zeros((<span class="va">self</span>.ball_colors))</span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>      <span class="cf">elif</span> init <span class="op">==</span> <span class="st">'random'</span>:</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._weights <span class="op">=</span> np.random.rand(<span class="va">self</span>.ball_colors)</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span>:</span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Initialization parameter must be 'ones', 'zeros', or 'random'."</span>)</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>      <span class="co">#set the weight of the mutator ball to the mutator mass</span></span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>      <span class="va">self</span>.weights[<span class="dv">0</span>] <span class="op">=</span> <span class="va">self</span>.mutator_mass</span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> draw(<span class="va">self</span>,n<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>    <span class="co">''' draw a ball from the urn with replacement and add a new ball of the same color'''</span></span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> []</span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>      row_idx <span class="op">=</span> np.random.choice(<span class="va">self</span>.ball_colors, p<span class="op">=</span><span class="va">self</span>.weights<span class="op">/</span><span class="va">self</span>.weights.<span class="bu">sum</span>(), size<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> row_idx[i] <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>        <span class="co">#add a new ball color</span></span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.ball_names.append(<span class="bu">str</span>(<span class="bu">len</span>(<span class="va">self</span>.ball_names)))</span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.weights <span class="op">=</span> np.append(<span class="va">self</span>.weights, c)</span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>        result.append(<span class="va">self</span>.ball_names[<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>      <span class="cf">else</span>:</span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>        result.append(<span class="va">self</span>.ball_names[row_idx[<span class="dv">0</span>]])</span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.weights[row_idx[i]] <span class="op">+=</span> c</span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Moran(Polya):</span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>  <span class="co">''' Moran urn model'''</span></span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> draw(<span class="va">self</span>,n<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>    <span class="co">''' draw a ball from the urn with replacement and add a new ball of the same color'''</span></span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> []</span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>      row_idx <span class="op">=</span> np.random.choice(<span class="va">self</span>.ball_colors, p<span class="op">=</span><span class="va">self</span>.weights<span class="op">/</span><span class="va">self</span>.weights.<span class="bu">sum</span>(), size<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>      <span class="va">self</span>.weights[row_idx[<span class="dv">0</span>]] <span class="op">+=</span> c</span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>      <span class="va">self</span>.weights[row_idx[<span class="dv">1</span>]] <span class="op">-=</span> c</span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a>      result.append(<span class="va">self</span>.ball_names[row_idx[<span class="dv">0</span>]])</span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="ehrenfest-urn-model" class="level3">
+<h3 class="anchored" data-anchor-id="ehrenfest-urn-model">Ehrenfest Urn Model</h3>
+<p>The Ehrenfest urn model is a simple model that describes the process of moving balls between two urns. I view this as a precursor to compartmental models in epidemiology and other fields and it demostrates how one can extend the urn model can be used to model more complex systems. The more general model is the multiurn model where we have multiple urns and we can move balls between them which is a Markov chain model.</p>
+<p>The model consists of two urns, each containing a fixed number of balls. At each time step, a ball is randomly selected from one of the urns and moved to the other urn.</p>
+</section>
+</section>
+<section id="the-multiurn-model" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-multiurn-model">The MultiUrn model</h2>
+<div class="page-columns page-full"><blockquote class="blockquote">
+<p>“any problem of probability appears comparable to a suitable problem about bags containing balls, and any random mass phenomenon appears as similar in certain essential respects to successive drawings of balls from a system of suitibly combined bags.” - <span class="citation" data-cites="polya1954patterns">Polya (<a href="#ref-polya1954patterns" role="doc-biblioref">1954</a>)</span></p>
+</blockquote><div class="no-row-height column-margin column-container"><div id="ref-polya1954patterns" class="csl-entry" role="listitem">
+Polya, G. 1954. <em>Patterns of Plausible Inference</em>. Princeton Paperbacks. Princeton University Press. <a href="https://www.google.com/books?id=Zu2hEAAAQBAJ">https://www.google.com/books?id=Zu2hEAAAQBAJ</a>.
+</div></div></div>
+<p>per polya’s suggestion we can think</p>
+<p>The MultiUrn model is an extension of the basic Urn model that allows for multiple urns to be used together. We may for example need to learn an urn model per state in our system extending a bandit algorithm to a contextual bandit algorithm.</p>
+<p>We can represent these using rows of a matrix where each row represents an urn and each column represents a ball color.</p>
+<p>In cases where we have hierarchical models we may be able to use additional constraints - for example on both rows and columns to speed up learning.</p>
+<div id="cf246056" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MultiUrn:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, row_names, col_names, init<span class="op">=</span><span class="st">'ones'</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.row_names <span class="op">=</span> row_names</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.col_names <span class="op">=</span> col_names</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.num_rows <span class="op">=</span> <span class="bu">len</span>(row_names)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.num_cols <span class="op">=</span> <span class="bu">len</span>(col_names)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> init <span class="op">==</span> <span class="st">'ones'</span>:</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.weights <span class="op">=</span> np.ones((<span class="va">self</span>.num_rows, <span class="va">self</span>.num_cols))</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> init <span class="op">==</span> <span class="st">'zeros'</span>:</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.weights <span class="op">=</span> np.zeros((<span class="va">self</span>.num_rows, <span class="va">self</span>.num_cols))</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> init <span class="op">==</span> <span class="st">'random'</span>:</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.weights <span class="op">=</span> np.random.rand(<span class="va">self</span>.num_rows, <span class="va">self</span>.num_cols)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Initialization parameter must be 'ones', 'zeros', or 'random'."</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _convert_to_numeric(<span class="va">self</span>, row_name, col_name):</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>            row_idx <span class="op">=</span> <span class="va">self</span>.row_names.index(row_name)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>            col_idx <span class="op">=</span> <span class="va">self</span>.col_names.index(col_name)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> row_idx, col_idx</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Invalid row or column name."</span>)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_weight(<span class="va">self</span>, row_name, col_name):</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        row_idx, col_idx <span class="op">=</span> <span class="va">self</span>._convert_to_numeric(row_name, col_name)</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.weights[row_idx, col_idx]</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> set_weight(<span class="va">self</span>, row_name, col_name, value):</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>        row_idx, col_idx <span class="op">=</span> <span class="va">self</span>._convert_to_numeric(row_name, col_name)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.weights[row_idx, col_idx] <span class="op">=</span> value</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> add_weights(<span class="va">self</span>, other_urn):</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.weights.shape <span class="op">!=</span> other_urn.weights.shape:</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Urns must have the same dimensions to add weights."</span>)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Urn(<span class="va">self</span>.row_names, <span class="va">self</span>.col_names, init<span class="op">=</span><span class="va">None</span>, weights<span class="op">=</span><span class="va">self</span>.weights <span class="op">+</span> other_urn.weights)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_conditional_probabilities(<span class="va">self</span>):</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>        row_sums <span class="op">=</span> <span class="va">self</span>.weights.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        conditional_probs <span class="op">=</span> <span class="va">self</span>.weights <span class="op">/</span> row_sums</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> conditional_probs</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_conditional_probability(<span class="va">self</span>, row_name, col_name):</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>        row_idx, col_idx <span class="op">=</span> <span class="va">self</span>._convert_to_numeric(row_name, col_name)</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>        row_sum <span class="op">=</span> <span class="va">self</span>.weights[row_idx, :].<span class="bu">sum</span>()</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>        conditional_prob <span class="op">=</span> <span class="va">self</span>.weights[row_idx, col_idx] <span class="op">/</span> row_sum</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> conditional_prob</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> choose_option(<span class="va">self</span>, row_name):</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>        row_idx <span class="op">=</span> <span class="va">self</span>.row_names.index(row_name)</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>        row_weights <span class="op">=</span> <span class="va">self</span>.weights[row_idx, :]</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>        col_idx <span class="op">=</span> np.random.choice(<span class="va">self</span>.num_cols, p<span class="op">=</span>row_weights<span class="op">/</span>row_weights.<span class="bu">sum</span>())</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.col_names[col_idx]</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> update_weights(<span class="va">self</span>, row_name, col_name, reward):</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>        row_idx, col_idx <span class="op">=</span> <span class="va">self</span>._convert_to_numeric(row_name, col_name)</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.weights[row_idx, col_idx] <span class="op">+=</span> reward</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> plot_heatmap(<span class="va">self</span>):</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> idx, row_name <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="va">self</span>.row_names):</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>            plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">1</span>))</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>            sns.heatmap(<span class="va">self</span>.weights[idx, :].reshape(<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>), annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">"viridis"</span>, cbar<span class="op">=</span><span class="va">False</span>, xticklabels<span class="op">=</span><span class="va">self</span>.col_names, yticklabels<span class="op">=</span>[row_name])</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>            plt.title(<span class="ss">f"Urn for </span><span class="sc">{</span>row_name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>            plt.show()</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_expected_reward(<span class="va">self</span>, receiver_urn):</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>        sender_probs <span class="op">=</span> <span class="va">self</span>.get_conditional_probabilities()</span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>        receiver_probs <span class="op">=</span> receiver_urn.get_conditional_probabilities()</span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> sender_state <span class="kw">in</span> <span class="va">self</span>.row_names:</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> sender_signal <span class="kw">in</span> <span class="va">self</span>.col_names:</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>                p_sender <span class="op">=</span> <span class="va">self</span>.get_conditional_probability(sender_state, sender_signal)</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> receiver_signal <span class="kw">in</span> receiver_urn.row_names:</span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> receiver_state <span class="kw">in</span> receiver_urn.col_names:</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>                        p_receiver <span class="op">=</span> receiver_urn.get_conditional_probability(receiver_signal, receiver_state)</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">if</span> receiver_signal <span class="op">==</span> sender_signal:</span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>                            result <span class="op">+=</span> p_sender <span class="op">*</span> p_receiver</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> result</span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> add_expected_reward(<span class="va">self</span>, receiver_urn):</span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>        expected_reward <span class="op">=</span> <span class="va">self</span>.calculate_expected_reward(receiver_urn)</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row_name <span class="kw">in</span> <span class="va">self</span>.row_names:</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> col_name <span class="kw">in</span> <span class="va">self</span>.col_names:</span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.update_weights(row_name, col_name, expected_reward)    </span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__str__</span>(<span class="va">self</span>):</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">str</span>(<span class="va">self</span>.weights)</span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage</span></span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>row_names <span class="op">=</span> [<span class="st">'state0'</span>, <span class="st">'state1'</span>, <span class="st">'state2'</span>, <span class="st">'state3'</span>, <span class="st">'state4'</span>]</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a>col_names <span class="op">=</span> [<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>, <span class="st">'d'</span>]</span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a>urn <span class="op">=</span> MultiUrn(row_names, col_names, init<span class="op">=</span><span class="st">'ones'</span>)</span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Initial weights:"</span>)</span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(urn)</span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a>weight_0_a <span class="op">=</span> urn.get_weight(<span class="st">'state0'</span>, <span class="st">'a'</span>)</span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Weight for state0 and signal 'a': </span><span class="sc">{</span>weight_0_a<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>urn.set_weight(<span class="st">'state0'</span>, <span class="st">'a'</span>, <span class="fl">2.0</span>)</span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Weights after setting weight for state0 and signal 'a' to 0.5:"</span>)</span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(urn)</span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a>conditional_probs <span class="op">=</span> urn.get_conditional_probabilities()</span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Conditional probabilities:"</span>)</span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(conditional_probs)</span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a>state <span class="op">=</span> <span class="st">'state0'</span></span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a>signal <span class="op">=</span> <span class="st">'a'</span></span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a>conditional_prob <span class="op">=</span> urn.get_conditional_probability(state, signal)</span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Conditional probability of signal </span><span class="sc">{</span>signal<span class="sc">}</span><span class="ss"> given </span><span class="sc">{</span>state<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>conditional_prob<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a>state <span class="op">=</span> <span class="st">'state1'</span></span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a>signal <span class="op">=</span> <span class="st">'a'</span></span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>conditional_prob <span class="op">=</span> urn.get_conditional_probability(state, signal)</span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Conditional probability of signal </span><span class="sc">{</span>signal<span class="sc">}</span><span class="ss"> given </span><span class="sc">{</span>state<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>conditional_prob<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a>chosen_signal <span class="op">=</span> urn.choose_option(<span class="st">'state0'</span>)</span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Chosen signal for state0: </span><span class="sc">{</span>chosen_signal<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a>urn.update_weights(<span class="st">'state0'</span>, <span class="st">'a'</span>, <span class="fl">1.0</span>)</span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Weights after updating weight for state0 and signal 'a' with a reward of 0.1:"</span>)</span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(urn)</span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot heatmaps</span></span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a>urn.plot_heatmap()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initial weights:
+[[1. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]]
+Weight for state0 and signal 'a': 1.0
+Weights after setting weight for state0 and signal 'a' to 0.5:
+[[2. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]]
+Conditional probabilities:
+[[0.4  0.2  0.2  0.2 ]
+ [0.25 0.25 0.25 0.25]
+ [0.25 0.25 0.25 0.25]
+ [0.25 0.25 0.25 0.25]
+ [0.25 0.25 0.25 0.25]]
+Conditional probability of signal a given state0: 0.4
+Conditional probability of signal a given state1: 0.25
+Chosen signal for state0: a
+Weights after updating weight for state0 and signal 'a' with a reward of 0.1:
+[[3. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]
+ [1. 1. 1. 1.]]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-7-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="urn_files/figure-html/cell-7-output-2.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-7-output-3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="urn_files/figure-html/cell-7-output-3.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-7-output-4.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="urn_files/figure-html/cell-7-output-4.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-7-output-5.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="urn_files/figure-html/cell-7-output-5.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-7-output-6.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="urn_files/figure-html/cell-7-output-6.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="b50a77b4" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>s_row_names <span class="op">=</span> [<span class="st">'state0'</span>, <span class="st">'state1'</span>, <span class="st">'state2'</span>, <span class="st">'state3'</span>, <span class="st">'state4'</span>]</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>s_col_names <span class="op">=</span> [<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>, <span class="st">'d'</span>]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>s_urn <span class="op">=</span> MultiUrn(s_row_names, s_col_names, init<span class="op">=</span><span class="st">'ones'</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>s_urn.plot_heatmap()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-8-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="urn_files/figure-html/cell-8-output-1.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-8-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="urn_files/figure-html/cell-8-output-2.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-8-output-3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="urn_files/figure-html/cell-8-output-3.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-8-output-4.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="urn_files/figure-html/cell-8-output-4.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-8-output-5.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="urn_files/figure-html/cell-8-output-5.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="e53735c3" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>r_row_names <span class="op">=</span> [<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>, <span class="st">'d'</span>]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>r_col_names <span class="op">=</span> [<span class="st">'state0'</span>, <span class="st">'state1'</span>, <span class="st">'state2'</span>, <span class="st">'state3'</span>, <span class="st">'state4'</span>]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>r_urn <span class="op">=</span> MultiUrn(r_row_names, r_col_names, init<span class="op">=</span><span class="st">'ones'</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>r_urn.plot_heatmap()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-9-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="urn_files/figure-html/cell-9-output-1.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-9-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="urn_files/figure-html/cell-9-output-2.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-9-output-3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="urn_files/figure-html/cell-9-output-3.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-9-output-4.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="urn_files/figure-html/cell-9-output-4.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>lets add a method to calculate the expected reward of two urns</p>
+<p>result = 0.0 for each sender state sender_state for each sender signal sender_signal p_sender = the conditional probability of the sender_signal given the sender_state for each reciever signal reciever_signal for each reciever state reciever_state p_reciever = the conditional probability of the reciever_state given the reciever_signal if the reciever_signal is the same as the sender_signal result += p_sender * p_reciever return result</p>
+</section>
+<section id="note-i-think-the-expected-reward-chould-be-less-then-one---since-the-expected-reward-is-the-probability-of-the-reciever-signal-given-the-sender-signal" class="level1">
+<h1>note I think the expected reward chould be less then one - since the expected reward is the probability of the reciever signal given the sender signal</h1>
+<p>and sum of probabilities of the reciever signal given the sender signal is less then one.</p>
+<pre><code>    calculate the expected reward
+    add the expected reward to the urn</code></pre>
+<p>where we start with a reciever, chose</p>
+<div id="d5ac1ab1" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>expected_reward <span class="op">=</span> s_urn.calculate_expected_reward(r_urn)<span class="op">/</span>(s_urn.num_rows<span class="op">*</span>r_urn.num_cols<span class="op">*</span>s_urn.num_rows<span class="op">*</span>r_urn.num_cols)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected reward: </span><span class="sc">{</span>expected_reward<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>s_urn.add_expected_reward(r_urn)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Sender Urn weights after adding expected reward:"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(s_urn)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>s_urn.plot_heatmap()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Expected reward: 0.007999999999999985
+Sender Urn weights after adding expected reward:
+[[6. 6. 6. 6.]
+ [6. 6. 6. 6.]
+ [6. 6. 6. 6.]
+ [6. 6. 6. 6.]
+ [6. 6. 6. 6.]]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-10-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="urn_files/figure-html/cell-10-output-2.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-10-output-3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="urn_files/figure-html/cell-10-output-3.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-10-output-4.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="urn_files/figure-html/cell-10-output-4.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-10-output-5.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="urn_files/figure-html/cell-10-output-5.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="urn_files/figure-html/cell-10-output-6.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="urn_files/figure-html/cell-10-output-6.png" width="786" height="135" class="figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>basic operations:</p>
+<ul>
+<li>draw() draw a ball from the urn</li>
+</ul>
+<p>operations:</p>
+<ul>
+<li>convert balls/weights to probabilities</li>
+<li>given the balls counts estimate/simulate probability of drawing some sequence of balls.</li>
+<li>given n observations of balls estimate the ball proportions and thier confidence intervals.</li>
+</ul>
+<p>what about other urn types</p>
+<ul>
+<li>basic urn - sampling is with replacement</li>
+<li>hypergeometric urn - sampling without replacement…</li>
+<li>urn with sampling with replacement and adding a new ball of the same color</li>
+<li>polya urn - when a ball is observed the urn is updated with the same color ball and a new ball of the same color</li>
+<li>beta-binomial when ever a ball is observed the urn is updated with the number of balls of the same color</li>
+<li>dirichlet</li>
+<li>hopper urn - the urn has a mutator ball that generates new ball color (a new column) and a mutator state that generates new states (a new row)</li>
+<li>moran urn</li>
+</ul>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman,
+  author = {Bochman, Oren},
+  title = {Urn Using Numpy},
+  url = {https://orenbochman.github.io//posts/2024/2024-05-01-Signals/urn.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. n.d. <span>“Urn Using Numpy.”</span> <a href="https://orenbochman.github.io//posts/2024/2024-05-01-Signals/urn.html">https://orenbochman.github.io//posts/2024/2024-05-01-Signals/urn.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","openEffect":"zoom","loop":false,"selector":".lightbox"});
+window.onload = () => {
+  lightboxQuarto.on('slide_before_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    const href = trigger.getAttribute('href');
+    if (href !== null) {
+      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+      if (imgEl !== null) {
+        const srcAttr = imgEl.getAttribute("src");
+        if (srcAttr && srcAttr.startsWith("data:")) {
+          slideConfig.href = srcAttr;
+        }
+      }
+    } 
+  });
+
+  lightboxQuarto.on('slide_after_load', (data) => {
+    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+    if (window.Quarto?.typesetMath) {
+      window.Quarto.typesetMath(slideNode);
+    }
+  });
+
+};
+          </script>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

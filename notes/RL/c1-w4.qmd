@@ -1,9 +1,10 @@
 ---
-title: RL Fundamentals W4 - Dynamic Programming
-description: Fundamentals of Reinforcement Learning Course Notes Week 4 - DynamicProgramming Bandit Problem
-author: Oren Bochman
-date: 2022-05-02
+date: 2022-05-05
 lastmod: 2022-05-07
+subtitle: RL Fundamentals 
+title: Dynamic Programming
+description: In week 4 we learn how to compute value functions and optimal policies, assuming you have the MDP model. You will implement dynamic programming to compute value functions and optimal policies and understand the utility of dynamic programming.
+author: Oren Bochman
 draft: false
 categories:
   - Coursera
@@ -11,43 +12,179 @@ categories:
   - rl
   - reinforcement learning
   - dynamic programming
+editor: 
+  markdown: 
+    wrap: none
 ---
 
-# Fundamentals of Reinforcement Learning
 
 ![rl algorithms](img/alg_selector.jpeg)
-## Week 4: Dynamic Programming 
+# Week 4: Dynamic Programming 
 
 In this week, we learn how to compute value functions and optimal policies, assuming you have the MDP model. You will implement dynamic programming to compute value functions and optimal policies and understand the utility of dynamic programming.
 
 The 'programming' in dynamic programming really means solving an optimization problem. We have learned about using the Bellman equations as update rules. Now we look at some basic applications of this idea to solve MDP.
-The intuition is pretty simple we have two tasks - one is to decide how good a policy $\pi$ is - think  'discounted summation of the rewards from the best actions over the $s_ta_tr_t$ tree'. This policy evaluation step is named **prediction**, as we don't really know what the actual rewards of stochastic actions will be, only their expectation. But what we really want is to find near optimal policy which is called 'control'. We have a strong theoretical result on how to go about this by iteratively improving a policy by picking its the actions with highest value at each steps.
+The intuition is pretty simple we have two tasks - one is to decide how good a policy $\pi$ is - think  [discounted summation of the rewards from the best actions over the $s_ta_tr_t$ tree]{.mark}. This policy evaluation step is named **prediction**, as we don't really know what the actual rewards of stochastic actions will be, only their expectation. But what we really want is to find near optimal policy which is called 'control'. We have a strong theoretical result on how to go about this by iteratively improving a policy by picking its the actions with highest value at each steps.
 What is surprising at first is that even starting with a uniform random policy we don't need to explore the tree too deeply in the prediction step to be able to pick better actions. Also we can see from the maze like grid world that we really need to update one or two states every iteration. Which suggest that there is great room for improvement with smarter algorithms.
-Read: 
+
+# Lesson 1: Policy Evaluation (Prediction)
+
+::: callout-note
+### Read
 
 - [x] [RL Book§4.1-7](http://incompleteideas.net/book/RLbook2020.pdf#page=47) pp. 73-88 -> before lessons.
 - [x] [RL Book§4.8](http://incompleteideas.net/book/RLbook2020.pdf#page=64) pp. 88-89 -> before assignments.
+:::
 
-### Lesson 1: Policy Evaluation (Prediction)
+::: callout-note
+
+### Learning Objectives
  
-- [x] Understand the distinction between `policy evaluation` and `control`.
-- [x] Explain the setting in which dynamic programming can be applied, as well as its limitations.
-- [x] Outline the `iterative policy evaluation algorithm` for estimating state values under a given policy 
-- [x] Apply iterative policy evaluation to compute value functions.
+- [x] Understand the distinction between **policy evaluation** and **control**. [\#](#sec-sec-policy-evaluation-control)
+- [x] Explain the setting in which dynamic programming can be applied, as well as its limitations. [\#](#sec-l1g2)
+- [x] Outline the **iterative policy evaluation algorithm** for estimating state values under a given policy $\pi$. [\#](#sec-l1g3)
+- [x] Apply iterative policy evaluation to compute value functions. [\#](#sec-l1g4)
+:::
 
-### Lesson 2: Policy Iteration (Control) 
+## Policy Evaluation and Control {#sec-policy-evaluation-control}
 
-- [x] Understand the `policy improvement theorem`.
-- [x] Use a value function for a policy to produce a better policy for a given MDP.
-- [ x] Outline the `policy iteration algorithm for finding the optimal policy`.
-- [x] Understand `“the dance of policy and value”`.
-- [x] Apply policy iteration to compute `optimal policies` and optimal `value functions`.
+The distinction between policy evaluation and control:
 
-### Lesson 3: Generalized Policy Iteration
+policy evaluation (prediction)
+: is the task of evaluating the future, i.e. the value function given some specific policy $\pi$.
 
-- [x] Understand the framework of `generalized policy iteration`.
-- [x] Outline `value iteration`, an important example of generalized policy iteration.
-- [x] Understand the distinction between `synchronous` and `asynchronous` dynamic programming methods.
-- [x] Describe brute force search as an alternative method for searching for an optimal policy.
-- [x] Describe `Monte Carlo` as an alternative method for learning a value function.
-- [x] Understand the advantage of Dynamic programming and "bootstrapping" over these alternative strategies for finding the optimal policy.
+control
+: is the task of finding the optimal policy, given some specific value function $v$.
+
+planning
+: is the task of finding the optimal policy $\pi_{\star}$ and value function $v$, given a model of the environment.
+this is typically done by dynamic programming methods.
+
+
+Typically we need to solve the prediction problem before we can solve the control problem.
+This is because we need to know the value of the states under the policy to be able to pick the best actions.
+
+## Dynamic Programming {#sec-l1g2}
+
+Dynamic programming is a method for solving complex problems by breaking them down into simpler subproblems.
+It is a general approach to solving problems that can be formulated as a sequence of decisions.
+Dynamic programming is a powerful tool for solving problems that can be formulated as a sequence of decisions.
+
+## Iterative Policy Evaluation Algorithm {#sec-l1g3}
+
+The iterative policy evaluation algorithm is a simple iterative algorithm that estimates the value function for a given policy $\pi$.
+
+The algorithm starts with an initial estimate of the value function and iteratively updates the value function until it converges to the true value function.
+
+The algorithm uses the Bellman equation to update the value function at each iteration.
+
+## Applying Iterative Policy Evaluation {#sec-l1g4}
+
+The iterative policy evaluation algorithm can be applied to compute the value function for a given policy $\pi$.
+
+# Lesson 2: Policy Iteration (Control) 
+
+::: callout-note
+
+### Learning Objectives
+
+- [x] Understand the `policy improvement theorem`. [\#](#sec-l2g1)
+- [x] Use a value function for a policy to produce a better policy for a given MDP. [\#](#sec-l2g2)
+- [x] Outline the `policy iteration algorithm for finding the optimal policy`. [\#](#sec-l2g3)
+- [x] Understand `“the dance of policy and value”`. [\#](#sec-l2g4)
+- [x] Apply policy iteration to compute `optimal policies` and optimal `value functions`. [\#](#sec-l2g5)
+
+:::
+
+### Policy Improvement Theorem {#sec-l2g1}
+
+The policy improvement theorem states that given a policy $\pi$ and the value 
+function $v_{\pi}$, we can construct a new policy $\pi'$ that is as good as or 
+better than $\pi$.
+
+### Value Function for a Policy {#sec-l2g2}
+
+The value function for a policy $\pi$ is the expected return when starting in 
+state $s$ and following policy $\pi$ thereafter. 
+
+The value function for a policy $\pi$ is denoted by $v_{\pi}(s)$.
+
+$$
+v_{\pi}(s) = \mathbb{E}[G_t \vert S_t = s]
+$$
+
+where $G_t$ is the return at time $t$ and $S_t$ is the state at time $t$.   
+
+### Policy Iteration Algorithm {#sec-l2g3}
+
+The policy iteration algorithm is a simple iterative algorithm that alternates 
+between policy evaluation and policy improvement. The algorithm starts with an 
+initial policy $\pi$ and iteratively evaluates the policy to get the value 
+function $v_{\pi}$ and then improves the policy to get a new policy $\pi'$. 
+The algorithm continues this process until the policy no longer changes, i.e., 
+the policy is optimal.
+
+### The Dance of Policy and Value {#sec-l2g4}
+
+The policy iteration algorithm is called the dance of policy and value because
+it alternates between policy evaluation and policy improvement. The policy
+evaluation step computes the value function for the current policy, and the
+policy improvement step constructs a new policy based on the value function.
+
+# Lesson 3: Generalized Policy Iteration
+
+::: callout-note
+
+### Learning Objectives
+
+- [x] Understand the framework of **generalized policy iteration**. [\#](#sec-l3g1)
+- [x] Outline **value iteration**, an important example of generalized policy iteration. [\#](#sec-l3g2)
+- [x] Understand the distinction between **synchronous** and **asynchronous** dynamic programming methods. [\#](#sec-l3g3)
+- [x] Describe brute force search as an alternative method for searching for an optimal policy. [\#](#sec-l3g4)
+- [x] Describe `Monte Carlo` as an alternative method for learning a value function. [\#](#sec-l3g5)
+- [x] Understand the advantage of Dynamic programming and **bootstrapping** over these alternative strategies for finding the optimal policy. [\#](#sec-l3g6)
+:::
+
+### Generalized Policy Iteration {#sec-l3g1}
+
+Generalized policy iteration is a framework for solving reinforcement learning
+problems that combines policy evaluation and policy improvement in a single
+loop. The idea is to alternate between evaluating the policy and improving the
+policy until the policy converges to the optimal policy.
+
+### Value Iteration {#sec-l3g2}
+
+Value iteration is an important example of generalized policy iteration. It is
+an iterative algorithm that computes the optimal value function and the optimal
+policy for a given MDP. The algorithm starts with an initial estimate of the
+value function and iteratively updates the value function until it converges to
+the optimal value function.
+
+### Synchronous and Asynchronous Dynamic Programming {#sec-l3g3}
+
+Synchronous dynamic programming methods update all states in the MDP in each
+iteration, while asynchronous dynamic programming methods update only a subset
+of states in each iteration. Synchronous dynamic programming methods are
+typically slower than asynchronous dynamic programming methods, but they are
+guaranteed to converge to the optimal policy.
+
+### Brute Force Search {#sec-l3g4}
+
+Brute force search is an alternative method for searching for an optimal policy.
+It involves exploring all possible policies and selecting the policy that
+maximizes the expected return. Brute force search is computationally expensive
+and is not practical for large MDPs.
+
+### Monte Carlo {#sec-l3g5}
+
+Monte Carlo is an alternative method for learning a value function. It involves
+estimating the value function by sampling returns from the environment. Monte
+Carlo is computationally expensive and is not practical for large MDPs.
+
+### Advantage of Dynamic Programming {#sec-l3g6}
+
+Dynamic programming and bootstrapping are more efficient than brute force search
+and Monte Carlo for finding the optimal policy. Dynamic programming and
+bootstrapping exploit the structure of the MDP to update the value function
+iteratively, while brute force search and Monte Carlo do not.
+

@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="dcterms.date" content="2022-05-02">
-<meta name="description" content="Fundamentals of Reinforcement Learning Course Notes Week 2 - MDPs Markov Decision Processes">
+<meta name="dcterms.date" content="2022-05-03">
+<meta name="description" content="In week 2 we learn about Markov Decision Processes (MDP) and how to compute value functions and optimal policies, assuming you have the MDP model. We implement dynamic programming to compute value functions and optimal policies.">
 
-<title>Oren Bochman’s Blog - RL Fundamentals W2 - Markov Decision Processes</title>
+<title>Oren Bochman’s Blog - Markov Decision Processes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,7 +23,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -140,14 +160,14 @@ window.Quarto = {
 };
 </script>
 
-<meta name="twitter:title" content="Oren Bochman’s Blog - RL Fundamentals W2 - Markov Decision Processes">
-<meta name="twitter:description" content="Fundamentals of Reinforcement Learning Course Notes Week 2 - MDPs Markov Decision Processes">
+<meta name="twitter:title" content="Oren Bochman’s Blog - Markov Decision Processes">
+<meta name="twitter:description" content="In week 2 we learn about Markov Decision Processes (MDP) and how to compute value functions and optimal policies, assuming you have the MDP model. We implement dynamic programming to compute value functions and optimal policies.">
 <meta name="twitter:image" content="https://orenbochman.github.io/notes/RL/thumbnail_blog.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="floating nav-fixed">
+<body class="floating nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -271,10 +291,11 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">RL Fundamentals W2 - Markov Decision Processes</h1>
+      <h1 class="title">Markov Decision Processes</h1>
+            <p class="subtitle lead">RL Fundamentals</p>
                   <div>
         <div class="description">
-          Fundamentals of Reinforcement Learning Course Notes Week 2 - MDPs Markov Decision Processes
+          In week 2 we learn about Markov Decision Processes (MDP) and how to compute value functions and optimal policies, assuming you have the MDP model. We implement dynamic programming to compute value functions and optimal policies.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -301,7 +322,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">May 2, 2022</p>
+        <p class="date">May 3, 2022</p>
       </div>
     </div>
     
@@ -316,16 +337,29 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#fundamentals-of-reinforcement-learning" id="toc-fundamentals-of-reinforcement-learning" class="nav-link active" data-scroll-target="#fundamentals-of-reinforcement-learning">Fundamentals of Reinforcement Learning</a>
+  <li><a href="#lesson-1-introduction-to-markov-decision-processes" id="toc-lesson-1-introduction-to-markov-decision-processes" class="nav-link active" data-scroll-target="#lesson-1-introduction-to-markov-decision-processes">Lesson 1: Introduction to Markov Decision Processes</a>
   <ul class="collapse">
-  <li><a href="#week-2-markov-decision-processes-mdps" id="toc-week-2-markov-decision-processes-mdps" class="nav-link" data-scroll-target="#week-2-markov-decision-processes-mdps">Week 2 Markov Decision Processes MDPs</a>
+  <li><a href="#sec-Markov-Process" id="toc-sec-Markov-Process" class="nav-link" data-scroll-target="#sec-Markov-Process">Markov Process</a></li>
+  <li><a href="#sec-MRP" id="toc-sec-MRP" class="nav-link" data-scroll-target="#sec-MRP">Markov Reward Process</a>
   <ul class="collapse">
-  <li><a href="#objectives" id="toc-objectives" class="nav-link" data-scroll-target="#objectives">Objectives</a></li>
+  <li><a href="#sec-bellman-MRP" id="toc-sec-bellman-MRP" class="nav-link" data-scroll-target="#sec-bellman-MRP">Bellman equations for MRP</a></li>
   </ul></li>
-  <li><a href="#markov-process" id="toc-markov-process" class="nav-link" data-scroll-target="#markov-process">Markov Process</a>
+  <li><a href="#sec-MDP" id="toc-sec-MDP" class="nav-link" data-scroll-target="#sec-MDP">Markov Decision Processes</a>
   <ul class="collapse">
-  <li><a href="#markov-reward-process" id="toc-markov-reward-process" class="nav-link" data-scroll-target="#markov-reward-process">Markov Reward Process</a></li>
+  <li><a href="#sec-MDP-dynamics" id="toc-sec-MDP-dynamics" class="nav-link" data-scroll-target="#sec-MDP-dynamics">The dynamics of an MDP</a></li>
+  <li><a href="#sec-MDP-graphical" id="toc-sec-MDP-graphical" class="nav-link" data-scroll-target="#sec-MDP-graphical">Graphical representation of an MDP</a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#lesson-2-goal-of-reinforcement-learning" id="toc-lesson-2-goal-of-reinforcement-learning" class="nav-link" data-scroll-target="#lesson-2-goal-of-reinforcement-learning">Lesson 2: Goal of Reinforcement Learning</a>
+  <ul class="collapse">
+  <li><a href="#l2g1" id="toc-l2g1" class="nav-link" data-scroll-target="#l2g1">Rewards and the Goal of an Agent</a></li>
+  <li><a href="#l2g2" id="toc-l2g2" class="nav-link" data-scroll-target="#l2g2">Episodes and Episodic Tasks</a></li>
+  </ul></li>
+  <li><a href="#lesson-3-continuing-tasks" id="toc-lesson-3-continuing-tasks" class="nav-link" data-scroll-target="#lesson-3-continuing-tasks">Lesson 3: Continuing Tasks</a>
+  <ul class="collapse">
+  <li><a href="#l3g1" id="toc-l3g1" class="nav-link" data-scroll-target="#l3g1">Returns for Continuing Tasks</a></li>
+  <li><a href="#l3g2" id="toc-l3g2" class="nav-link" data-scroll-target="#l3g2">Returns at Successive Time Steps</a></li>
+  <li><a href="#l3g3" id="toc-l3g3" class="nav-link" data-scroll-target="#l3g3">Episodic vs.&nbsp;Continuing Tasks</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -335,113 +369,534 @@ window.Quarto = {
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
 
 
 
 
 
-<section id="fundamentals-of-reinforcement-learning" class="level1">
-<h1>Fundamentals of Reinforcement Learning</h1>
-<div class="quarto-figure quarto-figure-center">
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="img/alg_selector.jpeg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" data-glightbox="description: .lightbox-desc-1" title="rl algorithms"><img src="img/alg_selector.jpeg" class="img-fluid figure-img" alt="rl algorithms"></a></p>
 <figcaption>rl algorithms</figcaption>
 </figure>
+</div></div><section id="lesson-1-introduction-to-markov-decision-processes" class="level1 page-columns page-full">
+<h1>Lesson 1: Introduction to Markov Decision Processes</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<section id="week-2-markov-decision-processes-mdps" class="level2">
-<h2 class="anchored" data-anchor-id="week-2-markov-decision-processes-mdps">Week 2 Markov Decision Processes MDPs</h2>
-<section id="objectives" class="level3">
-<h3 class="anchored" data-anchor-id="objectives">Objectives</h3>
+<div class="callout-title-container flex-fill">
+Readings:
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox" checked="">Understand Markov Decision Processes (MDP).</label></li>
-<li><label><input type="checkbox" checked="">Describe how the dynamics of an MDP are defined.</label></li>
-<li><label><input type="checkbox" checked="">Understand the graphical representation of a Markov Decision Process.</label></li>
-<li><label><input type="checkbox" checked="">Explain how many diverse processes can be written in terms of the MDP framework.</label></li>
-<li><label><input type="checkbox" checked="">Describe how rewards relate to the goal of an agent.</label></li>
-<li><label><input type="checkbox" checked="">Understand episodes and identify episodic tasks.</label></li>
-<li><label><input type="checkbox" checked="">Formulate returns for continuing tasks using discounting.</label></li>
-<li><label><input type="checkbox" checked="">Describe how returns at successive time steps are related to each other.</label></li>
-<li><label><input type="checkbox" checked="">Understand when to formalize a task as episodic or continuing.</label></li>
+<li><label><input type="checkbox" checked="">[<a href="http://incompleteideas.net/book/RLbook2020.pdf#page=47">@sutton2018reinforcement§3.3, pp.&nbsp;47-56</a>]</label></li>
 </ul>
-<p>Before I started this course I saw an intro to RL course on you tube. I really like it as the David Silver is the best best instructors I have come across so far. Anyhow what I liked about his talk on MDP is how he develops them constructively. He begins with a Markov Process. By adding rewards he gets a Markov reward process. By adding actions he then gets a markov decision process. He explains these and in the notes covers three additional extentions.</p>
-<p>shows in his lecture how to develop MDP. He starts with a Markov process with (states and transitions), My adding rewards we get a Markov rewards process. By adding actions we get a markov decision process. He notes in the notes the following MDP extensions:</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Understand Markov Decision Processes (MDP). <a href="#l1g1">#</a></label></li>
+<li><label><input type="checkbox" checked="">Describe how the dynamics of an MDP are defined. <a href="#l1g2">#</a></label></li>
+<li><label><input type="checkbox" checked="">Understand the graphical representation of a Markov Decision Process. <a href="#l1g3">#</a></label></li>
+<li><label><input type="checkbox" checked="">Explain how many diverse processes can be written in terms of the MDP framework. <a href="#l1g4">#</a></label></li>
+</ul>
+</div>
+</div>
+<p>Before I started this course I viewed <span class="citation" data-cites="silver2015">(<a href="#ref-silver2015" role="doc-biblioref">Silver 2015</a>)</span> online course by David Silver who in many ways is the face of RL. He is also the lead of the AlphaGo project, a principal researcher at DeepMind and a lecturer at University College London. Silver is also featured in one of the Lectures in this specialization. In his course he develops the MDP constructively starting with simpler structures as is often done in mathematics. I find this is a good way to learn how to think about how we generalize and specialize from more abstract to more concrete structures.</p>
+<p>Many students of probability theory will be familiar with Markov Chains. And Markov Decision Processes are a generalization of Markov Chains.</p>
+<p>In <span class="citation" data-cites="silver2015">(<a href="#ref-silver2015" role="doc-biblioref">Silver 2015</a>)</span> he begins with a <strong>Markov Process</strong>, with states and transitions probabilities, by adding <strong>rewards</strong> he constructs a <em>Markov reward process</em>. Then by adding <strong>actions</strong> he constructs a <em>Markov decision process</em>. He explains these and in the notes covers three additional extensions. In the the notes he also add the following MDP extensions:</p>
 <ul>
 <li>Infinite and continuous MDPs - the case of optimal control</li>
 <li>Partially observable MDPs.</li>
 <li>Undiscounted, average reward MDPs.</li>
+<li>David Silver’s 2015 <a href="https://www.davidsilver.uk/teaching/">UCL Course</a> <a href="https://www.youtube.com/watch?v=2pWv7GOvuf0">Video</a> and Slides.</li>
 </ul>
-</section>
-</section>
-<section id="markov-process" class="level2">
-<h2 class="anchored" data-anchor-id="markov-process">Markov Process</h2>
-<p>Markov Property for a state space where The future is independent of the past given the present.</p>
+<section id="sec-Markov-Process" class="level2">
+<h2 class="anchored" data-anchor-id="sec-Markov-Process">Markov Process</h2>
+<p>Silver goes into some detail on what we mean by state in RL:</p>
+<ul>
+<li>In th abstract state can be any function of the history.</li>
+<li>The state should summarize the information on the previous actions, and rewards.</li>
+<li>He points out that the history in RL can be very long, for Atari games it can include actions plus all the pixels for every screen in many plays of the game. In contrast the state tries to capture the bare essentials of the history for decision making at each time step. For Atari games they used the last 4 screens as the state.</li>
+<li>A second point is that there is always a state. The full history is also a state, but not a very useful one. The internal representation of the ram in the Atari game is also a state, much smaller but this is the representation used by the environment and contains more information than is available to the agent. Ideally the agent would want to model this state, but again it contains lots more information than is available would need to male a decision.</li>
+<li>Another useful property of the state is that it should have the Markov Property for a state space which is when the future is independent of the past given the present.</li>
+</ul>
 <p>A state S<span class="math inline">_t</span> is Markov if and only if:</p>
-<p><span class="math display"> \mathbb{P}[S_{t+1}  \vert  S_{t}] =  \mathbb{P}[S_{t+1}  \vert  S_1,...,S_t]
-</span> * The state captures all relevant information from the history * Once the state is known, the history may be thrown away i.e.&nbsp; * The state is a sufficient statistic of the future For a Markov state s and successor state s′, the state transition probability is defined by:</p>
+<p><span id="eq-markov-property"><span class="math display">
+\mathbb{P}[S_{t+1}  \vert  S_{t}] =  \mathbb{P}[S_{t+1}  \vert  S_1,...,S_t] \qquad \text{(Markov Property)}
+\tag{1}</span></span></p>
+<p><strong>The state captures all relevant information from the history</strong> Once the state is known, the history may be thrown away i.e.&nbsp;<mark>The state is a sufficient statistic of the future</mark></p>
+<p>Recall:</p>
+<blockquote class="blockquote">
+<p>a statistic satisfies the criterion for sufficency when no other statistic that can be calculated from the same <a href="https://en.wikipedia.org/wiki/Sample_(statistics)" title="Sample (statistics)">sample</a> provides any additional information as to the value of the parameter”. — <span class="citation" data-cites="doi:10.1098/rsta.1922.0009">(<a href="#ref-doi:10.1098/rsta.1922.0009" role="doc-biblioref">Fisher and Russell 1922</a>)</span></p>
+</blockquote>
+<p>For a Markov state <span class="math inline">s</span> and successor state <span class="math inline">s'</span>, the state transition probability is defined by:</p>
 <p><span class="math display">
-\mathbb{P}_{ss′} = \mathbb{P}[S_{t+1}=s′  \vert  S_t=s]
-</span> State transition matrix <span class="math inline">P</span> defines transition probabilities from all states <span class="math inline">s</span> to all successor states <span class="math inline">s′</span>,</p>
-<p><span class="math display">
-\begin{align}
+\mathbb{P}_{ss'} = \mathbb{P}[S_{t+1}=s'  \vert  S_t=s]
+</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Markov Process or Chain Definion
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<dl>
+<dt>A Markov Process is</dt>
+<dd>
+a tuple <span class="math inline">⟨S,P⟩</span>
+</dd>
+</dl>
+<p>where:</p>
+<ul>
+<li><span class="math inline">S</span> is a (finite) set of states</li>
+<li><span class="math inline">P</span> is a state transition probability matrix, <span class="math inline">P_{ss'} = P[S_{t+1} = s'  \vert S_t=s]</span> State transition matrix <span class="math inline">P_{ss'}</span> defines transition probabilities from all states <span class="math inline">s</span> to all successor states <span class="math inline">s'</span>,</li>
+</ul>
+<p><span id="eq-transition-matrix"><span class="math display">
+\begin{align*}
   P=\left( \begin{array}{cc}
       p_{11} &amp; \cdots &amp; p_{1n} \newline
       \vdots &amp; \ddots &amp; \vdots \newline
       p_{n1} &amp; \cdots &amp; p_{nn} \end{array} \right)
-  \end{align}</span></p>
-<p>Definition: A Markov Process (or Markov Chain) is: : a tuple <span class="math inline">⟨S,P⟩</span> where: - <strong><span class="math inline">S</span></strong> is a (finite) set of states - <strong><span class="math inline">P</span></strong> is a state transition probability matrix, <span class="math inline">P_{ss'} =P[S_{t+1}=s'  \vert S_t=s]</span></p>
-<section id="markov-reward-process" class="level3">
-<h3 class="anchored" data-anchor-id="markov-reward-process">Markov Reward Process</h3>
-<p>A Markov Reward Process <strong>(MRP)</strong> is a Markov chain with values. Definition: A Markov Reward Process is: : a tuple <span class="math inline">⟨S, P, R, γ⟩</span> where - <strong><span class="math inline">S</span></strong> is a finite set of states - <strong><span class="math inline">P</span></strong> is a state transition probability matrix, where <span class="math inline">P_{ss′} =  \mathbb{P}[S_{t+1} = s′ \vert  S_t = s]</span> - <strong><span class="math inline">R</span></strong> is a reward function, $R_s = [R_{t+1} S_t = s] $ - <strong><span class="math inline">\gamma</span></strong> is a discount factor, <span class="math inline">\gamma \in [0, 1]</span> The return <span class="math inline">G_t</span>: : is the total discounted reward from time-step t. <span class="math display">
-G_t =R_t+1+\gamma R_t+2+...=\sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
-</span> The value function: : The state value function v(s) of an MRP is the expected return starting from state s</p>
+\end{align*}
+\tag{2}</span></span></p>
+</div>
+</div>
+</section>
+<section id="sec-MRP" class="level2">
+<h2 class="anchored" data-anchor-id="sec-MRP">Markov Reward Process</h2>
+<p>A Markov Reward Process <strong>(MRP)</strong> is a Markov chain with values.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Markov Reward Process Definition
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<dl>
+<dt>A Markov Reward Process is</dt>
+<dd>
+a tuple <span class="math inline">⟨S, P, R, \gamma⟩</span>
+</dd>
+</dl>
+<p>where:</p>
+<ul>
+<li><span class="math inline">S</span> is a finite set of states</li>
+<li><span class="math inline">P</span> is a state transition probability matrix, where <span class="math inline">P_{ss'} =  \mathbb{P}[S_{t+1} = s' \vert  S_t = s]</span></li>
+<li><span class="math inline">R</span> is a reward function, <span class="math inline">R_s = \mathbb{E}[R_{t+1} \vert S_t = s]</span></li>
+<li><span class="math inline">\gamma</span> is a discount factor, <span class="math inline">\gamma \in [0, 1]</span></li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+the return definition
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<dl>
+<dt>The return <span class="math inline">G_t</span></dt>
+<dd>
+<p>is the total discounted reward from time-step t.</p>
+</dd>
+</dl>
+<p><span id="eq-return"><span class="math display">
+G_t =R_{t+1}+\gamma R_{t+2}+...=\sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
+\tag{3}</span></span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">R_t</span> is the reward at time-step <span class="math inline">t</span></li>
+<li><span class="math inline">\gamma</span> the discount factor <span class="math inline">\gamma \in [0, 1]</span> is the present value of future rewards.</li>
+<li>The value of receiving reward <span class="math inline">R</span> after <span class="math inline">k+1</span> time-steps is <span class="math inline">\gamma^k R</span></li>
+<li>This values immediate reward above delayed reward.
+<ul>
+<li><span class="math inline">\gamma = 0</span> makes the agent short-sighted.</li>
+<li><span class="math inline">\gamma = 1</span> makes the agent far-sighted.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The value function
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<dl>
+<dt>The value function:</dt>
+<dd>
+<p>The state value function <span class="math inline">v(s)</span> of an MRP is the expected return starting from state <span class="math inline">s</span></p>
+</dd>
+</dl>
 <p><span class="math display">
 v(s) =\mathbb{E} [G_t  \vert  S_t = s]
 </span></p>
-<section id="bellman-equations-for-mrp" class="level4">
-<h4 class="anchored" data-anchor-id="bellman-equations-for-mrp">Bellman equations for MRP</h4>
+</div>
+</div>
+<section id="sec-bellman-MRP" class="level3">
+<h3 class="anchored" data-anchor-id="sec-bellman-MRP">Bellman equations for MRP</h3>
 <p>The value function can be decomposed into two parts:</p>
 <ul>
-<li>immediate reward <span class="math inline">R_{t+1}</span> and</li>
+<li>an immediate reward <span class="math inline">R_{t+1}</span> and</li>
 <li>a discounted value of successor state <span class="math inline">\gamma v(S_{t+1})</span></li>
 </ul>
-<p><span class="math display">
-\begin{align}
+<p>The Bellman equation for MRPs expresses this relationship:</p>
+<p><span id="eq-bellman-mrp"><span class="math display">
+\begin{align*}
 v(s) &amp;= \mathbb{E}[G_t  \vert  S_t=s] \newline
 &amp; = \mathbb{E}[R_{t+1} + \gamma R_{t+2}+\gamma^2 R_{t+3} + ...  \vert S_t = s]   \newline
 &amp; = \mathbb{E}[R_{t+1} + \gamma( R_{t+2}+\gamma^2 R_{t+3} + ... )  \vert S_t = s]   \newline
 &amp; = \mathbb{E}[R_{t+1} + \gamma G_{t+1}  \vert  S_t = s]   \newline
 &amp; = \mathbb{E}[R_{t+1} + \gamma v(S_{t+1})  \vert S_t = s]
+\end{align*} \qquad \text{(Bellman Equation)}
+\tag{4}</span></span></p>
+<p>The Bellman equation can also be expressed in terms of the dynamics matrix for state transitions:</p>
+<p><span id="eq-bellman-mrp-with-dynamics-matrix"><span class="math display">
+v(s) = R_s + γ \sum_{s'\in S} P_{ss'}v(s) \qquad \text{value with dynamics}
+\tag{5}</span></span></p>
+<p>where we use the dynamics matrix <span class="math inline">P</span> to express the expected value of the successor state.</p>
+</section>
+</section>
+<section id="sec-MDP" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-MDP">Markov Decision Processes</h2>
+<ul>
+<li>The k-Armed Bandit problem does not account for the fact that different situations call for different actions.</li>
+<li>Because it the problem is limited to a single state agents can only make decisions based on immediate reward so they fail to consider the long-term impact of their decisions - this is an inability to make plan.</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-agent-env.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" data-glightbox="description: .lightbox-desc-2" title="The agent–environment interaction in a Markov decision process."><img src="img/rl-agent-env.png" class="img-fluid figure-img" alt="The agent–environment interaction in a Markov decision process."></a></p>
+<figcaption>The agent–environment interaction in a Markov decision process.</figcaption>
+</figure>
+</div></div><div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+MDP definition
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<dl>
+<dt>A Markov Decision Process is a Markov Reward Process with decisions.</dt>
+<dd>
+<p>a tuple <span class="math inline">⟨S, A, P, R, \gamma⟩</span></p>
+</dd>
+</dl>
+<p>where:</p>
+<ul>
+<li><span class="math inline">S</span> is a finite set of states</li>
+<li><span class="math inline">A</span> is a finite set of actions</li>
+<li><span class="math inline">P</span> is a state transition probability matrix, <span class="math inline">P_{ss'}^a = \mathbb{P}[S_{t+1} = s' \vert S_t = s, A_t = a]</span></li>
+<li><span class="math inline">R</span> is a reward function, <span class="math inline">R_s^a = \mathbb{E}[R_{t+1} \vert S_t = s, A_t = a]</span></li>
+<li><span class="math inline">\gamma</span> is a discount factor, <span class="math inline">\gamma \in [0, 1]</span></li>
+</ul>
+</div>
+</div>
+<section id="sec-MDP-dynamics" class="level3">
+<h3 class="anchored" data-anchor-id="sec-MDP-dynamics">The dynamics of an MDP</h3>
+<p>In a finite MDP, the sets of states, actions, and rewards (S, A and R) all have a finite number of elements. In this case, the random variables <span class="math inline">S_t</span> and <span class="math inline">R_t</span> have well defined discrete probability distributions dependent only on the preceding state and action.</p>
+<p>The dynamics of an MDP are defined by the four argument dynamics function:</p>
+<p><span id="eq-four-part-dynamics"><span class="math display">
+p(s',r \vert s,a)\ \dot =\ Pr\{S_t = s', R_t = r \vert S_{t-1} = s, A_{t-1} = a\}\qquad  \forall s',s \in S\ \forall r\in R\ \forall a\in A
+\tag{6}</span></span></p>
+<p>where the sum of the probabilities over fixed set of s,a is 1:</p>
+<p><span id="eq-dynamics-function-sum"><span class="math display">
+\sum_{s' \in S} \sum_{r \in R} p(s',r \vert s,a) = 1 \qquad \forall s \in S, \forall a \in A \qquad \text{(Dynamics function)}
+\tag{7}</span></span></p>
+<p>This is just a regular function that takes a state and action and returns a probability distribution over the next state and reward.</p>
+<p>In a tabular setting, we can also express this function as a table. Here is my solution for ex 3.4, a table for the recycling robot</p>
+<div id="tbl-dynamics-function" class="quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-dynamics-function-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Dynamics function for a recycling robot MDP
+</figcaption>
+<div aria-describedby="tbl-dynamics-function-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table">
+<thead>
+<tr class="header">
+<th><span class="math inline">s</span></th>
+<th><span class="math inline">a</span></th>
+<th><span class="math inline">s'</span></th>
+<th><span class="math inline">r</span></th>
+<th><span class="math inline">p(s',r \mid s,a)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>high</td>
+<td>search</td>
+<td>high</td>
+<td><span class="math inline">r_{search}</span></td>
+<td><span class="math inline">\alpha</span></td>
+</tr>
+<tr class="even">
+<td>high</td>
+<td>search</td>
+<td>low</td>
+<td><span class="math inline">r_{search}</span></td>
+<td><span class="math inline">1-\alpha</span></td>
+</tr>
+<tr class="odd">
+<td>low</td>
+<td>search</td>
+<td>high</td>
+<td>-3</td>
+<td><span class="math inline">1-\beta</span></td>
+</tr>
+<tr class="even">
+<td>low</td>
+<td>search</td>
+<td>low</td>
+<td><span class="math inline">r_{search}</span></td>
+<td><span class="math inline">\beta</span></td>
+</tr>
+<tr class="odd">
+<td>high</td>
+<td>wait</td>
+<td>high</td>
+<td><span class="math inline">r_{wait}</span></td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>low</td>
+<td>wait</td>
+<td>low</td>
+<td><span class="math inline">r_{wait}</span></td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>low</td>
+<td>recharge</td>
+<td>high</td>
+<td>0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>a couple of takeaways from this exercise are:</p>
+<ol type="1">
+<li><p>rewards are uniquely assigned for action at s resulting in s’ so we don’t need to make r another factor (i.e.&nbsp;list all possible rewards for (s,a,s’) tuple.</p></li>
+<li><p>there are (s,a,s’,r) tuples for which we don’t have a non-zero probabilities - since there are no transition possible.</p>
+<p>e.g.&nbsp;the robot wont charge when high, so there isn’t a transition from that state, nor a reward, nor a probability.</p></li>
+</ol>
+</section>
+<section id="sec-MDP-graphical" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="sec-MDP-graphical">Graphical representation of an MDP</h3>
+<p>The graphical representation of an MDP is a directed graph where the nodes represent states and the edges represent actions. The graph is labeled with the probabilities of transitioning from one state to another given an action.</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-mdp-graph.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" data-glightbox="description: .lightbox-desc-3" title="graphical MDP for cleaning robot"><img src="img/rl-mdp-graph.png" class="img-fluid figure-img" alt="graphical MDP for cleaning robot"></a></p>
+<figcaption>graphical MDP for cleaning robot</figcaption>
+</figure>
+</div></div><p>In an MDP, the probabilities given by four part dynamics function completely characterize the environment’s dynamics.</p>
+<p>That is, the probability of each possible value for <span class="math inline">S_{t+1}</span> and <span class="math inline">R_{t+1}</span> depends only on the immediately preceding state <span class="math inline">S_t</span> and action <span class="math inline">A_t</span>.</p>
+<p>This is best viewed a restriction not on the decision process, but on the state.</p>
+<p>The state must include information about all aspects of the past agent–environment interaction that make a difference for the future.</p>
+<p>If it does, then the state is said to have the Markov property.</p>
+<p>We can use the four-part dynamics function to compute the <strong>state transition probabilities</strong> for a given state and action:</p>
+<p><span id="eq-transition-probabilities"><span class="math display">
+\begin{align}
+  p(s' \vert s,a) &amp;= \mathbb{P}[S_t = s'\vert S_{t-1} = s, A_{t-1} = a] \newline
+  &amp;= \sum_{r \in R} p(s',r \vert s,a) \qquad \text{(state transition p)}
 \end{align}
-</span></p>
+\tag{8}</span></span></p>
+<p>where we summed over all possible rewards to get the state transition probability.</p>
+<p>We can use the four-part dynamics function to compute the <strong>expected rewards</strong> for a given state and action:</p>
+<p><span id="eq-expected-reward-for-state-action"><span class="math display">
+\begin{align}
+  r(s,a) &amp;= \mathbb{E}[R_t \vert S_{t-1} = s, A_{t-1} = a] \newline
+  &amp;= \sum_{r \in R} r  \times \sum_{s' \in S}  p(s', r, \vert s, a)
+\end{align}
+\tag{9}</span></span></p>
+<p>where we summed over all possible rewards and all successor state to get the expected reward.</p>
+<p>We can also get the expected reward for a given state, action, and successor state using the four-part dynamics function:</p>
+<p><span id="eq-expected-reward-for-state-action-successor-state"><span class="math display">
+\begin{align}
+  r(s,a,s') &amp;= \mathbb{E}[R_t \vert S_{t-1} = s, A_{t-1} = a, S_t = s'] \newline
+  &amp;= \sum_{r \in R} r \times
+  \frac {  p(s', r \vert s, a) } {  p(s' \vert s, a) }
+\end{align}
+\tag{10}</span></span></p>
+<p>where we summed over all possible rewards to get the expected reward.</p>
+<p>Note: perhaps implementing these in python might be further clarify the math for a given state transition graph.</p>
+</section>
+</section>
+</section>
+<section id="lesson-2-goal-of-reinforcement-learning" class="level1">
+<h1>Lesson 2: Goal of Reinforcement Learning</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Describe how rewards relate to the goal of an agent. <a href="#l2g1">#</a></label></li>
+<li><label><input type="checkbox" checked="">Understand episodes and identify episodic tasks. <a href="#l2g2">#</a></label></li>
+</ul>
+</div>
+</div>
+<section id="l2g1" class="level2">
+<h2 class="anchored" data-anchor-id="l2g1">Rewards and the Goal of an Agent</h2>
+<p>The agent interacts with the environment by taking actions and receiving rewards.</p>
+<p>In the bandit setting, it is enough to maximize immediate rewards. In the MDP setting, the agent must consider the long-term consequences of its actions.</p>
+<p>return <span class="math inline">G_t</span> is the total future reward from time-step <span class="math inline">t</span>.</p>
 <p><span class="math display">
-\begin{equation}
-    v(s) = \mathbb{E}[R_{t+1} + \gamma v(S_{t+1})  \vert S_t = s]
-    \end{equation}
-</span></p>
-<p><span class="math display">
-v(s) = R_s + γ \sum_{s'\in S} P_{ss'}v(s)
-</span></p>
+G_t \dot= R_{t+1} + R_{t+2} +  R_{t+3} + \ldots
+</span> - <span class="math inline">G_t</span> is a random variable because both transition and the rewards can be stochastic.</p>
+<p>The goal of an agent is to maximize the expected cumulative reward.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+the reward hypothesis
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>That all of what we mean by goals and purposes can be well thought of as the maximization of the expected value of the cumulative sum of a received scalar signal (called reward).</p>
+</div>
+</div>
+<p>some basic formulations of the goal of an agent:</p>
+<ol type="1">
+<li>Maze runner: -1 for each time step until the goal is reached, then 0.</li>
+<li>Recycling robot: +1 per can, 0 otherwise.</li>
+<li>Chess: 1 for a win, 0 for a draw, -1 for a loss.</li>
+</ol>
+</section>
+<section id="l2g2" class="level2">
+<h2 class="anchored" data-anchor-id="l2g2">Episodes and Episodic Tasks</h2>
+<p>An episode is a sequence of states, actions, and rewards that ends in a terminal state. An episodic task is a task with a well-defined terminal state.</p>
+<p>An example of an episodic task is a game of chess, where the game ends when one player wins or the game is a draw. The opposite setting of an episodic task is a continuing task, where the agent interacts with the environment indefinitely.</p>
+</section>
+</section>
+<section id="lesson-3-continuing-tasks" class="level1">
+<h1>Lesson 3: Continuing Tasks</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Formulate returns for continuing tasks using discounting. <a href="#l3g1">#</a></label></li>
+<li><label><input type="checkbox" checked="">Describe how returns at successive time steps are related to each other. <a href="#l3g2">#</a></label></li>
+<li><label><input type="checkbox" checked="">Understand when to formalize a task as episodic or continuing. <a href="#l3g3">#</a></label></li>
+</ul>
+</div>
+</div>
+<section id="l3g1" class="level2">
+<h2 class="anchored" data-anchor-id="l3g1">Returns for Continuing Tasks</h2>
+<ul>
+<li>In continuing tasks, the agent interacts with the environment indefinitely.</li>
+<li>The return at time <span class="math inline">t</span> is the sum of the rewards from time <span class="math inline">t</span> to the end of the episode.</li>
+<li>The return can be formulated using discounting, where the rewards are discounted by a factor <span class="math inline">\gamma</span>.</li>
+</ul>
+<p><span id="eq-discounted-return-continuing"><span class="math display">
+\begin{align}
+G_t&amp;=R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \ldots \newline
+&amp;= \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
+\end{align}
+\tag{11}</span></span></p>
+<ul>
+<li>returns have a recursive structure, where the return at time <span class="math inline">t</span> is related to the return at time <span class="math inline">t+1</span> by the discount factor <span class="math inline">\gamma</span>.</li>
+</ul>
+<p><span id="eq-return-recursive"><span class="math display">  
+\begin{align}
+G_t &amp;= R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \ldots \newline
+&amp;= R_{t+1} + \gamma ( R_{t+2} + \gamma R_{t+3} + \ldots ) \newline
+&amp;= R_{t+1} + \gamma G_{t+1}
+\end{align}
+\tag{12}</span></span></p>
+<p>this form of the return is called the recursive form of the return and is usefull in developing algorithms for reinforcement learning.</p>
+</section>
+<section id="l3g2" class="level2">
+<h2 class="anchored" data-anchor-id="l3g2">Returns at Successive Time Steps</h2>
+<ul>
+<li>The return at time <span class="math inline">t</span> is related to the return at time <span class="math inline">t+1</span> by the discount factor <span class="math inline">\gamma</span>.</li>
+<li>The return at time <span class="math inline">t</span> is the sum of the reward at time <span class="math inline">t</span> and the discounted return at time $t+1.</li>
+</ul>
+</section>
+<section id="l3g3" class="level2">
+<h2 class="anchored" data-anchor-id="l3g3">Episodic vs.&nbsp;Continuing Tasks</h2>
+<ul>
+<li>An episodic task has a well-defined terminal state, and the episode ends when the terminal state is reached.</li>
+<li>A continuing task does not have a terminal state, and the agent interacts with the environment indefinitely.</li>
+<li>To avoid infinite returns in continuing tasks, we use discounting to ensure that the return is finite.</li>
+<li>The discount factor <span class="math inline">\gamma\in(0,1)</span> is the present value of future rewards.</li>
+</ul>
 
 
 <div class="hidden" aria-hidden="true">
 <span class="glightbox-desc lightbox-desc-1">rl algorithms</span>
+<span class="glightbox-desc lightbox-desc-2">The agent–environment interaction in a Markov decision process.</span>
+<span class="glightbox-desc lightbox-desc-3">graphical MDP for cleaning robot</span>
 </div>
-</section>
-</section>
+
 </section>
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2022,
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-doi:10.1098/rsta.1922.0009" class="csl-entry" role="listitem">
+Fisher, R. A., and Edward John Russell. 1922. <span>“On the Mathematical Foundations of Theoretical Statistics.”</span> <em>Philosophical Transactions of the Royal Society of London. Series A, Containing Papers of a Mathematical or Physical Character</em> 222 (594-604): 309–68. <a href="https://doi.org/10.1098/rsta.1922.0009">https://doi.org/10.1098/rsta.1922.0009</a>.
+</div>
+<div id="ref-silver2015" class="csl-entry" role="listitem">
+Silver, David. 2015. <span>“Lectures on Reinforcement Learning.”</span> <span class="smallcaps">url:</span>&nbsp;<a href="https://www.davidsilver.uk/teaching/" class="uri">https://www.davidsilver.uk/teaching/</a>.
+</div>
+</div></section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2022,
   author = {Bochman, Oren},
-  title = {RL {Fundamentals} {W2} - {Markov} {Decision} {Processes}},
-  date = {2022-05-02},
+  title = {Markov {Decision} {Processes}},
+  date = {2022-05-03},
   url = {https://orenbochman.github.io//notes/RL/c1-w2.html},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2022" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2022. <span>“RL Fundamentals W2 - Markov Decision
-Processes.”</span> May 2, 2022. <a href="https://orenbochman.github.io//notes/RL/c1-w2.html">https://orenbochman.github.io//notes/RL/c1-w2.html</a>.
+Bochman, Oren. 2022. <span>“Markov Decision Processes.”</span> May 3,
+2022. <a href="https://orenbochman.github.io//notes/RL/c1-w2.html">https://orenbochman.github.io//notes/RL/c1-w2.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1128,7 +1583,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"openEffect":"zoom","selector":".lightbox","descPosition":"bottom","closeEffect":"zoom","loop":false});
+<script>var lightboxQuarto = GLightbox({"loop":false,"descPosition":"bottom","openEffect":"zoom","closeEffect":"zoom","selector":".lightbox"});
 window.onload = () => {
   lightboxQuarto.on('slide_before_load', (data) => {
     const { slideIndex, slideNode, slideConfig, player, trigger } = data;

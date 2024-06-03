@@ -51,14 +51,13 @@ We describe a MDP as a linear process in time. However, it is really a tree of p
 ::: callout-note
 ### Learning Objectives
 
-- [x] Recognize that a policy is a distribution over actions for each possible state [\#](#sec-policy-definition)
-- [x] Describe the similarities and differences between stochastic and deterministic policies [\#](#sec-stochastic-vs-deterministic)
-- [x] Identify the characteristics of a well-defined policy [\#](#sec-policy-definition)
-- [x] Generate examples of valid policies for a given MDP [\#](#sec-policy-definition)
-- [x] Describe the roles of state-value and action-value functions in reinforcement learning [\#](#sec-value-functions)
-- [x] Describe the relationship between value functions and policies [\#](#sec-value-functions)
-- [x] Create examples of valid value functions for a given MDP [\#](#sec-value-functions)
-
+-   [x] Recognize that a policy is a distribution over actions for each possible state [\#](#sec-policy-definition)
+-   [x] Describe the similarities and differences between stochastic and deterministic policies [\#](#sec-stochastic-vs-deterministic)
+-   [x] Identify the characteristics of a well-defined policy [\#](#sec-policy-definition)
+-   [x] Generate examples of valid policies for a given MDP [\#](#sec-policy-definition)
+-   [x] Describe the roles of state-value and action-value functions in reinforcement learning [\#](#sec-value-functions)
+-   [x] Describe the relationship between value functions and policies [\#](#sec-value-functions)
+-   [x] Create examples of valid value functions for a given MDP [\#](#sec-value-functions)
 :::
 
 ## Policy Definition {#sec-policy-definition}
@@ -116,6 +115,36 @@ The value functions are deterministic and can be computed from the MDP.
 
 ## Bellman Equation for State-Value Functions {#sec-bellman-equation-state-value-functions}
 
+![backup diagram for $v_\pi$](img/rl-backup-v.png){#fig-backup-v .column-margin}
+
+::: callout-note
+### Bellman Equation intuition
+
+Richard Bellman was a uniquely gifted mathematician who worked on dynamic programming. The Bellman equations is a recursive equation that decomposes the value of a state into the immediate reward and the discounted value of the successor state. These equations form the basis of Dynamic Programming which is used in disparate problems including
+
+-   Schedule optimization
+-   String algorithms (e.g. sequence alignment)
+-   Graph algorithms (e.g. the shortest path problem)
+-   Graphical algorithms (e.g. the Vitrebi algorithm)
+-   Bioinformatics (e.g. lattice models)
+
+Although Bellman was one of the greatest problem solvers of the 20th century, he was not a great communicator. He was known for his terse and cryptic writing. The Bellman equations are a case in point. They are simple to understand once you get the hang of them but they are not easy to read for the first time. However the key to understanding the Bellman equations is to understand that they are a recursive equation based on some physical process
+
+> The trick that one learns over time, a basic part of mathematical methodology, is to sidestep the equation and focus instead on the structure of the underlying physical process -- Richard Bellman
+
+in the case of RL the recursive physical process is: $$ 
+  S \rightarrow A \rightarrow R.
+$$ {#eq-bellman-equation-intuition}
+
+and we can diagram it using a backup diagram as shown in the @fig-backup-v above.
+
+The name backup diagram comes from the idea that we are backing up the value of the state $v(s)$ from the successor state $v(s')$. I.e. we are going back up the tree of possible effects of some action $a$ starting from the state $s$.
+
+While the Bellman equation are difficult to read, remember and to derive, the backup diagram are very easy to sketch even if you don't remember the equations. Once you have sketch the backup diagram, you should be able to easily derive the Bellman equations.
+
+This same intuition can be used for working through all the above dynamic programming algorithms!
+:::
+
 The Bellman equation for state-value functions is a recursive equation that decomposes the value of a state into the immediate reward and the discounted value of the successor state.
 
 $$
@@ -129,6 +158,8 @@ $$
 $$ {#eq-bellman-state-value-function}
 
 ## Bellman Equation for Action-Value Functions {#sec-bellman-equation-action-value-functions}
+
+![](img/rl-backup-q.png){.column-margin}
 
 The Bellman equation for action-value functions is a recursive equation that decomposes the value of a state-action pair into the immediate reward and the discounted value of the successor state-action pair.
 
@@ -169,8 +200,7 @@ v_\pi(B) &= 0.25 \times 0.7 \times v(A) + 0.5 \times (5 + 0.7 \times v(B)) + 0.2
 v_\pi(C) &= 0.25 \times 0.7 \times v(A) + 0.5 \times (0.7 \times v(B)) + 0.25 \times 0.7 \times v(C) \newline
 v_\pi(D) &= 0.25 \times 0.7 \times v(B) + 0.5 \times 0.7 \times v(C) + 0.25 \times 0.7 \times v(D)
 \end{align}
-$$
-we can solve these equations to get the value of each state.
+$$ we can solve these equations to get the value of each state.
 
 theses are
 
@@ -193,7 +223,7 @@ For larger MDP the Bellman equations are not practical method to calculate the v
 ### Goals
 
 -   [x] Define an optimal policy [\#](#sec-optimal-policy)
--   [x] Understand how a policy can be at least as good as every other policy in every state. [\#](#sec-optimal-policy) 
+-   [x] Understand how a policy can be at least as good as every other policy in every state. [\#](#sec-optimal-policy)
 -   [x] Identify an optimal policy for given MDPs.
 -   [x] Derive the Bellman optimality equation for state-value functions
 -   [x] Derive the Bellman optimality equation for action-value functions
@@ -218,6 +248,8 @@ $$ {#eq-optimal-policy}
 
 ## Bellman Optimality Equation for State-Value Functions {#sec-bellman-optimality-state-value-function}
 
+![](img/rl-backup-v-star.png){.column-margin}
+
 The Bellman optimality equation for state-value functions is a recursive equation that decomposes the value of a state into the immediate reward and the discounted value of the successor state under the optimal policy.
 
 $$
@@ -229,6 +261,8 @@ v_*(s) & \dot = \max_{\pi} v_{\pi}(s) \quad \forall s \in S\newline
 $$ {#eq-bellman-optimality-state-value-function}
 
 ## Bellman Optimality Equation for Action-Value Functions {#sec-bellman-optimality-action-value-function}
+
+![](img/rl-backup-q-star.png){.column-margin}
 
 The Bellman optimality equation for action-value functions is a recursive equation that decomposes the value of a state-action pair into the immediate reward and the discounted value of the successor state-action pair under the optimal policy.
 

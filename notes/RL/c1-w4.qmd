@@ -36,18 +36,17 @@ What is surprising at first is that even starting with a uniform random policy w
 ::: callout-note
 ### Read
 
-- [x] [RL Book§4.1-7](http://incompleteideas.net/book/RLbook2020.pdf#page=47) pp. 73-88 -> before lessons.
-- [x] [RL Book§4.8](http://incompleteideas.net/book/RLbook2020.pdf#page=64) pp. 88-89 -> before assignments.
+- [x] [RL Book§4.1-5,6-7, pp73-88](http://incompleteideas.net/book/RLbook2020.pdf#page=72) 
 :::
 
 ::: callout-note
 
 ### Learning Objectives
  
-- [x] Understand the distinction between **policy evaluation** and **control**. [\#](#sec-sec-policy-evaluation-control)
-- [x] Explain the setting in which dynamic programming can be applied, as well as its limitations. [\#](#sec-l1g2)
-- [x] Outline the **iterative policy evaluation algorithm** for estimating state values under a given policy $\pi$. [\#](#sec-l1g3)
-- [x] Apply iterative policy evaluation to compute value functions. [\#](#sec-l1g4)
+- [x] Understand the distinction between **policy evaluation** and **control**. [\#](#sec-policy-evaluation-control)
+- [x] Explain the setting in which dynamic programming can be applied, as well as its limitations. [\#](#sec-dynamic-programming)
+- [x] Outline the **iterative policy evaluation algorithm** for estimating state values under a given policy $\pi$. [\#](#sec-iterative-policy-evaluation)
+- [x] Apply iterative policy evaluation to compute value functions. [\#](#sec-applying-iterative-policy-evaluation)
 :::
 
 ## Policy Evaluation and Control {#sec-policy-evaluation-control}
@@ -68,7 +67,7 @@ this is typically done by dynamic programming methods.
 Typically we need to solve the prediction problem before we can solve the control problem.
 This is because we need to know the value of the states under the policy to be able to pick the best actions.
 
-## Dynamic Programming {#sec-l1g2}
+## Dynamic Programming {#sec-dynamic-programming}
 
 - Dynamic programming is a method for solving complex problems by breaking them down into simpler sub-problems.
 - It is a general approach to solving problems that can be formulated as a sequence of decisions.
@@ -76,14 +75,44 @@ This is because we need to know the value of the states under the policy to be a
   - Optimal substructure: The optimal solution to a problem can be obtained by combining the optimal solutions to its sub-problems.
   - Overlapping sub-problems: The same sub-problems are solved multiple times.
   
-## Iterative Policy Evaluation Algorithm {#sec-l1g3}
+## Iterative Policy Evaluation Algorithm {#sec-iterative-policy-evaluation}
 
-The iterative policy evaluation algorithm is a simple iterative algorithm that estimates the value function for a given policy $\pi$.
+Continuing with our goal of finding the optimal policy, we now turn to the
+an algorithms that will allow us to predict the value all the state starting
+with even the most naive policy. 
 
-The algorithm starts with an initial estimate of the value function and iteratively updates the value function until it converges to the true value function.
+The iterative policy evaluation algorithm is a simple iterative algorithm 
+that estimates the value function for a given policy $\pi$.
 
-The algorithm uses the Bellman equation to update the value function at each iteration.
+We start with no knowledge of the value function or the policy. 
+We set all the values to zero and we may even assume all actions are equally likely and all states are equally good.
+This is the uniform random policy. Alternatively we can start with some other policy. 
 
+These two assumptions are implemented in the initialization step of the algorithm.
+
+The crux of the algorithm is the update step which is based on the recursive
+bellman equation for the value function under a policy $\pi$:
+
+
+$$
+v_{\pi}(s) = \sum_{s',r} p(s',r|s,a)[r + \gamma V(s')] \sum_{a} \pi(a|s)
+$$
+I rearranged the terms to make it clear that we are iterating over the states
+we use this equation to update the value of each state  using
+
+1. the four part dynamics function $p(s',r|s,a)$ to get the probability of receiving a reward $r$ 
+   at a successor state $s'$ given the current state $s$ and action $a$.
+2. the value of the next state $V(s')$. which we initially assumed is 0 and may have already updated
+3. the policy $\pi(a|s)$ which we use to weigh the previous term 
+
+Al this will give us the expected value of the state under the policy $\pi$.
+
+The final part of the algorithm is the stopping condition. We stop when the
+change in the value function is less than a small threshold $\theta$.
+
+The algorithm is guaranteed to converge to the value function for the policy $\pi$.
+
+Here is the consice statement of the algorithm in pseudocode:
 
 ``` pseudocode
 #| label: alg-Iterative-Policy-Evaluation
@@ -98,14 +127,14 @@ The algorithm uses the Bellman equation to update the value function at each ite
 \begin{algorithm}
 \caption{Iterative Policy Evaluation, for estimating $V \approx v_{\pi}$}
 \begin{algorithmic}[1]
-\State Input $\pi$, the policy to be evaluated
+\State Input: $\pi$, the policy to be evaluated, default to uniform random policy
 \State Algorithm parameter: a small threshold $\theta > 0$ determining accuracy of estimation
 \State Initialize $V(s)$ arbitrarily,  $\forall s \in S$, and V (terminal) to 0
 \REPEAT
   \STATE $\Delta \leftarrow 0$
   \FORALL { $s\in S$}
     \STATE $v \leftarrow  V(s)$
-    \STATE $V(s) \leftarrow \sum_{a} \pi(a|s) \sum_{s',r} p(s',r|s,a)[r + \gamma V(s')]$
+    \STATE $V(s) \leftarrow \sum_{a} \pi(a|s) \sum_{s',r} p(s',r|s,a)[r + \gamma V(s')]\quad$ \comment{ Bellman equation}
     \STATE $\Delta \leftarrow \max(\Delta, |v - V(s)|)$
   \ENDFOR
 \UNTIL{$\Delta < \theta$}
@@ -113,7 +142,12 @@ The algorithm uses the Bellman equation to update the value function at each ite
 \end{algorithm}
 ```
 
-## Applying Iterative Policy Evaluation {#sec-l1g4}
+note: the algorithm makes a couple of assumptions that are ommited in the pseudocode.
+
+1. that we have access to the dynamics function $p(s',r|s,a)$
+2. that we have access to the reward function $r(s,a,s')$
+
+## Applying Iterative Policy Evaluation {#sec-applying-iterative-policy-evaluation}
 
 The iterative policy evaluation algorithm can be applied to compute the value function for a given policy $\pi$.
 
@@ -152,17 +186,25 @@ where $G_t$ is the return at time $t$ and $S_t$ is the state at time $t$.
 
 ### Policy Iteration Algorithm {#sec-l2g3}
 
+
 The policy iteration algorithm is a simple iterative algorithm that alternates 
-between policy evaluation and policy improvement. The algorithm starts with an 
-initial policy $\pi$ and iteratively evaluates the policy to get the value 
-function $v_{\pi}$ and then improves the policy to get a new policy $\pi'$. 
-The algorithm continues this process until the policy no longer changes, i.e., 
-the policy is optimal.
+between policy evaluation and policy improvement. 
+
+The algorithm starts with an initial policy $\pi$ and iteratively evaluates 
+the policy to get the value function $v_{\pi}$ and then improves the policy 
+to get a new policy $\pi'$. 
+
+The algorithm continues this process until the policy no longer changes, which
+indicates that the optimal policy has been found.
 
 
 $$
-\pi_0 \xrightarrow{\text{Policy Evaluation}} v_{\pi_0} \xrightarrow{\text{Policy Improvement}} \pi_1 \xrightarrow{\text{Policy Evaluation}} v_{\pi_1} \xrightarrow{\text{Policy Improvement}} \ldots \pi_* \xrightarrow{\text{Policy Evaluation}} v_{\pi_*}
+\pi_0 \xrightarrow{\text{Evaluation}} v_{\pi_0} \xrightarrow{\text{Improvement}} \pi_1 \xrightarrow{\text{Evaluation}} v_{\pi_1} \xrightarrow{\text{Improvement}} \ldots \pi_* \xrightarrow{\text{Evaluation}} v_{\pi_*}
 $$
+
+![starting with the uniform random policy](img/rl-iterative-pl-eval1.png){.column-margin}
+
+![we iterate to an optimal policy](img/rl-iterative-pl-eval2.png){.column-margin}
 
 ``` pseudocode
 #| label: alg-Policy-Iteration

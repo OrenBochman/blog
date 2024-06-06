@@ -16,9 +16,8 @@ categories:
   - Optimality
   - Optimal Policies
   - Optimal Value Functions
-editor: 
-  markdown: 
-    wrap: none
+image: /images/nlp-brain-wordcloud.jpg
+title-block-banner: /images/banner_black_3.jpg
 ---
 
 ![rl algorithms](img/alg_selector.jpeg){.column-margin}
@@ -59,6 +58,121 @@ We describe a MDP as a linear process in time. However, it is really a tree of p
 -   [x] Describe the relationship between value functions and policies [\#](#sec-value-functions)
 -   [x] Create examples of valid value functions for a given MDP [\#](#sec-value-functions)
 :::
+
+``` {ojs}
+//| echo: false
+
+dotStyles = ({ defaults: `
+  graph [
+    labelloc = "b",
+    fontname="Times",
+    fontsize=12,
+    overlap=false ];
+
+  node [
+    style=filled,
+    shape=circle,
+    colorscheme=accent5,
+    color=1,
+    fontname="Times",
+    fontsize=12];
+
+  edge [
+    fontname="Times",
+    fontsize=12,
+    margin=2,
+    overlap=false ];
+` })
+```
+
+``` {ojs}
+//| echo: false
+//| fig-cap: "Backup diagram for the V(s) - state value function"
+
+
+{ 
+  function flatten(ll) {
+    return ll.reduce((acc, l) => [...acc].concat(l), []);
+  }
+  
+  const numActions = 3;
+  const numNextStates = 2;
+  
+  const actions = d3.range(1, numActions+1);
+  const nextStates = flatten(actions.map(i => d3.range(1, numNextStates+1).map(j => `s${i}${j}`)));
+  const nextStateTransitions = flatten(actions.map(i => d3.range(1, numNextStates+1).map(j => `a${i} -> s${i}${j}  [label="p, r"]`)));
+    
+  return dot`
+digraph G {
+  ${dotStyles.defaults}
+
+  subgraph root {
+    rank=same;
+    node [ color=1 ];
+    s ;
+  }
+
+  subgraph env1 {
+    rank=same;
+    node [ color=2 ];
+    ${actions.map(i => `a${i} [label="s, a${i}"]`).join(';\n')};
+  }
+
+  subgraph sp {
+    rank=same;
+    node [ color=1, label="s'" ];
+    ${nextStates.join('; ')};
+  }
+
+  ${actions.map(a => `s -> a${a} [label="&pi;"];`).join('\n')}
+
+  ${nextStateTransitions.join('\n')}
+}`     
+}
+```
+
+``` {ojs}
+//| echo: false
+//| fig-cap: "Backup diagram for the Q(a,s) action value function"
+
+dot`
+digraph G {
+
+  ${dotStyles.defaults}
+
+  subgraph root {
+    rank=same;
+    node [ color=2,label="s, a" ];
+    sa ;
+  }	
+
+  subgraph s1 {
+    rank=same;
+    node [ color=1, label="s'"];
+    s1;
+    s2;
+    s3;
+  }
+
+  subgraph sp {
+    rank=same;
+    node [ color=2, label="s', a'" ];
+    sa11; 
+    sa12; 
+    sa21; 
+    sa22; 
+    sa31; 
+    sa32;
+  }	
+
+	sa -> s1, s2, s3 [label="p, r"];
+
+	s1 -> sa11, sa12 [label="&pi;"];
+	s2 -> sa21, sa22 [label="&pi;"];
+	s3 -> sa31, sa32 [label="&pi;"];
+}`                                                      
+```
+
 
 ## Policy Definition {#sec-policy-definition}
 
@@ -159,7 +273,7 @@ $$ {#eq-bellman-state-value-function}
 
 ## Bellman Equation for Action-Value Functions {#sec-bellman-equation-action-value-functions}
 
-![](img/rl-backup-q.png){.column-margin}
+![backup diagram for q(s,a) function](img/rl-backup-q.png){.column-margin}
 
 The Bellman equation for action-value functions is a recursive equation that decomposes the value of a state-action pair into the immediate reward and the discounted value of the successor state-action pair.
 

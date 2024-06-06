@@ -2,15 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.5.41">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="dcterms.date" content="2020-10-23">
 <meta name="description" content="Concepts, code snippets, slide commentaries for this week’s lesson of the Course notes from the deeplearning.ai natural language programming specialization.">
 
-<title>Oren Bochman’s Blog - Classification &amp; Vector Spaces - Logistic Regression</title>
+<title>Oren Bochman's Blog – Classification &amp; Vector Spaces - Logistic Regression</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -53,8 +52,7 @@ div.csl-indent {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
-<link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<link href="../../favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -66,6 +64,8 @@ div.csl-indent {
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
+<link href="../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
 <script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -96,27 +96,16 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
-
-<script type="text/javascript" charset="UTF-8">
-document.addEventListener('DOMContentLoaded', function () {
-cookieconsent.run({
-  "notice_banner_type":"simple",
-  "consent_type":"implied",
-  "palette":"light",
-  "language":"en",
-  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
-  "notice_banner_reject_button_hide":false,
-  "preferences_center_close_button_hide":false,
-  "website_name":""
-  ,
-"language":"en"
-  });
-});
-</script> 
-  
 <style>html{ scroll-behavior: smooth; }</style>
+<style>
 
-  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+      .quarto-title-block .quarto-title-banner {
+        background-image: url(../banner_black_3.jpg);
+background-size: cover;
+      }
+</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
  var mathElements = document.getElementsByClassName("math");
  var macros = [];
@@ -131,7 +120,7 @@ cookieconsent.run({
    });
 }}});
   </script>
-  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -167,7 +156,7 @@ window.Quarto = {
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="floating nav-fixed slimcontent">
+<body class="nav-sidebar docked nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -182,26 +171,31 @@ window.Quarto = {
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../about.html"> 
-<span class="menu-text">About</span></a>
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="bi bi-book" role="img">
-</i> 
- <span class="menu-text"></span>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-about" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">about</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-about">    
         <li>
-    <a class="dropdown-item" href="../../notes.html">
- <span class="dropdown-text">All Notes</span></a>
+    <a class="dropdown-item" href="../../about.html">
+ <span class="dropdown-text">About</span></a>
   </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-notes" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">notes</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-notes">    
         <li>
     <a class="dropdown-item" href="../../nlp.html">
  <span class="dropdown-text">NLP Specilization</span></a>
@@ -220,11 +214,11 @@ window.Quarto = {
   </li>  
         <li>
     <a class="dropdown-item" href="../../rl.html">
- <span class="dropdown-text">rl</span></a>
+ <span class="dropdown-text">Reinforcement Learning</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../rhetoric.html">
- <span class="dropdown-text">rhetoric</span></a>
+ <span class="dropdown-text">Rhetoric</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../tfp.html">
@@ -236,7 +230,7 @@ window.Quarto = {
   </li>  
         <li>
     <a class="dropdown-item" href="../../cognitiveai.html">
- <span class="dropdown-text">cognitive AI</span></a>
+ <span class="dropdown-text">Cognitive AI</span></a>
   </li>  
     </ul>
   </li>
@@ -248,7 +242,7 @@ window.Quarto = {
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="link" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span>
@@ -276,7 +270,7 @@ window.Quarto = {
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
   <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
   <div class="quarto-reader-toggle-btn">
@@ -286,6 +280,19 @@ window.Quarto = {
 </div>
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Classification &amp; Vector Spaces - Logistic Regression</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
@@ -325,7 +332,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">October 23, 2020</p>
+        <p class="date">Friday, October 23, 2020</p>
       </div>
     </div>
     
@@ -335,7 +342,12 @@ window.Quarto = {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
     <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
@@ -368,7 +380,7 @@ window.Quarto = {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
@@ -380,7 +392,7 @@ window.Quarto = {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/course-banner.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" data-glightbox="description: .lightbox-desc-1" title="course banner"><img src="img/course-banner.jpg" class="img-fluid figure-img" alt="course banner"></a></p>
+<p><a href="img/course-banner.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="course banner"><img src="img/course-banner.jpg" class="img-fluid figure-img" alt="course banner"></a></p>
 <figcaption>course banner</figcaption>
 </figure>
 </div></div><section id="sec-week1-logistic-regression" class="level1 page-columns page-full">
@@ -399,7 +411,7 @@ Flatten learning curve of Logistic Regression
 <div class="callout-body-container callout-body">
 <p>It’s possible to do <strong>sentiment analysis</strong> in a much simpler way than shown in this course. <strong>Logistic regression</strong> isn’t as simple as <strong>OLS regrsion</strong> due to having categorical features. Finally <strong>Stochastic Gradient Descent</strong> isn’t the standard way of solving logistic regression, <strong>Maximum Likelihood Estimation</strong> is. I think they use SGD so it’s more familiar later in the specialization. However if we want to flatten our learning curve consider the following videos which will help us get more confident with logistic regression by building from the more familiar OLS regression.</p>
 <div id="table-resources">
-<table class="table">
+<table class="caption-top table">
 <caption>Table of logistic regression tutorials</caption>
 <colgroup>
 <col style="width: 66%">
@@ -433,10 +445,10 @@ Flatten learning curve of Logistic Regression
 <section id="sec-supervised-ml-sentiment-analysis" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="sec-supervised-ml-sentiment-analysis">Supervised ML &amp; Sentiment Analysis</h2>
 
-<div class="no-row-height column-margin column-container"><div id="fig-slide1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-slide1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_001.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" data-glightbox="description: .lightbox-desc-2"><img src="img/slide_001.png" class="img-fluid figure-img"></a>
+<a href="img/slide_001.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;1: classification overview"><img src="img/slide_001.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: classification overview
@@ -452,10 +464,10 @@ Figure&nbsp;1: classification overview
 <li>We use the sigmoid cost function:</li>
 </ul>
 
-<div class="no-row-height column-margin column-container"><div id="fig-slide2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-slide2" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_002.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" data-glightbox="description: .lightbox-desc-3"><img src="img/slide_002.png" class="img-fluid figure-img"></a>
+<a href="img/slide_002.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;2: the sigmoid cost function"><img src="img/slide_002.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: the sigmoid cost function
@@ -465,10 +477,10 @@ Figure&nbsp;2: the sigmoid cost function
 <section id="sec-sentiment-analysis" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="sec-sentiment-analysis">Sentiment Analysis</h2>
 
-<div class="no-row-height column-margin column-container"><div id="fig-slide3" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-slide3" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_003.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" data-glightbox="description: .lightbox-desc-4"><img src="img/slide_003.png" class="img-fluid figure-img"></a>
+<a href="img/slide_003.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figure&nbsp;3: Sentiment Analysis"><img src="img/slide_003.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3: Sentiment Analysis
@@ -487,7 +499,7 @@ Sentiment Analysis - Motivation
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>If we are passionate about NLP here is a gem to get we started. This is a popular science with many ideas for additional classifiers using pronouns.</p>
-<table class="table">
+<table class="caption-top table">
 <caption>Table of logistic regression tutorials</caption>
 <colgroup>
 <col style="width: 66%">
@@ -525,10 +537,10 @@ Sentiment Analysis - Motivation
 <section id="sec-supervised-ml-sentiment-analysis" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="sec-supervised-ml-sentiment-analysis">Supervised ML &amp; Sentiment Analysis</h2>
 
-<div class="no-row-height column-margin column-container"><div id="fig-slide4" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-slide4" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_005.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" data-glightbox="description: .lightbox-desc-5"><img src="img/slide_005.png" class="img-fluid figure-img"></a>
+<a href="img/slide_005.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Figure&nbsp;4: classification overview"><img src="img/slide_005.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4: classification overview
@@ -556,10 +568,10 @@ Figure&nbsp;4: classification overview
 <section id="sec-sparse-representation" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="sec-sparse-representation">Sparse Representation</h3>
 
-<div class="no-row-height column-margin column-container"><div id="fig-slide4" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-slide4" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_004.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" data-glightbox="description: .lightbox-desc-6"><img src="img/slide_004.png" class="img-fluid figure-img"></a>
+<a href="img/slide_004.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Figure&nbsp;5: Problems with sparse representation"><img src="img/slide_004.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;5: Problems with sparse representation
@@ -567,10 +579,10 @@ Figure&nbsp;5: Problems with sparse representation
 </figure>
 </div></div><p>Given a tweet, or some text, one can represent it as a vector. The vector has a dimension <span class="math inline">|V|</span>, where V corresponds to the size of the vocabulary size. If we had the tweet “I am happy because I am learning NLP,” then we would put a 1 in the corresponding index for any word in the tweet, and a 0 otherwise.</p>
 
-<div class="no-row-height column-margin column-container"><div id="fig-slide5" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-slide5" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_005.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" data-glightbox="description: .lightbox-desc-7"><img src="img/slide_005.png" class="img-fluid figure-img"></a>
+<a href="img/slide_005.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Figure&nbsp;6: A sparse representation"><img src="img/slide_005.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;6: A sparse representation
@@ -580,13 +592,13 @@ Figure&nbsp;6: A sparse representation
 </section>
 <section id="sec-feature-extraction-class-frequencies" class="level3">
 <h3 class="anchored" data-anchor-id="sec-feature-extraction-class-frequencies">Feature Extraction based on class frequencies</h3>
-<div id="tbl-tweets" class="quarto-float anchored">
+<div id="tbl-tweets" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-tweets-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;1: Table of tweets
 </figcaption>
 <div aria-describedby="tbl-tweets-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="table">
+<table class="caption-top table">
 <thead>
 <tr class="header">
 <th>Positive tweets</th>
@@ -608,13 +620,13 @@ Table&nbsp;1: Table of tweets
 </figure>
 </div>
 <p>Given a corpus with positive and negative tweets we can represent it as follows:</p>
-<div id="tbl-vocab" class="quarto-float anchored">
+<div id="tbl-vocab" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-vocab-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;2: Word class table
 </figcaption>
 <div aria-describedby="tbl-vocab-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="table">
+<table class="caption-top table">
 <thead>
 <tr class="header">
 <th>Vocabulary</th>
@@ -680,19 +692,19 @@ Table&nbsp;2: Word class table
 <section id="sec-preprocessing" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="sec-preprocessing">Preprocessing</h2>
 
-<div class="no-row-height column-margin column-container"><div id="fig-slide6" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-slide6" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_006.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" data-glightbox="description: .lightbox-desc-8"><img src="img/slide_006.png" class="img-fluid figure-img"></a>
+<a href="img/slide_006.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="Figure&nbsp;7: preprocessing - feature extraction"><img src="img/slide_006.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;7: preprocessing - feature extraction
 </figcaption>
 </figure>
-</div><div id="fig-slide7" class="quarto-figure quarto-figure-center quarto-float anchored">
+</div><div id="fig-slide7" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_007.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9" data-glightbox="description: .lightbox-desc-9"><img src="img/slide_007.png" class="img-fluid figure-img"></a>
+<a href="img/slide_007.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="Figure&nbsp;8: preprocessing - stemming"><img src="img/slide_007.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;8: preprocessing - stemming
@@ -713,10 +725,10 @@ Figure&nbsp;8: preprocessing - stemming
 <div class="page-columns page-full"><p>{}</p><div class="no-row-height column-margin column-container"><img src="img/slide_008.png" id="fig-slide8" class="img-fluid" alt="training algorithm - flow chart"></div></div>
 <p>To train our logistic regression function, we’ll do the following: we initialize our parameter <span class="math inline">\theta</span> , that we can use in you sigmoid, we then compute the gradient that we’ll use to update , and then calculate the cost. we keep doing so until good enough</p>
 
-<div class="no-row-height column-margin column-container"><div id="fig-slide9" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-slide9" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide9-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_009.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10" data-glightbox="description: .lightbox-desc-10"><img src="img/slide_009.png" class="img-fluid figure-img"></a>
+<a href="img/slide_009.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="Figure&nbsp;9: triaining"><img src="img/slide_009.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide9-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;9: triaining
@@ -727,10 +739,10 @@ Figure&nbsp;9: triaining
 <section id="sec-testing-logistic-regression" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="sec-testing-logistic-regression">Testing Logistic Regression</h2>
 
-<div class="no-row-height column-margin column-container"><div id="fig-slide10" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-slide10" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide10-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_010.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11" data-glightbox="description: .lightbox-desc-11"><img src="img/slide_010.png" class="img-fluid figure-img"></a>
+<a href="img/slide_010.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="Figure&nbsp;10: triaining"><img src="img/slide_010.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide10-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;10: triaining
@@ -750,10 +762,10 @@ accuracy = \sum \frac{pred^{(i)}==y^{(i)}_{val}}{m}
 <section id="sec-logistic-regression-cost-function" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="sec-logistic-regression-cost-function">Logistic Regression: Cost Function</h2>
 
-<div class="no-row-height column-margin column-container"><div id="fig-slide11" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-slide11" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-slide11-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="img/slide_011.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12" data-glightbox="description: .lightbox-desc-12"><img src="img/slide_011.png" class="img-fluid figure-img"></a>
+<a href="img/slide_011.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12" title="Figure&nbsp;11: training intuitions"><img src="img/slide_011.png" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-slide11-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;11: training intuitions
@@ -907,20 +919,6 @@ When <span class="math inline">y ≈ 0</span> , we want the term <span class
 </ul>
 
 
-<div class="hidden" aria-hidden="true">
-<span class="glightbox-desc lightbox-desc-1">course banner</span>
-<span class="glightbox-desc lightbox-desc-2">Figure&nbsp;1: classification overview</span>
-<span class="glightbox-desc lightbox-desc-3">Figure&nbsp;2: the sigmoid cost function</span>
-<span class="glightbox-desc lightbox-desc-4">Figure&nbsp;3: Sentiment Analysis</span>
-<span class="glightbox-desc lightbox-desc-5">Figure&nbsp;4: classification overview</span>
-<span class="glightbox-desc lightbox-desc-6">Figure&nbsp;5: Problems with sparse representation</span>
-<span class="glightbox-desc lightbox-desc-7">Figure&nbsp;6: A sparse representation</span>
-<span class="glightbox-desc lightbox-desc-8">Figure&nbsp;7: preprocessing - feature extraction</span>
-<span class="glightbox-desc lightbox-desc-9">Figure&nbsp;8: preprocessing - stemming</span>
-<span class="glightbox-desc lightbox-desc-10">Figure&nbsp;9: triaining</span>
-<span class="glightbox-desc lightbox-desc-11">Figure&nbsp;10: triaining</span>
-<span class="glightbox-desc lightbox-desc-12">Figure&nbsp;11: training intuitions</span>
-</div>
 
 </section>
 
@@ -1122,18 +1120,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -1165,7 +1152,29 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {
@@ -1224,7 +1233,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -1622,36 +1631,67 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </a>
   </li>  
 </ul>
-    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    </div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"loop":false,"selector":".lightbox","closeEffect":"zoom","descPosition":"bottom","openEffect":"zoom"});
-window.onload = () => {
-  lightboxQuarto.on('slide_before_load', (data) => {
-    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
-    const href = trigger.getAttribute('href');
-    if (href !== null) {
-      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
-      if (imgEl !== null) {
-        const srcAttr = imgEl.getAttribute("src");
-        if (srcAttr && srcAttr.startsWith("data:")) {
-          slideConfig.href = srcAttr;
-        }
-      }
-    } 
-  });
-
-  lightboxQuarto.on('slide_after_load', (data) => {
-    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
-    if (window.Quarto?.typesetMath) {
-      window.Quarto.typesetMath(slideNode);
+    <script type="text/javascript">
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let pseudocodeOptions = {
+          indentSize: el.dataset.indentSize || "1.2em",
+          commentDelimiter: el.dataset.commentDelimiter || "//",
+          lineNumber: el.dataset.lineNumber === "true" ? true : false,
+          lineNumberPunc: el.dataset.lineNumberPunc || ":",
+          noEnd: el.dataset.noEnd === "true" ? true : false,
+          titlePrefix: el.dataset.algTitle || "Algorithm"
+        };
+        pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+      });
+    })(document);
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        titleSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+        titlePrefix = el.dataset.algTitle;
+        titleIndex = el.dataset.chapterLevel ? el.dataset.chapterLevel + "." + el.dataset.pseudocodeIndex : el.dataset.pseudocodeIndex;
+        titleSpan.innerHTML = titlePrefix + " " + titleIndex + " ";
+      });
+    })(document);
+    </script>
+  
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","openEffect":"zoom","loop":false,"selector":".lightbox","descPosition":"bottom"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
     }
-  });
-
-};
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
           </script>
 
 

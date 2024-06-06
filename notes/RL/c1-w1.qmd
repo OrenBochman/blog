@@ -17,17 +17,14 @@ categories:
   - explotation
   - epsilon greedy algorithm
   - sample avarage method
-filters:
-  - pseudocode
-
-editor: 
-  markdown: 
-    wrap: none
+jupyter: python3
+image: /images/nlp-brain-wordcloud.jpg
 ---
 
+![RL logo](img/logo.png){.column-margin}
 ![RL algorithms](img/alg_selector.jpeg){.column-margin}
 
-# Intro 
+# Intro
 
 The teachers are world class, researches from the best university for this subject. However, this high level comes with the following caveat: their delivery is always terse and precise. They frequently reference old material which you may not have *fully digested* yet. In fact I discovered to my 😱 horror how easy it is go through the material, quizzes and programming assignments scoring 100% but not connect the dots.
 
@@ -90,7 +87,7 @@ I have extracted the essentials from the text book below. Best to memorize these
 ::: callout-note
 ### Goals
 
--   [ ] Understand the temporal nature of the bandit problem [\#](#sec-k-armed-bandit)
+-   [x] Understand the temporal nature of the bandit problem [\#](#sec-k-armed-bandit)
 -   [x] Define k-armed bandit problem [\#](#l1g2)
 -   [x] Define action-values and the greedy action selection method [\#](#sec-l1g3)
 -   [x] Define reward, time steps, and value functions [\#](#l1g4)
@@ -317,7 +314,6 @@ $$ {#eq-general-incremental-update-rule}
 # Lesson 3: Exploration vs Exploitation {#sec-lesson-exploration-exploitation}
 
 ::: callout-note
-
 ### Goals
 
 -   Define $\epsilon$-greedy [\#](#sec-epsilon-greedy-policies)
@@ -490,8 +486,6 @@ To get the best of both worlds we need to balance exploration and exploitation i
 
 ## Optimistic initial values {#sec-optimistic-initial-values}
 
-
-
 Optimistic initial values
 
 :   Setting all initially action values greater than the algorithmicaly available values in \[0,1\]
@@ -538,13 +532,11 @@ In the short-term it will perform worse than Ɛ- greedy which tend to exploit. B
 ![The effect of optimistic initial action-value estimates](img/rl-optimistic-initial-conditions.png)
 
 ::: callout-caution
-
 ### Criticisms of optimistic initial values {#sec-criticisms-of-optimistic-initial-values}
 
 -   Optimistic initial values only drive early exploration. The agent will stop exploring once this is done.
 -   For a non-stationary problems - this is inadequate.
 -   In a real world problems the maximum reward is an unknown quantity.
-
 :::
 
 ## The UCB action selection method {#sec-the-ucb-action-selection-method}
@@ -676,3 +668,94 @@ Let's list some useful RL resources.
         -   [Muzero](https://www.nature.com/articles/s41586-020-03051-4.epdf?sharing_token=kTk-xTZpQOF8Ym8nTQK6EdRgN0jAjWel9jnR3ZoTv0PMSWGj38iNIyNOw_ooNp2BvzZ4nIcedo7GEXD7UmLqb0M_V_fop31mMY9VBBLNmGbm0K9jETKkZnJ9SgJ8Rwhp3ySvLuTcUr888puIYbngQ0fiMf45ZGDAQ7fUI66-u7Y%3D)
         -   [MuZero](https://arxiv.org/abs/2202.06626) and
         -   [EfficentZero](https://arxiv.org/abs/2111.00210) [code](https://github.com/YeWR/EfficientZero)
+
+## Coding Bandits with MESA
+
+```{python}
+from tqdm import tqdm
+from mesa import Model, Agent
+from mesa.time import RandomActivation
+import numpy as np
+
+
+
+class EpsilonGreedyAgent(Agent):
+    """
+    This agent implements the epsilon-greedy 
+    """
+
+    def __init__(self, unique_id, model, num_arms, epsilon=0.1):
+        super().__init__(unique_id,model)
+        self.num_arms = num_arms
+        self.epsilon = epsilon
+        self.q_values = np.zeros(num_arms)  # Initialize Q-value estimates
+        self.action_counts = np.zeros(num_arms)  # Track action counts
+
+    def choose_action(self):
+        if np.random.rand() < self.epsilon:
+            # Exploration: Choose random arm
+            return np.random.randint(0, self.num_arms)
+        else:
+            # Exploitation: Choose arm with highest Q-value
+            return np.argmax(self.q_values)
+
+    def step(self, model):
+        chosen_arm = self.choose_action()
+        reward = model.get_reward(chosen_arm)
+        assert reward is not None, "Reward is not provided by the model"
+        self.action_counts[chosen_arm] += 1
+        self.q_values[chosen_arm] = (self.q_values[chosen_arm] * self.action_counts[chosen_arm] + reward) / (self.action_counts[chosen_arm] + 1)
+
+
+class TestbedModel(Model):
+    """
+    This model represents the 10-armed bandit testbed environment.
+    """
+
+    def __init__(self, num_arms, mean_reward, std_dev,num_agents=1):
+        super().__init__()
+        self.num_agents = num_agents
+        self.num_arms = num_arms
+        self.mean_reward = mean_reward
+        self.std_dev = std_dev
+        self.env_init()
+        #self.arms = [None] * num_arms  # List to store arm rewards
+        self.schedule = RandomActivation(self)
+        for i in range(self.num_agents):
+          self.create_agent(EpsilonGreedyAgent, i, 0.1) 
+
+    def env_init(self,env_info={}):
+        self.arms = np.random.randn(self.num_arms)  # Initialize arm rewards
+
+    def create_agent(self, agent_class, agent_id, epsilon):
+        """
+        Create an RL agent instance with the specified class and parameters.
+        """
+        agent = agent_class(agent_id, self, self.num_arms, epsilon)
+        self.schedule.add(agent)
+        return agent
+
+    def step(self):
+        for agent in self.schedule.agents:
+            chosen_arm = agent.choose_action()
+            reward = np.random.normal(self.mean_reward, self.std_dev)
+            self.arms[chosen_arm] = reward  # Update arm reward in the model
+            agent.step(self)  # Pass the model instance to the agent for reward access
+
+    def get_reward(self, arm_id):
+        # Access reward from the stored list
+        return self.arms[arm_id]
+
+
+# Example usage
+model = TestbedModel(10, 0, 1)  # Create model with 10 arms
+num_runs = 200                  # The number of times we run the experiment
+num_steps = 1000                # The number of pulls of each arm the agent takes
+
+
+# Run simulation for multiple steps
+for _ in tqdm(range(num_runs)):
+    for _ in range(num_steps):
+        model.step()
+    model.step()
+```

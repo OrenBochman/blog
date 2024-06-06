@@ -2,15 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.5.41">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="dcterms.date" content="2024-03-01">
 <meta name="description" content="In this module we learn about Sample based MC methods that allow learning from sampled episodes. We revise our initial algorithm to better handle exploration. In off policy RL we see methods to learn a policy using samples from another policy, corrected using importance sampleing.">
 
-<title>Oren Bochman’s Blog - Sample-based Learning Methods</title>
+<title>Oren Bochman's Blog – Sample-based Learning Methods</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -33,8 +32,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
-<link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<link href="../../favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -46,6 +44,8 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
+<link href="../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
 <script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -76,27 +76,15 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-
-<script type="text/javascript" charset="UTF-8">
-document.addEventListener('DOMContentLoaded', function () {
-cookieconsent.run({
-  "notice_banner_type":"simple",
-  "consent_type":"implied",
-  "palette":"light",
-  "language":"en",
-  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
-  "notice_banner_reject_button_hide":false,
-  "preferences_center_close_button_hide":false,
-  "website_name":""
-  ,
-"language":"en"
-  });
-});
-</script> 
-  
 <style>html{ scroll-behavior: smooth; }</style>
+<style>
 
-  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+      .quarto-title-block .quarto-title-banner {
+        background: /images/banner_black_3.jpg;
+      }
+</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
  var mathElements = document.getElementsByClassName("math");
  var macros = [];
@@ -111,7 +99,7 @@ cookieconsent.run({
    });
 }}});
   </script>
-  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -142,12 +130,12 @@ window.Quarto = {
 
 <meta name="twitter:title" content="Oren Bochman’s Blog - Sample-based Learning Methods">
 <meta name="twitter:description" content="In this module we learn about Sample based MC methods that allow learning from sampled episodes. We revise our initial algorithm to better handle exploration. In off policy RL we see methods to learn a policy using samples from another policy, corrected using importance sampleing.">
-<meta name="twitter:image" content="https://orenbochman.github.io/notes/RL/thumbnail_blog.png">
+<meta name="twitter:image" content="https://orenbochman.github.io//images/nlp-brain-wordcloud.jpg">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="floating nav-fixed slimcontent">
+<body class="nav-sidebar docked nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -162,26 +150,31 @@ window.Quarto = {
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../about.html"> 
-<span class="menu-text">About</span></a>
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="bi bi-book" role="img">
-</i> 
- <span class="menu-text"></span>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-about" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">about</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-about">    
         <li>
-    <a class="dropdown-item" href="../../notes.html">
- <span class="dropdown-text">All Notes</span></a>
+    <a class="dropdown-item" href="../../about.html">
+ <span class="dropdown-text">About</span></a>
   </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-notes" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">notes</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-notes">    
         <li>
     <a class="dropdown-item" href="../../nlp.html">
  <span class="dropdown-text">NLP Specilization</span></a>
@@ -200,11 +193,11 @@ window.Quarto = {
   </li>  
         <li>
     <a class="dropdown-item" href="../../rl.html">
- <span class="dropdown-text">rl</span></a>
+ <span class="dropdown-text">Reinforcement Learning</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../rhetoric.html">
- <span class="dropdown-text">rhetoric</span></a>
+ <span class="dropdown-text">Rhetoric</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../tfp.html">
@@ -216,7 +209,7 @@ window.Quarto = {
   </li>  
         <li>
     <a class="dropdown-item" href="../../cognitiveai.html">
- <span class="dropdown-text">cognitive AI</span></a>
+ <span class="dropdown-text">Cognitive AI</span></a>
   </li>  
     </ul>
   </li>
@@ -228,7 +221,7 @@ window.Quarto = {
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="link" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span>
@@ -256,7 +249,7 @@ window.Quarto = {
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
   <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
   <div class="quarto-reader-toggle-btn">
@@ -266,6 +259,19 @@ window.Quarto = {
 </div>
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Sample-based Learning Methods</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
@@ -309,7 +315,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">March 1, 2024</p>
+        <p class="date">Friday, March 1, 2024</p>
       </div>
     </div>
     
@@ -319,21 +325,38 @@ window.Quarto = {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
     <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
   <li><a href="#lesson-1-introduction-to-monte-carlo-methods" id="toc-lesson-1-introduction-to-monte-carlo-methods" class="nav-link active" data-scroll-target="#lesson-1-introduction-to-monte-carlo-methods">Lesson 1: Introduction to Monte-Carlo Methods</a></li>
-  <li><a href="#lesson-2-monte-carlo-for-control" id="toc-lesson-2-monte-carlo-for-control" class="nav-link" data-scroll-target="#lesson-2-monte-carlo-for-control">Lesson 2: Monte Carlo for Control</a></li>
-  <li><a href="#lesson-3-exploration-methods-for-monte-carlo" id="toc-lesson-3-exploration-methods-for-monte-carlo" class="nav-link" data-scroll-target="#lesson-3-exploration-methods-for-monte-carlo">Lesson 3: Exploration Methods for Monte Carlo</a></li>
-  <li><a href="#lesson-4-off-policy-learning-for-prediction" id="toc-lesson-4-off-policy-learning-for-prediction" class="nav-link" data-scroll-target="#lesson-4-off-policy-learning-for-prediction">Lesson 4: Off-policy learning for prediction</a></li>
+  <li><a href="#sec-mc-control" id="toc-sec-mc-control" class="nav-link" data-scroll-target="#sec-mc-control">Lesson 2: Monte Carlo for Control</a>
+  <ul class="collapse">
+  <li><a href="#sec-l2g1" id="toc-sec-l2g1" class="nav-link" data-scroll-target="#sec-l2g1">MC Action-Value Functions</a></li>
+  </ul></li>
+  <li><a href="#lesson-3-exploration-methods-for-monte-carlo" id="toc-lesson-3-exploration-methods-for-monte-carlo" class="nav-link" data-scroll-target="#lesson-3-exploration-methods-for-monte-carlo">Lesson 3: Exploration Methods for Monte Carlo</a>
+  <ul class="collapse">
+  <li><a href="#lesson-4-off-policy-learning-for-prediction" id="toc-lesson-4-off-policy-learning-for-prediction" class="nav-link" data-scroll-target="#lesson-4-off-policy-learning-for-prediction">Lesson 4: Off-policy learning for prediction</a>
+  <ul class="collapse">
+  <li><a href="#sec-l4g1" id="toc-sec-l4g1" class="nav-link" data-scroll-target="#sec-l4g1">Off-policy learning</a></li>
+  <li><a href="#sec-l4g2" id="toc-sec-l4g2" class="nav-link" data-scroll-target="#sec-l4g2">Target and behavior policies</a></li>
+  <li><a href="#sec-l4g3" id="toc-sec-l4g3" class="nav-link" data-scroll-target="#sec-l4g3">Importance sampling</a></li>
+  <li><a href="#sec-l4g4" id="toc-sec-l4g4" class="nav-link" data-scroll-target="#sec-l4g4">Importance sampling ratio</a></li>
+  <li><a href="#emma-brunskill-batch-reinforcement-learning" id="toc-emma-brunskill-batch-reinforcement-learning" class="nav-link" data-scroll-target="#emma-brunskill-batch-reinforcement-learning">Emma Brunskill: Batch Reinforcement Learning</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
 </nav>
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
@@ -371,7 +394,7 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-RLDR 🥜🥜🥜
+TLDR 🥜🥜🥜
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -388,7 +411,7 @@ RLDR 🥜🥜🥜
 </div>
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center callout-margin-content">
 <figure class="figure">
-<p><a href="img/alg_selector.jpeg" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-1" title="RL algorithms"><img src="img/alg_selector.jpeg" class="img-fluid figure-img" alt="RL algorithms"></a></p>
+<p><a href="img/alg_selector.jpeg" class="lightbox" data-gallery="slides" title="RL algorithms"><img src="img/alg_selector.jpeg" class="img-fluid figure-img" alt="RL algorithms"></a></p>
 <figcaption>RL algorithms</figcaption>
 </figure>
 </div></div><div class="callout callout-style-default callout-note callout-titled">
@@ -518,12 +541,12 @@ Definitions
 </div>
 </div>
 </div>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;<strong>Prediction</strong> in the sense that we want to predict for <span class="math inline">\pi</span> how well it will preforms i.e.&nbsp;its expected returns for a state</p></div></div><ul>
+<ul>
 <li>Sample based methods learning from experience, without having prior knowledge of the underlying MDP model.</li>
 <li>We will cover tabular methods in which the action-values can be represented by a table.</li>
 </ul>
-<section id="lesson-1-introduction-to-monte-carlo-methods" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="lesson-1-introduction-to-monte-carlo-methods">Lesson 1: Introduction to Monte-Carlo Methods</h2>
+<section id="lesson-1-introduction-to-monte-carlo-methods" class="level1 page-columns page-full">
+<h1>Lesson 1: Introduction to Monte-Carlo Methods</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -548,14 +571,14 @@ Lesson Learning Goals
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-mc-methods.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-2" title="MC methods for Policy evaluation"><img src="img/rl-mc-methods.png" class="img-fluid figure-img" alt="MC methods for Policy evaluation"></a></p>
+<p><a href="img/rl-mc-methods.png" class="lightbox" data-gallery="slides" title="MC methods for Policy evaluation"><img src="img/rl-mc-methods.png" class="img-fluid figure-img" alt="MC methods for Policy evaluation"></a></p>
 <figcaption>MC methods for Policy evaluation</figcaption>
 </figure>
 </div></div><p>let us now try to understand how <a href="#dfn-mc">Monte-Carlo</a> can be used to estimate <span class="math inline">v(s)</span> value functions from sampled interaction.</p>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-mc-12-dice.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-3" title="12 dice"><img src="img/rl-mc-12-dice.png" class="img-fluid figure-img" alt="12 dice"></a></p>
+<p><a href="img/rl-mc-12-dice.png" class="lightbox" data-gallery="slides" title="12 dice"><img src="img/rl-mc-12-dice.png" class="img-fluid figure-img" alt="12 dice"></a></p>
 <figcaption>12 dice</figcaption>
 </figure>
 </div></div><div id="exm-dp-dice" class="theorem example">
@@ -571,19 +594,19 @@ Lesson Learning Goals
 </div>
 <ul>
 <li>For most MDPs knowing the dynamics and rewards is an unreasonably strong requirement.</li>
-<li>If we can treat this like a bandit problem we can try to use the long term avarages rewards to estimate value of a state</li>
+<li>If we can treat this like a bandit problem we can try to use the long term averages rewards to estimate value of a state</li>
 </ul>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-mc-bandit.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-4" title="MC bandits"><img src="img/rl-mc-bandit.png" class="img-fluid figure-img" alt="MC bandits"></a></p>
+<p><a href="img/rl-mc-bandit.png" class="lightbox" data-gallery="slides" title="MC bandits"><img src="img/rl-mc-bandit.png" class="img-fluid figure-img" alt="MC bandits"></a></p>
 <figcaption>MC bandits</figcaption>
 </figure>
 </div></div><p>more formally we can use the MC value prediction algorithm.</p>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-mc-alg.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-5" title="MC value prediction algorithm any visit"><img src="img/rl-mc-alg.png" class="img-fluid figure-img" alt="MC value prediction algorithm any visit"></a></p>
+<p><a href="img/rl-mc-alg.png" class="lightbox" data-gallery="slides" title="MC value prediction algorithm any visit"><img src="img/rl-mc-alg.png" class="img-fluid figure-img" alt="MC value prediction algorithm any visit"></a></p>
 <figcaption>MC value prediction algorithm any visit</figcaption>
 </figure>
 </div></div><div id="nte-mc-value-prediction-any-visit" class="alg callout callout-style-default callout-note callout-titled">
@@ -620,7 +643,7 @@ Note&nbsp;1: MC prediction any visit for estimating <span class="math inline">V 
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-mc-first-visit-prediction.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-6" title="MC value prediction algorithm first visits"><img src="img/rl-mc-first-visit-prediction.png" class="img-fluid figure-img" alt="MC value prediction algorithm first visits"></a></p>
+<p><a href="img/rl-mc-first-visit-prediction.png" class="lightbox" data-gallery="slides" title="MC value prediction algorithm first visits"><img src="img/rl-mc-first-visit-prediction.png" class="img-fluid figure-img" alt="MC value prediction algorithm first visits"></a></p>
 <figcaption>MC value prediction algorithm first visits</figcaption>
 </figure>
 </div></div><div id="nte-mc-value-prediction-first-visit" class="alg callout callout-style-default callout-note callout-titled">
@@ -675,12 +698,12 @@ Any visit / First-visit
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-mc-calc.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-7" title="Efficient returns calculations"><img src="img/rl-mc-calc.png" class="img-fluid figure-img" alt="Efficient returns calculations"></a></p>
+<p><a href="img/rl-mc-calc.png" class="lightbox" data-gallery="slides" title="Efficient returns calculations"><img src="img/rl-mc-calc.png" class="img-fluid figure-img" alt="Efficient returns calculations"></a></p>
 <figcaption>Efficient returns calculations</figcaption>
 </figure>
 </div><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-mc-incremental-updates.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-8" title="incremental-update rule"><img src="img/rl-mc-incremental-updates.png" class="img-fluid figure-img" alt="incremental-update rule"></a></p>
+<p><a href="img/rl-mc-incremental-updates.png" class="lightbox" data-gallery="slides" title="incremental-update rule"><img src="img/rl-mc-incremental-updates.png" class="img-fluid figure-img" alt="incremental-update rule"></a></p>
 <figcaption>incremental-update rule</figcaption>
 </figure>
 </div></div>
@@ -690,7 +713,7 @@ Any visit / First-visit
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-bj-example.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-9" title="Blackjack example"><img src="img/rl-bj-example.png" class="img-fluid figure-img" alt="Blackjack example"></a></p>
+<p><a href="img/rl-bj-example.png" class="lightbox" data-gallery="slides" title="Blackjack example"><img src="img/rl-bj-example.png" class="img-fluid figure-img" alt="Blackjack example"></a></p>
 <figcaption>Blackjack example</figcaption>
 </figure>
 </div></div><ul>
@@ -717,12 +740,12 @@ Any visit / First-visit
 </ul></li>
 </ul></li>
 </ul>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;worth either 1 or 11</p></div><div id="fn3"><p><sup>3</sup>&nbsp;face card are worth 10</p></div><div id="fn4"><p><sup>4</sup>&nbsp;this is a big simplifying assumption</p></div></div></div>
+</div>
 <p>In the programming assignment we will produce the following graphs</p>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-bj-outcomes.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-10" title="Blackjack outcomes"><img src="img/rl-bj-outcomes.png" class="img-fluid figure-img" alt="Blackjack outcomes"></a></p>
+<p><a href="img/rl-bj-outcomes.png" class="lightbox" data-gallery="slides" title="Blackjack outcomes"><img src="img/rl-bj-outcomes.png" class="img-fluid figure-img" alt="Blackjack outcomes"></a></p>
 <figcaption>Blackjack outcomes</figcaption>
 </figure>
 </div></div><ul>
@@ -776,8 +799,8 @@ Note
 <li><p>Computation for updating values or each state is independent of the size of the MDP^[in DP we had to solve <span class="math inline">n\times n</span> - simultaneous equations]</p></li>
 </ul>
 </section>
-<section id="lesson-2-monte-carlo-for-control" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="lesson-2-monte-carlo-for-control">Lesson 2: Monte Carlo for Control</h2>
+<section id="sec-mc-control" class="level1 page-columns page-full">
+<h1>Lesson 2: Monte Carlo for Control</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -789,29 +812,32 @@ Lesson Learning Goals
 </div>
 <div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox">Estimate action-value functions using <a href="#dfn-mc">Monte Carlo</a></label></li>
-<li><label><input type="checkbox">Understand the importance of maintaining exploration in Monte Carlo algorithms</label></li>
-<li><label><input type="checkbox" checked="">Understand how to use <a href="#dfn-mc">Monte Carlo</a> methods to implement a GPI algorithm.</label></li>
-<li><label><input type="checkbox" checked="">Apply <a href="#dfn-mc">Monte Carlo</a> with exploring starts to solve an MDP</label></li>
+<li><label><input type="checkbox">Estimate action-value functions using <a href="#dfn-mc">Monte Carlo</a> <a href="#sec-l2g1">#</a></label></li>
+<li><label><input type="checkbox">Understand the importance of maintaining exploration in Monte Carlo algorithms <a href="#sec-l2g2">#</a></label></li>
+<li><label><input type="checkbox" checked="">Understand how to use <a href="#dfn-mc">Monte Carlo</a> methods to implement a GPI algorithm. <a href="#sec-l2g3">#</a></label></li>
+<li><label><input type="checkbox" checked="">Apply <a href="#dfn-mc">Monte Carlo</a> with exploring starts to solve an MDP <a href="#sec-l2g4">#</a></label></li>
 </ul>
 </div>
 </div>
+<section id="sec-l2g1" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-l2g1">MC Action-Value Functions</h2>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-mc-action-values.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-11" title="action values"><img src="img/rl-mc-action-values.png" class="img-fluid figure-img" alt="action values"></a></p>
+<p><a href="img/rl-mc-action-values.png" class="lightbox" data-gallery="slides" title="action values"><img src="img/rl-mc-action-values.png" class="img-fluid figure-img" alt="action values"></a></p>
 <figcaption>action values</figcaption>
 </figure>
 </div><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-mc-backoff.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-12" title="back off"><img src="img/rl-mc-backoff.png" class="img-fluid figure-img" alt="back off"></a></p>
+<p><a href="img/rl-mc-backoff.png" class="lightbox" data-gallery="slides" title="back off"><img src="img/rl-mc-backoff.png" class="img-fluid figure-img" alt="back off"></a></p>
 <figcaption>back off</figcaption>
 </figure>
 </div></div>
 <p>This back off diagram indicates that the value of a state S depends on the values of its actions.</p>
 <ul>
 <li>Recall that <a href="#def-contol">control</a> is simply improving a policy using our action values estimate.</li>
-<li>Policy improvement is done by <strong>Greedifing</strong> a policy <span class="math inline">\pi</span> at a state <span class="math inline">s</span> by selecting the action <span class="math inline">a</span> with the highest action value. If we are missing some action values we can make the policy worse.</li>
+<li>Policy improvement is done by <strong>Greedyfying</strong> a policy <span class="math inline">\pi</span> at a state <span class="math inline">s</span> by selecting the action <span class="math inline">a</span> with the highest action value.</li>
+<li>If we are missing some action values we can make the policy worse!</li>
 <li>We need to ensure that our RL algorithm engages the different actions of a state. There are two strategies:
 <ul>
 <li>Exploring starts</li>
@@ -821,26 +847,33 @@ Lesson Learning Goals
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-exploring-starts.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-13" title="exploring starts"><img src="img/rl-exploring-starts.png" class="img-fluid figure-img" alt="exploring starts"></a></p>
+<p><a href="img/rl-exploring-starts.png" class="lightbox" data-gallery="slides" title="exploring starts"><img src="img/rl-exploring-starts.png" class="img-fluid figure-img" alt="exploring starts"></a></p>
 <figcaption>exploring starts</figcaption>
 </figure>
 </div></div><p>The following is the MC alg with exploring start for estimation.</p>
-<div class="page-columns page-full"><p> We can recap how GPI looks:</p><div class="no-row-height column-margin column-container"><img src="img/rl-exploring-starts-pseudocode.png" class="img-fluid" data-group="slides" alt="exploring starts pseudocode"></div></div>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-exploring-starts-pseudocode.png" class="lightbox" data-gallery="slides" title="exploring starts pseudocode"><img src="img/rl-exploring-starts-pseudocode.png" class="img-fluid figure-img" alt="exploring starts pseudocode"></a></p>
+<figcaption>exploring starts pseudocode</figcaption>
+</figure>
+</div></div><p>Let’s recap how GPI looks:</p>
 <ul>
-<li><p>Keeping <span class="math inline">\pi_0</span> fixed we do evaluation of <span class="math inline">q_\pi</span> using MC–ES</p></li>
-<li><p>We improve <span class="math inline">\pi_0</span> by picking the actions with the highest values</p></li>
-<li><p>We stop when we don’t improve <span class="math inline">\pi</span></p></li>
+<li>Keeping <span class="math inline">\pi_0</span> fixed we do evaluation of <span class="math inline">q_\pi</span> using MC–ES</li>
+<li>We improve <span class="math inline">\pi_0</span> by picking the actions with the highest values</li>
+<li>We stop when we don’t improve <span class="math inline">\pi</span></li>
 </ul>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-monte-carlo-GPI-01.png" class="lightbox" data-gallery="slides" data-glightbox="description: .lightbox-desc-14" title="exploring starts pseudocode"><img src="img/rl-monte-carlo-GPI-01.png" class="img-fluid figure-img" alt="exploring starts pseudocode"></a></p>
+<p><a href="img/rl-monte-carlo-GPI-01.png" class="lightbox" data-gallery="slides" title="exploring starts pseudocode"><img src="img/rl-monte-carlo-GPI-01.png" class="img-fluid figure-img" alt="exploring starts pseudocode"></a></p>
 <figcaption>exploring starts pseudocode</figcaption>
 </figure>
 </div></div><p>Here, in the evaluation step, we estimate the action-values using MC prediction, with exploration driven by exploring Starts or an <span class="math inline">\epsilon</span>-soft policy</p>
 </section>
-<section id="lesson-3-exploration-methods-for-monte-carlo" class="level2">
-<h2 class="anchored" data-anchor-id="lesson-3-exploration-methods-for-monte-carlo">Lesson 3: Exploration Methods for Monte Carlo</h2>
+</section>
+<section id="lesson-3-exploration-methods-for-monte-carlo" class="level1">
+<h1>Lesson 3: Exploration Methods for Monte Carlo</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -852,8 +885,8 @@ Lesson Learning Goals
 </div>
 <div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox" checked="">Understand why Exploring Starts can be problematic in real problems</label></li>
-<li><label><input type="checkbox" checked="">Describe an alternative exploration method for Monte Carlo control</label></li>
+<li><label><input type="checkbox" checked="">Understand why Exploring Starts can be problematic in real problems <a href="#sec-l3g1">#</a></label></li>
+<li><label><input type="checkbox" checked="">Describe an alternative exploration method for Monte Carlo control <a href="#sec-l3g2">#</a></label></li>
 </ul>
 </div>
 </div>
@@ -869,7 +902,7 @@ Lesson Learning Goals
 <p>The con is we can never reach a deterministic optimal policy - but we can get to a stochastic policy where the best choice is <span class="math inline">1-\epsilon+\frac{\epsilon}{|A|}</span></p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/wk2-epsilon-soft-pseudocode.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15" data-glightbox="description: .lightbox-desc-15" title="MC control with epsilon-soft policies"><img src="img/wk2-epsilon-soft-pseudocode.png" class="img-fluid figure-img" alt="MC control with epsilon-soft policies"></a></p>
+<p><a href="img/wk2-epsilon-soft-pseudocode.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16" title="MC control with epsilon-soft policies"><img src="img/wk2-epsilon-soft-pseudocode.png" class="img-fluid figure-img" alt="MC control with epsilon-soft policies"></a></p>
 <figcaption>MC control with epsilon-soft policies</figcaption>
 </figure>
 </div>
@@ -881,7 +914,6 @@ Lesson Learning Goals
 <li><p>The new policy generated in each iteration is <span class="math inline">\epsilon</span>-greedy w.r.t. the current action-value estimate, which is improved prior.</p></li>
 <li><p>The optimal <span class="math inline">\epsilon</span>-soft policy is an <span class="math inline">\epsilon</span>-soft policy.</p></li>
 </ol>
-</section>
 <section id="lesson-4-off-policy-learning-for-prediction" class="level2">
 <h2 class="anchored" data-anchor-id="lesson-4-off-policy-learning-for-prediction">Lesson 4: Off-policy learning for prediction</h2>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -895,15 +927,44 @@ Lesson Learning Goals
 </div>
 <div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox">Understand how off-policy learning can help deal with the exploration problem</label></li>
-<li><label><input type="checkbox">Produce examples of target policies and examples of behavior policies.</label></li>
-<li><label><input type="checkbox">Understand importance sampling</label></li>
-<li><label><input type="checkbox">Use importance sampling to estimate the expected value of a target distribution using samples from a different distribution.</label></li>
-<li><label><input type="checkbox">Understand how to use importance sampling to correct returns</label></li>
-<li><label><input type="checkbox">Understand how to modify the Monte Carlo prediction algorithm for off-policy learning.</label></li>
+<li><label><input type="checkbox">Understand how off-policy learning can help deal with the exploration problem <a href="#sec-l4g1">#</a></label></li>
+<li><label><input type="checkbox">Produce examples of target policies and examples of behavior policies. <a href="#sec-l4g2">#</a></label></li>
+<li><label><input type="checkbox">Understand importance sampling <a href="#sec-l4g3">#</a></label></li>
+<li><label><input type="checkbox">Use importance sampling to estimate the expected value of a target distribution using samples from a different distribution. <a href="#sec-l4g4">#</a></label></li>
+<li><label><input type="checkbox">Understand how to use importance sampling to correct returns <a href="#sec-l4g5">#</a></label></li>
+<li><label><input type="checkbox">Understand how to modify the Monte Carlo prediction algorithm for off-policy learning. <a href="#sec-l4g6">#</a></label></li>
 </ul>
 </div>
 </div>
+<section id="sec-l4g1" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l4g1">Off-policy learning</h3>
+<ul>
+<li>Off-policy learning is a way to learn a policy <span class="math inline">\pi</span> using samples from another policy <span class="math inline">\pi'</span>.</li>
+<li>This is useful when we have a policy that is easier to sample from than the policy we want to learn.</li>
+<li>A key idea is to correct the returns using importance sampling.</li>
+</ul>
+<p>For example suppose we can use a rule based model to generate samples of agent state, action and rewards - but we don’t realy have an MDP, value function or policy. We could start with a uniform random policy and then use the samples to learn a better policy. However this would require us to interact with the environment and our agents may not be able to do this. In the case of Sugarscape model the agents are not realy making descisions, they are following rules.</p>
+<p>If we wished to develop agent that learn using RL with differnt rules on or off and other settings and use those to learn a policy using many samples. One advantage of the Sugarscape model is that it is highly hetrogenous so we get a rich set of samples to work with. A second advantage is that the rule based model can be fast to sample from and we can generate many samples by running it using hyperparameters optimized testbed.</p>
+<p>So if we have lots of samples we may not need to explore as much initially, but rather learn to exploit the samples we have. Once we learn a near optimal policy for the samples we can use our agent to explore new vistas in our environment.</p>
+</section>
+<section id="sec-l4g2" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l4g2">Target and behavior policies</h3>
+<ul>
+<li>The target policy is the policy we want to learn.</li>
+<li>The behavior policy is the policy we sample from.</li>
+</ul>
+</section>
+<section id="sec-l4g3" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l4g3">Importance sampling</h3>
+<ul>
+<li><p>Importance sampling is a technique to estimate the expected value of a target distribution using samples from a different distribution.</p></li>
+<li><p>Why cant we just use the samples from the behavior policy to estimate the target policy?</p></li>
+<li><p>The answer is that the samples from the behavior policy are biased towards the behavior policy.</p></li>
+<li><p>In the target policy we may have states that are never visited by the behavior policy.</p></li>
+<li><p>For example we might want to learn a policy that focuses on trade rather than combat or Vica versa. This extreme idea of introducing/eliminating some action would significantly change behavioral trajectories. Sample based methods could be able to handle these changes - if we can restrit them to each subset of actions but clearly the expected return of states will be diverge in the long run.</p></li>
+<li><p>So what we want is someway to correct the returns from the behavior policy to the target policy.</p></li>
+<li><p>It is used to correct returns from the behavior policy to the target policy.</p></li>
+</ul>
 <p><span id="eq-trajectory-probability"><span class="math display">
 \begin{align*}
   P(A_t, S_{t+1}, &amp; A_{t+1}, ... ,S_T | S_t, A_{t:T-1} \sim \pi) \\
@@ -911,6 +972,9 @@ Lesson Learning Goals
   &amp; = \prod_{k=t}^{T-1} \pi(A_k|S_k)p(S_{k+1}|S_k, A_k)
 \end{align*}
 \tag{1}</span></span></p>
+</section>
+<section id="sec-l4g4" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l4g4">Importance sampling ratio</h3>
 <p><strong>Definition:</strong> The importance sampling ratio (rho, <span class="math inline">\rho</span>) is the relative probability of the trajectory under the target vs behavior policy:</p>
 <p><span id="eq-importance-sampling"><span class="math display">
 \begin{align}
@@ -927,33 +991,31 @@ V(s) \doteq \frac{\displaystyle \sum_{t\in \mathscr T(s)}\rho_{t:T(t) - 1} \cdot
 <p><span id="eq-value3"><span class="math display">
 V(s) \doteq \frac{\displaystyle \sum_{t\in \mathscr T(s)} \Big(\rho_{t:T(t) - 1} \cdot G_t\Big)}{\displaystyle \sum_{t\in \mathscr T(s)}\rho_{t:T(t) - 1}} \qquad
 \tag{5}</span></span></p>
-<!-- TODO: add 
+</section>
+<section id="emma-brunskill-batch-reinforcement-learning" class="level3">
+<h3 class="anchored" data-anchor-id="emma-brunskill-batch-reinforcement-learning">Emma Brunskill: Batch Reinforcement Learning</h3>
+<ul>
+<li>Emma Brunskill is a professor at Stanford University.</li>
+<li>In batch RL we have a fixed dataset of samples and we want to learn a policy from this data.</li>
+<li>This is useful when we have a fixed dataset of samples and we want to learn a policy from this data.</li>
+<li>The key idea is to use importance sampling to correct the returns from the behavior policy to the target policy.</li>
+</ul>
 
-### Emma Brunskill: Batch Reinforcement Learning
--->
 
-
-<div class="hidden" aria-hidden="true">
-<span class="glightbox-desc lightbox-desc-1">RL algorithms</span>
-<span class="glightbox-desc lightbox-desc-2">MC methods for Policy evaluation</span>
-<span class="glightbox-desc lightbox-desc-3">12 dice</span>
-<span class="glightbox-desc lightbox-desc-4">MC bandits</span>
-<span class="glightbox-desc lightbox-desc-5">MC value prediction algorithm any visit</span>
-<span class="glightbox-desc lightbox-desc-6">MC value prediction algorithm first visits</span>
-<span class="glightbox-desc lightbox-desc-7">Efficient returns calculations</span>
-<span class="glightbox-desc lightbox-desc-8">incremental-update rule</span>
-<span class="glightbox-desc lightbox-desc-9">Blackjack example</span>
-<span class="glightbox-desc lightbox-desc-10">Blackjack outcomes</span>
-<span class="glightbox-desc lightbox-desc-11">action values</span>
-<span class="glightbox-desc lightbox-desc-12">back off</span>
-<span class="glightbox-desc lightbox-desc-13">exploring starts</span>
-<span class="glightbox-desc lightbox-desc-14">exploring starts pseudocode</span>
-<span class="glightbox-desc lightbox-desc-15">MC control with epsilon-soft policies</span>
-</div>
+</section>
+</section>
 </section>
 
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p><strong>Prediction</strong> in the sense that we want to predict for <span class="math inline">\pi</span> how well it will preforms i.e.&nbsp;its expected returns for a state<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>worth either 1 or 11<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>face card are worth 10<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>this is a big simplifying assumption<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
   author = {Bochman, Oren},
   title = {Sample-Based {Learning} {Methods}},
   date = {2024-03-01},
@@ -1143,18 +1205,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -1186,7 +1237,29 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {
@@ -1245,7 +1318,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -1643,36 +1716,67 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </a>
   </li>  
 </ul>
-    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    </div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"selector":".lightbox","openEffect":"zoom","closeEffect":"zoom","loop":false,"descPosition":"bottom"});
-window.onload = () => {
-  lightboxQuarto.on('slide_before_load', (data) => {
-    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
-    const href = trigger.getAttribute('href');
-    if (href !== null) {
-      const imgEl = window.document.querySelector(`a[href="${href}"] img`);
-      if (imgEl !== null) {
-        const srcAttr = imgEl.getAttribute("src");
-        if (srcAttr && srcAttr.startsWith("data:")) {
-          slideConfig.href = srcAttr;
-        }
-      }
-    } 
-  });
-
-  lightboxQuarto.on('slide_after_load', (data) => {
-    const { slideIndex, slideNode, slideConfig, player, trigger } = data;
-    if (window.Quarto?.typesetMath) {
-      window.Quarto.typesetMath(slideNode);
+    <script type="text/javascript">
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let pseudocodeOptions = {
+          indentSize: el.dataset.indentSize || "1.2em",
+          commentDelimiter: el.dataset.commentDelimiter || "//",
+          lineNumber: el.dataset.lineNumber === "true" ? true : false,
+          lineNumberPunc: el.dataset.lineNumberPunc || ":",
+          noEnd: el.dataset.noEnd === "true" ? true : false,
+          titlePrefix: el.dataset.algTitle || "Algorithm"
+        };
+        pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+      });
+    })(document);
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        titleSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+        titlePrefix = el.dataset.algTitle;
+        titleIndex = el.dataset.chapterLevel ? el.dataset.chapterLevel + "." + el.dataset.pseudocodeIndex : el.dataset.pseudocodeIndex;
+        titleSpan.innerHTML = titlePrefix + " " + titleIndex + " ";
+      });
+    })(document);
+    </script>
+  
+<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","closeEffect":"zoom","selector":".lightbox","openEffect":"zoom","loop":false});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
     }
-  });
-
-};
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
           </script>
 
 

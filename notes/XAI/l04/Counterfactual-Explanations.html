@@ -2,12 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.554">
+<meta name="generator" content="quarto-1.4.555">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="dcterms.date" content="2023-03-23">
 <meta name="description" content="How to explain a machine learning model such that the explanation is truthful to the model and yet interpretable to people? This question is key to ML explanations research because explanation techniques face an inherent tradeoff between fidelity and interpretability — a high-fidelity explanation for an ML model tends to be complex and hard to interpret, while an interpretable explanation is often inconsistent with the ML model. In this talk, I will present counterfactual (CF) explanations that bridge this tradeoff. Rather than approximate an ML model or rank features by their predictive importance, a CF explanation “interrogates” a model to find required changes that would flip the model’s decision and presents those examples to a user. Such examples offer a true reflection of how the model would change its prediction, thus helping decision-subject decide what they should do next to obtain a desired outcome and helping model designers debug their model. Using benchmark datasets on loan approval, I will compare counterfactual explanations to popular alternatives like LIME and SHAP. I will also present a case study on generating CF examples for image classifiers that can be used for evaluating fairness and even improving the generalizability of a model.">
 
 <title>Oren Bochman’s Blog - 4 Counterfactual Explanations - Explaining and Debugging</title>
@@ -53,8 +52,7 @@ div.csl-indent {
 <script src="../../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../../">
-<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
-<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<link href="../../../favicon.ico" rel="icon">
 <script src="../../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -66,6 +64,8 @@ div.csl-indent {
 <link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
 <script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -96,25 +96,14 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
-
-<script type="text/javascript" charset="UTF-8">
-document.addEventListener('DOMContentLoaded', function () {
-cookieconsent.run({
-  "notice_banner_type":"simple",
-  "consent_type":"implied",
-  "palette":"light",
-  "language":"en",
-  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
-  "notice_banner_reject_button_hide":false,
-  "preferences_center_close_button_hide":false,
-  "website_name":""
-  ,
-"language":"en"
-  });
-});
-</script> 
-  
 <style>html{ scroll-behavior: smooth; }</style>
+<style>
+
+      .quarto-title-block .quarto-title-banner {
+        background-image: url(../../banner_black_3.jpg);
+background-size: cover;
+      }
+</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -167,7 +156,7 @@ window.Quarto = {
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="floating nav-fixed slimcontent">
+<body class="nav-sidebar docked nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -188,20 +177,25 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../../about.html"> 
-<span class="menu-text">About</span></a>
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="bi bi-book" role="img">
-</i> 
- <span class="menu-text"></span>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-about" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">about</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-about">    
         <li>
-    <a class="dropdown-item" href="../../../notes.html">
- <span class="dropdown-text">All Notes</span></a>
+    <a class="dropdown-item" href="../../../about.html">
+ <span class="dropdown-text">About</span></a>
   </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-notes" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">notes</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-notes">    
         <li>
     <a class="dropdown-item" href="../../../nlp.html">
  <span class="dropdown-text">NLP Specilization</span></a>
@@ -220,11 +214,11 @@ window.Quarto = {
   </li>  
         <li>
     <a class="dropdown-item" href="../../../rl.html">
- <span class="dropdown-text">rl</span></a>
+ <span class="dropdown-text">Reinforcement Learning</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../../rhetoric.html">
- <span class="dropdown-text">rhetoric</span></a>
+ <span class="dropdown-text">Rhetoric</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../../tfp.html">
@@ -236,7 +230,7 @@ window.Quarto = {
   </li>  
         <li>
     <a class="dropdown-item" href="../../../cognitiveai.html">
- <span class="dropdown-text">cognitive AI</span></a>
+ <span class="dropdown-text">Cognitive AI</span></a>
   </li>  
     </ul>
   </li>
@@ -286,6 +280,19 @@ window.Quarto = {
 </div>
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">4 Counterfactual Explanations - Explaining and Debugging</li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
@@ -324,7 +331,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">March 23, 2023</p>
+        <p class="date">Thursday, March 23, 2023</p>
       </div>
     </div>
     
@@ -334,7 +341,12 @@ window.Quarto = {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
     <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
@@ -422,7 +434,7 @@ window.Quarto = {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="talk-outline.png" class="lightbox" data-glightbox="description: .lightbox-desc-1" data-gallery="quarto-lightbox-gallery-1" title="outline"><img src="talk-outline.png" class="img-fluid figure-img" alt="outline"></a></p>
+<p><a href="talk-outline.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" data-glightbox="description: .lightbox-desc-1" title="outline"><img src="talk-outline.png" class="img-fluid figure-img" alt="outline"></a></p>
 <figcaption>outline</figcaption>
 </figure>
 </div></div></section>
@@ -431,7 +443,7 @@ window.Quarto = {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="asscessing-human-decision-making.png" class="lightbox" data-glightbox="description: .lightbox-desc-2" data-gallery="quarto-lightbox-gallery-2" title="Assessing human decision-making"><img src="asscessing-human-decision-making.png" class="img-fluid figure-img" alt="Assessing human decision-making"></a></p>
+<p><a href="asscessing-human-decision-making.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" data-glightbox="description: .lightbox-desc-2" title="Assessing human decision-making"><img src="asscessing-human-decision-making.png" class="img-fluid figure-img" alt="Assessing human decision-making"></a></p>
 <figcaption>Assessing human decision-making</figcaption>
 </figure>
 </div></div><p>A great starting point for ML tasks if often best motivated by considering pros and cons of human capabilities in these tasks. Sharma points out that in <span class="citation" data-cites="weichselbaumer2019">(<a href="#ref-weichselbaumer2019" role="doc-biblioref">Weichselbaumer 2019</a>)</span> researchers used counterfactual thinking to study if employers discriminate against women wearing a head scarf. The idea was to they sent resumes sent to German Companies and modified names and images of applicants. German companies usually require images in the C.V. The study found there was discrimination.</p>
@@ -441,7 +453,7 @@ window.Quarto = {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="what-is-a-counterfactuals.png" class="lightbox" data-glightbox="description: .lightbox-desc-3" data-gallery="quarto-lightbox-gallery-3" title="What is a counterfactual"><img src="what-is-a-counterfactuals.png" class="img-fluid figure-img" alt="What is a counterfactual"></a></p>
+<p><a href="what-is-a-counterfactuals.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" data-glightbox="description: .lightbox-desc-3" title="What is a counterfactual"><img src="what-is-a-counterfactuals.png" class="img-fluid figure-img" alt="What is a counterfactual"></a></p>
 <figcaption>What is a counterfactual</figcaption>
 </figure>
 </div></div><p>Sharma presents the definition for a counterfactual provided by Judea Pearl</p>
@@ -469,7 +481,7 @@ window.Quarto = {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="explaining-ml-predictions.png" class="lightbox" data-glightbox="description: .lightbox-desc-4" data-gallery="quarto-lightbox-gallery-4" title="Feature Importance"><img src="explaining-ml-predictions.png" class="img-fluid figure-img" alt="Feature Importance"></a></p>
+<p><a href="explaining-ml-predictions.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" data-glightbox="description: .lightbox-desc-4" title="Feature Importance"><img src="explaining-ml-predictions.png" class="img-fluid figure-img" alt="Feature Importance"></a></p>
 <figcaption>Feature Importance</figcaption>
 </figure>
 </div></div></section>
@@ -478,7 +490,7 @@ window.Quarto = {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="the-problem.png" class="lightbox" data-glightbox="description: .lightbox-desc-5" data-gallery="quarto-lightbox-gallery-5" title="A problem with SHAP &amp; LIME"><img src="the-problem.png" class="img-fluid figure-img" alt="A problem with SHAP &amp; LIME"></a></p>
+<p><a href="the-problem.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" data-glightbox="description: .lightbox-desc-5" title="A problem with SHAP &amp; LIME"><img src="the-problem.png" class="img-fluid figure-img" alt="A problem with SHAP &amp; LIME"></a></p>
 <figcaption>A problem with SHAP &amp; LIME</figcaption>
 </figure>
 </div></div><p>Suppose an ML model recommends that an individual should be denied a loan</p>
@@ -503,7 +515,7 @@ window.Quarto = {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="CFX-Desiderata.png" class="lightbox" data-glightbox="description: .lightbox-desc-6" data-gallery="quarto-lightbox-gallery-6" title="Desiderata of contractual explanation"><img src="CFX-Desiderata.png" class="img-fluid figure-img" alt="Desiderata of contractual explanation"></a></p>
+<p><a href="CFX-Desiderata.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" data-glightbox="description: .lightbox-desc-6" title="Desiderata of contractual explanation"><img src="CFX-Desiderata.png" class="img-fluid figure-img" alt="Desiderata of contractual explanation"></a></p>
 <figcaption>Desiderata of contractual explanation</figcaption>
 </figure>
 </div></div><ol type="1">
@@ -538,7 +550,7 @@ C= \arg \min_c loss_y(f(c),y)+|x-c| \qquad
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="CFX-loss-function.png" class="lightbox" data-glightbox="description: .lightbox-desc-7" data-gallery="quarto-lightbox-gallery-7" title="CF loss function"><img src="CFX-loss-function.png" class="img-fluid figure-img" alt="CF loss function"></a></p>
+<p><a href="CFX-loss-function.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" data-glightbox="description: .lightbox-desc-7" title="CF loss function"><img src="CFX-loss-function.png" class="img-fluid figure-img" alt="CF loss function"></a></p>
 <figcaption>CF loss function</figcaption>
 </figure>
 </div></div><p>This is the simple framework used in DICE to generate diverse counterfactual explanations.</p>
@@ -576,7 +588,7 @@ C= \arg \min_c loss_y(f(c),y)+|x-c| \qquad
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="CFX-for-generating-debugging-edge-cases.png" class="lightbox" data-glightbox="description: .lightbox-desc-8" data-gallery="quarto-lightbox-gallery-8" title="CFX as a way to generate debugging edge cases"><img src="CFX-for-generating-debugging-edge-cases.png" class="img-fluid figure-img" alt="CFX as a way to generate debugging edge cases"></a></p>
+<p><a href="CFX-for-generating-debugging-edge-cases.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" data-glightbox="description: .lightbox-desc-8" title="CFX as a way to generate debugging edge cases"><img src="CFX-for-generating-debugging-edge-cases.png" class="img-fluid figure-img" alt="CFX as a way to generate debugging edge cases"></a></p>
 <figcaption>CFX as a way to generate debugging edge cases</figcaption>
 </figure>
 </div></div></section>
@@ -585,14 +597,14 @@ C= \arg \min_c loss_y(f(c),y)+|x-c| \qquad
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="quantitative-evaluation-for-CFX.png" class="lightbox" data-glightbox="description: .lightbox-desc-9" data-gallery="quarto-lightbox-gallery-9" title="Quantitative evaluation for CFX"><img src="quantitative-evaluation-for-CFX.png" class="img-fluid figure-img" alt="Quantitative evaluation for CFX"></a></p>
+<p><a href="quantitative-evaluation-for-CFX.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9" data-glightbox="description: .lightbox-desc-9" title="Quantitative evaluation for CFX"><img src="quantitative-evaluation-for-CFX.png" class="img-fluid figure-img" alt="Quantitative evaluation for CFX"></a></p>
 <figcaption>Quantitative evaluation for CFX</figcaption>
 </figure>
 </div></div><p>This is how we translate the desiderata into a formal model using metrics.</p>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="results-comparing-CF-based-methods.png" class="lightbox" data-glightbox="description: .lightbox-desc-10" data-gallery="quarto-lightbox-gallery-10" title="results comparing CF based methods"><img src="results-comparing-CF-based-methods.png" class="img-fluid figure-img" alt="results comparing CF based methods"></a></p>
+<p><a href="results-comparing-CF-based-methods.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10" data-glightbox="description: .lightbox-desc-10" title="results comparing CF based methods"><img src="results-comparing-CF-based-methods.png" class="img-fluid figure-img" alt="results comparing CF based methods"></a></p>
 <figcaption>results comparing CF based methods</figcaption>
 </figure>
 </div></div></section>
@@ -601,7 +613,7 @@ C= \arg \min_c loss_y(f(c),y)+|x-c| \qquad
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="Comparing-DiCE-with-LIME-and-CHAP.png" class="lightbox" data-glightbox="description: .lightbox-desc-11" data-gallery="quarto-lightbox-gallery-11" title="Comparing DiCE with LIME and CHAP"><img src="Comparing-DiCE-with-LIME-and-CHAP.png" class="img-fluid figure-img" alt="Comparing DiCE with LIME and CHAP"></a></p>
+<p><a href="Comparing-DiCE-with-LIME-and-CHAP.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11" data-glightbox="description: .lightbox-desc-11" title="Comparing DiCE with LIME and CHAP"><img src="Comparing-DiCE-with-LIME-and-CHAP.png" class="img-fluid figure-img" alt="Comparing DiCE with LIME and CHAP"></a></p>
 <figcaption>Comparing DiCE with LIME and CHAP</figcaption>
 </figure>
 </div></div><p>The results section from the DiCE paper!</p>
@@ -611,7 +623,7 @@ C= \arg \min_c loss_y(f(c),y)+|x-c| \qquad
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="practical-considerations.png" class="lightbox" data-glightbox="description: .lightbox-desc-12" data-gallery="quarto-lightbox-gallery-12" title="Practical Considerations"><img src="practical-considerations.png" class="img-fluid figure-img" alt="Practical Considerations"></a></p>
+<p><a href="practical-considerations.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12" data-glightbox="description: .lightbox-desc-12" title="Practical Considerations"><img src="practical-considerations.png" class="img-fluid figure-img" alt="Practical Considerations"></a></p>
 <figcaption>Practical Considerations</figcaption>
 </figure>
 </div></div></section>
@@ -620,7 +632,7 @@ C= \arg \min_c loss_y(f(c),y)+|x-c| \qquad
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="returning-to-the-optimization-problem.png" class="lightbox" data-glightbox="description: .lightbox-desc-13" data-gallery="quarto-lightbox-gallery-13" title="Returning to the optimization problem"><img src="returning-to-the-optimization-problem.png" class="img-fluid figure-img" alt="Returning to the optimization problem"></a></p>
+<p><a href="returning-to-the-optimization-problem.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13" data-glightbox="description: .lightbox-desc-13" title="Returning to the optimization problem"><img src="returning-to-the-optimization-problem.png" class="img-fluid figure-img" alt="Returning to the optimization problem"></a></p>
 <figcaption>Returning to the optimization problem</figcaption>
 </figure>
 </div></div></section>
@@ -629,7 +641,7 @@ C= \arg \min_c loss_y(f(c),y)+|x-c| \qquad
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="how-to-genenrate-CFX-for-a-ML-model.png" class="lightbox" data-glightbox="description: .lightbox-desc-14" data-gallery="quarto-lightbox-gallery-14" title="How to generate a counterfactual for a ML model"><img src="how-to-genenrate-CFX-for-a-ML-model.png" class="img-fluid figure-img" alt="How to generate a counterfactual for a ML model"></a></p>
+<p><a href="how-to-genenrate-CFX-for-a-ML-model.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14" data-glightbox="description: .lightbox-desc-14" title="How to generate a counterfactual for a ML model"><img src="how-to-genenrate-CFX-for-a-ML-model.png" class="img-fluid figure-img" alt="How to generate a counterfactual for a ML model"></a></p>
 <figcaption>How to generate a counterfactual for a ML model</figcaption>
 </figure>
 </div></div></section>
@@ -638,10 +650,10 @@ C= \arg \min_c loss_y(f(c),y)+|x-c| \qquad
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="CFX-methods.png" class="lightbox" data-glightbox="description: .lightbox-desc-15" data-gallery="quarto-lightbox-gallery-15" title="Methods"><img src="CFX-methods.png" class="img-fluid figure-img" alt="Methods"></a></p>
+<p><a href="CFX-methods.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15" data-glightbox="description: .lightbox-desc-15" title="Methods"><img src="CFX-methods.png" class="img-fluid figure-img" alt="Methods"></a></p>
 <figcaption>Methods</figcaption>
 </figure>
-</div></div><table class="table">
+</div></div><table class="caption-top table">
 <thead>
 <tr class="header">
 <th>Data</th>
@@ -717,7 +729,7 @@ C= \arg \min_c loss_y(f(c),y)+|x-c| \qquad
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="conclusion.png" class="lightbox" data-glightbox="description: .lightbox-desc-16" data-gallery="quarto-lightbox-gallery-16" title="Conclusion"><img src="conclusion.png" class="img-fluid figure-img" alt="Conclusion"></a></p>
+<p><a href="conclusion.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16" data-glightbox="description: .lightbox-desc-16" title="Conclusion"><img src="conclusion.png" class="img-fluid figure-img" alt="Conclusion"></a></p>
 <figcaption>Conclusion</figcaption>
 </figure>
 </div></div></section>
@@ -1510,13 +1522,37 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </a>
   </li>  
 </ul>
-    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    </div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"selector":".lightbox","loop":false,"closeEffect":"zoom","descPosition":"bottom","openEffect":"zoom"});
+    <script type="text/javascript">
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let pseudocodeOptions = {
+          indentSize: el.dataset.indentSize || "1.2em",
+          commentDelimiter: el.dataset.commentDelimiter || "//",
+          lineNumber: el.dataset.lineNumber === "true" ? true : false,
+          lineNumberPunc: el.dataset.lineNumberPunc || ":",
+          noEnd: el.dataset.noEnd === "true" ? true : false,
+          titlePrefix: el.dataset.algTitle || "Algorithm"
+        };
+        pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+      });
+    })(document);
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        titleSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+        titlePrefix = el.dataset.algTitle;
+        titleIndex = el.dataset.chapterLevel ? el.dataset.chapterLevel + "." + el.dataset.pseudocodeIndex : el.dataset.pseudocodeIndex;
+        titleSpan.innerHTML = titlePrefix + " " + titleIndex + " ";
+      });
+    })(document);
+    </script>
+  
+<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","loop":false,"closeEffect":"zoom","selector":".lightbox","openEffect":"zoom"});
 window.onload = () => {
   lightboxQuarto.on('slide_before_load', (data) => {
     const { slideIndex, slideNode, slideConfig, player, trigger } = data;

@@ -2,12 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.554">
+<meta name="generator" content="quarto-1.4.555">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="dcterms.date" content="2023-03-13">
 <meta name="description" content="Machine learning models can be analyzed at a high level using global explanations, such as linear model coefficients. However, there are several limitations to these global explanations. In this talk, I will review the use cases where local explanations are needed and introduce two popular methods for generating local explanations LIME and SHAP. Our learning will be focused on SHAP, its theory, model-agnostic and model-specific versions, and how to use and read SHAP visualizations.">
 
 <title>Oren Bochman’s Blog - 2 Local Explanations - Concept and Methods</title>
@@ -87,8 +86,7 @@ div.csl-indent {
 <script src="../../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../../">
-<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
-<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<link href="../../../favicon.ico" rel="icon">
 <script src="../../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -100,6 +98,8 @@ div.csl-indent {
 <link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
 <script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -130,25 +130,14 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
-
-<script type="text/javascript" charset="UTF-8">
-document.addEventListener('DOMContentLoaded', function () {
-cookieconsent.run({
-  "notice_banner_type":"simple",
-  "consent_type":"implied",
-  "palette":"light",
-  "language":"en",
-  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
-  "notice_banner_reject_button_hide":false,
-  "preferences_center_close_button_hide":false,
-  "website_name":""
-  ,
-"language":"en"
-  });
-});
-</script> 
-  
 <style>html{ scroll-behavior: smooth; }</style>
+<style>
+
+      .quarto-title-block .quarto-title-banner {
+        background-image: url(../../banner_black_3.jpg);
+background-size: cover;
+      }
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -204,7 +193,7 @@ window.Quarto = {
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="floating nav-fixed slimcontent">
+<body class="nav-sidebar docked nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -225,20 +214,25 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../../about.html"> 
-<span class="menu-text">About</span></a>
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-book" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="bi bi-book" role="img">
-</i> 
- <span class="menu-text"></span>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-about" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">about</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-bi-book">    
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-about">    
         <li>
-    <a class="dropdown-item" href="../../../notes.html">
- <span class="dropdown-text">All Notes</span></a>
+    <a class="dropdown-item" href="../../../about.html">
+ <span class="dropdown-text">About</span></a>
   </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-notes" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">notes</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-notes">    
         <li>
     <a class="dropdown-item" href="../../../nlp.html">
  <span class="dropdown-text">NLP Specilization</span></a>
@@ -257,11 +251,11 @@ window.Quarto = {
   </li>  
         <li>
     <a class="dropdown-item" href="../../../rl.html">
- <span class="dropdown-text">rl</span></a>
+ <span class="dropdown-text">Reinforcement Learning</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../../rhetoric.html">
- <span class="dropdown-text">rhetoric</span></a>
+ <span class="dropdown-text">Rhetoric</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../../tfp.html">
@@ -273,7 +267,7 @@ window.Quarto = {
   </li>  
         <li>
     <a class="dropdown-item" href="../../../cognitiveai.html">
- <span class="dropdown-text">cognitive AI</span></a>
+ <span class="dropdown-text">Cognitive AI</span></a>
   </li>  
     </ul>
   </li>
@@ -323,6 +317,19 @@ window.Quarto = {
 </div>
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">2 Local Explanations - Concept and Methods</li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
@@ -364,7 +371,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">March 13, 2023</p>
+        <p class="date">Monday, March 13, 2023</p>
       </div>
     </div>
     
@@ -374,7 +381,12 @@ window.Quarto = {
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
     <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
@@ -452,7 +464,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="series-poster">Series Poster</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="XAI_Poster.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" data-glightbox="description: .lightbox-desc-1" title="series poster"><img src="XAI_Poster.jpg" class="img-fluid figure-img" alt="series poster"></a></p>
+<p><a href="XAI_Poster.jpg" class="lightbox" data-glightbox="description: .lightbox-desc-1" data-gallery="quarto-lightbox-gallery-1" title="series poster"><img src="XAI_Poster.jpg" class="img-fluid figure-img" alt="series poster"></a></p>
 <figcaption>series poster</figcaption>
 </figure>
 </div>
@@ -504,7 +516,7 @@ window.Quarto = {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_002.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-2" title="Explainability approaches"><img src="sl_002.png" class="img-fluid figure-img" alt="Explainability approaches"></a></p>
+<p><a href="sl_002.png" class="lightbox" data-glightbox="description: .lightbox-desc-2" data-gallery="my-gallery" title="Explainability approaches"><img src="sl_002.png" class="img-fluid figure-img" alt="Explainability approaches"></a></p>
 <figcaption>Explainability approaches</figcaption>
 </figure>
 </div></div><ul>
@@ -590,7 +602,7 @@ window.Quarto = {
 Table&nbsp;1: Local &amp; Global method Comparison
 </figcaption>
 <div aria-describedby="tbl-global-local-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="sl_008.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" data-glightbox="description: .lightbox-desc-3"><img src="sl_008.png" class="img-fluid figure-img"></a>
+<a href="sl_008.png" class="lightbox" data-glightbox="description: .lightbox-desc-3" data-gallery="quarto-lightbox-gallery-3"><img src="sl_008.png" class="img-fluid figure-img"></a>
 </div>
 </figure>
 </div>
@@ -607,7 +619,7 @@ Table&nbsp;1: Local &amp; Global method Comparison
 Table&nbsp;2: Post-hoc Explainability Table
 </figcaption>
 <div aria-describedby="tbl-techniques-categorization-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="sl_011.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" data-glightbox="description: .lightbox-desc-4"><img src="sl_011.png" class="img-fluid figure-img"></a>
+<a href="sl_011.png" class="lightbox" data-glightbox="description: .lightbox-desc-4" data-gallery="quarto-lightbox-gallery-4"><img src="sl_011.png" class="img-fluid figure-img"></a>
 </div>
 </figure>
 </div>
@@ -633,7 +645,7 @@ Table&nbsp;2: Post-hoc Explainability Table
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_019.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-5" title="LIME Post-hoc"><img src="sl_019.png" class="img-fluid figure-img" alt="LIME Post-hoc"></a></p>
+<p><a href="sl_019.png" class="lightbox" data-glightbox="description: .lightbox-desc-5" data-gallery="my-gallery" title="LIME Post-hoc"><img src="sl_019.png" class="img-fluid figure-img" alt="LIME Post-hoc"></a></p>
 <figcaption>LIME Post-hoc</figcaption>
 </figure>
 </div></div><ul>
@@ -652,7 +664,7 @@ Table&nbsp;2: Post-hoc Explainability Table
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_013.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-6" title="salary prediction dataset overview"><img src="sl_013.png" class="img-fluid figure-img" alt="salary prediction dataset overview"></a></p>
+<p><a href="sl_013.png" class="lightbox" data-glightbox="description: .lightbox-desc-6" data-gallery="my-gallery" title="salary prediction dataset overview"><img src="sl_013.png" class="img-fluid figure-img" alt="salary prediction dataset overview"></a></p>
 <figcaption>salary prediction dataset overview</figcaption>
 </figure>
 </div></div><section id="load-the-dataset" class="level3 page-columns page-full">
@@ -660,7 +672,7 @@ Table&nbsp;2: Post-hoc Explainability Table
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_014.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-7" title="Salary Prediction DS"><img src="sl_014.png" class="img-fluid figure-img" alt="Salary Prediction DS"></a></p>
+<p><a href="sl_014.png" class="lightbox" data-glightbox="description: .lightbox-desc-7" data-gallery="my-gallery" title="Salary Prediction DS"><img src="sl_014.png" class="img-fluid figure-img" alt="Salary Prediction DS"></a></p>
 <figcaption>Salary Prediction DS</figcaption>
 </figure>
 </div></div><div class="cell" data-execution_count="1">
@@ -770,7 +782,7 @@ Table&nbsp;3
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_015.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-8" title="Preprocessing"><img src="sl_015.png" class="img-fluid figure-img" alt="Preprocessing"></a></p>
+<p><a href="sl_015.png" class="lightbox" data-glightbox="description: .lightbox-desc-8" data-gallery="my-gallery" title="Preprocessing"><img src="sl_015.png" class="img-fluid figure-img" alt="Preprocessing"></a></p>
 <figcaption>Preprocessing</figcaption>
 </figure>
 </div></div><ul>
@@ -1396,7 +1408,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <div id="fig-decision-tree-graphviz" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-decision-tree-graphviz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="index_files/figure-html/fig-decision-tree-graphviz-output-1.svg" class="lightbox" data-gallery="my-gallery" data-description="A
+<a href="index_files/figure-html/fig-decision-tree-graphviz-output-1.svg" class="lightbox" data-description="A
 
 depth
 
@@ -1414,7 +1426,7 @@ the
 
 Salary
 
-DataSet" data-glightbox="description: .lightbox-desc-9"><img src="index_files/figure-html/fig-decision-tree-graphviz-output-1.svg" class="img-fluid figure-img"></a>
+DataSet" data-glightbox="description: .lightbox-desc-9" data-gallery="my-gallery"><img src="index_files/figure-html/fig-decision-tree-graphviz-output-1.svg" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-decision-tree-graphviz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: A simple decision tree for the Salary DataSet
@@ -1429,7 +1441,7 @@ Figure&nbsp;1: A simple decision tree for the Salary DataSet
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_017.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-10" title="LIME for Tabular"><img src="sl_017.png" class="img-fluid figure-img" alt="LIME for Tabular"></a></p>
+<p><a href="sl_017.png" class="lightbox" data-glightbox="description: .lightbox-desc-10" data-gallery="my-gallery" title="LIME for Tabular"><img src="sl_017.png" class="img-fluid figure-img" alt="LIME for Tabular"></a></p>
 <figcaption>LIME for Tabular</figcaption>
 </figure>
 </div></div><div id="cell-lime-explainer" class="cell" data-execution_count="8">
@@ -1476,7 +1488,7 @@ X does not have valid feature names, but DecisionTreeRegressor was fitted with f
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_018.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-11" title="LIME for Tabular Viz"><img src="sl_018.png" class="img-fluid figure-img" alt="LIME for Tabular Viz"></a></p>
+<p><a href="sl_018.png" class="lightbox" data-glightbox="description: .lightbox-desc-11" data-gallery="my-gallery" title="LIME for Tabular Viz"><img src="sl_018.png" class="img-fluid figure-img" alt="LIME for Tabular Viz"></a></p>
 <figcaption>LIME for Tabular Viz</figcaption>
 </figure>
 </div></div><div class="cell" data-execution_count="9">
@@ -38629,7 +38641,7 @@ Listing&nbsp;1
 <h2 class="anchored" data-anchor-id="lime-an-intuitive-explantion">LIME an intuitive explantion</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_019.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-12" title="LIME Post-hoc"><img src="sl_019.png" class="img-fluid figure-img" alt="LIME Post-hoc"></a></p>
+<p><a href="sl_019.png" class="lightbox" data-glightbox="description: .lightbox-desc-12" data-gallery="my-gallery" title="LIME Post-hoc"><img src="sl_019.png" class="img-fluid figure-img" alt="LIME Post-hoc"></a></p>
 <figcaption>LIME Post-hoc</figcaption>
 </figure>
 </div>
@@ -38654,14 +38666,14 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_020.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-13" title="LIME for Images"><img src="sl_020.png" class="img-fluid figure-img" alt="LIME for Images"></a></p>
+<p><a href="sl_020.png" class="lightbox" data-glightbox="description: .lightbox-desc-13" data-gallery="my-gallery" title="LIME for Images"><img src="sl_020.png" class="img-fluid figure-img" alt="LIME for Images"></a></p>
 <figcaption>LIME for Images</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_023.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-14" title="LIME for Images"><img src="sl_023.png" class="img-fluid figure-img" alt="LIME for Images"></a></p>
+<p><a href="sl_023.png" class="lightbox" data-glightbox="description: .lightbox-desc-14" data-gallery="my-gallery" title="LIME for Images"><img src="sl_023.png" class="img-fluid figure-img" alt="LIME for Images"></a></p>
 <figcaption>LIME for Images</figcaption>
 </figure>
 </div></div><hr>
@@ -38671,7 +38683,7 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_024.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-15" title="LIME Pros &amp; Cons"><img src="sl_024.png" class="img-fluid figure-img" alt="LIME Pros &amp; Cons"></a></p>
+<p><a href="sl_024.png" class="lightbox" data-glightbox="description: .lightbox-desc-15" data-gallery="my-gallery" title="LIME Pros &amp; Cons"><img src="sl_024.png" class="img-fluid figure-img" alt="LIME Pros &amp; Cons"></a></p>
 <figcaption>LIME Pros &amp; Cons</figcaption>
 </figure>
 </div></div><hr>
@@ -38681,14 +38693,14 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_026.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-16" title="Terminology"><img src="sl_026.png" class="img-fluid figure-img" alt="Terminology"></a></p>
+<p><a href="sl_026.png" class="lightbox" data-glightbox="description: .lightbox-desc-16" data-gallery="my-gallery" title="Terminology"><img src="sl_026.png" class="img-fluid figure-img" alt="Terminology"></a></p>
 <figcaption>Terminology</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_027.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-17" title="Shapley Values"><img src="sl_027.png" class="img-fluid figure-img" alt="Shapley Values"></a></p>
+<p><a href="sl_027.png" class="lightbox" data-glightbox="description: .lightbox-desc-17" data-gallery="my-gallery" title="Shapley Values"><img src="sl_027.png" class="img-fluid figure-img" alt="Shapley Values"></a></p>
 <figcaption>Shapley Values</figcaption>
 </figure>
 </div></div><hr>
@@ -38705,35 +38717,35 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_029.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-18" title="Shapley Formula"><img src="sl_029.png" class="img-fluid figure-img" alt="Shapley Formula"></a></p>
+<p><a href="sl_029.png" class="lightbox" data-glightbox="description: .lightbox-desc-18" data-gallery="my-gallery" title="Shapley Formula"><img src="sl_029.png" class="img-fluid figure-img" alt="Shapley Formula"></a></p>
 <figcaption>Shapley Formula</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_030.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-19" title="In ML"><img src="sl_030.png" class="img-fluid figure-img" alt="In ML"></a></p>
+<p><a href="sl_030.png" class="lightbox" data-glightbox="description: .lightbox-desc-19" data-gallery="my-gallery" title="In ML"><img src="sl_030.png" class="img-fluid figure-img" alt="In ML"></a></p>
 <figcaption>In ML</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_031.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-20" title="Shapley Problems"><img src="sl_031.png" class="img-fluid figure-img" alt="Shapley Problems"></a></p>
+<p><a href="sl_031.png" class="lightbox" data-glightbox="description: .lightbox-desc-20" data-gallery="my-gallery" title="Shapley Problems"><img src="sl_031.png" class="img-fluid figure-img" alt="Shapley Problems"></a></p>
 <figcaption>Shapley Problems</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_032.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-21" title="Shapley for ML"><img src="sl_032.png" class="img-fluid figure-img" alt="Shapley for ML"></a></p>
+<p><a href="sl_032.png" class="lightbox" data-glightbox="description: .lightbox-desc-21" data-gallery="my-gallery" title="Shapley for ML"><img src="sl_032.png" class="img-fluid figure-img" alt="Shapley for ML"></a></p>
 <figcaption>Shapley for ML</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_033.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-22" title="SHAP"><img src="sl_033.png" class="img-fluid figure-img" alt="SHAP"></a></p>
+<p><a href="sl_033.png" class="lightbox" data-glightbox="description: .lightbox-desc-22" data-gallery="my-gallery" title="SHAP"><img src="sl_033.png" class="img-fluid figure-img" alt="SHAP"></a></p>
 <figcaption>SHAP</figcaption>
 </figure>
 </div></div></section>
@@ -38742,35 +38754,35 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_034.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-23" title="Kernel SHAP"><img src="sl_034.png" class="img-fluid figure-img" alt="Kernel SHAP"></a></p>
+<p><a href="sl_034.png" class="lightbox" data-glightbox="description: .lightbox-desc-23" data-gallery="my-gallery" title="Kernel SHAP"><img src="sl_034.png" class="img-fluid figure-img" alt="Kernel SHAP"></a></p>
 <figcaption>Kernel SHAP</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_035.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-24" title="Tree SHAP"><img src="sl_035.png" class="img-fluid figure-img" alt="Tree SHAP"></a></p>
+<p><a href="sl_035.png" class="lightbox" data-glightbox="description: .lightbox-desc-24" data-gallery="my-gallery" title="Tree SHAP"><img src="sl_035.png" class="img-fluid figure-img" alt="Tree SHAP"></a></p>
 <figcaption>Tree SHAP</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_036.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-25" title="Decision Tree"><img src="sl_036.png" class="img-fluid figure-img" alt="Decision Tree"></a></p>
+<p><a href="sl_036.png" class="lightbox" data-glightbox="description: .lightbox-desc-25" data-gallery="my-gallery" title="Decision Tree"><img src="sl_036.png" class="img-fluid figure-img" alt="Decision Tree"></a></p>
 <figcaption>Decision Tree</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_037.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-26" title="TreeExplainer"><img src="sl_037.png" class="img-fluid figure-img" alt="TreeExplainer"></a></p>
+<p><a href="sl_037.png" class="lightbox" data-glightbox="description: .lightbox-desc-26" data-gallery="my-gallery" title="TreeExplainer"><img src="sl_037.png" class="img-fluid figure-img" alt="TreeExplainer"></a></p>
 <figcaption>TreeExplainer</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_038.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-27" title="Kernel Explainer"><img src="sl_038.png" class="img-fluid figure-img" alt="Kernel Explainer"></a></p>
+<p><a href="sl_038.png" class="lightbox" data-glightbox="description: .lightbox-desc-27" data-gallery="my-gallery" title="Kernel Explainer"><img src="sl_038.png" class="img-fluid figure-img" alt="Kernel Explainer"></a></p>
 <figcaption>Kernel Explainer</figcaption>
 </figure>
 </div></div></section>
@@ -38782,7 +38794,7 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_040.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-28" title="Local Waterfall Plot"><img src="sl_040.png" class="img-fluid figure-img" alt="Local Waterfall Plot"></a></p>
+<p><a href="sl_040.png" class="lightbox" data-glightbox="description: .lightbox-desc-28" data-gallery="my-gallery" title="Local Waterfall Plot"><img src="sl_040.png" class="img-fluid figure-img" alt="Local Waterfall Plot"></a></p>
 <figcaption>Local Waterfall Plot</figcaption>
 </figure>
 </div></div></section>
@@ -38791,7 +38803,7 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_043.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-29" title="Local Bar Plot"><img src="sl_043.png" class="img-fluid figure-img" alt="Local Bar Plot"></a></p>
+<p><a href="sl_043.png" class="lightbox" data-glightbox="description: .lightbox-desc-29" data-gallery="my-gallery" title="Local Bar Plot"><img src="sl_043.png" class="img-fluid figure-img" alt="Local Bar Plot"></a></p>
 <figcaption>Local Bar Plot</figcaption>
 </figure>
 </div></div></section>
@@ -38800,14 +38812,14 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_044.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-30" title="Global Bar Plot"><img src="sl_044.png" class="img-fluid figure-img" alt="Global Bar Plot"></a></p>
+<p><a href="sl_044.png" class="lightbox" data-glightbox="description: .lightbox-desc-30" data-gallery="my-gallery" title="Global Bar Plot"><img src="sl_044.png" class="img-fluid figure-img" alt="Global Bar Plot"></a></p>
 <figcaption>Global Bar Plot</figcaption>
 </figure>
 </div></div><hr>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_045.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-31" title="Global Bar Plot"><img src="sl_045.png" class="img-fluid figure-img" alt="Global Bar Plot"></a></p>
+<p><a href="sl_045.png" class="lightbox" data-glightbox="description: .lightbox-desc-31" data-gallery="my-gallery" title="Global Bar Plot"><img src="sl_045.png" class="img-fluid figure-img" alt="Global Bar Plot"></a></p>
 <figcaption>Global Bar Plot</figcaption>
 </figure>
 </div></div></section>
@@ -38816,7 +38828,7 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_046.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-32" title="Global Beeswarm"><img src="sl_046.png" class="img-fluid figure-img" alt="Global Beeswarm"></a></p>
+<p><a href="sl_046.png" class="lightbox" data-glightbox="description: .lightbox-desc-32" data-gallery="my-gallery" title="Global Beeswarm"><img src="sl_046.png" class="img-fluid figure-img" alt="Global Beeswarm"></a></p>
 <figcaption>Global Beeswarm</figcaption>
 </figure>
 </div></div></section>
@@ -38825,7 +38837,7 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_047.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-33" title="Global Scatter Plot"><img src="sl_047.png" class="img-fluid figure-img" alt="Global Scatter Plot"></a></p>
+<p><a href="sl_047.png" class="lightbox" data-glightbox="description: .lightbox-desc-33" data-gallery="my-gallery" title="Global Scatter Plot"><img src="sl_047.png" class="img-fluid figure-img" alt="Global Scatter Plot"></a></p>
 <figcaption>Global Scatter Plot</figcaption>
 </figure>
 </div></div></section>
@@ -38834,7 +38846,7 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_048.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-34" title="Globle Scatter Plot"><img src="sl_048.png" class="img-fluid figure-img" alt="Globle Scatter Plot"></a></p>
+<p><a href="sl_048.png" class="lightbox" data-glightbox="description: .lightbox-desc-34" data-gallery="my-gallery" title="Globle Scatter Plot"><img src="sl_048.png" class="img-fluid figure-img" alt="Globle Scatter Plot"></a></p>
 <figcaption>Globle Scatter Plot</figcaption>
 </figure>
 </div></div></section>
@@ -38843,7 +38855,7 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_049.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-35" title="Globle Scatter Plot"><img src="sl_049.png" class="img-fluid figure-img" alt="Globle Scatter Plot"></a></p>
+<p><a href="sl_049.png" class="lightbox" data-glightbox="description: .lightbox-desc-35" data-gallery="my-gallery" title="Globle Scatter Plot"><img src="sl_049.png" class="img-fluid figure-img" alt="Globle Scatter Plot"></a></p>
 <figcaption>Globle Scatter Plot</figcaption>
 </figure>
 </div></div></section>
@@ -38852,7 +38864,7 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_050.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-36" title="Model Hierarchy"><img src="sl_050.png" class="img-fluid figure-img" alt="Model Hierarchy"></a></p>
+<p><a href="sl_050.png" class="lightbox" data-glightbox="description: .lightbox-desc-36" data-gallery="my-gallery" title="Model Hierarchy"><img src="sl_050.png" class="img-fluid figure-img" alt="Model Hierarchy"></a></p>
 <figcaption>Model Hierarchy</figcaption>
 </figure>
 </div></div><hr>
@@ -38862,7 +38874,7 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_051.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-37" title="Local Uncertainty"><img src="sl_051.png" class="img-fluid figure-img" alt="Local Uncertainty"></a></p>
+<p><a href="sl_051.png" class="lightbox" data-glightbox="description: .lightbox-desc-37" data-gallery="my-gallery" title="Local Uncertainty"><img src="sl_051.png" class="img-fluid figure-img" alt="Local Uncertainty"></a></p>
 <figcaption>Local Uncertainty</figcaption>
 </figure>
 </div></div></section>
@@ -38872,7 +38884,7 @@ Listing&nbsp;1
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="sl_052.png" class="lightbox" data-gallery="my-gallery" data-glightbox="description: .lightbox-desc-38" title="References"><img src="sl_052.png" class="img-fluid figure-img" alt="References"></a></p>
+<p><a href="sl_052.png" class="lightbox" data-glightbox="description: .lightbox-desc-38" data-gallery="my-gallery" title="References"><img src="sl_052.png" class="img-fluid figure-img" alt="References"></a></p>
 <figcaption>References</figcaption>
 </figure>
 </div></div><hr>
@@ -39663,13 +39675,37 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </a>
   </li>  
 </ul>
-    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    </div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"selector":".lightbox","closeEffect":"zoom","descPosition":"bottom","openEffect":"zoom","loop":false});
+    <script type="text/javascript">
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let pseudocodeOptions = {
+          indentSize: el.dataset.indentSize || "1.2em",
+          commentDelimiter: el.dataset.commentDelimiter || "//",
+          lineNumber: el.dataset.lineNumber === "true" ? true : false,
+          lineNumberPunc: el.dataset.lineNumberPunc || ":",
+          noEnd: el.dataset.noEnd === "true" ? true : false,
+          titlePrefix: el.dataset.algTitle || "Algorithm"
+        };
+        pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+      });
+    })(document);
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        titleSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+        titlePrefix = el.dataset.algTitle;
+        titleIndex = el.dataset.chapterLevel ? el.dataset.chapterLevel + "." + el.dataset.pseudocodeIndex : el.dataset.pseudocodeIndex;
+        titleSpan.innerHTML = titlePrefix + " " + titleIndex + " ";
+      });
+    })(document);
+    </script>
+  
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","openEffect":"zoom","closeEffect":"zoom","loop":false,"descPosition":"bottom"});
 window.onload = () => {
   lightboxQuarto.on('slide_before_load', (data) => {
     const { slideIndex, slideNode, slideConfig, player, trigger } = data;

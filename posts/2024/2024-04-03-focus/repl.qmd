@@ -1,0 +1,126 @@
+---
+title: RAD REPL
+date: 2024-05-01
+---
+
+#  REPL MVP
+
+TODO:
+1. [x] basic REPL
+2. [x] command based class
+3. [x] add task command
+4. [x] list tasks command
+5. [x] set current task command
+6. [x] complete task command
+
+3. [] semantic kernel support
+
+```{python}
+
+
+class ReplCommand:
+    def __init__(self, name):
+        self.name = name
+
+    def execute(self):
+        raise NotImplementedError("execute method must be implemented in subclasses")
+
+class QuitCommand(ReplCommand):
+    def execute(self):
+        print("Exiting REPL...")
+        exit()
+
+class HelpCommand(ReplCommand):
+
+    def execute(self):
+        print("Available commands:")
+        print("- quit: Exit the REPL")
+        print("- help: Show available commands")
+        print("- list_commands: List all available commands")
+        print("- add_feature: Add a new feature")
+        print("- list_features: List all features")
+        print("- remove_feature: Remove a feature")
+        print("- update_feature: Update a feature")
+
+
+features= {}
+class AddFeatuerCommand(ReplCommand):
+    def execute(self, feature_name, feature_text):
+        print(f"Adding feature: {feature_name}")
+        features[feature_name] = feature_text
+
+
+class ListFeaturesCommand(ReplCommand):
+    def execute(self):
+        print("Current features:")
+        for feature_name, feature_text in features.items():
+            print(f"- {feature_name}: {feature_text}")
+
+class RemoveFeatureCommand(ReplCommand):
+    def execute(self, feature_name):
+        if feature_name in features:
+            del features[feature_name]
+            print(f"Removed feature: {feature_name}")
+        else:
+            print(f"Feature {feature_name} does not exist.")
+
+class UpdateFeatureCommand(ReplCommand):
+    def execute(self, feature_name, feature_text):
+        if feature_name in features:
+            features[feature_name] = feature_text
+            print(f"Updated feature: {feature_name}")
+        else:
+            print(f"Feature {feature_name} does not exist.")
+
+class ListCommandsCommand(ReplCommand):
+    def execute(self):
+        print("Available commands:")
+        for command_name in commands.keys():
+            print(f"- {command_name}")
+
+
+# Create a dictionary to map command names to command objects
+commands = {
+    "quit": QuitCommand("quit"),
+    "help": HelpCommand("help"),
+    "list_commands": ListCommandsCommand("list_commands"),
+    "add_feature": AddFeatuerCommand("add_feature"),
+    "list_features": ListFeaturesCommand("list_features"),
+    "remove_feature": RemoveFeatureCommand("remove_feature"),
+    "update_feature": UpdateFeatureCommand("update_feature"),
+
+
+}
+
+def my_repl():
+    # Define any initial setup or variables here
+    
+    while True:
+        
+        # Get user input
+        user_input = input(">>> ")
+
+        # Evaluate user input
+        try:
+            # Split user input into command and arguments
+            command_parts = user_input.split(" ")
+            command_name = command_parts[0]
+            command_args = command_parts[1:]
+
+            # Check if command exists in the commands dictionary
+            if command_name in commands:
+                # Get the command object
+                command = commands[command_name]
+
+                # Execute the command
+                command.execute(*command_args)
+            else:
+                print("Unknown command. Type 'help' for available commands.")
+        except Exception as e:
+            print("Error:", e)
+
+        # Start the REPL
+        if __name__ == "__main__":
+            my_repl()
+
+```

@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.41">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="description" content="Stochastic Gradient Descent - The good parts">
+
+<title>Oren Bochman's Blog – Stochastic Gradient Descent - The good parts</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<link href="../../../favicon.ico" rel="icon">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Stochastic Gradient Descent - The good parts">
+<meta name="twitter:description" content="Stochastic Gradient Descent - The good parts">
+<meta name="twitter:image" content="https://orenbochman.github.io/posts/2021/2021-09-08-stochastic-gradient-descent/sisipus.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image-height" content="901">
+<meta name="twitter:image-width" content="1280">
+</head>
+
+<body class="nav-sidebar docked nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-about" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">about</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-about">    
+        <li>
+    <a class="dropdown-item" href="../../../about.html">
+ <span class="dropdown-text">About</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-notes" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">notes</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-notes">    
+        <li>
+    <a class="dropdown-item" href="../../../nlp.html">
+ <span class="dropdown-text">NLP Specilization</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../dnn.html">
+ <span class="dropdown-text">Neural Networks for Machine Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../model-thinking.html">
+ <span class="dropdown-text">Model Thinking</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../xai.html">
+ <span class="dropdown-text">XAI</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rl.html">
+ <span class="dropdown-text">Reinforcement Learning</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../rhetoric.html">
+ <span class="dropdown-text">Rhetoric</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../tfp.html">
+ <span class="dropdown-text">TFP</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../ab-testing.html">
+ <span class="dropdown-text">AB testing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../../cognitiveai.html">
+ <span class="dropdown-text">Cognitive AI</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Stochastic Gradient Descent - The good parts</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Stochastic Gradient Descent - The good parts</h1>
+                  <div>
+        <div class="description">
+          Stochastic Gradient Descent - The good parts
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">Sunday, August 29, 2021</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#tldr" id="toc-tldr" class="nav-link active" data-scroll-target="#tldr">TLDR</a></li>
+  <li><a href="#stochastic-gradient-descent---the-good-parts" id="toc-stochastic-gradient-descent---the-good-parts" class="nav-link" data-scroll-target="#stochastic-gradient-descent---the-good-parts">Stochastic Gradient Descent - The good parts</a></li>
+  <li><a href="#decision-boundary-and-weight-space." id="toc-decision-boundary-and-weight-space." class="nav-link" data-scroll-target="#decision-boundary-and-weight-space.">Decision boundary and Weight Space.</a></li>
+  <li><a href="#sgd" id="toc-sgd" class="nav-link" data-scroll-target="#sgd">SGD</a></li>
+  <li><a href="#picking-a-minima" id="toc-picking-a-minima" class="nav-link" data-scroll-target="#picking-a-minima">Picking a minima</a></li>
+  <li><a href="#so-how-do-we-get-to-the-minima" id="toc-so-how-do-we-get-to-the-minima" class="nav-link" data-scroll-target="#so-how-do-we-get-to-the-minima">So how do we get to the minima?</a></li>
+  <li><a href="#what-is-the-learning-rate" id="toc-what-is-the-learning-rate" class="nav-link" data-scroll-target="#what-is-the-learning-rate">What is the learning rate?</a></li>
+  <li><a href="#what-are-the-main-variants-of-sgd" id="toc-what-are-the-main-variants-of-sgd" class="nav-link" data-scroll-target="#what-are-the-main-variants-of-sgd">What are the main variants of SGD ?</a></li>
+  <li><a href="#batch-size" id="toc-batch-size" class="nav-link" data-scroll-target="#batch-size">Batch size</a></li>
+  <li><a href="#learning-rates-decay-and-schedules" id="toc-learning-rates-decay-and-schedules" class="nav-link" data-scroll-target="#learning-rates-decay-and-schedules">Learning rates, decay and schedules</a></li>
+  <li><a href="#momentum" id="toc-momentum" class="nav-link" data-scroll-target="#momentum">Momentum</a></li>
+  <li><a href="#shuffling-and-bookkeeping" id="toc-shuffling-and-bookkeeping" class="nav-link" data-scroll-target="#shuffling-and-bookkeeping">Shuffling and bookkeeping</a>
+  <ul class="collapse">
+  <li><a href="#out-of-core-learning" id="toc-out-of-core-learning" class="nav-link" data-scroll-target="#out-of-core-learning">Out of core learning</a></li>
+  </ul></li>
+  <li><a href="#initilization-schemes" id="toc-initilization-schemes" class="nav-link" data-scroll-target="#initilization-schemes">Initilization schemes</a></li>
+  <li><a href="#second-order-methods" id="toc-second-order-methods" class="nav-link" data-scroll-target="#second-order-methods">Second order methods</a></li>
+  <li><a href="#automl-and-the-future-of-sgd" id="toc-automl-and-the-future-of-sgd" class="nav-link" data-scroll-target="#automl-and-the-future-of-sgd">AutoML and the future of SGD !?</a></li>
+  <li><a href="#terminology" id="toc-terminology" class="nav-link" data-scroll-target="#terminology">Terminology</a></li>
+  <li><a href="#bibliography" id="toc-bibliography" class="nav-link" data-scroll-target="#bibliography">Bibliography</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="tldr" class="level1">
+<h1>TLDR</h1>
+<p>What’s the best way to scale a mountain ? Stochastic gradient descent (SGD) seems is quite a mouthful and it is a class of a optimization algorithms used to train deep neural networks. In these we consider the loss function a mountain that needs climbing and being lazy we make it negative so we only have to go down. Confused? If you are here you probably knew that already this article is both an overview and a repository of answers to questions I came up with about SGD over the years as I learned it and thought it.</p>
+</section>
+<section id="stochastic-gradient-descent---the-good-parts" class="level1">
+<h1>Stochastic Gradient Descent - The good parts</h1>
+<p>I think I first first learned about gradient descent in second year of collage more or less this monte carlo methods and simulated annealing. Today the stochastic variant is commonly used in the context of training deep neural network models with forward and back propagation and in this context is seems more complex. I also has a lot of mathematics. I love mathematics and most of the math for SGD is not particularly difficult. Formally what you need first year calculus and linear algebra. When I came back to SGD to using it for fitting Deep Neural Networks I had many questions and not much in the way of answers. I’d like to present some of these and the solutions I came across and others that I figured out and I will also try to go over some of the variants and ideas being used used. I got a lot of input about geometry from Geoffrey Hinton’s course and I got some practical advice from the book answers from (Montavon et al., 2012) and I got input on online learning using regret from Goodfellow</p>
+</section>
+<section id="decision-boundary-and-weight-space." class="level1">
+<h1>Decision boundary and Weight Space.</h1>
+<p>Say we want to classify cats and dogs or perform OCR. In the case of binary classification we can imagine the data as two groups of point mixed either separable or more likely overlapping. As data is seen by the model it adds weights to adjust a decision surface which attempts to best separate the two groups. Underfitting means we have not given the model enough data points to get the decision boundary right in some areas. Overfitting means the boundary is represents both the true nature of the data, AKA the signal and the noise. Fitting the noise will make the model less likely to fit new data.</p>
+</section>
+<section id="sgd" class="level1">
+<h1>SGD</h1>
+<p>SGD is a general-purpose optimization technique for fitting a function using some parameters. However it is worth pointing out that the algorithm is attempting to find a spot within the space of weights that minimize the overall error for predicting the training set. A major problem is that dnn are highly nonlinear with many local minimas. Also a model like VGG had 138 Million parameters.</p>
+</section>
+<section id="picking-a-minima" class="level1">
+<h1>Picking a minima</h1>
+<p>There is an idea in statistics called model selection. The idea is that as more data comes in certain models are eliminated and others become less likely. While SGD is not a bayesian procedure I think one could extrapolate: All thing being equal given two local minima which would we prefer? The deeper of the two basin as it would give us a model with lower loss. This usually will score higher on other metrics such as accuracy. The wider of the two basins if they have the same depth. As a basin of attraction is wider and it will give us a more stable solution. Many DNN are hard to fit. More stable also means we can reach to the optimum quicker. Based on the Bayesian model selection I would hazard a guess that a wider basin would be preferable to a narrow one as it could contain a larger range of models which would be likely to generalize better than a smaller basin. Why choose just one local minima? Ensemble methods combines multiple models to make better predictions. We can use completely different models (different architecture and algorithm) or pick the same model and architecture but use weights that have converged to different local minima. Different minima we should expect to be able give a similar loss but due to different decision surfaces and we can use two or more to give a better model. While hardly a new idea, this is still used to get better results out of the state of the art and in competition.</p>
+</section>
+<section id="so-how-do-we-get-to-the-minima" class="level1">
+<h1>So how do we get to the minima?</h1>
+<p>The main idea is that taking the negative of the gradient of the error is a vector that points to the minima. We then take a step in that direction governed by a constant called the learning rate.</p>
+</section>
+<section id="what-is-the-learning-rate" class="level1">
+<h1>What is the learning rate?</h1>
+<p>Learning rate is what we call a hyper parameter, that is a setting of the optimization algorithm but not a parameter used by the model. Now is we use a learning rate that is small we will be taking baby steps and may take a very long time to finish training. If we pick a value that is too large we will over step the goal diverge and possibly even jump to a different attraction basin. Now learning rate is important and is rarely kept at a single value. Most algorithms will benefit from adjusting the learning rate to accommodate the form of the basin or based on the epoch used for fitting. Finally second order method estimate the second derivative of gradient. This facilitates finding the optimal learning rate and reaching the minima in one step. However, these methods while faster learners have a computational complexity that is not practical.</p>
+</section>
+<section id="what-are-the-main-variants-of-sgd" class="level1">
+<h1>What are the main variants of SGD ?</h1>
+<p>At one end of the spectrum is Gradient Descent which for DNN is prohibitive to perform due to a high computational complexity as calculating the gradient prior to updating the weights would require performing a forward pass on all the data to calculate the error and then back propagate it before each weight update. The upside is that using all the data will generate a precise gradient. The downside is that depending on the initial conditions (how we initialize weights and biases) may have us within the convergence basin of a local minima. GD will lead us there and will not be able to get us out. At the other extreme is the online version of gradient descent. This uses just one sample for each step. The upside is that we can make one step per sample in each epoch. downside is that we could have low quality gradient estimate. On the upside we can more easily jump between local basins of attraction. The main issue is that the gradient varies a lot and it becomes difficult to understand if the model is improving or not and if it is overfitting or not. The compromise is Batched gradient descent. What this does is do a forward pas on a small batch of data points and use the averaged error adjust the weights in a single BackProp step. The direction used is in one dimension and we use the dimension with biggest gradient.</p>
+</section>
+<section id="batch-size" class="level1">
+<h1>Batch size</h1>
+<p>Batch size is one of the main hyper parameters used in SGD. We use batches to let multiple rows of data inform the direction our optimization step should take. The larger the batch size the more we are likely to be going in the a good direction (to our local minima)! But it also means that we make less steps per per epoch. Hey we want to get to the global minima. To get out of a local minima we need to allow just the opposite. Also batches are are a wellunderstood and consitant method of speedomg up SGD faster since batches are computed in parallel and the more parallel the algorithms the more compute we can leverage. However many acceleration techniques like conjugate pairs only work on batches ) So in the end we will want to use the biggest batch size that our gpu will allow and that depends first on the number of cores, the second constraint is the the memory needed per row. It can be large if it is an image or a very big embedding. This means that this important hyperparmeter which controls hardware speedups is decided primarily by the hardware.</p>
+</section>
+<section id="learning-rates-decay-and-schedules" class="level1">
+<h1>Learning rates, decay and schedules</h1>
+<p><span class="math display"> W(t+1) = W(T) -\eta \frac{\partial E^T }{ \partial W} </span> The learning rate <span class="math inline">\eta</span> is probably the most important hyper-parameter. It corresponds to the step size on takes in the direction of the gradient. It can be a single number in a simple algorithms but it can take the form of a diagonal matrix with a value for each row. This is often essential as learning happens at different rates as we get further from the source of the error at the top layer. Finlay it is also common to change the learning rate recognizing that on a plain we should take big step but near a cliff we should be more restrained. Again the simpler idea is to let the learning rate decay but using a more complicated schedule can have different benefits. As mentioned in the previous section first order algorithm tend to go after local minima and shrinking the learning rate can trap them inside a local minima. There are a number of strategies to help the algorithm get out of the rut. One strategy to use periodic learning rate schedule which will easily let the algorithm jum out of the local minima but these usually come with a safety mechanism of saving snapshots in case it jumps to the middle of nowhere and we’d like to try again. Yet another approach is to try to learn the minimum and maximum training rate by training for an epoch with a schedule triangular schedule. This innovative method pioneered by leslie … can have dramatic speedups.</p>
+</section>
+<section id="momentum" class="level1">
+<h1>Momentum</h1>
+<p><span class="math display"> \Delta W(t+1) = \eta \frac{\partial E_{t+1} }{ \partial w} + \mu \Delta w(t)</span> Momentum is another method used to increase the size in the direction where curvature is spherical and damps it in the directions where it is not. I like to think of this as a second order learning rate in which we introducing momentum to add an element of memory to the learning rate. Algorithms with momentum seems to do better navigating saddle points. ## Nesterov momentum one problem with momentum is it may be lagging behind the gradient causing us to overshoot. There is a simple correction to this called the Nesterov Accelerated Momentum (NAG) which allows to compensate for this lag.</p>
+</section>
+<section id="shuffling-and-bookkeeping" class="level1">
+<h1>Shuffling and bookkeeping</h1>
+<p>We can speed learning with the the following two strategies to use rows with maximum information content: 1. Shuffle the training set so that successive training examples are unlikely belong to the same class. 1. Present input examples that produce a large error more frequently than examples that produce a small error.</p>
+<section id="out-of-core-learning" class="level2">
+<h2 class="anchored" data-anchor-id="out-of-core-learning">Out of core learning</h2>
+<p>Many of the training loops I wrote for NLP transformers use an out-of-core approach. This simply means there is a low level generator for the data set we cannot store in memory and there is a higher level loop or generator that uses an index or a hash for the data and fits in memory where we manage metadata such class, error rates, and other metadata. We then manage shuffling and augmentation and batching at the second level . One Example is when working with reformer style transformers in NLP we want to bucket together rows of certain length. Another aspect of using this approach is due to augmentation where we want to generate and cache augmented cycles. Of course all these make the notion of an epoch more complicated. But dea has to do wThis makes the notion</p>
+</section>
+</section>
+<section id="initilization-schemes" class="level1">
+<h1>Initilization schemes</h1>
+<p>the intilization scheme of the network seems to be another aspect that can affect its convergence rate.</p>
+</section>
+<section id="second-order-methods" class="level1">
+<h1>Second order methods</h1>
+<p>Second order methods calculate or estimate the Hessian or second order derivative matrix. This then allows to make much better steps towards the global maximum. However, inverting this matrix for a neural network is often intractable. some words on second order methods. look at the paper on training and variants - adam, adagrad, etc - do we care on these adding figures.</p>
+</section>
+<section id="automl-and-the-future-of-sgd" class="level1">
+<h1>AutoML and the future of SGD !?</h1>
+<p>Some years back I attended a couple of talks by google ai execs. They have a very broad overview of work being done in the field and reported some of the more amazing projects conducted by google ds. Since Google makes an effort to nab all the best researchers and entice them with unlimited compute power, some of the stories are pretty amazing. In one such talk by Jeff Dean who heads AutoML discussed their work on evolving better optimization algorithms that beat SGD. What I liked about this is that it is looking at the problem from first principles and that he reports that the AutoML program made a number of discoveries that eventually created a variant of SGD with a RELU and a feed forward network. The program developed a rather terse piece of code for this where we use complex libraries. IT also takes an expert interpreter to determine what each successive improvement in low level code corresponds too. Jeff Dean pointed out that when they let AutoML run on it eventually evolved a number of variants that beat SGD. AutoML and similar platforms for minimal DS are often touted as a replacement of data scientists. Perhaps one day they will be just that. Lots of DS work is very routine. On the other hand others Google executives are quick to point out that without good DS your models may converge very slowly, maybe never. Trying to optimise the hyper-parameters for a single SGD algorithm is a very compute intensive task so evolving the algorithm from scratch is orders of magnitude more of a challenge. One imagines that the compute costs for something like this might be enough to fund a dozen startups.</p>
+</section>
+<section id="terminology" class="level1">
+<h1>Terminology</h1>
+<ul>
+<li><dl>
+<dt>Back propagation</dt>
+<dd>
+Also Backprop, the backwards pass through a neural network in which we attribute the overall output to each node and change their weights. This is the more complicated step. <span class="math display"> W(t+1) = W(T) -\eta \frac{\partial E^T }{ \partial W} </span>
+</dd>
+</dl></li>
+<li><dl>
+<dt>Forward propagation</dt>
+<dd>
+The forward pass through a neural network in which we calculate its output. This is the simple step.
+</dd>
+</dl></li>
+<li><dl>
+<dt>Gradient</dt>
+<dd>
+The slope in all direction of a tangent on a curve.
+</dd>
+</dl></li>
+<li><dl>
+<dt>Loss</dt>
+<dd>
+The loss is a measure of the sum of the difference between our prediction and the actual value. There are many variants e.g.&nbsp;for classification and regression. However loss is the raw quantity we are trying to reduce. We may calculate more standardized metrics like accuracy.
+</dd>
+</dl></li>
+<li><dl>
+<dt>Overfitting</dt>
+<dd>
+when we learn the noise as well as the signal this is often considered to be due to the model being to complex.
+</dd>
+</dl></li>
+<li><dl>
+<dt>Hyperparmeter</dt>
+<dd>
+These are settings in the algorithm like batch size of learning rate which we can tweak that can make it slower or faster. Slower in this case often means it runs forever. Finding a good setting for our model’s Hyperparameters is called Hyperparmeter tuning and is rather time consuming.
+</dd>
+</dl></li>
+<li><dl>
+<dt>Underfitting</dt>
+<dd>
+When our approximation of the signal is too simple and does not account for local changes.
+</dd>
+</dl></li>
+<li><dl>
+<dt>Objective function</dt>
+<dd>
+Objective here means target and objective function is simply the function we want to optimize
+</dd>
+</dl></li>
+<li><dl>
+<dt>Regularization</dt>
+<dd>
+A process or activity used to battle overfitting. Adding more data, using augmentation, reducing number of parameters, use l1 and l0 metrics, early stopping, dropout and using ensembles are all considered regularization techniques.
+</dd>
+</dl></li>
+<li><dl>
+<dt>Momentum</dt>
+<dd>
+from physics is the tendency of a mass to continue in its path of motion.
+</dd>
+</dl></li>
+</ul>
+</section>
+<section id="bibliography" class="level1">
+<h1>Bibliography</h1>
+<ul>
+<li>Montavon, G., Orr, G.B., Müller, K.-R., 2012. <a href="https://www.springer.com/gp/book/9783642352881">Neural networks tricks of the trade, 2nd ed, Lecture notes in computer science. Springer, Heidelberg.</a></li>
+<li>Goodfellow, I., Bengio, Y., Courville, A., 2017. <a href="https://www.deeplearningbook.org/">Deep learning.</a></li>
+<li>Montavon, G., Orr, G.B., Müller, K.-R., 2012. <a href="">Neural networks tricks of the trade, 2nd ed, Lecture notes in computer science. Springer, Heidelberg.</a></li>
+<li>Real, E., Liang, C., So, D.R., Le, Q.V., 2020. <a href="https://arxiv.org/abs/2003.03384">AutoML-Zero: Evolving Machine Learning Algorithms From Scratch.</a> arXiv:2003.03384 [cs, stat].
+<ul>
+<li>Note: Research about evolving SGD from scratch.</li>
+<li><a href="https://ai.googleblog.com/2020/07/automl-zero-evolving-code-that-learns.html">blog post</a></li>
+<li><a href="https://arxiv.org/abs/2003.03384">paper</a></li>
+<li><a href="https://www.youtube.com/watch?v=aumUBLMfIA4&amp;ab_channel=HenryAILabs">random video</a></li>
+<li><a href="https://github.com/google-research/google-research/blob/master/automl_zero/README.md">github Repo</a></li>
+</ul></li>
+</ul>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2021,
+  author = {Bochman, Oren},
+  title = {Stochastic {Gradient} {Descent} - {The} Good Parts},
+  date = {2021-08-29},
+  url = {https://orenbochman.github.io//posts/2021/2021-09-08-stochastic-gradient-descent/2021-09-08-stochastic-gradient-descent.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2021" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2021. <span>“Stochastic Gradient Descent - The Good
+Parts.”</span> August 29, 2021. <a href="https://orenbochman.github.io//posts/2021/2021-09-08-stochastic-gradient-descent/2021-09-08-stochastic-gradient-descent.html">https://orenbochman.github.io//posts/2021/2021-09-08-stochastic-gradient-descent/2021-09-08-stochastic-gradient-descent.html</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+          // default icon
+          link.classList.add("external");
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+      for (let i=0; i<annoteTargets.length; i++) {
+        const annoteTarget = annoteTargets[i];
+        const targetCell = annoteTarget.getAttribute("data-target-cell");
+        const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+        const contentFn = () => {
+          const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          if (content) {
+            const tipContent = content.cloneNode(true);
+            tipContent.classList.add("code-annotation-tip-content");
+            return tipContent.outerHTML;
+          }
+        }
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          onShow: (instance) => {
+            selectCodeLines(instance.reference);
+            instance.reference.classList.add('code-annotation-active');
+            window.tippy.hideAll();
+          },
+          onHide: (instance) => {
+            unselectCodeLines();
+            instance.reference.classList.remove('code-annotation-active');
+          },
+          maxWidth: 300,
+          delay: [50, 0],
+          duration: [200, 0],
+          offset: [5, 10],
+          arrow: true,
+          appendTo: function(el) {
+            return el.parentElement.parentElement.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto',
+          placement: 'right',
+          popperOptions: {
+            modifiers: [
+            {
+              name: 'flip',
+              options: {
+                flipVariations: false, // true by default
+                allowedAutoPlacements: ['right'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+              },
+            },
+            {
+              name: 'preventOverflow',
+              options: {
+                mainAxis: false,
+                altAxis: false
+              }
+            }
+            ]        
+          }      
+        };
+        window.tippy(annoteTarget, config); 
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="OrenBochman/blogComments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2024, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../license.html">
+<p>License</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../trademark.html">
+<p>Trademark</p>
+</a>
+  </li>  
+</ul>
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+    <script type="text/javascript">
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let pseudocodeOptions = {
+          indentSize: el.dataset.indentSize || "1.2em",
+          commentDelimiter: el.dataset.commentDelimiter || "//",
+          lineNumber: el.dataset.lineNumber === "true" ? true : false,
+          lineNumberPunc: el.dataset.lineNumberPunc || ":",
+          noEnd: el.dataset.noEnd === "true" ? true : false,
+          titlePrefix: el.dataset.algTitle || "Algorithm"
+        };
+        pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+      });
+    })(document);
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        titleSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+        titlePrefix = el.dataset.algTitle;
+        titleIndex = el.dataset.chapterLevel ? el.dataset.chapterLevel + "." + el.dataset.pseudocodeIndex : el.dataset.pseudocodeIndex;
+        titleSpan.innerHTML = titlePrefix + " " + titleIndex + " ";
+      });
+    })(document);
+    </script>
+  
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

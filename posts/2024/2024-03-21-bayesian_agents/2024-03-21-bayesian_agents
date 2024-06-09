@@ -1,0 +1,153 @@
+---
+date: 2024-03-21
+title: "Bayesian Agent"
+subtitle: "Agent Based Modeling With MESA" 
+categories: [ABM, Agent Based Modeling, Baysian Game Theory, Game Theory, Signaling Games]
+draft: true
+---
+
+## The Sherif Dillema Game
+
+The Sherif Dillema is a considered a signaling game in game theory
+However is is also a fairly simple example of a Bayesain game
+
+
+This game is defined by (N,A,T,p,u), where:
+
+- N = {Suspect, Sheriff} 
+- ASuspect = {Shoot, Not} ,
+- ASheriff = {Shoot, Not}
+- TSuspect = {Criminal, Civilian} , 
+- TSheriff = {\*} 
+- pCriminal = p , 
+- pCivilian = (1 - p) 
+
+It is assumed that the payoffs, u, are given as follows:
+
+|                  | Sheriff's action | Shoot  | Not   |
+|------------------|------------------|--------|-------|
+| Suspect's action | Shoot            | 0, 0   | 2, -2 |
+| Suspect's action | Not              | -2, -1 | -1,1  |
+: Payoffs for "Criminal" {#tbl-criminal}
+
+|                  | Sheriff's action | Shoot    | Not      |
+|------------------|------------------|----------|----------|
+| Suspect's action | Shoot            | (-3, -1) | (-1, -2) |
+| Suspect's action | Not              | (-2, -1) | (0, 0)   |
+: Payoffs for "Civilian" {#tbl-civilian}
+
+
+
+The following Python code uses the MESA framework to simulate a Bayesian game known as the Sheriff's Dilemma. It defines agents with different roles (Sheriff and Suspect) and types (Criminal or Civilian for the suspect). Each agent makes decisions based on its beliefs and the payoff structure defined for the game. The game tracks the actions, payoffs, and beliefs of each player and simulates multiple iterations of the game.
+
+
+
+```{python}
+import random
+import mesa
+from mesa import Agent, Model, DataCollector
+from mesa.time import RandomActivation
+
+class SheriffAgent(Agent):
+    """Agent representing the Sheriff."""
+    def __init__(self, unique_id, model):
+        super().__init__(unique_id, model)
+        self.action = None
+    
+    def step(self):
+        # Sheriff decides based on belief about the suspect's type
+        belief_criminal = self.model.belief_criminal
+        # Simple decision rule based on belief (could be improved with a more sophisticated strategy)
+        self.action = "Shoot" if belief_criminal > 0.5 else "Not"
+
+class SuspectAgent(Agent):
+    """Agent representing the Suspect."""
+    def __init__(self, unique_id, model, suspect_type):
+        super().__init__(unique_id, model)
+        self.suspect_type = suspect_type
+        self.action = None
+    
+    def step(self):
+        # Suspect's decision could be based on its type or a strategy considering the sheriff's action
+        # For simplicity, let's say criminals are more likely to shoot
+        if self.suspect_type == "Criminal":
+            self.action = "Shoot" if random.random() > 0.5 else "Not"
+        else:
+            self.action = "Not"  # Civilians are less likely to shoot
+
+class SheriffsDilemma(Model):
+    """A model for the Sheriff's Dilemma game."""
+    def __init__(self, p_criminal):
+        super().__init__()
+        self.schedule = mesa.time.RandomActivation(self)
+        self.suspect_type = "Criminal" if random.random() < p_criminal else "Civilian"
+        self.belief_criminal = p_criminal  # Initial belief about suspect being a criminal
+        self.payoff = None
+        # Create agents
+        sheriff = SheriffAgent(1, self)
+        suspect = SuspectAgent(2, self, self.suspect_type)
+        self.schedule.add(sheriff)
+        self.schedule.add(suspect)
+        
+        self.datacollector = mesa.DataCollector(
+          model_reporters={"Payoff":"payoff"},
+          agent_reporters={"Action":"action"}
+            )
+            
+
+    
+    def step(self):
+        self.datacollector.collect(self)
+        self.schedule.step()
+        
+        # After both agents have taken their actions, calculate payoffs based on the table provided
+        sheriff_action = [agent for agent in self.schedule.agents if isinstance(agent, SheriffAgent)][0].action
+        suspect_action = [agent for agent in self.schedule.agents if isinstance(agent, SuspectAgent)][0].action
+        suspect_type = self.suspect_type
+
+        payoff_matrix = {
+            ("Criminal", "Shoot", "Shoot"): (0, 0),
+            ("Criminal", "Shoot", "Not"): (2, -2),
+            ("Criminal", "Not", "Shoot"): (-2, -1),
+            ("Criminal", "Not", "Not"): (-1, 1),
+            ("Civilian", "Shoot", "Shoot"): (-3, -1),
+            ("Civilian", "Shoot", "Not"): (-1, -2),
+            ("Civilian", "Not", "Shoot"): (-2, -1),
+            ("Civilian", "Not", "Not"): (0, 0),
+        }
+        self.payoff = payoff_matrix[(suspect_type, suspect_action, sheriff_action)]
+        print(f"Round results - Suspect Type: {suspect_type}, Sheriff Action: {sheriff_action}, Suspect Action: {suspect_action}, Payoffs: {self.payoff}")
+
+# Example of running a single iteration
+model = SheriffsDilemma(p_criminal=0.5)
+for i in range(100):
+    model.step()
+```
+
+```{python}
+mvars = model.datacollector.get_model_vars_dataframe()
+mvars
+# Plot the Gini coefficient over time
+#g = sns.lineplot(data=gini)
+#g.set(title="Gini Coefficient over Time", ylabel="Gini Coefficient");
+
+
+```
+
+
+```{python}
+avars = model.datacollector.get_agent_vars_dataframe()
+avars
+```
+
+
+This code sets up the game and agents, then runs a single step (or iteration) of the game, printing out the results. The decision-making process for both the Sheriff and the Suspect is simplified and can be enhanced to implement more sophisticated strategies based on beliefs, historical actions, or game theory.
+
+
+1. I am not very happy with this yet. I also think that a second take using a public good game might be more interesting
+2. In this game we would like to know
+    1. the agent beliefs at the three stages: 
+
+
+
+

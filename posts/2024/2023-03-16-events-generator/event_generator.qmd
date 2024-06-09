@@ -1,0 +1,124 @@
+---
+title: "event generator"
+description: "fake data"
+date: 2023-02-16
+categories: ["news", "code", "analysis", "prompt engineering"]
+---
+
+## Goal: 
+
+Create Simulated data sets
+
+## steps:
+
+1. break down simulation into blocks
+1. simulate each block into a csv 
+1. simulate an event stream
+1. simulate a graph
+2. put on s3
+3. put in deltalake
+4. process with spark
+
+# Block list
+
+Simulated Fake data is one of the most important tools in the Bayesian arsnal. 
+
+1. it makes us think about the data side of the problem.
+1. it lets find out about some of the contraints that should go into building the priors.
+1. it gives us a chorent ground truth to validate our models.
+
+In this case I want to simulate an ecommerce store:
+the first two objects have to do with demand
+
+1. there are different types of seasonality [winter,summer,spring,fall,weekdays,weekend,holiday,none]
+1. there are different types of trend [up,down,steady,random]
+1. there are thee relations between products [substitutes, complements, none]
+1. there is  three relation beteen products and brands [inferior, superior, none]
+1. there is a list of brands
+1. there is a list of product categories.
+1. there is a list of products.
+
+generate_brand()
+    id,
+    rv_quality: Normal(`quality_mean`, `quality_variance`)
+    name
+product_generator(brand,category):
+    generate a product with fields: 
+        id, 
+        brand,
+        description,
+        quality_score drawn from the brand's distribution
+for each product category:
+    while there are less than three products in the category()
+        for each brand:
+            if there is a product with the brand
+                continue
+            else
+                if random bernulli(p=0.5) > 0.3333
+                    generate a product .
+ 
+prompt
+
+```{text}
+can you write a python generator that takes parmeters `user_count` for the number of user `start_date` and simulates user events in an ecommerce site. The events are drawn from a markov cain with the following states [entry, product_view, add_to_cart, check_in, sale] each event has a time_stamp, user_id, session_id, and product. The event is one of  if the page is a sale there is a purchase price .
+```
+
+```{python}
+import random
+import datetime
+STATES = ['entry', 'product_view', 'add_to_cart', 'check_in', 'sale']
+
+# Define the transition probabilities between states
+TRANSITION_PROBABILITIES = {
+    'entry': {'product_view': 0.5, 'check_in': 0.3, 'add_to_cart': 0.2},
+    'product_view': {'add_to_cart': 0.3, 'check_in': 0.5, 'entry': 0.2},
+    'add_to_cart': {'check_in': 0.4, 'product_view': 0.3, 'sale': 0.3},
+    'check_in': {'product_view': 0.4, 'add_to_cart': 0.3, 'sale': 0.3},
+    'sale': {}
+}
+
+def generate_events(user_count, start_date):
+    for user_id in range(1, user_count + 1):
+        # Generate a session ID for the user
+        session_id = str(user_id) + '_' + str(random.randint(100000, 999999))
+        # Initialize the state and timestamp for the user's first event
+        current_state = 'entry'
+        current_time = start_date
+        while True:
+            # Generate the next state based on the current state and transition probabilities
+            next_state = random.choices(list(TRANSITION_PROBABILITIES[current_state].keys()), 
+                                         list(TRANSITION_PROBABILITIES[current_state].values()))[0]
+            # Generate a timestamp for the next event
+            time_diff = datetime.timedelta(seconds=random.randint(1, 300))
+            next_time = current_time + time_diff
+            # Generate a product ID for product-related events
+            product = None
+            if next_state in ['product_view', 'add_to_cart', 'sale']:
+                product = 'product_' + str(random.randint(1, 100))
+            # If the next state is a sale, generate a purchase price
+            purchase_price = None
+            if next_state == 'sale':
+                purchase_price = round(random.uniform(10, 100), 2)
+            # Yield the event with the user ID, session ID, state, timestamp, product, and purchase price
+            yield {'user_id': user_id, 'session_id': session_id, 'state': next_state, 'time_stamp': next_time,
+                   'product': product, 'purchase_price': purchase_price}
+            # If the next state is a sale, stop generating events for the user
+            if next_state == 'sale':
+                break
+            # Otherwise, update the current state and timestamp for the next event
+            current_state = next_state
+            current_time = next_time
+
+```
+
+```{python}
+
+# Generate events for 10 users starting from January 1, 2023
+events = generate_events(user_count=10, start_date=datetime.datetime(2023, 1, 1))
+
+# Iterate through the events and print them
+for event in events:
+    print(event)
+```
+
+can you use the python faker to create a user genrator and a product generator then incorporate these into the about event_genrator adding support for `units_sold`  and the page_address based on the product. The products should have a category and thier price should be drawn from a category level normal distribution

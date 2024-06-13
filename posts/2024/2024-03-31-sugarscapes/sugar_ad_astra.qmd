@@ -1,0 +1,266 @@
+---
+date: 2024-03-24
+title: "Sugarscape Ad Astra"
+draft: true
+categories:
+---
+
+I am really enjoying reading Growing artificial societies [@epstein1996growing] . Perhaps, the most brilliant aspect of the book is the authors reductionist approach to social science. This type of research was pioneered by Schelling in [@schelling1978micromotives] his work on segregation. However the way the simulation is constructively developed is something I have rarely seen outside pure mathematics.
+
+The book is centered around an environment in which a small colony of ant like agent . The evolution of the environment is driven by simple rules. It is purported to a tool to investigate the emergence of complex macro behavior from local micro rules. The rules are generally kept as simple as possible. Some rules are part of the environment but most affect the behavior of the agents.
+
+However they interactions are not baked into the rules AFAIK - they are emergent?
+
+As I process this amazing book, I want to:
+
+1.  list some research questions and some directions to answer them.
+2.  list some areas in which to extend the sim
+3.  list some ideas on implementation
+
+# Research questions
+
+## Understanding rules:
+
+
+Recent work outlined in RL [@Team2021OpenEndedLL] RL suggests that agent operating in highly variable environments will generalize better. However the work cannot be reproduced since the project was not made public.
+
+In an interview \[\@<https://www.youtube.com/watch?v=1yVoNAMLIy0&t=1460s>\] seems to mention artificial life as a source of inspiration. Which go me thinking again about this article. I later found a related work \[\@<https://arxiv.org/abs/2312.12044>\] on XLand-MiniGrid which has been made public.
+
+## How can we make the Sugarscape rules more fluid?
+
+1.  The autors introduced parametrised rules
+
+2.  The authors also gave some variants of rules
+
+3.  The authors also listed some ideas they never implemented.
+
+4.  Other researchers have come up with additional rules
+
+    1.  Adding rivers to expand trade to many agents
+    2.  Adding agents that live from trade only.
+
+5.  In Sugarscape Rules prescribe actions. More challenging is a simulation where agents must learn to make decision and the rules would then determine the impact on the future state.
+
+    This would be greatly facilitated by restructuring the rules into:
+
+    1.  initial state $s$
+    2.  an action $a$
+    3.  the new state $s'$ \[change to env, agent, other agents\]
+    4.  (optional) the immediate reward $r$ gained by to the agent
+
+    This should make the simulation more ameanable to introducing agents that can learn optimal behavior using RL.\
+    Rewards can be based on some king of Utility function estimating a Pareto frontier of preferences factoring in expected wealth, progeny etc.\
+    On the agent side there would be a
+
+    5.  a policy $\pi$ that the agent follows
+
+    For each rule we would want to also learn a policy $\pi_0$ which mimic the original agent's behavior.
+
+6.  Another way to make rules more fluid is to introduce direct or indirect interactions. For example culture might activate combat and trade (perhaps within family, friends, tribes, everyone, or with none). This could be implemented for different forms of culture formation.
+
+7.  Changing landscapes - Agents learn more general strategies if they are subject to many different shocks this can be done
+
+    by introducing a "changing the landscape" i.e. rules for evolution of states are not fixed. This is occasionally implemented in the book.
+
+    1.  Parameters of active rules vary over the course of the simulation.
+    2.  Each epoch a rule variant might switch
+    3.  Rules might be randomized - (state evolves using a random pick of rule variant and parameters)
+    4.  Rules might be localized (similar to the above but rules change locally within cells or nighbourhoods)
+
+8.  Game theory suggest all sort of challenges for making decisions harder
+
+    1.  imperfect information is (in poker might not know some *sets of information* like the hands of other players or their startegy)
+
+    2.  incomplete information agents also have limited knowledge of the game's structure (e.g. in auctions/negotionation don't know others' valuations or constraints and can use Bayesian updating to update their beliefs regarding these as the game progresses.)
+
+    3.  decisions that affect group like social dilemmas, voting, public goods, assiginging payments to coalitions, marriage problems etc.
+
+9.  Finally, I can specify the original idea I had on this subject, Can we create a very general notion of a trade rule drawn from some family of unspecified trade rules
+
+    1.  For any trade and price agents should get to decide if they like the trade, perhaps subject to some public information like the mean wealth of nearby agents or private information, like their expected future harvests or their original endownment. This might be represented as a random variable drawn from all possible decision trees of some depth based on the given input. The tree could also be learned using random forest or some neural net.
+    2.  A part of this decision tree might be a based on a learned function approximation of the Cobbs-Douglass utility function using a deep Q network (DQN) or Actor-Critic methods. This function could evolve with changing environmental factors.
+
+## Formalizing Sugarscape as an MDP
+
+If we define Sugarscape as an MDP how can we collect data for training agent's policies given that agent are heterogeneous, rules may change and have different preferences and utilities.
+
+1.  the main question seems to be defining the state, which depends on the rules active.
+2.  However since rules are localized we might store for each agent at each time step:
+    1.  agent\[sugar,spice,sugar_endowment,spice_endowment,sugar_metabolism,spice_metabolism,vision,gender,age\]
+    2.  fov_sugar\[(offset,\[sugar,spice,pollution\])\],
+    3.  fov_agents\[(offset,agent)\] where agent could be as in 1 or some some of their data might be considered private.
+    4.  context rules:\[G_1,M,P,T,S\]\
+        after each rule we can store the actions taken and the new state and rewards.
+    5.  note that for some decisions like harvesting an agent might not consider some part of the state.\
+        perhaps for such decisions a smaller representation might suffice.
+3.  Since there are many similar agents envitonments fov_sugar and fov_agent might repeat many times they could be hashed.
+4.  Since different rules might cause some of the data to be missing this makes the state space very large.
+
+We could assign a reward for each rule's action - a form if intrinsic reward or we could assign a rewards at time of death.\
+An agent fitness is their expected progeney.
+
+3.  Agent Identification problem: In different settings we might have similar agents. In fact we may switch rules on and off during the sim. If there is no spice many different agent with different spice endowment might be identified as a single agent. Why do we care ? We might want to do learning at the agent level and so we would need many episodes for each to use MC RL methods.
+
+    1.  The mathematical notion is to create equivalence classes of agents and perhaps more practical a heirarchy of agents where we might consider members of a subset more as similar.
+    2.  We might want though something more sophisticated - we might want to have an equivalence that can account for
+        1.  ignoring some intrinsics (forgetful equivalence)
+        2.  can compare two potentially different agents. (potential equivalence)
+    3.  Seed equivalence: If Each agent is created using a function from some random seed we can generate all possible agents with full intrinsic. Any agent without some intrinsic is equivalent wrt the seed.
+    4.  With fewer intrinsic parameters many agents that are not identical wrt seed are going to be the same for all intents and purposes.
+    5.  consider a more complex agent coming from the same seed (assuming the same intrinsics get the same seeds) we get a subset operation - more complexs agents belong to the set of more complex ones.
+    6.  Each agent might get a has
+    7.  One idea is to hash the agents
+    8.  Another idea is to generate an agent from a seed with a function. This would
+
+4.  Different reward schemes
+
+    1.  For a episodic RL setting we could consider an agen't lifetime an episode.
+        1.  Survior reward:
+
+            If they die of old age they get a reward of 1 otherwise they get 0.
+
+        2.  Lifespan reward
+
+            We could amplify this signal by giving a reward of one for each time step for surviving.
+
+        3.  Fitness
+
+            This is an evolutionary reward signal defined as the expected number of progeny or number of children.
+
+            To get the expected number we can simply average the number from many episodes. In reality this statistic is an Random Variable that changes due to the stochastic nature of the environment, distribution of other agent types.
+
+            Also the progeny are different from their parents since they are produced my mitosis like sexual reproduction step
+
+            Population dynamics does typically updates subsequent generation based on agents' fitness.
+
+            We can simplify things by giving a reward of one for each descendant that is born
+
+            we can amplify this signal by giving a reward of one per turn a decendent is alive
+    2.  Intrinsic rewards
+        1.  for each rule we add an intrinsic reward
+    3.  Utility based approach instead of calulating a reward an agent has a utility function of the state. Their rewards for an action a in $s\rightarrow a\rightarrow s'$ is $U(s')-U(s)$
+
+5.  Alternitively\
+    they might be given a reward at thier\
+
+6.  Suppose we generate all generate each agent from a seed
+
+7.  Recall that MDPs are an extension of MRPs which extend a markov process by adding rewards
+
+8.  If we consider Sugarscape as a markov process ignoring rewards and
+
+    Given access to some subset of states,action,state could can agents lean the dynamics of the simulation. Sugarscape rules are simple.
+
+9.  This\
+    IF the agent learn the rules they could use that with a utility to estimate the
+
+10. 
+
+11. the existing rule would become be specific strategy/policy profile in its respective game.
+
+12. since policies are probabilistic mapping from states to actions, they be represented as square table whose rows are states and column are actions and the cells hold the probabilities, which should sum to 1 for each column. 1. define a random strategy (assign same/different probability to all states) 1. define simple mutations (reassign probability between transitions 2. define a simple mitosis rule to 3. define a non robust variants
+
+13. RL agents might be initially assigned a random uniform strategy then optimize from it using a continuing task RL algorithm.
+
+14. Sugarscape is reductionist but typically three or more "rules" are described working in tandem. The serial nature of the rule's execution seems to mean that in each rule few choices are available.
+
+    -   Movement lets you move one step.
+    -   Harvesting is determined by location.
+    -   Metabolism is automatic.
+    -   Aging is automatic
+    -   Reproduction is automatic if conditions are right
+    -   Trade is also automatic - a once an agent picks a trader the alg will trade regardless of the other traders alternatives. If an agent is building rss for reproduction it will lose any resources it builds. What might help here is being able to switch utility.
+
+15. What if agents could also learn thier own rules for trade, combat, sex, communcation, bargaing, trade, government etc. This might be easier if rules become multi episode or contious games agent played and they could be assigned or aquire a strategy \[uniform-random,nash-equilibrium, ess, pareto-optimal, learned, a strategy\] this could also make them baysian players with the ability to respond to the **State of the World** (SOTW) and **Model of Other Agents** (MOA),
+
+    1.  what about games that are related.
+        -   we can compose games like move, harvest to get
+
+16. Can we teach agents to evolve and communicate efficently.
+
+    1.  supoprt grammer
+    2.  support injecting contexts?
+    3.  support for evolving error corection
+
+17. Can agents that learn from mistakes? Say by getting another life if it was very unlucky!? [^1] And how would that help. [^2]
+
+18. How can we make agent explore/exploit thier action space. **Bandits**
+
+19. How can we make a differntiable utility/fitness/loss which we can differntitate to get intresting gradients
+
+20. can we make SugarScape more realistic by adding additional rules. Like the original rules each should make a minimal change
+
+21. can we make make the SugerScape grow increasingly more challanging over time?
+
+22. can we impose quantifiable selection pressure 1. can we make more commodeties and matching matabolism so that agents need to coordinate gathering and trades. 1. can we make commodeties more scarce 1. can we make agent need to specilize in roles to survive and thrive as a group.
+
+23. can we add predetors
+
+24. can we add calamaties like earthquakes, hurricanes, avalanches, sugar slides
+
+25. can we add differnt ecological regimes:
+
+    1.  make growback be based on a game of life ruleset.
+    2.  Agents can overgraze and destroy thier habitat.
+    3.  Agriculture - Agents can learn to expand thier endowmant by seeding the nearby neighbourhood with glider like patterns that generate resource growth around them. This would allow them to follow the glider and harvest. This is perhaps a hybrid between agriculture and herding.
+    4.  agents can terraform thier habitat to increase the carying capaciry for thier species/culture metabolism and possibly hostile to thier enemies. with a risk that the world could also lose its carrying capacity. damaged ivable and couse extinction.
+    5.  polution requires cleanup work before one can harvest again.
+    6.  deforestation degrades food resuuply.
+    7.  polution leads to golbabl warming.
+    8.  polution leads to global cooling.that would disasters like global warming and green house effect that impact metabilism, deasease and resource growth
+
+26. can we make resource groth less predictable under
+
+27. can we force switching from regimes of cooperation, and competition.
+
+28. can we make it a RL Gym and run different RL aglorithms.
+
+29. Culture seems to minimal. I see a culture rule that is a contrlller for other behavioral rules.
+
+30. 
+
+31. More trading rules.
+
+32. Expanding the economy by adding more commodeties.
+
+[^1]: but isn't bad luck the ugly face of natural selection!?
+
+[^2]: e.g. start life with a better prior
+
+
+
+a.  some commodities
+
+can we add speciation: 1. penealty on inbreeding - we add a recesive gene will reduce max age of the child 2. success in sexual reproduction is proprtional to similarity of agents. (compatability) 3. bigger map with different localities i.e. conditions for local genetic advantages to emrege. 4. resistance to parasites and sickness through diversity. (they are transmittion and leathality are linked to genetic/cultural traits)
+
+-   Consider representing traits with sugar_metabolism_1 ... 5 if all are on you have a metabolism of 5
+
+-   vision_1 ... 5
+
+-   foresight_1 ... 5
+
+-   There are also immunity genes that give a permanent immunity, temporary immunity, partial_immunitry, carriar status, reduced risk.
+
+-   each parasite and sickness can target genetic and or cultural traits.
+
+-   each trait is binary
+
+-   same for culture
+
+-   a second column makes the trait genetic/cultural
+
+-   a third column makes the trait dominant or recessive,
+
+-   parasites and sickness have a limited number or genes they can flip
+
+    -   parasites might turn on metabolism genes
+    -   sickness could be trnasmited on contact, proximity or during sex
+    -   blindness would eventually kill agents.
+
+changing prefernces: - change can be driven by sickness (e.g. loss of taste, smell, vison) - by scarcity - by culture.
+
+difffernet inheritance rules that are cultural/social in nature
+
+give to the poorest give to the poorest child give to children but equaliznig thier waelth give to a favourite (this can be arbitrary or can be via counter of proximity and or benefits in trade)
+
+what if we change movement to 1. bandit like explore explot 2. ad a prefernce towards better prices with respect to MRS - this can let agent with shor vision a hint of where goods are better distributed.

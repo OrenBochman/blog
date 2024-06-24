@@ -23,44 +23,336 @@ title-block-banner: /images/banner_black_3.jpg
 
 ## Lesson 1: What is a model?
 
--   [ ] Describe what a model is and how they can be used
--   [ ] Classify models as **distribution models** or **sample models**
--   [ ] Identify when to use a distribution model or sample model
--   [ ] Describe the advantages and disadvantages of sample models and
-    distribution models
--   [ ] Explain why sample models can be represented more compactly than
-    distribution models
+::: {.callout-info}
+### Lesson Learning Goals {.unnumbered}
+
+-   [ ] Describe what a model is and how they can be used [\#](#sec-l1g1)
+-   [ ] Classify models as **distribution models** or **sample models** [\#](#sec-l1g2)
+-   [ ] Identify when to use a distribution model or sample model [\#](#sec-l1g3)
+-   [ ] Describe the advantages and disadvantages of sample models and distribution models [\#](#sec-l1g4)
+-   [ ] Explain why sample models can be represented more compactly than distribution models [\#](#sec-l1g5)
+:::
+
+### What is a model and how can it be used? {#sec-l1g1}
+
+-   A model is a simplified representation of the environment dynamics
+-   Models can be used to simulate the environment
+-   In this course a Model is a function that predicts the next state and reward given the current state and action
+
+- a transition model $s_{t_+1} = f(s_t, a_t)$ predicts the next state given the current state and action
+- a reward model $r_{t_+1} = f(s_t, a_t)$ predicts the reward given the current state and action
+
+
+three other model types are mentioned in the [ICML Tutorial on Model-Based Reinforcement Learning](https://sites.google.com/view/mbrl-tutorial)
+
+- **Inverse models** predict the action given the current state and next state $a_{t+1} = f_s^{-1}(s_t, s_{t+1})$
+- **Distances models** predict the distance between the current state and the goal state $d_{ij} =d(s, s')$
+- **Future return models** predict the future return given the current state and action $G_t=Q(s_t, a_t)$ or $G_t=V(s_t)$
+
+Why do we want to use models?
+
+- model allow us to simulate the environment without interacting with it.
+- this can increase sample efficiency - e.g. by replaying past experiences to propergate learning from goal to all predecessor states we have visited
+- this can reduce risks - e.g. by simulating dangerous situations instead of actually experiencing them.
+- this can reduce costs - e.g. by simulating costly actions in a simulated environment instead of paying the cost in the real environment.
+- this could be much faster than real-time interaction with the environment. Often in robotics simulation is orders of magnitude faster than real-time interaction.
+
+
+### Types of models {#sec-l1g2}
+
+![models](img/rl-models.png){.column-margin}
+
+-   **Distribution models** predict the probability distribution of the next state and reward
+-   **Sample models** predict a single next state and reward
+
+Also there are:Environment simulator**
+
+- Chess Programs typicaly can simulate all possible movers and evaluate the board position (tacticaly and strategically). The difference between the current board position and the board position after a move is the reward. 
+- [@Silver2016MasteringTG] mentions an **Environment simulator** for the game of go
+- [@Agostinelli2019SolvingTR] used a simulator of the rubik's cube to train a reinforcement learning agent to solve the cube.
+- [@Bellemare2012TheAL] used a simulator of the game of atari to train a reinforcement learning agent to play atari games.
+- [@Todorov2012MuJoCoAP] used a simulator of the physics of the real world to train a reinforcement learning agent to control a robot.
+- [@Shen2018MWalkLT] used a simulator to train agents to navigate a graph using MCTS. 
+- [@Ellis2019WriteEA] used a REPL environment to train a reinforcement learning agent to write code.
+
+
+### When to use a distribution model or sample model {#sec-l1g3}
+
+-   **Distribution models** are useful when we need to know the probability of different outcomes
+-   **Sample models** are useful when we need to simulate the environment
+
+### Advantages and disadvantages of sample models and distribution models {#sec-l1g4}
+
+-   **Sample models** can be represented more compactly than distribution models
+  
+-   **Distribution models** can be more accurate than sample models
+  -  exact expectations can be computed from distribution models
+  -  assessing risks and uncertainties is easier with distribution models
+
+### Why sample models can be represented more compactly than distribution models {#sec-l1g5}
+
+-   **Sample models** can be represented more compactly than distribution models because they only need to store a single next state and reward
+-   **Distribution models** need to store the joint probability of each possible next state and reward pair
+  
+-   **Sample models** can be more efficient when we only need to simulate the environment
 
 ## Lesson 2: Planning
 
--   [ ] Explain how planning is used to improve policies
--   [ ] Describe random-sample one-step **tabular Q-planning**
+
+::: {.callout-info}
+### Lesson Learning Goals {.unnumbered}
+
+-   [ ] Explain how planning is used to improve policies [\#](#sec-l2g1)
+-   [ ] Describe random-sample one-step **tabular Q-planning** [\#](#sec-l2g2)
+
+:::
+
+### How planning is used to improve policies {#sec-l2g1}
+
+-   **Planning** is the process of using a model to improve a policy or value function
+-   **Planning** can be used to improve a policy or value function without interacting with the environment
+-   **Planning** can be used to improve a policy or value function more efficiently than direct RL updates
+
+Random-sample one-step **tabular Q-planning** {#sec-l2g2}
+
+![Q-planning alg overview](rl-wk5-random-sample-one-step-tabular-Q-learning.png_){.column-margin}
+
+![random sample one step tabular Q-planning](img/rl-wk5-Q-planning.png){.column-margin}
+
+<!-- replace with latex version -->
+
+-   **Tabular Q-planning** is a planning algorithm that uses a sample model to improve a policy or value function
+-   **Tabular Q-planning** uses a sample model to simulate the environment
+-   **Tabular Q-planning** uses the simulated experience to improve a policy or value function
+
+advantages of planning
+
+-   **Planning** can be more efficient than direct RL updates
+-   **Planning** can be used to improve a policy or value function without interacting with the environment
+-   **Planning** can be used to improve a policy or value function more efficiently than direct RL updates
+  
+
 
 ## Lesson 3: Dyna as a formalism for planning
 
--   [ ] Recognize that direct RL updates use experience from the
-    environment to improve a policy or value function
--   [ ] Recognize that planning updates use experience from a model to
-    improve a policy or value function
--   [ ] Describe how both direct RL and planning updates can be combined
-    through the **Dyna architecture**
--   [ ] Describe the **Tabular Dyna-Q algorithm**
--   [ ] Identify the direct-RL and planning updates in **Tabular
-    Dyna-Q**
--   [ ] Identify the model learning and search control components of
-    **Tabular Dyna-Q**
--   [ ] Describe how learning from both direct and simulated experience
-    impacts performance
--   [ ] Describe how simulated experience can be useful when the model
-    is accurate
+::: {.callout-info}
+### Lesson Learning Goals {.unnumbered}
+
+-   [ ] Recognize that direct RL updates use experience from the environment to improve a policy or value function [\#](#sec-l3g1)
+-   [ ] Recognize that planning updates use experience from a model to improve a policy or value function [\#](#sec-l3g2)
+-   [ ] Describe how both direct RL and planning updates can be combined through the **Dyna architecture** [\#](#sec-l3g3)
+-   [ ] Describe the **Tabular Dyna-Q algorithm** [\#](#sec-l3g4)
+-   [ ] Identify the direct-RL and planning updates in **Tabular Dyna-Q** [\#](#sec-l3g5)
+-   [ ] Identify the model learning and search control components of **Tabular Dyna-Q** [\#](#sec-l3g6)
+-   [ ] Describe how learning from both direct and simulated experience impacts performance [\#](#sec-l3g7)
+-   [ ] Describe how simulated experience can be useful when the model is accurate [\#](#sec-l3g8)
+:::
+
+### Direct RL updates use experience from the environment to improve a policy or value function {#sec-l3g1}
+
+-   **Direct RL updates** use experience from the environment to improve a policy or value function
+-   **Direct RL updates** can be used to improve a policy or value function by interacting with the environment
+
+### Planning updates use experience from a model to improve a policy or value function {#sec-l3g2}
+
+-   **Planning updates** use experience from a model to improve a policy or value function
+-   **Planning updates** can be used to improve a policy or value function without interacting with the environment
+
+### Both direct RL and planning updates can be combined through the **Dyna architecture** {#sec-l3g3}
+
+-   **Dyna architecture** combines direct RL updates and planning updates to improve a policy or value function
+-   **Dyna architecture** uses a model to simulate the environment
+-   **Dyna architecture** uses the simulated experience to improve a policy or value function
+
+### The **Tabular Dyna-Q algorithm** {#sec-l3g4}
+
+-   **Tabular Dyna-Q** is a planning algorithm that uses a sample model to improve a policy or value function
+-   **Tabular Dyna-Q** uses a sample model to simulate the environment
+-   **Tabular Dyna-Q** uses the simulated experience to improve a policy or value function
+
+![The dyna-Q algortihm](img/rl-wk5-tabular-dyna-Q.png){.column-margin}
+
+### Direct-RL and planning updates in **Tabular Dyna-Q** {#sec-l3g5}
+
+-   **Tabular Dyna-Q** uses direct RL updates to improve a policy or value function
+-   **Tabular Dyna-Q** uses planning updates to improve a policy or value function
+
+### Model learning and search control components of **Tabular Dyna-Q** {#sec-l3g6}
+
+-   **Tabular Dyna-Q** uses a sample model to simulate the environment
+-   **Tabular Dyna-Q** uses the simulated experience to improve a policy or value function
+
+### Learning from both direct and simulated experience impacts performance {#sec-l3g7}
+
+-   Learning from both direct and simulated experience can improve performance
+-   Learning from both direct and simulated experience can be more efficient than direct RL updates
+
+### Simulated experience can be useful when the model is accurate {#sec-l3g8}
+
+-   Simulated experience can be useful when the model is accurate
+-   Simulated experience can be used to improve a policy or value function without interacting with the environment
+
+
 
 ## Lesson 4: Dealing with inaccurate models
 
--   [ ] Identify ways in which models can be inaccurate
--   [ ] Explain the effects of planning with an inaccurate model
--   [ ] Describe how **Dyna** can plan successfully with a partially
-    inaccurate model
--   [ ] Explain how model inaccuracies produce another
-    exploration-exploitation trade-off
--   [ ] Describe how **Dyna-Q+** proposes a way to address this
-    trade-off
+::: {.callout-info}
+### Lesson Learning Goals {.unnumbered}
+
+-   [ ] Identify ways in which models can be inaccurate [\#](#sec-l4g1)
+-   [ ] Explain the effects of planning with an inaccurate model [\#](#sec-l4g2)
+-   [ ] Describe how **Dyna** can plan successfully with a partially inaccurate model [\#](#sec-l4g3)
+-   [ ] Explain how model inaccuracies produce another exploration-exploitation trade-off [\#](#sec-l4g4)
+-   [ ] Describe how **Dyna-Q+** proposes a way to address this  trade-off [\#](#sec-l4g5)
+:::
+
+### Ways in which models can be inaccurate {#sec-l4g1}
+
+-   Models can be inaccurate for many reasons
+  -   because they have not sampled all actions in all states
+  -   because the environment is has changed since the model was learned
+  -   if the environment is stochastic
+
+### Effects of planning with an inaccurate model {#sec-l4g2}
+
+-   Planning with an inaccurate model can cause the value function to become worse
+-   Planning with an inaccurate model can lead to sub-optimal policies
+
+### **Dyna** can plan successfully with a partially inaccurate model {#sec-l4g3}
+
+-   **Dyna** can plan successfully with a partially inaccurate model
+-   **Dyna** can use direct RL updates to improve a policy or value function as well as the model
+-   **Dyna** can use planning updates to improve a policy or value function
+
+### Model inaccuracies produce another exploration-exploitation trade-off {#sec-l4g4}
+
+-   Model inaccuracies produce another exploration-exploitation trade-off
+  - exploit an inaccurate model to improve the policy
+  - revisit states/actoins with low  value to update the model
+- Can we use an inverse sort of planning to identify states for which the model is inaccurate?
+  
+-   Model inaccuracies can lead to suboptimal policies
+-   Model inaccuracies can lead to poor performance
+
+### **Dyna-Q+** proposes a way to address this trade-off {#sec-l4g5}
+
+
+![Dyna-Q+ solution](img/rl-wk5-bonus-rewards-for-exploration.png){.column-margin}
+
+-   **Dyna-Q+** proposes a way to address this trade-off
+-   **Dyna-Q+** uses a bonus reward to encourage exploration
+-   **Dyna-Q+** can improve performance when the model is inaccurate
+
+
+
+### Drew Bagnell on self-driving cars robotics and model-based reinforcement learning
+
+Drew Bagnell is a professor at Carnegie Mellon University and the CTO at Aurora innovation. 
+
+He has worked on self-driving cars and robotics. He has also worked on model-based reinforcement learning. He point out a dirty little secret that  model-based reinforcement learning is a key technology for robotics.
+
+He points out that the real world is expensive and dangerous. Using model based reinforcement learning can reduce the number of interactions with the real world
+and along learning about risky actions in the simulated world to improve performance
+in the real world. Also as we pointer out before this can usually be done much faster than real-time interaction with the environment.
+
+Sample complexity: how many real-world samples are required to achieve high performance? It takes exponentially fewer interactions with a model than without. Not really 
+sure what exponentially fewer means here - but it's a lot fewer.
+
+Quadratic value function approximation goes back to optimal control in the 1960s.
+It's continuous in states and actions. This is a method that should be part of the 
+next course but isn't covered there either
+
+For linear transition dynamics with quadratic costs/rewards, it's exact. For local convex / concave points, it is a good approximation of the true action-value function.
+
+Here is the math from his slide:
+
+Quadratic value function approximation
+
+$$
+Q_t(x,a) = [x,a]^T\mat
+$$
+
+
+The approximation allows for calculating the optimal action-value in closed form (finite number of standard operations) even with continuous actions.
+
+Differential dynamic programming takes advantage of the technique above.
+
+The 2nd paper is particularly clear and easy to work through for the approach just described.
+
+
+
+
+::: {.column-page}
+```{mermaid}
+
+timeline
+
+    title Bandit Algorithms Timeline
+
+    
+        1952 : Thompson Sampling
+        1955 : Upper Confidence Bound (UCB)
+        1963 : Epsilon-Greedy
+        2002 : Bayesian UCB
+        2011 : Bayesian Bandits
+        2012 : Contextual Bandits
+```
+:::
+
+
+::: {.column-page}
+```{mermaid}
+%%{init: {'theme': 'base', 'themeVariables': { 'timeline': { 'nodeSpacing': 50, 'sectionSpacing': 100, 'verticalStartPosition': 50, 'verticalSectionStartPosition': 50 }}}}%%
+timeline
+    direction TD
+    title Reinforcement Learning Algorithms Timeline
+
+
+    
+        1948 : Monte Carlo Methods
+        1950 : Bellman Optimality Equations
+        1957 : Dynamic Programming
+        1959 : Temporal Difference Learning (TD)
+        1960 : Policy Iteration
+        1963 : Value Iteration
+        1983 : Q-Learning
+        1984 : Expected SARSA
+        1990 : Dyna-Q : Dyna-Q+
+        1992 : SARSA
+        1994 : Monte Carlo with E-Soft
+        1995 : Monte Carlo with Exploring Starts
+             : Generalized Policy Iteration (GPI)
+        1998 : Semi-Gradient TD
+        2000 : Differential Semi-Gradient SARSA
+        2001 : Gradient Monte Carlo (Gradient MC)
+        2003 : Gaussian Actor-Critic
+             : Softmax Actor-Critic
+             : Deep Q-Network (DQN)
+
+
+```
+
+
+
+:::
+
+### References
+
+
+Materials from [ICML Tutorial on Model-Based Reinforcement Learning](https://sites.google.com/view/mbrl-tutorial):
+
+the page above contains the following materials as well as an extensive bibliography.
+
+- [Slides](https://docs.google.com/presentation/d/1f-DIrIvh44-jmTIKdKcue0Hx2RqQSw52t4k8HEdn5-c/edit?usp=sharing)
+- [Part 1: Introduction and Learning Models](https://slideslive.com/38930488/modelbased-methods-in-reinforcement-learning-part-1-introduction-learning-models)
+- [Part 2: Model-Based Control](https://slideslive.com/38930486/modelbased-methods-in-reinforcement-learning-part-2-modelbased-control)
+- [Part 3: Model-Based Control in the Loop](https://slideslive.com/38930487/modelbased-methods-in-reinforcement-learning-part-3-modelbased-control-in-the-loop)
+- [Part 4: Beyond Vanilla MBRL](https://slideslive.com/38930489/modelbased-methods-in-reinforcement-learning-part-4-beyond-vanilla-mbrl)
+
+
+From Bagnell's talk:
+
+- [Modern Adaptive Control and Reinforcement Learning](https://macrl-book.github.io/)
+- [Synthesis and Stabilization of Complex Behaviors through
+Online Trajectory Optimization](https://homes.cs.washington.edu/~todorov/papers/TassaIROS12.pdf)
+- [Optimal Control, Trajectory Optimization, Learning Dynamics](https://katefvision.github.io/katefSlides/trajectoryoptimization_katef.pdf)

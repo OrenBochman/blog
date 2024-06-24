@@ -5,4 +5,156 @@ date: 2024-06-10
 categories: ["paper review", "multi-agent reinforcement learning", "sequential social dilemmas","sequential social dilemmas", "cooperation", "Markov games", "agent-based social simulation", "non-cooperative games"]
 ---
 
-## Generally Capable Agents Emerge from Open-Ended Play
+## First impressions
+
+The paper does not present a breakthrough like alpha go zero etc. But it shows very high level of creativity and innovation. I am still a new comer to RL and this paper has opened my eyes to how little of the field I have seen. There are lots of buzz words, references to other papers and concepts that I am not familiar with. Also this paper is visually stunning. The authors have put a lot of energy into creating an aesthetically pleasing project and they have gone to some length to explain what would otherwise might be a very challenging evaluation process.
+
+{{< video https://www.youtube.com/watch?v=1yVoNAMLIy0&t=1531s title="Max Jaderberg" >}}
+
+1.  to what extent can agents learn to solve certain types of problems like solving a maze. I might call these learning tactical solutions
+2.  to what extent can agents compress this tactical knowledge into a heuristic that might end up as much more general.
+3.  to what extent can RL agents learn representations of the environment that allow them to reuse tactics and heuristics across different problems instead of having to discover them anew each time.
+4.  when sparse rewards or no rewards are given can agents learn use their capabilities to model the environment
+5.  generally capable agents should be able to handle the many different RL problem settings that are out there:
+
+-   single state, multi-state, continuous state,
+-   tabular, continuous,
+-   finite state space, infinite state space,
+-   episodic, continuing, i.e. finite horizon, infinite horizon,
+-   single agent, multi-agent,
+-   online, offline,
+-   model based, model free,
+-   known dynamics, unknown dynamics,
+-   sparse rewards, dense rewards,
+-   on-policy, off-policy,
+-   discounted, undiscounted rewards,
+-   single goal, multi-goal,
+-   deterministic, stochastic,
+-   stationary, non-stationary,
+-   specific constraints, in reality there are also variations of these settings not all of these are dichotomies.
+
+6.  The paper mentions priors work on social dilemmas - another dimension that seems to be related is how well can agents learn to solve simple game theoretic scenarios like the prisoner's dilemma or colonel Blotto and then to transfer the knowledge to more complex games. The same idea might be applied to problems based in economic models.
+
+here are some of the concepts that I am not familiar with:
+
+-   [Population based training](https://deepmind.google/discover/blog/population-based-training-of-neural-networks/) a technique used to optimize a series of NN at the same time.
+    -   can this be useful in RL where an agent might need to learn multiple NNs to solve a problem.
+        -   the transition model P(s' \| s, a) model
+        -   the reward model R(r \| s, a) model
+        -   for representing the model (this is the four part dynamic function for $f(s',r|s,a)$
+        -   value functions
+            -   the value function, $v_{\pi_{\star} } (s)$
+            -   the action value function $q_{\pi_{\star} }(s,a)$
+        -   the advantage function $A_{\pi_{\star} }(s,a)= Q_{\pi_{\star} }(s,a) - V_{\pi_{\star} }(s)$
+        -   the the policy $pi_\star (s)$
+
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Algorithm                            | Abr       | Q-Fn\    | V-Fn\  | Policy\  | Advantage\ | Transitions\ | Reward $R(s,a)$ |
+|                                      |           | $Q(s,a)$ | $V(s)$ | $π(a∣s)$ | $A(s,a)$   | $P(s′∣s,a)$  |                 |
++======================================+===========+==========+========+==========+============+==============+=================+
+| Deep Q-Network\                      | (DQN)     | Yes      | No     | No       | No         | No           | No              |
+| [@Mnih2015HumanlevelCT]              |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Double DQN                           | (DDQN)    | Yes      | No     | No       | No         | No           | No              |
+|                                      |           |          |        |          |            |              |                 |
+| [@Hasselt2015DeepRL]                 |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Dueling DQN\                         |           | Yes      | Yes    | No       | Yes        | No           | No              |
+| [@Wang2015DuelingNA]                 |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Deep Deterministic Policy Gradients\ | (DDPG)    | Yes      | No     | Yes      | No         | No           | No              |
+| [@Lillicrap2015ContinuousCW]         |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Twin Delayed DDPG                    | (TD3)     | Yes      | No     | Yes      | No         | No           | No              |
+|                                      |           |          |        |          |            |              |                 |
+| [@Fujimoto2018AddressingFA]          |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Soft Actor-Critic                    | (SAC)     | Yes      | No     | Yes      | No         | No           | No              |
+|                                      |           |          |        |          |            |              |                 |
+| [@Haarnoja2018SoftAO]                |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Proximal Policy Optimization         | (PPO)     | No       | Yes    | Yes      | No         | No           | No              |
+|                                      |           |          |        |          |            |              |                 |
+| [@Schulman2017ProximalPO]            |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Trust Region Policy Optimization     | (TRPO)    | No       | Yes    | Yes      | No         | No           | No              |
+|                                      |           |          |        |          |            |              |                 |
+| [@Schulman2015TrustRP]               |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Advantage Actor-Critic\              | (A2C/A3C) | Yes      | Yes    | Yes      | Yes        | No           | No              |
+| [@Mnih2016AsynchronousMF]            |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Model-Based DQN\                     | (M-DQN)   | Yes      | No     | No       | No         | Yes          | Yes             |
+| [@Feinberg2018ModelBasedVE]          |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| Model-Based PPO\                     | (M-PPO)   | No       | Yes    | Yes      | No         | Yes          | Yes             |
+| [@Clavera2018ModelBasedRL]           |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| AlphaGo                              |           | No       | Yes    | Yes      | No         | No           | No              |
+|                                      |           |          |        |          |            |              |                 |
+| [@Silver2016MasteringTG]             |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| AlphaGo Zero                         |           | No       | No     | No       | No         | Yes          | Yes             |
+|                                      |           |          |        |          |            |              |                 |
+| [@Silver2017MasteringTG]             |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+| AlphaZero                            |           | No       | Yes    | Yes      | No         | No           | No              |
+|                                      |           |          |        |          |            |              |                 |
+| [@Silver2018AGR]                     |           |          |        |          |            |              |                 |
++--------------------------------------+-----------+----------+--------+----------+------------+--------------+-----------------+
+
+## Summary
+
+The paper [@Team2021OpenEndedLL] explores the idea that generally capable agents can emerge from open-ended play, similar to how human children learn and develop through play. The goal is to create agents that exhibit broad competencies and adaptability without being explicitly trained for specific tasks. In other words in the typical RL settings agents are trained to perform specific tasks and can learn solution to general problems. However they are very poor at generalizing these solutions to slightly different versions of the same problem. The authors seek to develop agents that can not only learn to solve a wide range of tasks but can also generalize and transfer their solutions to new problems.
+
+This is not the first time that this idea has been explored. Prior work includes the development of agents that can learn to play a variety of video games without explicit training on each game. Other work like [@impala2018] and [@Hessel2018MultitaskDR] at deep mind have already shown how this can be done. However, the authors of this paper take this idea further by developing agents that can learn to solve a wider range of tasks.
+
+In this paper they develop environments that co-evolve with the agents. The environment increase in difficulty as the agents learn to solve them. The agents are equipped with intrinsic motivation mechanisms, such as curiosity and novelty-seeking behaviors, to drive exploration. A variety of tasks and challenges are presented dynamically, promoting continuous learning and adaptation.
+
+But the real question is to what degree does this approach create agents that can learn to solve a wide range of tasks and can generalize their solutions to new problems. There seems to be three parts
+
+## Open-Ended Learning:
+
+Open-Ended Learning
+
+:   Open-ended learning refers to an unsupervised, exploratory process where agents interact with their environment without predefined goals. This approach contrasts with traditional reinforcement learning, which focuses on optimizing performance for specific tasks.
+
+Have the the authors really provided environment with not predefined goals or just many many goals. There are games in game theory where the player
+
+is given incomplete information - you don't get told the reward or the rules and need to figure out an optimal strategy without them.
+
+## Methodology:
+
+The authors design an environment that encourages diverse interactions and challenges. Agents are equipped with intrinsic motivation mechanisms, such as curiosity and novelty-seeking behaviors, to drive exploration. A variety of tasks and challenges are presented dynamically, promoting continuous learning and adaptation.
+
+As the authors point out - making a maze larger don't necessarily make it more difficult once the agents have learned to solved a few mazes. The authors have to carefully design the environment to ensure that the agents are always challenged but not overwhelmed.
+
+I have three criticism of the methodology:
+
+1.  Although this paper is about RL there is more than a fair share of evolutionary algorithms. It isn't clear to what extent the agents are learning through RL and to what extent they are evolving through evolutionary algorithms. I don't dislike this idea but it seems to muddy the waters regarding how well this research might be applied to create generally capable RL agents in the real world.
+2.  Some of the environment used in testing are hand crafted while the bulk of the environments are procedurally generated.
+3.  The claim about these these hand crafted test environments being unlike other environments that are procedurally generated is not very convincing.
+
+How is skill acquisition tracked?
+
+Intrinsic Motivations are based on curiosity and novelty seeking behaviors. However I think that for some environment/problems intrinsic (motivation) could emerge from a dynamic of the environment itself. In some way this intrinsic motivation reflects the agents ability to model the environment and to predict the consequences of its actions.
+
+For example in an agent can reproduce under some selection pressure it should acquire a relevant fitness intrinsic (expected progeny). If it needs to solve different mazes it should need an exploration intrinsic. If it needs to maximize harvesting of resources it should learn some utility function intrinsic. For a social dilemma it might learn some social utility function intrinsic. However in this case this is an intrinsic that need to be learned by all agents Even if all the agents learn it there is are possibility that the agents will not cooperate. We might look to game theory, mechanism design to see if agents can learn self encouraging mechanisms to cooperate and so on. Can they learn to signal or coordinate behavior to activate the social utility function intrinsic. Can they plan to change roles in sequential games with memory and without.
+
+a environment itself. For example in the case of the maze the agent might be intrinsically motivated to explore the maze because it is the only way to find the reward. In this case the environment itself is providing the intrinsic motivation.
+
+A more interesting approach would be to track the agents ability to solve a wide range of tasks and to generalize their solutions to new problems. This would be a more direct measure of the agents general capabilities.
+
+The paper and website show how the internal state of the agent is visualized over the course of play. This seems to be a hearmap with different possible goals.
+
+## Results and Findings:
+
+Agents developed through open-ended play demonstrate a wide range of capabilities, such as problem-solving, tool use, and social interaction. These agents outperform those trained with traditional task-specific reinforcement learning in terms of adaptability and generalization. Emergent behaviors and skills are observed, highlighting the potential of open-ended play in fostering general intelligence.
+
+## Implications for AI Development:
+
+The findings suggest that fostering environments that encourage open-ended play can lead to the development of more robust and versatile AI agents. This approach could be pivotal in advancing AI towards general intelligence, where agents can perform well across a wide range of tasks without explicit training for each.
+
+## Future Directions:
+
+Further research is needed to understand the mechanisms underlying the success of open-ended play. Scaling up the complexity of environments and intrinsic motivation systems could lead to even more capable agents. Exploring the integration of open-ended play with other AI paradigms might enhance the development of general AI.

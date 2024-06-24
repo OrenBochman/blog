@@ -22,7 +22,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -83,7 +103,53 @@ ul.task-list li input[type="checkbox"] {
         background: /images/banner_black_3.jpg;
       }
 </style>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta name="twitter:title" content="Oren Bochman’s Blog - Sample-based Learning Methods">
 <meta name="twitter:description" content="In these module we define cover model based RL sampling. We start with the Dyna architecture. Then we consider tabular Q-planning algorithm, the Tabular Dyna-Q and Dyna-Q+ algorithms">
@@ -288,10 +354,43 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#lesson-1-what-is-a-model" id="toc-lesson-1-what-is-a-model" class="nav-link active" data-scroll-target="#lesson-1-what-is-a-model">Lesson 1: What is a model?</a></li>
-  <li><a href="#lesson-2-planning" id="toc-lesson-2-planning" class="nav-link" data-scroll-target="#lesson-2-planning">Lesson 2: Planning</a></li>
-  <li><a href="#lesson-3-dyna-as-a-formalism-for-planning" id="toc-lesson-3-dyna-as-a-formalism-for-planning" class="nav-link" data-scroll-target="#lesson-3-dyna-as-a-formalism-for-planning">Lesson 3: Dyna as a formalism for planning</a></li>
-  <li><a href="#lesson-4-dealing-with-inaccurate-models" id="toc-lesson-4-dealing-with-inaccurate-models" class="nav-link" data-scroll-target="#lesson-4-dealing-with-inaccurate-models">Lesson 4: Dealing with inaccurate models</a></li>
+  <li><a href="#lesson-1-what-is-a-model" id="toc-lesson-1-what-is-a-model" class="nav-link active" data-scroll-target="#lesson-1-what-is-a-model">Lesson 1: What is a model?</a>
+  <ul class="collapse">
+  <li><a href="#lesson-learning-goals" id="toc-lesson-learning-goals" class="nav-link" data-scroll-target="#lesson-learning-goals">Lesson Learning Goals</a></li>
+  <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">What is a model and how can it be used?</a></li>
+  <li><a href="#sec-l1g2" id="toc-sec-l1g2" class="nav-link" data-scroll-target="#sec-l1g2">Types of models</a></li>
+  <li><a href="#sec-l1g3" id="toc-sec-l1g3" class="nav-link" data-scroll-target="#sec-l1g3">When to use a distribution model or sample model</a></li>
+  <li><a href="#sec-l1g4" id="toc-sec-l1g4" class="nav-link" data-scroll-target="#sec-l1g4">Advantages and disadvantages of sample models and distribution models</a></li>
+  <li><a href="#sec-l1g5" id="toc-sec-l1g5" class="nav-link" data-scroll-target="#sec-l1g5">Why sample models can be represented more compactly than distribution models</a></li>
+  </ul></li>
+  <li><a href="#lesson-2-planning" id="toc-lesson-2-planning" class="nav-link" data-scroll-target="#lesson-2-planning">Lesson 2: Planning</a>
+  <ul class="collapse">
+  <li><a href="#lesson-learning-goals-1" id="toc-lesson-learning-goals-1" class="nav-link" data-scroll-target="#lesson-learning-goals-1">Lesson Learning Goals</a></li>
+  <li><a href="#sec-l2g1" id="toc-sec-l2g1" class="nav-link" data-scroll-target="#sec-l2g1">How planning is used to improve policies</a></li>
+  </ul></li>
+  <li><a href="#lesson-3-dyna-as-a-formalism-for-planning" id="toc-lesson-3-dyna-as-a-formalism-for-planning" class="nav-link" data-scroll-target="#lesson-3-dyna-as-a-formalism-for-planning">Lesson 3: Dyna as a formalism for planning</a>
+  <ul class="collapse">
+  <li><a href="#lesson-learning-goals-2" id="toc-lesson-learning-goals-2" class="nav-link" data-scroll-target="#lesson-learning-goals-2">Lesson Learning Goals</a></li>
+  <li><a href="#sec-l3g1" id="toc-sec-l3g1" class="nav-link" data-scroll-target="#sec-l3g1">Direct RL updates use experience from the environment to improve a policy or value function</a></li>
+  <li><a href="#sec-l3g2" id="toc-sec-l3g2" class="nav-link" data-scroll-target="#sec-l3g2">Planning updates use experience from a model to improve a policy or value function</a></li>
+  <li><a href="#sec-l3g3" id="toc-sec-l3g3" class="nav-link" data-scroll-target="#sec-l3g3">Both direct RL and planning updates can be combined through the <strong>Dyna architecture</strong></a></li>
+  <li><a href="#sec-l3g4" id="toc-sec-l3g4" class="nav-link" data-scroll-target="#sec-l3g4">The <strong>Tabular Dyna-Q algorithm</strong></a></li>
+  <li><a href="#sec-l3g5" id="toc-sec-l3g5" class="nav-link" data-scroll-target="#sec-l3g5">Direct-RL and planning updates in <strong>Tabular Dyna-Q</strong></a></li>
+  <li><a href="#sec-l3g6" id="toc-sec-l3g6" class="nav-link" data-scroll-target="#sec-l3g6">Model learning and search control components of <strong>Tabular Dyna-Q</strong></a></li>
+  <li><a href="#sec-l3g7" id="toc-sec-l3g7" class="nav-link" data-scroll-target="#sec-l3g7">Learning from both direct and simulated experience impacts performance</a></li>
+  <li><a href="#sec-l3g8" id="toc-sec-l3g8" class="nav-link" data-scroll-target="#sec-l3g8">Simulated experience can be useful when the model is accurate</a></li>
+  </ul></li>
+  <li><a href="#lesson-4-dealing-with-inaccurate-models" id="toc-lesson-4-dealing-with-inaccurate-models" class="nav-link" data-scroll-target="#lesson-4-dealing-with-inaccurate-models">Lesson 4: Dealing with inaccurate models</a>
+  <ul class="collapse">
+  <li><a href="#lesson-learning-goals-3" id="toc-lesson-learning-goals-3" class="nav-link" data-scroll-target="#lesson-learning-goals-3">Lesson Learning Goals</a></li>
+  <li><a href="#sec-l4g1" id="toc-sec-l4g1" class="nav-link" data-scroll-target="#sec-l4g1">Ways in which models can be inaccurate</a></li>
+  <li><a href="#sec-l4g2" id="toc-sec-l4g2" class="nav-link" data-scroll-target="#sec-l4g2">Effects of planning with an inaccurate model</a></li>
+  <li><a href="#sec-l4g3" id="toc-sec-l4g3" class="nav-link" data-scroll-target="#sec-l4g3"><strong>Dyna</strong> can plan successfully with a partially inaccurate model</a></li>
+  <li><a href="#sec-l4g4" id="toc-sec-l4g4" class="nav-link" data-scroll-target="#sec-l4g4">Model inaccuracies produce another exploration-exploitation trade-off</a></li>
+  <li><a href="#sec-l4g5" id="toc-sec-l4g5" class="nav-link" data-scroll-target="#sec-l4g5"><strong>Dyna-Q+</strong> proposes a way to address this trade-off</a></li>
+  <li><a href="#drew-bagnell-on-self-driving-cars-robotics-and-model-based-reinforcement-learning" id="toc-drew-bagnell-on-self-driving-cars-robotics-and-model-based-reinforcement-learning" class="nav-link" data-scroll-target="#drew-bagnell-on-self-driving-cars-robotics-and-model-based-reinforcement-learning">Drew Bagnell on self-driving cars robotics and model-based reinforcement learning</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
   </ul>
 </nav>
 </nav>
@@ -312,50 +411,376 @@ ul.task-list li input[type="checkbox"] {
 <p><a href="img/alg_selector.jpeg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="RL algorithms"><img src="img/alg_selector.jpeg" class="img-fluid figure-img" alt="RL algorithms"></a></p>
 <figcaption>RL algorithms</figcaption>
 </figure>
-</div></div><section id="lesson-1-what-is-a-model" class="level2">
+</div></div><section id="lesson-1-what-is-a-model" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="lesson-1-what-is-a-model">Lesson 1: What is a model?</h2>
+<section id="lesson-learning-goals" class="level3 unnumbered callout-info">
+<h3 class="unnumbered anchored" data-anchor-id="lesson-learning-goals">Lesson Learning Goals</h3>
 <ul class="task-list">
-<li><label><input type="checkbox">Describe what a model is and how they can be used</label></li>
-<li><label><input type="checkbox">Classify models as <strong>distribution models</strong> or <strong>sample models</strong></label></li>
-<li><label><input type="checkbox">Identify when to use a distribution model or sample model</label></li>
-<li><label><input type="checkbox">Describe the advantages and disadvantages of sample models and distribution models</label></li>
-<li><label><input type="checkbox">Explain why sample models can be represented more compactly than distribution models</label></li>
+<li><label><input type="checkbox">Describe what a model is and how they can be used <a href="#sec-l1g1">#</a></label></li>
+<li><label><input type="checkbox">Classify models as <strong>distribution models</strong> or <strong>sample models</strong> <a href="#sec-l1g2">#</a></label></li>
+<li><label><input type="checkbox">Identify when to use a distribution model or sample model <a href="#sec-l1g3">#</a></label></li>
+<li><label><input type="checkbox">Describe the advantages and disadvantages of sample models and distribution models <a href="#sec-l1g4">#</a></label></li>
+<li><label><input type="checkbox">Explain why sample models can be represented more compactly than distribution models <a href="#sec-l1g5">#</a></label></li>
 </ul>
 </section>
-<section id="lesson-2-planning" class="level2">
+<section id="sec-l1g1" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l1g1">What is a model and how can it be used?</h3>
+<ul>
+<li><p>A model is a simplified representation of the environment dynamics</p></li>
+<li><p>Models can be used to simulate the environment</p></li>
+<li><p>In this course a Model is a function that predicts the next state and reward given the current state and action</p></li>
+<li><p>a transition model <span class="math inline">s_{t_+1} = f(s_t, a_t)</span> predicts the next state given the current state and action</p></li>
+<li><p>a reward model <span class="math inline">r_{t_+1} = f(s_t, a_t)</span> predicts the reward given the current state and action</p></li>
+</ul>
+<p>three other model types are mentioned in the <a href="https://sites.google.com/view/mbrl-tutorial">ICML Tutorial on Model-Based Reinforcement Learning</a></p>
+<ul>
+<li><strong>Inverse models</strong> predict the action given the current state and next state <span class="math inline">a_{t+1} = f_s^{-1}(s_t, s_{t+1})</span></li>
+<li><strong>Distances models</strong> predict the distance between the current state and the goal state <span class="math inline">d_{ij} =d(s, s')</span></li>
+<li><strong>Future return models</strong> predict the future return given the current state and action <span class="math inline">G_t=Q(s_t, a_t)</span> or <span class="math inline">G_t=V(s_t)</span></li>
+</ul>
+<p>Why do we want to use models?</p>
+<ul>
+<li>model allow us to simulate the environment without interacting with it.</li>
+<li>this can increase sample efficiency - e.g.&nbsp;by replaying past experiences to propergate learning from goal to all predecessor states we have visited</li>
+<li>this can reduce risks - e.g.&nbsp;by simulating dangerous situations instead of actually experiencing them.</li>
+<li>this can reduce costs - e.g.&nbsp;by simulating costly actions in a simulated environment instead of paying the cost in the real environment.</li>
+<li>this could be much faster than real-time interaction with the environment. Often in robotics simulation is orders of magnitude faster than real-time interaction.</li>
+</ul>
+</section>
+<section id="sec-l1g2" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="sec-l1g2">Types of models</h3>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-models.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="models"><img src="img/rl-models.png" class="img-fluid figure-img" alt="models"></a></p>
+<figcaption>models</figcaption>
+</figure>
+</div></div><ul>
+<li><strong>Distribution models</strong> predict the probability distribution of the next state and reward</li>
+<li><strong>Sample models</strong> predict a single next state and reward</li>
+</ul>
+<p>Also there are:Environment simulator**</p>
+<ul>
+<li>Chess Programs typicaly can simulate all possible movers and evaluate the board position (tacticaly and strategically). The difference between the current board position and the board position after a move is the reward.</li>
+<li><span class="citation" data-cites="Silver2016MasteringTG">(<a href="#ref-Silver2016MasteringTG" role="doc-biblioref">Silver et al. 2016</a>)</span> mentions an <strong>Environment simulator</strong> for the game of go</li>
+<li><span class="citation" data-cites="Agostinelli2019SolvingTR">(<a href="#ref-Agostinelli2019SolvingTR" role="doc-biblioref">Agostinelli et al. 2019</a>)</span> used a simulator of the rubik’s cube to train a reinforcement learning agent to solve the cube.</li>
+<li><span class="citation" data-cites="Bellemare2012TheAL">(<a href="#ref-Bellemare2012TheAL" role="doc-biblioref">Bellemare et al. 2012</a>)</span> used a simulator of the game of atari to train a reinforcement learning agent to play atari games.</li>
+<li><span class="citation" data-cites="Todorov2012MuJoCoAP">(<a href="#ref-Todorov2012MuJoCoAP" role="doc-biblioref">Todorov, Erez, and Tassa 2012</a>)</span> used a simulator of the physics of the real world to train a reinforcement learning agent to control a robot.</li>
+<li><span class="citation" data-cites="Shen2018MWalkLT">(<a href="#ref-Shen2018MWalkLT" role="doc-biblioref">Shen et al. 2018</a>)</span> used a simulator to train agents to navigate a graph using MCTS.</li>
+<li><span class="citation" data-cites="Ellis2019WriteEA">(<a href="#ref-Ellis2019WriteEA" role="doc-biblioref">Ellis et al. 2019</a>)</span> used a REPL environment to train a reinforcement learning agent to write code.</li>
+</ul>
+</section>
+<section id="sec-l1g3" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l1g3">When to use a distribution model or sample model</h3>
+<ul>
+<li><strong>Distribution models</strong> are useful when we need to know the probability of different outcomes</li>
+<li><strong>Sample models</strong> are useful when we need to simulate the environment</li>
+</ul>
+</section>
+<section id="sec-l1g4" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l1g4">Advantages and disadvantages of sample models and distribution models</h3>
+<ul>
+<li><p><strong>Sample models</strong> can be represented more compactly than distribution models</p></li>
+<li><p><strong>Distribution models</strong> can be more accurate than sample models</p></li>
+<li><p>exact expectations can be computed from distribution models</p></li>
+<li><p>assessing risks and uncertainties is easier with distribution models</p></li>
+</ul>
+</section>
+<section id="sec-l1g5" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l1g5">Why sample models can be represented more compactly than distribution models</h3>
+<ul>
+<li><p><strong>Sample models</strong> can be represented more compactly than distribution models because they only need to store a single next state and reward</p></li>
+<li><p><strong>Distribution models</strong> need to store the joint probability of each possible next state and reward pair</p></li>
+<li><p><strong>Sample models</strong> can be more efficient when we only need to simulate the environment</p></li>
+</ul>
+</section>
+</section>
+<section id="lesson-2-planning" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="lesson-2-planning">Lesson 2: Planning</h2>
+<section id="lesson-learning-goals-1" class="level3 unnumbered callout-info">
+<h3 class="unnumbered anchored" data-anchor-id="lesson-learning-goals-1">Lesson Learning Goals</h3>
 <ul class="task-list">
-<li><label><input type="checkbox">Explain how planning is used to improve policies</label></li>
-<li><label><input type="checkbox">Describe random-sample one-step <strong>tabular Q-planning</strong></label></li>
+<li><label><input type="checkbox">Explain how planning is used to improve policies <a href="#sec-l2g1">#</a></label></li>
+<li><label><input type="checkbox">Describe random-sample one-step <strong>tabular Q-planning</strong> <a href="#sec-l2g2">#</a></label></li>
 </ul>
 </section>
-<section id="lesson-3-dyna-as-a-formalism-for-planning" class="level2">
+<section id="sec-l2g1" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="sec-l2g1">How planning is used to improve policies</h3>
+<ul>
+<li><strong>Planning</strong> is the process of using a model to improve a policy or value function</li>
+<li><strong>Planning</strong> can be used to improve a policy or value function without interacting with the environment</li>
+<li><strong>Planning</strong> can be used to improve a policy or value function more efficiently than direct RL updates</li>
+</ul>
+<p>Random-sample one-step <strong>tabular Q-planning</strong> {#sec-l2g2}</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="rl-wk5-random-sample-one-step-tabular-Q-learning.png_" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Q-planning alg overview"><img src="rl-wk5-random-sample-one-step-tabular-Q-learning.png_" class="img-fluid figure-img" alt="Q-planning alg overview"></a></p>
+<figcaption>Q-planning alg overview</figcaption>
+</figure>
+</div><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-wk5-Q-planning.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="random sample one step tabular Q-planning"><img src="img/rl-wk5-Q-planning.png" class="img-fluid figure-img" alt="random sample one step tabular Q-planning"></a></p>
+<figcaption>random sample one step tabular Q-planning</figcaption>
+</figure>
+</div></div>
+<!-- replace with latex version -->
+<ul>
+<li><strong>Tabular Q-planning</strong> is a planning algorithm that uses a sample model to improve a policy or value function</li>
+<li><strong>Tabular Q-planning</strong> uses a sample model to simulate the environment</li>
+<li><strong>Tabular Q-planning</strong> uses the simulated experience to improve a policy or value function</li>
+</ul>
+<p>advantages of planning</p>
+<ul>
+<li><strong>Planning</strong> can be more efficient than direct RL updates</li>
+<li><strong>Planning</strong> can be used to improve a policy or value function without interacting with the environment</li>
+<li><strong>Planning</strong> can be used to improve a policy or value function more efficiently than direct RL updates</li>
+</ul>
+</section>
+</section>
+<section id="lesson-3-dyna-as-a-formalism-for-planning" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="lesson-3-dyna-as-a-formalism-for-planning">Lesson 3: Dyna as a formalism for planning</h2>
+<section id="lesson-learning-goals-2" class="level3 unnumbered callout-info">
+<h3 class="unnumbered anchored" data-anchor-id="lesson-learning-goals-2">Lesson Learning Goals</h3>
 <ul class="task-list">
-<li><label><input type="checkbox">Recognize that direct RL updates use experience from the environment to improve a policy or value function</label></li>
-<li><label><input type="checkbox">Recognize that planning updates use experience from a model to improve a policy or value function</label></li>
-<li><label><input type="checkbox">Describe how both direct RL and planning updates can be combined through the <strong>Dyna architecture</strong></label></li>
-<li><label><input type="checkbox">Describe the <strong>Tabular Dyna-Q algorithm</strong></label></li>
-<li><label><input type="checkbox">Identify the direct-RL and planning updates in <strong>Tabular Dyna-Q</strong></label></li>
-<li><label><input type="checkbox">Identify the model learning and search control components of <strong>Tabular Dyna-Q</strong></label></li>
-<li><label><input type="checkbox">Describe how learning from both direct and simulated experience impacts performance</label></li>
-<li><label><input type="checkbox">Describe how simulated experience can be useful when the model is accurate</label></li>
+<li><label><input type="checkbox">Recognize that direct RL updates use experience from the environment to improve a policy or value function <a href="#sec-l3g1">#</a></label></li>
+<li><label><input type="checkbox">Recognize that planning updates use experience from a model to improve a policy or value function <a href="#sec-l3g2">#</a></label></li>
+<li><label><input type="checkbox">Describe how both direct RL and planning updates can be combined through the <strong>Dyna architecture</strong> <a href="#sec-l3g3">#</a></label></li>
+<li><label><input type="checkbox">Describe the <strong>Tabular Dyna-Q algorithm</strong> <a href="#sec-l3g4">#</a></label></li>
+<li><label><input type="checkbox">Identify the direct-RL and planning updates in <strong>Tabular Dyna-Q</strong> <a href="#sec-l3g5">#</a></label></li>
+<li><label><input type="checkbox">Identify the model learning and search control components of <strong>Tabular Dyna-Q</strong> <a href="#sec-l3g6">#</a></label></li>
+<li><label><input type="checkbox">Describe how learning from both direct and simulated experience impacts performance <a href="#sec-l3g7">#</a></label></li>
+<li><label><input type="checkbox">Describe how simulated experience can be useful when the model is accurate <a href="#sec-l3g8">#</a></label></li>
 </ul>
 </section>
-<section id="lesson-4-dealing-with-inaccurate-models" class="level2">
+<section id="sec-l3g1" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l3g1">Direct RL updates use experience from the environment to improve a policy or value function</h3>
+<ul>
+<li><strong>Direct RL updates</strong> use experience from the environment to improve a policy or value function</li>
+<li><strong>Direct RL updates</strong> can be used to improve a policy or value function by interacting with the environment</li>
+</ul>
+</section>
+<section id="sec-l3g2" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l3g2">Planning updates use experience from a model to improve a policy or value function</h3>
+<ul>
+<li><strong>Planning updates</strong> use experience from a model to improve a policy or value function</li>
+<li><strong>Planning updates</strong> can be used to improve a policy or value function without interacting with the environment</li>
+</ul>
+</section>
+<section id="sec-l3g3" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l3g3">Both direct RL and planning updates can be combined through the <strong>Dyna architecture</strong></h3>
+<ul>
+<li><strong>Dyna architecture</strong> combines direct RL updates and planning updates to improve a policy or value function</li>
+<li><strong>Dyna architecture</strong> uses a model to simulate the environment</li>
+<li><strong>Dyna architecture</strong> uses the simulated experience to improve a policy or value function</li>
+</ul>
+</section>
+<section id="sec-l3g4" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="sec-l3g4">The <strong>Tabular Dyna-Q algorithm</strong></h3>
+<ul>
+<li><strong>Tabular Dyna-Q</strong> is a planning algorithm that uses a sample model to improve a policy or value function</li>
+<li><strong>Tabular Dyna-Q</strong> uses a sample model to simulate the environment</li>
+<li><strong>Tabular Dyna-Q</strong> uses the simulated experience to improve a policy or value function</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-wk5-tabular-dyna-Q.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="The dyna-Q algortihm"><img src="img/rl-wk5-tabular-dyna-Q.png" class="img-fluid figure-img" alt="The dyna-Q algortihm"></a></p>
+<figcaption>The dyna-Q algortihm</figcaption>
+</figure>
+</div></div></section>
+<section id="sec-l3g5" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l3g5">Direct-RL and planning updates in <strong>Tabular Dyna-Q</strong></h3>
+<ul>
+<li><strong>Tabular Dyna-Q</strong> uses direct RL updates to improve a policy or value function</li>
+<li><strong>Tabular Dyna-Q</strong> uses planning updates to improve a policy or value function</li>
+</ul>
+</section>
+<section id="sec-l3g6" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l3g6">Model learning and search control components of <strong>Tabular Dyna-Q</strong></h3>
+<ul>
+<li><strong>Tabular Dyna-Q</strong> uses a sample model to simulate the environment</li>
+<li><strong>Tabular Dyna-Q</strong> uses the simulated experience to improve a policy or value function</li>
+</ul>
+</section>
+<section id="sec-l3g7" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l3g7">Learning from both direct and simulated experience impacts performance</h3>
+<ul>
+<li>Learning from both direct and simulated experience can improve performance</li>
+<li>Learning from both direct and simulated experience can be more efficient than direct RL updates</li>
+</ul>
+</section>
+<section id="sec-l3g8" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l3g8">Simulated experience can be useful when the model is accurate</h3>
+<ul>
+<li>Simulated experience can be useful when the model is accurate</li>
+<li>Simulated experience can be used to improve a policy or value function without interacting with the environment</li>
+</ul>
+</section>
+</section>
+<section id="lesson-4-dealing-with-inaccurate-models" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="lesson-4-dealing-with-inaccurate-models">Lesson 4: Dealing with inaccurate models</h2>
+<section id="lesson-learning-goals-3" class="level3 unnumbered callout-info">
+<h3 class="unnumbered anchored" data-anchor-id="lesson-learning-goals-3">Lesson Learning Goals</h3>
 <ul class="task-list">
-<li><label><input type="checkbox">Identify ways in which models can be inaccurate</label></li>
-<li><label><input type="checkbox">Explain the effects of planning with an inaccurate model</label></li>
-<li><label><input type="checkbox">Describe how <strong>Dyna</strong> can plan successfully with a partially inaccurate model</label></li>
-<li><label><input type="checkbox">Explain how model inaccuracies produce another exploration-exploitation trade-off</label></li>
-<li><label><input type="checkbox">Describe how <strong>Dyna-Q+</strong> proposes a way to address this trade-off</label></li>
+<li><label><input type="checkbox">Identify ways in which models can be inaccurate <a href="#sec-l4g1">#</a></label></li>
+<li><label><input type="checkbox">Explain the effects of planning with an inaccurate model <a href="#sec-l4g2">#</a></label></li>
+<li><label><input type="checkbox">Describe how <strong>Dyna</strong> can plan successfully with a partially inaccurate model <a href="#sec-l4g3">#</a></label></li>
+<li><label><input type="checkbox">Explain how model inaccuracies produce another exploration-exploitation trade-off <a href="#sec-l4g4">#</a></label></li>
+<li><label><input type="checkbox">Describe how <strong>Dyna-Q+</strong> proposes a way to address this trade-off <a href="#sec-l4g5">#</a></label></li>
+</ul>
+</section>
+<section id="sec-l4g1" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l4g1">Ways in which models can be inaccurate</h3>
+<ul>
+<li>Models can be inaccurate for many reasons</li>
+<li>because they have not sampled all actions in all states</li>
+<li>because the environment is has changed since the model was learned</li>
+<li>if the environment is stochastic</li>
+</ul>
+</section>
+<section id="sec-l4g2" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l4g2">Effects of planning with an inaccurate model</h3>
+<ul>
+<li>Planning with an inaccurate model can cause the value function to become worse</li>
+<li>Planning with an inaccurate model can lead to sub-optimal policies</li>
+</ul>
+</section>
+<section id="sec-l4g3" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l4g3"><strong>Dyna</strong> can plan successfully with a partially inaccurate model</h3>
+<ul>
+<li><strong>Dyna</strong> can plan successfully with a partially inaccurate model</li>
+<li><strong>Dyna</strong> can use direct RL updates to improve a policy or value function as well as the model</li>
+<li><strong>Dyna</strong> can use planning updates to improve a policy or value function</li>
+</ul>
+</section>
+<section id="sec-l4g4" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l4g4">Model inaccuracies produce another exploration-exploitation trade-off</h3>
+<ul>
+<li>Model inaccuracies produce another exploration-exploitation trade-off</li>
+<li>Model inaccuracies can lead to suboptimal policies</li>
+<li>Model inaccuracies can lead to poor performance</li>
+</ul>
+</section>
+<section id="sec-l4g5" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="sec-l4g5"><strong>Dyna-Q+</strong> proposes a way to address this trade-off</h3>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-wk5-bonus-rewards-for-exploration.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Dyna-Q+ solution"><img src="img/rl-wk5-bonus-rewards-for-exploration.png" class="img-fluid figure-img" alt="Dyna-Q+ solution"></a></p>
+<figcaption>Dyna-Q+ solution</figcaption>
+</figure>
+</div></div><ul>
+<li><strong>Dyna-Q+</strong> proposes a way to address this trade-off</li>
+<li><strong>Dyna-Q+</strong> uses a bonus reward to encourage exploration</li>
+<li><strong>Dyna-Q+</strong> can improve performance when the model is inaccurate</li>
+</ul>
+</section>
+<section id="drew-bagnell-on-self-driving-cars-robotics-and-model-based-reinforcement-learning" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="drew-bagnell-on-self-driving-cars-robotics-and-model-based-reinforcement-learning">Drew Bagnell on self-driving cars robotics and model-based reinforcement learning</h3>
+<div class="column-page">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">timeline
+
+    title Bandit Algorithms Timeline
+
+    
+        1952 : Thompson Sampling
+        1955 : Upper Confidence Bound (UCB)
+        1963 : Epsilon-Greedy
+        2002 : Bayesian UCB
+        2011 : Bayesian Bandits
+        2012 : Contextual Bandits
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+<div class="column-page">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {'theme': 'base', 'themeVariables': { 'timeline': { 'nodeSpacing': 50, 'sectionSpacing': 100, 'verticalStartPosition': 50, 'verticalSectionStartPosition': 50 }}}}%%
+timeline
+    direction TD
+    title Reinforcement Learning Algorithms Timeline
+
+
+    
+        1948 : Monte Carlo Methods
+        1950 : Bellman Optimality Equations
+        1957 : Dynamic Programming
+        1959 : Temporal Difference Learning (TD)
+        1960 : Policy Iteration
+        1963 : Value Iteration
+        1983 : Q-Learning
+        1984 : Expected SARSA
+        1990 : Dyna-Q : Dyna-Q+
+        1992 : SARSA
+        1994 : Monte Carlo with E-Soft
+        1995 : Monte Carlo with Exploring Starts
+             : Generalized Policy Iteration (GPI)
+        1998 : Semi-Gradient TD
+        2000 : Differential Semi-Gradient SARSA
+        2001 : Gradient Monte Carlo (Gradient MC)
+        2003 : Gaussian Actor-Critic
+             : Softmax Actor-Critic
+             : Deep Q-Network (DQN)
+
+
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
+<p>Materials from <a href="https://sites.google.com/view/mbrl-tutorial">ICML Tutorial on Model-Based Reinforcement Learning</a>:</p>
+<p>the page above contains the following materials as well as an extensive bibliography.</p>
+<ul>
+<li><a href="https://docs.google.com/presentation/d/1f-DIrIvh44-jmTIKdKcue0Hx2RqQSw52t4k8HEdn5-c/edit?usp=sharing">Slides</a></li>
+<li><a href="https://slideslive.com/38930488/modelbased-methods-in-reinforcement-learning-part-1-introduction-learning-models">Part 1: Introduction and Learning Models</a></li>
+<li><a href="https://slideslive.com/38930486/modelbased-methods-in-reinforcement-learning-part-2-modelbased-control">Part 2: Model-Based Control</a></li>
+<li><a href="https://slideslive.com/38930487/modelbased-methods-in-reinforcement-learning-part-3-modelbased-control-in-the-loop">Part 3: Model-Based Control in the Loop</a></li>
+<li><a href="https://slideslive.com/38930489/modelbased-methods-in-reinforcement-learning-part-4-beyond-vanilla-mbrl">Part 4: Beyond Vanilla MBRL</a></li>
 </ul>
 
 
+
+</section>
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Agostinelli2019SolvingTR" class="csl-entry" role="listitem">
+Agostinelli, Forest, S. McAleer, A. Shmakov, and P. Baldi. 2019. <span>“Solving the Rubik’s Cube with Deep Reinforcement Learning and Search.”</span> <em>Nature Machine Intelligence</em> 1: 356–63.
+</div>
+<div id="ref-Bellemare2012TheAL" class="csl-entry" role="listitem">
+Bellemare, Marc G., Yavar Naddaf, J. Veness, and Michael Bowling. 2012. <span>“The Arcade Learning Environment: An Evaluation Platform for General Agents.”</span> <em>ArXiv</em> abs/1207.4708.
+</div>
+<div id="ref-Ellis2019WriteEA" class="csl-entry" role="listitem">
+Ellis, Kevin, Maxwell Nye, Yewen Pu, Felix Sosa, J. Tenenbaum, and Armando Solar-Lezama. 2019. <span>“Write, Execute, Assess: Program Synthesis with a REPL,”</span> 9165–74.
+</div>
+<div id="ref-Shen2018MWalkLT" class="csl-entry" role="listitem">
+Shen, Yelong, Jianshu Chen, Po-Sen Huang, Yuqing Guo, and Jianfeng Gao. 2018. <span>“M-Walk: Learning to Walk in Graph with Monte Carlo Tree Search.”</span> In <em>Neural Information Processing Systems</em>.
+</div>
+<div id="ref-Silver2016MasteringTG" class="csl-entry" role="listitem">
+Silver, David, Aja Huang, Chris J. Maddison, A. Guez, L. Sifre, George van den Driessche, Julian Schrittwieser, et al. 2016. <span>“Mastering the Game of Go with Deep Neural Networks and Tree Search.”</span> <em>Nature</em> 529: 484–89.
+</div>
+<div id="ref-Todorov2012MuJoCoAP" class="csl-entry" role="listitem">
+Todorov, E., Tom Erez, and Yuval Tassa. 2012. <span>“MuJoCo: A Physics Engine for Model-Based Control.”</span> <em>2012 IEEE/RSJ International Conference on Intelligent Robots and Systems</em>, 5026–33.
+</div>
+</div></section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
   author = {Bochman, Oren},
   title = {Sample-Based {Learning} {Methods}},
   date = {2024-03-04},
@@ -1086,7 +1511,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     })(document);
     </script>
   
-<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","openEffect":"zoom","closeEffect":"zoom","loop":false,"selector":".lightbox"});
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","loop":false,"openEffect":"zoom","closeEffect":"zoom","descPosition":"bottom"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {

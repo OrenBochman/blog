@@ -9,7 +9,7 @@
 <meta name="author" content="Oren Bochman">
 <meta name="description" content="In these unit we define some key terms like rewards, states, action, value functions, action values functions. Then we consider at the the multi-armed bandit problem leading to exploration explotation dillema, the epsilon greedy algorithm.">
 
-<title>Oren Bochman's Blog – Sample-based Learning Methods</title>
+<title>Oren Bochman's Blog – Temporal Difference Learning Methods for Prediction</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -84,8 +84,51 @@ ul.task-list li input[type="checkbox"] {
       }
 </style>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
-<meta name="twitter:title" content="Oren Bochman’s Blog - Sample-based Learning Methods">
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Temporal Difference Learning Methods for Prediction">
 <meta name="twitter:description" content="In these unit we define some key terms like rewards, states, action, value functions, action values functions. Then we consider at the the multi-armed bandit problem leading to exploration explotation dillema, the epsilon greedy algorithm.">
 <meta name="twitter:image" content="https://orenbochman.github.io//images/nlp-brain-wordcloud.jpg">
 <meta name="twitter:creator" content="@orenbochman">
@@ -221,7 +264,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Sample-based Learning Methods</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Temporal Difference Learning Methods for Prediction</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -234,8 +277,8 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Sample-based Learning Methods</h1>
-            <p class="subtitle lead">Temporal Difference Learning Methods for Prediction</p>
+      <h1 class="title">Temporal Difference Learning Methods for Prediction</h1>
+            <p class="subtitle lead">Sample-based Learning Methods</p>
                   <div>
         <div class="description">
           In these unit we define some key terms like rewards, states, action, value functions, action values functions. Then we consider at the the multi-armed bandit problem leading to exploration explotation dillema, the epsilon greedy algorithm.
@@ -288,8 +331,17 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#lesson-1-introduction-to-temporal-difference-learning" id="toc-lesson-1-introduction-to-temporal-difference-learning" class="nav-link active" data-scroll-target="#lesson-1-introduction-to-temporal-difference-learning">Lesson 1: Introduction to Temporal Difference Learning</a></li>
-  <li><a href="#lesson-2-advantages-of-td" id="toc-lesson-2-advantages-of-td" class="nav-link" data-scroll-target="#lesson-2-advantages-of-td">Lesson 2: Advantages of TD</a></li>
+  <li><a href="#lesson-1-introduction-to-temporal-difference-learning" id="toc-lesson-1-introduction-to-temporal-difference-learning" class="nav-link active" data-scroll-target="#lesson-1-introduction-to-temporal-difference-learning">Lesson 1: Introduction to Temporal Difference Learning</a>
+  <ul class="collapse">
+  <li><a href="#lesson-learning-goals" id="toc-lesson-learning-goals" class="nav-link" data-scroll-target="#lesson-learning-goals">Lesson Learning Goals</a></li>
+  <li><a href="#temporal-difference-learning-definition" id="toc-temporal-difference-learning-definition" class="nav-link" data-scroll-target="#temporal-difference-learning-definition">Temporal Difference Learning definition</a></li>
+  <li><a href="#temporal-difference-error" id="toc-temporal-difference-error" class="nav-link" data-scroll-target="#temporal-difference-error">Temporal Difference Error</a></li>
+  <li><a href="#td0-algorithm" id="toc-td0-algorithm" class="nav-link" data-scroll-target="#td0-algorithm">TD(0) Algorithm</a></li>
+  </ul></li>
+  <li><a href="#lesson-2-advantages-of-td" id="toc-lesson-2-advantages-of-td" class="nav-link" data-scroll-target="#lesson-2-advantages-of-td">Lesson 2: Advantages of TD</a>
+  <ul class="collapse">
+  <li><a href="#lesson-learning-goals-1" id="toc-lesson-learning-goals-1" class="nav-link" data-scroll-target="#lesson-learning-goals-1">Lesson Learning Goals</a></li>
+  </ul></li>
   </ul>
 </nav>
 </nav>
@@ -310,35 +362,162 @@ ul.task-list li input[type="checkbox"] {
 <p><a href="img/alg_selector.jpeg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="RL algorithms"><img src="img/alg_selector.jpeg" class="img-fluid figure-img" alt="RL algorithms"></a></p>
 <figcaption>RL algorithms</figcaption>
 </figure>
-</div></div><section id="lesson-1-introduction-to-temporal-difference-learning" class="level2">
-<h2 class="anchored" data-anchor-id="lesson-1-introduction-to-temporal-difference-learning">Lesson 1: Introduction to Temporal Difference Learning</h2>
+</div></div><div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Reading
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox">Define temporal-difference learning</label></li>
-<li><label><input type="checkbox">Define the temporal-difference error</label></li>
-<li><label><input type="checkbox">Understand the TD(0) algorithm</label></li>
+<li><label><input type="checkbox" checked=""><a href="http://incompleteideas.net/book/RLbook2020.pdf#page=91">RL Book§5.0-5.5 (pp.91-104)</a></label></li>
 </ul>
+</div>
+</div>
+</div>
+<section id="lesson-1-introduction-to-temporal-difference-learning" class="level2">
+<h2 class="anchored" data-anchor-id="lesson-1-introduction-to-temporal-difference-learning">Lesson 1: Introduction to Temporal Difference Learning</h2>
+<section id="lesson-learning-goals" class="level3 unnumbered callout-info">
+<h3 class="unnumbered anchored" data-anchor-id="lesson-learning-goals">Lesson Learning Goals</h3>
+<ul class="task-list">
+<li><label><input type="checkbox">Define temporal-difference learning <a href="#sec-l1g1">#</a></label></li>
+<li><label><input type="checkbox">Define the temporal-difference error <a href="#sec-l1g2">#</a></label></li>
+<li><label><input type="checkbox">Understand the TD(0) algorithm <a href="#sec-l1g3">#</a></label></li>
+</ul>
+</section>
+<section id="temporal-difference-learning-definition" class="level3">
+<h3 class="anchored" data-anchor-id="temporal-difference-learning-definition">Temporal Difference Learning definition</h3>
+<p>Now we turn to a new class of methods called Temporal Difference (TD) learning. According to Bass, TD learning is one of the key innovations in RL. TD learning is a method that combines the sampling of Monte Carlo methods with the bootstrapping of Dynamic Programming methods. The term <strong>temporal</strong> in the name references learning from two subsequent time steps and the term <strong>difference</strong> refers to using the difference between the values of each state.</p>
+<p>Let us now derive the TD update rule for the value function:</p>
+<p>Recall the definition of the value function from the previous course, is the expected return when starting in a particular state and following a particular policy.<br>
+We write this as:</p>
+<p><span id="eq-value-function"><span class="math display">
+v_\pi(s_t) \dot = \mathbb{E}_\pi[G_t | S_t = s] \qquad
+\tag{1}</span></span></p>
+<p>We can motivate td update rule by considering the DP and MC update rules.</p>
+<p>In The MC update rule a sample update based on the return for the entire episode. Which means that we can only update our value function at the end of the episode.</p>
+<p><span id="eq-mc-online-update"><span class="math display">
+V(S_t) \leftarrow V(S_t) + \alpha [\underbrace{G_t}_{\text{MC target}} -V(S_t)]  \qquad
+\tag{2}</span></span></p>
+<p>where:</p>
+<p><span class="math inline">G_t</span> is the return at time step <span class="math inline">t</span> and <span class="math inline">S_t</span> is the state at time step <span class="math inline">t</span>.</p>
+<p>This is the actual return at time t.</p>
+<p>In the DP update rule, the target is a full backup based on the entire distribution of possible next states which we can solve for exactly since we have the full dynamics of the environment.</p>
+<p><span id="eq-dp-update"><span class="math display">
+V(S_t) \leftarrow V(S_t) + \sum_a\pi(a|S_t) ([r(s,a) + \gamma p(s'\mid s,a) V(s')]) \qquad
+\tag{3}</span></span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">R_{t+1}</span> is the reward at time step <span class="math inline">t+1</span></li>
+<li><span class="math inline">V(S_{t+1})</span> is the approximate value of the state at time step <span class="math inline">t+1</span></li>
+<li><span class="math inline">\gamma</span> is the discount factor</li>
+<li><span class="math inline">\alpha</span> is the learning rate</li>
+</ul>
+<p>How can we make updates at each time step?</p>
+<p><span id="eq-return-definition"><span class="math display">
+\begin{aligned}
+G_t &amp; \dot= R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \ldots \qquad \newline
+         &amp;= R_{t+1} + \gamma G_{t+1} \qquad
+\end{aligned}
+\tag{4}</span></span></p>
+<p><span class="math display">
+\begin{aligned}
+v_\pi(s_t)  &amp; = \mathbb{E}_\pi [G_t \mid S_t = s] &amp; \text{definition}\newline
+          &amp; = \mathbb{E}_\pi [R_{t+1} + \gamma G_{t+1} \mid S_t = s] &amp; \text{(subst. Recursive return)}\newline
+          &amp; = \mathbb{E}_\pi[R_{t+1} + \gamma v_\pi (S_{t+1}) |S_t=s]    &amp; \text{(subst. value function)}\newline
+          &amp; = \mathbb{E}_\pi[R_{t+1}|S_t=s]  + \gamma \mathbb{E}_\pi[v_\pi (S_{t+1}) |S_t=s] &amp; \text{(by linearity of Expectation)} \newline
+          &amp; = R_{t+1} + \gamma v_\pi (S_{t+1}) &amp; \text{(by Expectation of constant RV)}
+\end{aligned}
+</span></p>
+<p>In this formula we have replaced <span class="math inline">G_t</span> with <span class="math inline">R_{t+1} + \gamma V(S_{t+1})</span>. We now have a recursive formula for the value functions in terms of the next value function. The next value function is a stand in for the value of the Return <span class="math inline">G_{t+1}</span> which we don’t know.</p>
+<p>we can use this formula to make an online update to our value function using an MC estimate of the return, without saving the full list of rewards.</p>
+<p>since <span class="math inline">G_t</span>, the MC update target is the return for the entire episode, we can only update our value function at the end of the episode. We will soon look at TD learning, which allows us to make updates at each time step.</p>
+<p>the motivation for TD learning is based on the MC update rule. The MC update rule is a sample update based on the return for the entire episode. This means that we can only update our value function at the end of the episode. We will soon look at TD learning, which allows us to make updates at each time step.</p>
+<p><span class="math display">
+V_\pi(S_t) \leftarrow V(S_t) + \alpha [
+\underbrace{R_{t+1} + \gamma V(S_{t+1})}_{\text{TD target}} - V(S_t)]
+</span></p>
+<p>We can use the following to make online TD updates like we were able to update our value function without saving the full list of rewards. here:</p>
+<ul>
+<li><span class="math inline">V(S_t)</span> is the value of the state at time <span class="math inline">t</span></li>
+<li><span class="math inline">V(S_{t+1})</span> is the value of the state at time <span class="math inline">t+1</span></li>
+<li><span class="math inline">R_{t+1}</span> is the reward at time <span class="math inline">t+1</span></li>
+<li><span class="math inline">\alpha</span> is a constant the learning rate</li>
+<li>the target is an estimate of the return</li>
+</ul>
+<p><span class="math display">
+\begin{aligned}
+G_t &amp; \dot = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \ldots \newline
+&amp;= R_{t+1} + \gamma G_{t+1} \newline
+\end{aligned}
+</span></p>
+<ul>
+<li>The MC target is an estimate of the expected value (average of sampled return) - The DP target is an estimate because the true value of the state is not known - The TD target is an estimate for both reasons: a sample of the expected value of the reward, and the current estimate of the value of the state rather than the true value.</li>
+</ul>
+<p>Like with MC, the target is a sample updates based on a single observed transition. This is in stark contrast to DP, where the target is a full backup based on the entire distribution of possible next states which we can solve for exactly since we have the full dynamics of the environment.</p>
+</section>
+<section id="temporal-difference-error" class="level3">
+<h3 class="anchored" data-anchor-id="temporal-difference-error">Temporal Difference Error</h3>
+<ul>
+<li>The TD error is the difference between the estimated value of a state and the value of the state at the next time step.</li>
+</ul>
+<p><span class="math display">
+\delta_t \dot = R_{t+1} + \gamma V(S_{t+1}) - V(S_t)
+</span> this is one of the most important equations in reinforcement learning - we will see it again and again.</p>
+</section>
+<section id="td0-algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="td0-algorithm">TD(0) Algorithm</h3>
+<ul>
+<li>The TD(0) algorithm is a TD learning algorithm that uses a bootstrapping method to estimate the value of a state.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The TD(0) algorithm for estimating <span class="math inline">v_\pi</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="alg-td-zero" class="pseudocode-container" data-indent-size="1.2em" data-pseudocode-index="1" data-no-end="false" data-line-number-punc=":" data-line-number="true" data-alg-title="Algorithm" data-comment-delimiter="#">
+<div class="pseudocode">
+\begin{algorithm} \caption{TD(0) for estimating $v_\pi$}\begin{algorithmic} \State Input: \State $\qquad \pi \leftarrow \text{policy to be evaluated}$ \State Initialize: \State $\qquad V(s) \leftarrow x \in \mathbb{R} \quad \forall s \in \mathcal{S}$ \FORALL {episode $e$:} \State $S \leftarrow \text{initial state of episode}$ \State $\text{Choose } A \sim \pi(\cdot \mid S)$ \FORALL {step $S \in e$:} \State Take action $A$, observe $R, S'$ \State $V(S) \leftarrow V(S) + \alpha [R + \gamma V(S') - V(S)]$ \State $S \leftarrow S'$ \State $\text{Choose} A' \sim \pi(\cdot \mid S)$ \State $S$ is terminal \ENDFOR \ENDFOR \end{algorithmic} \end{algorithm}
+</div>
+</div>
+</div>
+</div>
+</section>
 </section>
 <section id="lesson-2-advantages-of-td" class="level2">
 <h2 class="anchored" data-anchor-id="lesson-2-advantages-of-td">Lesson 2: Advantages of TD</h2>
+<section id="lesson-learning-goals-1" class="level3 unnumbered callout-info">
+<h3 class="unnumbered anchored" data-anchor-id="lesson-learning-goals-1">Lesson Learning Goals</h3>
 <ul class="task-list">
-<li><label><input type="checkbox">Understand the benefits of learning online with TD</label></li>
-<li><label><input type="checkbox">Identify key advantages of TD methods over Dynamic Programming and Monte Carlo methods</label></li>
-<li><label><input type="checkbox">Identify the empirical benefits of TD learning</label></li>
+<li><label><input type="checkbox">Understand the benefits of learning online with TD <a href="#sec-l2g1">#</a></label></li>
+<li><label><input type="checkbox">Identify key advantages of TD methods over Dynamic Programming and Monte Carlo methods <a href="#sec-l2g2">#</a></label></li>
+<li><label><input type="checkbox">Identify the empirical benefits of TD learning <a href="#sec-l2g3">#</a></label></li>
 </ul>
+</section>
 
 
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
   author = {Bochman, Oren},
-  title = {Sample-Based {Learning} {Methods}},
+  title = {Temporal {Difference} {Learning} {Methods} for {Prediction}},
   date = {2024-03-02},
   url = {https://orenbochman.github.io//notes/RL/c2-w2.html},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2024. <span>“Sample-Based Learning Methods.”</span> March
-2, 2024. <a href="https://orenbochman.github.io//notes/RL/c2-w2.html">https://orenbochman.github.io//notes/RL/c2-w2.html</a>.
+Bochman, Oren. 2024. <span>“Temporal Difference Learning Methods for
+Prediction.”</span> March 2, 2024. <a href="https://orenbochman.github.io//notes/RL/c2-w2.html">https://orenbochman.github.io//notes/RL/c2-w2.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1060,7 +1239,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     })(document);
     </script>
   
-<script>var lightboxQuarto = GLightbox({"openEffect":"zoom","selector":".lightbox","loop":false,"descPosition":"bottom","closeEffect":"zoom"});
+<script>var lightboxQuarto = GLightbox({"openEffect":"zoom","loop":false,"closeEffect":"zoom","selector":".lightbox","descPosition":"bottom"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {

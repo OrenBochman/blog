@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="description" content="In these unit we define some key terms like rewards, states, action, value functions, action values functions. Then we consider at the the multi-armed bandit problem leading to exploration explotation dillema, the epsilon greedy algorithm.">
+<meta name="description" content="This week, we will learn to using TD learning for control, as a generalized policy iteration strategy. We will see three different algorithms based on bootstrapping and Bellman equations for control: Sarsa, Q-learning and Expected Sarsa. We will see some of the differences between the methods for on-policy and off-policy control, and that Expected Sarsa is a unified algorithm for both.">
 
-<title>Oren Bochman's Blog – Sample-based Learning Methods</title>
+<title>Oren Bochman's Blog – Temporal Difference Learning Methods for Control</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -84,9 +84,52 @@ ul.task-list li input[type="checkbox"] {
       }
 </style>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
-<meta name="twitter:title" content="Oren Bochman’s Blog - Sample-based Learning Methods">
-<meta name="twitter:description" content="In these unit we define some key terms like rewards, states, action, value functions, action values functions. Then we consider at the the multi-armed bandit problem leading to exploration explotation dillema, the epsilon greedy algorithm.">
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Oren Bochman’s Blog - Temporal Difference Learning Methods for Control">
+<meta name="twitter:description" content="This week, we will learn to using TD learning for control, as a generalized policy iteration strategy. We will see three different algorithms based on bootstrapping and Bellman equations for control: Sarsa, Q-learning and Expected Sarsa. We will see some of the differences between the methods for on-policy and off-policy control, and that Expected Sarsa is a unified algorithm for both.">
 <meta name="twitter:image" content="https://orenbochman.github.io//images/nlp-brain-wordcloud.jpg">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
@@ -221,7 +264,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Sample-based Learning Methods</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Temporal Difference Learning Methods for Control</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -234,11 +277,11 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Sample-based Learning Methods</h1>
-            <p class="subtitle lead">The K-Armed Bandit Problem</p>
+      <h1 class="title">Temporal Difference Learning Methods for Control</h1>
+            <p class="subtitle lead">Sample-based Learning Methods</p>
                   <div>
         <div class="description">
-          In these unit we define some key terms like rewards, states, action, value functions, action values functions. Then we consider at the the multi-armed bandit problem leading to exploration explotation dillema, the epsilon greedy algorithm.
+          This week, we will learn to using TD learning for control, as a generalized policy iteration strategy. We will see three different algorithms based on bootstrapping and Bellman equations for control: Sarsa, Q-learning and Expected Sarsa. We will see some of the differences between the methods for on-policy and off-policy control, and that Expected Sarsa is a unified algorithm for both.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -290,9 +333,28 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#module-3-temporal-difference-learning-methods-for-control" id="toc-module-3-temporal-difference-learning-methods-for-control" class="nav-link active" data-scroll-target="#module-3-temporal-difference-learning-methods-for-control">Module 3: Temporal Difference Learning Methods for Control</a>
   <ul class="collapse">
-  <li><a href="#lesson-1-td-for-control" id="toc-lesson-1-td-for-control" class="nav-link" data-scroll-target="#lesson-1-td-for-control">Lesson 1: TD for Control</a></li>
-  <li><a href="#lesson-2-off-policy-td-control-q-learning" id="toc-lesson-2-off-policy-td-control-q-learning" class="nav-link" data-scroll-target="#lesson-2-off-policy-td-control-q-learning">Lesson 2: Off-policy TD Control: Q-learning</a></li>
-  <li><a href="#lesson-3-expected-sarsa" id="toc-lesson-3-expected-sarsa" class="nav-link" data-scroll-target="#lesson-3-expected-sarsa">Lesson 3: Expected SARSA</a></li>
+  <li><a href="#lesson-1-td-for-control" id="toc-lesson-1-td-for-control" class="nav-link" data-scroll-target="#lesson-1-td-for-control">Lesson 1: TD for Control</a>
+  <ul class="collapse">
+  <li><a href="#lesson-learning-goals" id="toc-lesson-learning-goals" class="nav-link" data-scroll-target="#lesson-learning-goals">Lesson Learning Goals</a></li>
+  </ul></li>
+  <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">Generalized Policy Iteration with TD</a>
+  <ul class="collapse">
+  <li><a href="#generalized-policy-iteration---recap" id="toc-generalized-policy-iteration---recap" class="nav-link" data-scroll-target="#generalized-policy-iteration---recap">Generalized Policy Iteration - Recap</a></li>
+  </ul></li>
+  <li><a href="#sec-l1g2" id="toc-sec-l1g2" class="nav-link" data-scroll-target="#sec-l1g2">Sarsa: On-policy TD Control</a></li>
+  <li><a href="#sec-l1g3" id="toc-sec-l1g3" class="nav-link" data-scroll-target="#sec-l1g3">Sarsa in an Example MDP</a></li>
+  <li><a href="#sec-l1g4" id="toc-sec-l1g4" class="nav-link" data-scroll-target="#sec-l1g4">Performance of Learning Algorithms in an MDP</a></li>
+  <li><a href="#lesson-2-off-policy-td-control-q-learning" id="toc-lesson-2-off-policy-td-control-q-learning" class="nav-link" data-scroll-target="#lesson-2-off-policy-td-control-q-learning">Lesson 2: Off-policy TD Control: Q-learning</a>
+  <ul class="collapse">
+  <li><a href="#lesson-learning-goals-1" id="toc-lesson-learning-goals-1" class="nav-link" data-scroll-target="#lesson-learning-goals-1">Lesson Learning Goals</a></li>
+  </ul></li>
+  <li><a href="#sec-l2g4" id="toc-sec-l2g4" class="nav-link" data-scroll-target="#sec-l2g4">Q-learning in an Example MDP</a></li>
+  <li><a href="#sec-l2g5" id="toc-sec-l2g5" class="nav-link" data-scroll-target="#sec-l2g5">Comparing Sarsa and Q-learning</a></li>
+  <li><a href="#lesson-3-expected-sarsa" id="toc-lesson-3-expected-sarsa" class="nav-link" data-scroll-target="#lesson-3-expected-sarsa">Lesson 3: Expected SARSA</a>
+  <ul class="collapse">
+  <li><a href="#lesson-learning-goals-2" id="toc-lesson-learning-goals-2" class="nav-link" data-scroll-target="#lesson-learning-goals-2">Lesson Learning Goals</a></li>
+  <li><a href="#sec-l3g1" id="toc-sec-l3g1" class="nav-link" data-scroll-target="#sec-l3g1">Understanding Expected Sarsa</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -314,53 +376,392 @@ ul.task-list li input[type="checkbox"] {
 <p><a href="img/alg_selector.jpeg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="RL algorithms"><img src="img/alg_selector.jpeg" class="img-fluid figure-img" alt="RL algorithms"></a></p>
 <figcaption>RL algorithms</figcaption>
 </figure>
-</div></div><section id="module-3-temporal-difference-learning-methods-for-control" class="level1">
+</div></div><section id="module-3-temporal-difference-learning-methods-for-control" class="level1 page-columns page-full">
 <h1>Module 3: Temporal Difference Learning Methods for Control</h1>
 <section id="lesson-1-td-for-control" class="level2">
 <h2 class="anchored" data-anchor-id="lesson-1-td-for-control">Lesson 1: TD for Control</h2>
+<section id="lesson-learning-goals" class="level3 unnumbered callout-info">
+<h3 class="unnumbered anchored" data-anchor-id="lesson-learning-goals">Lesson Learning Goals</h3>
 <ul class="task-list">
-<li><label><input type="checkbox">Explain how generalized policy iteration can be used with TD to find improved policies</label></li>
-<li><label><input type="checkbox">Describe the Sarsa Control algorithm</label></li>
-<li><label><input type="checkbox">Understand how the Sarsa control algorithm operates in an example MDP</label></li>
-<li><label><input type="checkbox">Analyze the performance of a learning algorithm</label></li>
+<li><label><input type="checkbox" checked="">Explain how generalized policy iteration can be used with TD to find improved policies <a href="#sec-l1g1">#</a></label></li>
+<li><label><input type="checkbox" checked="">Describe the Sarsa Control algorithm <a href="#sec-l1g2">#</a></label></li>
+<li><label><input type="checkbox" checked="">Understand how the Sarsa control algorithm operates in an example MDP <a href="#sec-l1g3">#</a></label></li>
+<li><label><input type="checkbox" checked="">Analyze the performance of a learning algorithm in an MDP <a href="#sec-l1g4">#</a></label></li>
 </ul>
+</section>
+</section>
+<section id="sec-l1g1" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l1g1">Generalized Policy Iteration with TD</h2>
+<p>we would like now to combine TD with a planning algorithm to use TD for control. We This will be a GPI algorithm.</p>
+<section id="generalized-policy-iteration---recap" class="level3 unnumbered callout-info">
+<h3 class="unnumbered anchored" data-anchor-id="generalized-policy-iteration---recap">Generalized Policy Iteration - Recap</h3>
+<p>lets recap the Generalized Policy Iteration (GPI) algorithm:</p>
+<ul>
+<li><strong>Policy Evaluation</strong>: Update the value function V to be closer to the true value function of the current policy</li>
+<li><strong>Policy Improvement</strong>: Improve the policy <span class="math inline">\pi</span> based on the current value function V</li>
+<li><strong>Generalized Policy Iteration</strong>: Repeated steps of policy evaluation and policy improvement</li>
+<li>GPI does not require full evaluation of the value function, just an improvement can be used to update the policy.</li>
+<li>policy iteration
+<ul>
+<li>run policy evaluation to convergence</li>
+<li>greedifing the policy</li>
+</ul></li>
+<li>GPI MC
+<ul>
+<li>each episode:
+<ul>
+<li>policy evaluation (nota full evaluation)</li>
+<li>improvement per episode</li>
+</ul></li>
+</ul></li>
+<li>GPI TD
+<ul>
+<li>each step:
+<ul>
+<li>policy evaluation (for just one action)</li>
+<li>improvement pi after the single time step.</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<p>Recall how in the first course we saw DP methods for solving MDPs using the four part dynamic function and its variants. We used the Bellman equation to write down a system of linear equations for the value function and solve them exactly. We then used the value function to find the optimal policy. So in DP we don’t need to interact with the environment or to learn. We can compute the value function and the optimal policy exactly.</p>
+<p>In these course we relaxed the assumption of knowing the transition dynamics or the expected returns. This creates a new challange of learning V or Q from experience.</p>
+<p>In the first lesson we saw how MC methods can help us learn the value function but with the caveat that we need to wait until the end of the episode to update the value function.</p>
+<p>However we have now seen how the TD(0) algorithm uses recursive nature of the Bellman equation for the value function to make approximate updates to the value function. This allows us to learn Values of states directly from experience.</p>
+<p>Once we are able to approximate the value function, we can use it to create new generalized policy iteration algorithms. This part of the GPI remains the same, we still evaluate the policy and improve it. But now we can do this in an online fashion, updating the value function after each step.</p>
+<p>In SARSA we are making updates to the policy after a single step - this may lead to much faster convergence to the optimal policy. It also allows us to improve our plans during an episode or in a continuing task.</p>
+<p>The advantage of TD methods is that they can be used in continuing tasks, where the agent interacts with the environment indefinitely. This is because the value function is updated after each step, and the agent can continue to learn and improve its policy as it interacts with the environment. But this advantage is better understood by considering the episodic tasks, where the agent can learn during an episode that consequences of its actions are sub optimal. This allows TD(0) based GPI to make more frequent updates to the policy within one episode.</p>
+</section>
+<section id="sec-l1g2" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l1g2">Sarsa: On-policy TD Control</h2>
+<p>Next we consider how we can derive and use a similar approximate updating of the action-value function to learn the action-value function directly from experience.</p>
+<p>lets recap the Bellman equation for the action-value function:</p>
+<p><span id="eq-belman-action-value"><span class="math display">
+\begin{aligned}
+q_\pi(s,a) &amp; \dot = \mathbb{E}_\pi[G_t | S_t = s, A_t = a] \qquad \newline
+&amp; = \sum_{s', r} p(s', r | s, a) [r + \gamma \sum_{a'}\pi(a' \mid s') q_\pi(s', a')] \qquad
+\end{aligned}
+\tag{1}</span></span></p>
+<p>We can now use the same idea of bootstrapping to update the action-value function after each step. This is basis of Sarsa algorithm.</p>
+<p><span id="eq-sarsa-update"><span class="math display">
+Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha [R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t)]
+\tag{2}</span></span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+SARSA
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="alg-sarsa" class="pseudocode-container" data-no-end="false" data-alg-title="Algorithm" data-pseudocode-index="1" data-comment-delimiter="#" data-line-number="true" data-line-number-punc=":" data-indent-size="1.2em">
+<div class="pseudocode">
+\begin{algorithm} \caption{SARSA($\alpha,\epsilon$)}\begin{algorithmic} \State Initialize: \State $\qquad Q(s,a) \leftarrow x \in \mathbb{R} \forall s \in \mathcal{S^+}, a\in\mathcal{A}(s)\ except\ for\ Q(terminal,\cdot)=0$ \For {each episode e:} \State Initialize $S$ \State Choose A from S using policy derived from Q (e.g., $\epsilon$-greedy) \For {each step of e} \State Take action A, observe R, S' \State Choose A' from S' using policy derived from Q (e.g., $\epsilon$-greedy) \State $Q(S, A) \leftarrow Q(S, A) + \alpha [R + \gamma Q(S',A') - Q(S, A)]$ \State $S \leftarrow S'$; $A \leftarrow A'$ \EndFor \State until $S$ is terminal \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
+</div>
+</div>
+<p>Sarsa is a sample-based algorithm to solve the Bellman equation for action-values. - It picks an action based on the current policy and then - It policy evaluation by a TD updates of Q the action-value function based on the reward and the next action. - Then it does a policy improvement.</p>
+</section>
+<section id="sec-l1g3" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-l1g3">Sarsa in an Example MDP</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-sarsa-windy-gridworld.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="windy gridworld"><img src="img/rl-sarsa-windy-gridworld.png" class="img-fluid figure-img" alt="windy gridworld"></a></p>
+<figcaption>windy gridworld</figcaption>
+</figure>
+</div></div><p>In this grid world isn’t a good fit for MC methods as most policies never terminate. This is because the agent is pushed up by the wind and has to learn to navigate to the goal. Anyhow if the episode never terminates MC wont be able to update the value function.</p>
+<p>But Sarsa can learn the optimal policy in this environment by abandoning the epsilon greedy policy in mid episode and finding better policies. We can see that early episodes take longer to terminate after the e-greedy policy stops peaks.</p>
+</section>
+<section id="sec-l1g4" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l1g4">Performance of Learning Algorithms in an MDP</h2>
+<p>On the right side of the figure we see the performance of the learning algorithms in the windy grid world. We see that in this chart the Sarsa algorithm learns the optimal policy at Around step 7000 where the gradient becomes constant.</p>
+<p>Q. why is SARSA called an on-policy algorithm?</p>
+<p>this is because it learns by sampling from the policy induced by Q while following the same policy <span class="math inline">\pi</span>.</p>
 </section>
 <section id="lesson-2-off-policy-td-control-q-learning" class="level2">
 <h2 class="anchored" data-anchor-id="lesson-2-off-policy-td-control-q-learning">Lesson 2: Off-policy TD Control: Q-learning</h2>
+<section id="lesson-learning-goals-1" class="level3 unnumbered callout-info">
+<h3 class="unnumbered anchored" data-anchor-id="lesson-learning-goals-1">Lesson Learning Goals</h3>
 <ul class="task-list">
-<li><label><input type="checkbox">Describe the Q-learning algorithm</label></li>
-<li><label><input type="checkbox">Explain the relationship between q-learning and the Bellman optimality equations.</label></li>
-<li><label><input type="checkbox">Apply q-learning to an MDP to find the optimal policy</label></li>
-<li><label><input type="checkbox">Understand how Q-learning performs in an example MDP</label></li>
-<li><label><input type="checkbox">Understand the differences between Q-learning and Sarsa</label></li>
-<li><label><input type="checkbox">Understand how Q-learning can be off-policy without using importance sampling</label></li>
-<li><label><input type="checkbox">Describe how the on-policy nature of SARSA and the off-policy nature of Q-learning affect their relative performance</label></li>
+<li><label><input type="checkbox" checked="">Describe the Q-learning algorithm <a href="#sec-l2g1">#</a></label></li>
+<li><label><input type="checkbox" checked="">Explain the relationship between q-learning and the Bellman optimality equations. <a href="#sec-l2g2">#</a></label></li>
+<li><label><input type="checkbox">Apply q-learning to an MDP to find the optimal policy <a href="#sec-l2g3">#</a></label></li>
+<li><label><input type="checkbox">Understand how Q-learning performs in an example MDP <a href="#sec-l2g4">#</a></label></li>
+<li><label><input type="checkbox">Understand the differences between Q-learning and Sarsa <a href="#sec-l2g5">#</a></label></li>
+<li><label><input type="checkbox">Understand how Q-learning can be off-policy without using importance sampling <a href="#sec-l2g6">#</a></label></li>
+<li><label><input type="checkbox">Describe how the on-policy nature of SARSA and the off-policy nature of Q-learning affect their relative performance <a href="#sec-l2g7">#</a></label></li>
 </ul>
+</section>
+<p>lets recap the Bellman optimality equation for the action-value function:</p>
+<p><span id="eq-belman-optimality-action-value"><span class="math display">
+\begin{aligned}
+q_{\star}(s,a) = \sum_{s', r} p(s', r | s, a) [r + \gamma \max_{a'} q_{\star}(s', a')]
+\end{aligned}
+\tag{3}</span></span></p>
+<p>The following is an update rule for Q-learning:</p>
+<p>We can now use the same idea of bootstrapping to update the action-value function after each step. This is basis of Sarsa algorithm.</p>
+<p><span id="eq-q-learning-update"><span class="math display">
+Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha [R_{t+1} + \gamma \max_a Q(S_{t+1}, a') - Q(S_t, A_t)]
+\tag{4}</span></span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Q-learning (off-policy TD control)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="alg-q-learning" class="pseudocode-container" data-no-end="false" data-alg-title="Algorithm" data-pseudocode-index="2" data-comment-delimiter="#" data-line-number="true" data-line-number-punc=":" data-indent-size="1.2em">
+<div class="pseudocode">
+\begin{algorithm} \caption{Q-learning Off-policy TD control}\begin{algorithmic} \State Initialize: \State $\qquad Q(s,a) \leftarrow x \in \mathbb{R} \forall s \in \mathcal{S^+}, a\in\mathcal{A}(s)\ except\ for\ Q(terminal,\cdot)=0$ \For {each episode e:} \State Initialize $S$ \For {each step of e} \State Choose A from $A_B(S)$ using any ergodic Behavioural policy $B$ - perhaps the $\epsilon$-greedy induced by Q. \State Take action A, observe R, S' \State $Q(S, A) \leftarrow Q(S, A) + \alpha [R + \gamma \max_a Q(S',a) - Q(S, A)]$ \State $S \leftarrow S'$ \EndFor \State until $S$ is terminal \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
+<p>Note: I made some cosmetic changes to the psuedo code in the book to resolve the confusion I had about nature the behavioral policy.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The behavioral policy in Q-learning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Q-learning has a subtle issue I found confusing at first.</p>
+<p>Here I first state the issue:</p>
+<p>What is the behavioral policy we follow in these three td-learning algorithms when we sample the next action to follow?</p>
+<p>We are not writing here that Q function is <span class="math inline">Q_\pi</span> but the value functions are by definitions expectations under some policy. In these algorithms we keep updating the Q function using TD(0) updates. If we update the Q function in a sense that the best action changes at a given step then the updated function now uses a new policy. (In the case of Sarsa we can actually get a worse policy after the update.) I figured this out very quickly.</p>
+<p>A fully specified Q-functions isn’t just defined by following a policy. It also <strong>induces a policy</strong>. This in generaly is a stochastic policy. But if we take the greedy action with arbitrary tie breaks we get one or more deterministic policies. So it seems that off policy algorithms like Q-learning and Expected Sarsa are following a sequence of policies that are induced by the Q function that is being learned.</p>
+<p>In general off policy learning may be using S,A,R sequences that have been sampled like we clearly did in MC. So the question which arises is can sample from any ergodic policy as our behavioral policy in these off-policy algorithms or are we supposed to learn from experience and sample using the policy induced by latest and greatest Q function that we are learning?</p>
+<p><strong>Luckily Martha White is very clear about this</strong>:</p>
+<ul>
+<li>The target policy is the easy part - we are targeting <span class="math inline">Q_{\pi_\star}</span>.</li>
+<li>The behavior policy is the policy can be any policy so long as it is ergodic.
+<ul>
+<li>Using an <span class="math inline">\epsilon</span>-greedy policy derived from Q is very logical choice but we could use any other policy.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Do these algorithms converge?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Is Q-learning guaranteed to converge ?</li>
+<li>The course glossed over this in lectures perhaps referencing the text book – I will have to go back and check this.</li>
+<li>However as this is introductory CS and not Mathematics I will try to suspend my disbelief that the algs are guarenteed to converge and return to the point.</li>
+</ul>
+</div>
+</div>
+<ol type="1">
+<li>It is an off-policy algorithm.</li>
+</ol>
+<ul>
+<li>The <strong>target policy</strong> is the easy part - we are targeting <span class="math inline">Q_{\pi_\star}</span>.</li>
+<li>The <strong>behavior policy</strong> is the policy that we are following but what is that ?
+<ul>
+<li>it is clearly not <span class="math inline">Q_{\pi_\star}</span> as we don’t know it yet.</li>
+<li>we initialized Q(s,a) arbitrarily - so we may have a uniform random policy.</li>
+<li>bu we actual have any random policy.
+<ul>
+<li>any action that is a legit transition from the current state is a valid action.</li>
+<li>so long as their probabilities add up to 1.</li>
+</ul></li>
+<li>later Martha keeps saying that we need the ergodicity of the MDP to ensure that out policy will visit all states and actions with non-zero probability.</li>
+<li>this anyhow is one source of confusion.</li>
+<li>however an epsilon greedy policy of the induced policy from Q seems like a very good choice. Can we do better ?</li>
+<li>another point to consider here is that this is a value iteration algorithm.
+<ul>
+<li>what can we say about the inermediate Q functions that we are learning ?</li>
+<li>are they even a valid action value function ?</li>
+<li>is the policy they induce a coherent probability distribution over actions ?</li>
+</ul></li>
+</ul></li>
+</ul>
+<ol start="2" type="1">
+<li>When we select the action A’ what policy are we using ?</li>
+</ol>
+<ul>
+<li><p>we are clearly not using the policy that we are learning <span class="math inline">\pi_\star</span> - we dont know it yet.</p></li>
+<li><p>we are could use an <span class="math inline">\epsilon</span>-greedy policy by greedifying Q. this seems the most logical</p></li>
+<li><p>but we could pretty much use any other policy.</p></li>
+<li><p>this is because Q-learning is an off-policy algorithm.</p></li>
+<li><p>the confusion arises because it is not clear what “any policy derived from Q” means in the algorithm.</p></li>
+<li><p>q-learning</p>
+<ul>
+<li>is a <span class="marked">value iteration algorithm</span></li>
+<li>uses <span class="marked">the Bellman optimality equation</span> to update the action-value function.</li>
+<li>selects the action based on greedyfing the current q-values and then</li>
+</ul></li>
+<li><p>it policy evaluation by a TD updates of Q the action-value function based on the reward and the next action.</p></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+why can’t q-learning account for the consequences of exploration in its policy ?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>q-learning learns the optimal policy but follows a some other policy. Let suppose the optimal policy is deterministic. And let’s suppose that the behavior policy is epsilon greedy based on that.</p>
+<p>The alg does not follow the optimal policy - it follows the behavior policy and this will perform much worse because of exploration.</p>
+<p>If we need to account for the consequences of exploration in the policy we need to use a different algorithm!</p>
+</div>
+</div>
+</section>
+<section id="sec-l2g4" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-l2g4">Q-learning in an Example MDP</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-sarsa-windy-gridworld.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="windy gridworld"><img src="img/rl-sarsa-windy-gridworld.png" class="img-fluid figure-img" alt="windy gridworld"></a></p>
+<figcaption>windy gridworld</figcaption>
+</figure>
+</div></div><p>In this grid world isn’t a good fit for MC methods as most policies never terminate.</p>
+<p>Q-learning can learn the optimal policy in this environment by abandoning the epsilon greedy policy in mid episode and finding better policies.</p>
+<p>We can see that early episodes take longer to terminate after the e-greedy policy stops peaks.</p>
+<p>However Q-learning does not take seem to factor in the consequences of exploration in its policy.</p>
+<p>This is because it is learning the optimal policy and not the policy that it follows.</p>
+<p>Q-learning does not need Importance sampling to learn off-policy. This is because it is learning action values.</p>
+</section>
+<section id="sec-l2g5" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l2g5">Comparing Sarsa and Q-learning</h2>
+<p>Q-learning is an off-policy algorithm:</p>
+<ul>
+<li>the target policy is the optimal policy since the update rule approximates the Bellman optimality equation.</li>
+<li>the behavior policy is initially given updated at each step from the inital get updated a bit towards the optimal policy at each step.</li>
+</ul>
+<p>because it is learning <span class="math inline">\pi_*</span> (the optimal policy) but it samples a different policy.</p>
+<p>This is in contrast to Sarsa, which is an on-policy algorithm because it learns the policy that it follows.</p>
 </section>
 <section id="lesson-3-expected-sarsa" class="level2">
 <h2 class="anchored" data-anchor-id="lesson-3-expected-sarsa">Lesson 3: Expected SARSA</h2>
+<section id="lesson-learning-goals-2" class="level3 unnumbered callout-info">
+<h3 class="unnumbered anchored" data-anchor-id="lesson-learning-goals-2">Lesson Learning Goals</h3>
 <ul class="task-list">
-<li><label><input type="checkbox">Describe the Expected SARSA algorithm</label></li>
-<li><label><input type="checkbox">Describe Expected SARSA’s behavior in an example MDP</label></li>
-<li><label><input type="checkbox">Understand how Expected SARSA compares to SARSA control</label></li>
-<li><label><input type="checkbox">Understand how Expected SARSA can do off-policy learning without using importance sampling</label></li>
-<li><label><input type="checkbox">Explain how Expected SARSA generalizes Q-learning</label></li>
+<li><label><input type="checkbox">Describe the Expected SARSA algorithm <a href="#sec-l3g1">#</a></label></li>
+<li><label><input type="checkbox">Describe Expected SARSA’s behavior in an example MDP <a href="#sec-l3g2">#</a></label></li>
+<li><label><input type="checkbox">Understand how Expected SARSA compares to SARSA control <a href="#sec-l3g3">#</a></label></li>
+<li><label><input type="checkbox">Understand how Expected SARSA can do off-policy learning without using importance sampling <a href="#sec-l3g4">#</a></label></li>
+<li><label><input type="checkbox">Explain how Expected SARSA generalizes Q-learning <a href="#sec-l3g5">#</a></label></li>
 </ul>
+</section>
+<p><span class="math display">
+\begin{aligned}
+Q(S_t, A_t) &amp; \leftarrow Q(S_t, A_t) + \alpha [R_{t+1} + \gamma \mathbb{E}[Q(S_{t+1}, A_{t+1})] - Q(S_t, A_t)] \newline
+&amp; \leftarrow Q(S_t, A_t) + \alpha [R_{t+1} + \gamma \sum_a \pi(a|S_{t+1}) \cdot Q(S_{t+1}, a) - Q(S_t, A_t)]
+\end{aligned}
+</span></p>
+<section id="sec-l3g1" class="level3">
+<h3 class="anchored" data-anchor-id="sec-l3g1">Understanding Expected Sarsa</h3>
+<p>lets recap the Bellman equation for the action-value function:</p>
+<p><span id="eq-belman-action-value"><span class="math display">
+\begin{aligned}
+q_\pi(s,a) &amp; \dot = \mathbb{E}_\pi[G_t | S_t = s, A_t = a] \qquad \newline
+&amp; = \sum_{s', r} p(s', r | s, a) [r + \gamma \sum_{a'}\pi(a' \mid s') q_\pi(s', a')] \qquad
+\end{aligned}
+\tag{5}</span></span></p>
+<p>We can now use the same idea of bootstrapping to update the action-value function after each step. This is basis of Sarsa algorithm.</p>
+<p>in the sarsa update rule:</p>
+<p><span id="eq-sarsa-update"><span class="math display">
+Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha [R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t)]
+\tag{6}</span></span></p>
+<p>we knows the policy <span class="math inline">\pi</span> so we can make a better update by replacing the sampled next action with the expected value of the next action under the policy <span class="math inline">\pi</span>.</p>
+<p>This is the basis of Expected Sarsa.</p>
+<p>which uses the update rule:</p>
+<p><span id="eq-expected-sarsa-update"><span class="math display">
+Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha [R_{t+1} + \gamma \sum_a \pi(a|S_{t+1}) \cdot Q(S_{t+1}, a) - Q(S_t, A_t)]
+\tag{7}</span></span></p>
+<p>Otherwise the algorithm is the same as Sarsa.</p>
+<ul>
+<li>This target is more stable than the Sarsa target because it is less noisy.</li>
+<li>This makes it converge faster than Sarsa.</li>
+</ul>
+<p>this has a has a down side - it has more computation than Sarsa due to avaraging over many actions for every step.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Expected Sarsa
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="alg-q-learning" class="pseudocode-container" data-no-end="false" data-alg-title="Algorithm" data-pseudocode-index="3" data-comment-delimiter="#" data-line-number="true" data-line-number-punc=":" data-indent-size="1.2em">
+<div class="pseudocode">
+\begin{algorithm} \caption{expected SARSA}\begin{algorithmic} \State Initialize: \State $\qquad Q(s,a) \leftarrow x \in \mathbb{R} \forall s \in \mathcal{S^+}, a\in\mathcal{A}(s)\ except\ for\ Q(terminal,\cdot)=0$ \For {each episode e:} \State Initialize $S$ \State Choose A from S using policy derived from Q (e.g., $\epsilon$-greedy) \For {each step of e} \State Take action A, observe R, S' \State Choose A' from S' using policy derived from Q (e.g., $\epsilon$-greedy) \State $Q(S, A) \leftarrow Q(S, A) + \alpha [R + \gamma \sum_a \pi(a|S') Q(S',A') - Q(S, A)]$ \State $S \leftarrow S'$; $A \leftarrow A'$ \State $S$ is terminal \EndFor \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Summary - Connecting the dots
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Expected Sarsa is a generalization of Q-learning and Sarsa.</li>
+<li>There are many RL algorithms in our specialization flowchart.</li>
+<li>We would like to find a few or even one algorithm that may be widely applicable to many different settings, carrying over the insights we learned from each new algorithm.</li>
+<li>The first step in this direction was introducing the <span class="math inline">epsilon</span> parameter to the bandit algorithms, which allowed us to treat the exploration-exploitation trade-off. We have seen additional strategies for exploration but we have been using either an <span class="math inline">\epsilon</span>-greedy strategy or a epsilon-soft strategy in most algorithms.
+<ul>
+<li>We also got the powerful idea of using confidence intervals as tie breakers in the case of multiple actions with the same expected reward.</li>
+</ul></li>
+<li>Another step in this direction was to introduce discounting of rewards which let us parameter discounting with <span class="math inline">\gamma</span> and thus treat episodic and continuing tasks in the same way.</li>
+<li>The MC algorithms showed that this is not enough to fully generalize to episodic and continuing tasks. However we got a powerful new ideas of inverse sampling and doubly robust estimators. For use with off-policy learning.</li>
+<li>Next we introduced GPI in which we combined policy evaluation and policy improvement algorithms to iteratively approximate the optimal policy in a single algorithm.</li>
+<li>Another lesson was to using the TD error to bootstrap the value function. This let us update value functions after each step, rather than waiting until the end of the episode, increasing the data efficiency of the algorithms.
+<ul>
+<li>We also saw that we can use this idea with action-value functions, which is more fine grained than the value function and can lead to more efficient learning.</li>
+</ul></li>
+<li>Next we saw that Expected Sarsa is one such algorithm that can be used in many different settings.
+<ul>
+<li>It can be used in episodic and continuing tasks,</li>
+<li>It can be used for on-policy and off-policy learning.</li>
+<li>It is a GPI algorithm that uses the TD error to update the action-value function. And it the <span class="math inline">\epsilon</span>-greedy strategy implicit in its action-value function.</li>
+</ul></li>
+</ul>
+</div>
+</div>
 
 
+</section>
 </section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
   author = {Bochman, Oren},
-  title = {Sample-Based {Learning} {Methods}},
+  title = {Temporal {Difference} {Learning} {Methods} for {Control}},
   date = {2024-03-03},
   url = {https://orenbochman.github.io//notes/RL/c2-w3.html},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2024. <span>“Sample-Based Learning Methods.”</span> March
-3, 2024. <a href="https://orenbochman.github.io//notes/RL/c2-w3.html">https://orenbochman.github.io//notes/RL/c2-w3.html</a>.
+Bochman, Oren. 2024. <span>“Temporal Difference Learning Methods for
+Control.”</span> March 3, 2024. <a href="https://orenbochman.github.io//notes/RL/c2-w3.html">https://orenbochman.github.io//notes/RL/c2-w3.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1082,7 +1483,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     })(document);
     </script>
   
-<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","loop":false,"closeEffect":"zoom","selector":".lightbox","openEffect":"zoom"});
+<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","selector":".lightbox","closeEffect":"zoom","loop":false,"openEffect":"zoom"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {

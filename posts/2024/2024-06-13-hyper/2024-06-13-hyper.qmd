@@ -1,0 +1,57 @@
+---
+title: Hyperparameter Optimization 
+date: 2024-06-13
+draft: false
+---
+
+
+# Hyperparameter Optimization
+
+
+## best model
+
+one the idea is for a set of Hyperparameters to find the best one.
+
+- start with random search.
+ - for k in 1 to |hyper|:
+ - look for k hyperparameters which lead to correlated results.
+ - try to find the ranges where the correlation is valid
+ - use the correlation to search for the best joint hyperparameters.
+
+basically, we are trying to infer if $loss(a_1,a_2)$ is correlated with $a_1$ and $a_2$.
+each time we find such a relationship we can limit the search space to a subspace of the hyperparameter space.
+For a + correlation, we know that by increasing $a_1$ and $a_2$ we get a better result.
+For a - correlation, we know that by decreasing $a_1$ and increasing $a_2$ we get a better result.
+
+While we test these we should look for other correlations between hyperparameters.
+either with a_1 or a_2 or with within some other subset of hyperparameters.
+
+## fastest model
+
+the above is a good idea but we might do better if we can train faster and reject hyperparameters which are slow learners.
+
+another idea is to not find the best model first but the fasterst learner.
+
+we could do this iteratively by training an epoch per model and then selecting the models which converges the fastest.
+we can then pick the neighbours of the fastest model and train them for another epoch.
+as we gain confidence in the fastest learner we can use it to guide the search for subspace reduction by 
+also looking for corelations between hyperparameters per the previous section.
+
+for example we may find that for
+- a big learning rate we learn faster
+- a big batch size we learn faster
+- a big number of layers we learn slower
+
+1. we can use early stopping to save costs once the fast models overfit.
+2. we can use the best weights we got to starting future epocs for future 
+   hyperparameters settings.
+
+## adaptive learning schedules
+
+we could probably do better if we start with a fast learner then as it converges
+switch to a better but slower learner.
+
+this may allow us to train the best model faster.
+
+
+

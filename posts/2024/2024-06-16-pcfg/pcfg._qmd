@@ -1,0 +1,130 @@
+---
+title: "grammar induction"
+date: 2024-06-16
+draft: true
+---
+
+
+First, let's define the text input and initialize some necessary libraries.
+
+
+```{python}
+import nltk
+import numpy as np
+import random
+from collections import defaultdict
+
+# Sample text input (list of sentences)
+text_input = [
+    "the quick brown fox jumps over the lazy dog",
+    "the lazy dog lies in the sun",
+    "the quick brown fox is very quick"
+]
+
+class PCFG:
+    def __init__(self):
+        self.rules = defaultdict(list)
+        self.probabilities = defaultdict(float)
+
+    def add_rule(self, lhs, rhs, probability):
+        self.rules[lhs].append(tuple(rhs))  # Convert list to tuple
+        self.probabilities[(lhs, tuple(rhs))] = probability  # Convert list to tuple
+
+    def get_rules(self):
+        return self.rules
+
+    def get_probabilities(self):
+        return self.probabilities
+
+pcfg = PCFG()
+
+class PCFGEnvironment:
+    def __init__(self, texts):
+        self.texts = texts
+        self.current_text = 0
+        self.state = self.initialize_state()
+        self.actions = self.define_actions()
+        self.reward = 0
+
+    def initialize_state(self):
+        # Initialize the state based on the current text
+        pos_tags = nltk.pos_tag(self.texts[self.current_text].split())
+        return pos_tags
+
+    def define_actions(self):
+        # Define possible actions: create rules from POS tags
+        actions = []
+        for i in range(len(self.state)):
+            for j in range(i + 1, len(self.state) + 1):
+                actions.append(self.state[i:j])
+        return actions
+
+    def step(self, action):
+        # Apply action and calculate reward
+        lhs = action[0][1]
+        rhs = [word for word, tag in action]
+        pcfg.add_rule(lhs, rhs, random.uniform(0.1, 1.0))
+        self.reward = self.calculate_reward()
+        return self.state, self.reward
+
+    def calculate_reward(self):
+        # Define a reward function for creating a valid rule
+        return 1.0  # Simplified reward for demonstration purposes
+
+    def reset(self):
+        # Reset environment for the next sentence
+        self.current_text = (self.current_text + 1) % len(self.texts)
+        self.state = self.initialize_state()
+        self.actions = self.define_actions()
+        self.reward = 0
+
+env = PCFGEnvironment(text_input)
+
+class RLAgent:
+    def __init__(self, env):
+        self.env = env
+        self.q_table = defaultdict(lambda: defaultdict(float))
+        self.alpha = 0.1  # Learning rate
+        self.gamma = 0.9  # Discount factor
+        self.epsilon = 0.1  # Exploration rate
+
+    def choose_action(self, state):
+        state_key = tuple(state)
+        if random.uniform(0, 1) < self.epsilon:
+            return random.choice(self.env.actions)
+        else:
+            return max(self.env.actions, key=lambda action: self.q_table[state_key][tuple(map(tuple, action))])
+
+    def update_q_table(self, state, action, reward, next_state):
+        state_key = tuple(state)
+        next_state_key = tuple(next_state)
+        action_key = tuple(map(tuple, action))
+        best_next_action = max(self.q_table[next_state_key], key=self.q_table[next_state_key].get)
+        td_target = reward + self.gamma * self.q_table[next_state_key][best_next_action]
+        self.q_table[state_key][action_key] += self.alpha * (td_target - self.q_table[state_key][action_key])
+
+    def train(self, episodes):
+        for episode in range(episodes):
+            for _ in range(len(self.env.texts)):
+                state = self.env.initialize_state()
+                while True:
+                    action = self.choose_action(state)
+                    next_state, reward = self.env.step(action)
+                    self.update_q_table(state, action, reward, next_state)
+                    state = next_state
+                    if not self.env.actions:  # End of episode condition
+                        break
+                self.env.reset()
+
+agent = RLAgent(env)
+agent.train(100)
+
+# Display learned grammar rules and probabilities
+rules = pcfg.get_rules()
+probabilities = pcfg.get_probabilities()
+print("Learned PCFG Rules:")
+for lhs, rhs_list in rules.items():
+    for rhs in rhs_list:
+        print(f"{lhs} -> {' '.join(rhs)} [{probabilities[(lhs, rhs)]:.2f}]")
+
+```

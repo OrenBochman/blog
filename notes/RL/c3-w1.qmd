@@ -1,7 +1,8 @@
 ---
 date: 2024-04-01
 lastmod: 2024-04-01
-title: Prediction and Control with Function Approximation
+title: On-Policy Prediction with Approximation
+subtitle: Prediction and Control with Function Approximation
 author: Oren Bochman
 draft: false
 categories:
@@ -20,3 +21,414 @@ title-block-banner: /images/banner_black_3.jpg
 ---
 
 ![RL algorithms](img/alg_selector.jpeg){.column-margin}
+
+
+::: {.callout-tip collapse="true"}
+### Readings {.unnumbered}
+
+-   [x] [@sutton2018reinforcement§91.-9.4, pp. 194-209] [book][http://incompleteideas.net/book/RLbook2020.pdf#page=194)]
+:::
+
+# Lesson 1: Estimating Value Functions as Supervised Learning 
+
+In this lesson we will cover some important notation that will remain with us 
+till the end of the course. Mathematically most of it is trivial, 
+but it is important to understand the notation - otherwise the rest of the course
+will be hard to follow.
+
+::: callout-note
+### Learning Objectives {.unnumbered}
+
+-   [x] *Understand* how we can use **parameterized functions** to approximate value functions [\#](#sec-l1g1)
+-   [x] *Explain* the meaning of **linear value function approximation** [\#](#sec-l1g2)
+-   [x] *Recognize* that the tabular case is a special case of linear value function approximation [\#](#sec-l1g3)
+-   [x] *Understand* that there are many ways to parameterize an approximate value function [\#](#sec-l1g4)
+-   [x] *Understand* what is meant by **generalization** and **discrimination** [\#](#sec-l1g5)
+-   [x] *Understand* how generalization can be beneficial [\#](#sec-l1g6)
+-   [x] *Explain* why we want both generalization and discrimination from our function approximation [\#](#sec-l1g7)
+-   [x] *Understand* how value estimation can be framed as a **supervised learning** problem [\#](#sec-l1g8)
+-   [x] **Recognize** not all function approximation methods are well suited for reinforcement learning [\#](#sec-l1g9)
+:::
+
+## Understanding parameterized functions {#sec-l1g1}
+
+- In the previous courses we represented value functions as tables or arrays:
+  - For $V(s)$ we had an array of size $|S|$, 
+  - For $Q(s,a)$ we had an array of size $|S| \times |A|$.
+  This becomes impractical as $|S| \rightarrow \infty$.
+We can use **parameterized functions** to approximate value functions. This is called **function approximation**.
+- **Linear value function approximation** is a simple and popular method. 
+  - We represent the value function as a linear combination of features:
+
+  
+$$
+\hat{v}(s, \mathbb{w}) \approx v_\pi(s) \qquad
+$$ {#eq-fn-approx}
+
+- where:
+  - $\hat{v}()$ is the approximate value function
+  - $\mathbf{w}$ is a weight vector
+- for example:
+
+
+
+## Linear value function approximation {#sec-l1g2}
+
+- We can write the approximate value function as a linear combination of features:
+
+$$
+\hat{v}(s, \mathbb{w}) \dot = w_1 X + w_2 + Y    \qquad
+$$ {#eq-lin-fn-approx}
+
+- where:
+  - $X$ and $Y$ are features of the state $s$
+  - $w_1$ and $w_2$ are the weights of the features
+- now learning becomes finding better weights that parameterize the value function.
+
+finding the weights that minimize the error between the approximate value function and the true value function:
+
+## Tabular case is a special case of linear value function approximation {#sec-l1g3}
+
+![tabular case](img/rl-tabular-is-linear-fn.png){.column-margin}
+
+$$
+\begin{align*}
+\hat{v}(s, \mathbb{w}) & \dot = \sum w_i x_i(s) \newline
+                       & = <\mathbf{w}, \mathbf{x}(s)> \qquad
+\end{align*}
+$$ {#eq-fn-approx}
+
+- here:
+  - $\mathbf{w}$ is a weight vector
+  - $\mathbf{x}(s)$ is a feature vector that is 1 in the $i$-th position and 0 elsewhere.
+- linear value function approximation is a generalization of the tabular case.
+- limitations of linear value function approximation:
+  - the choice of features limits the expressiveness of the value function.
+  - it can only represent linear relationships between the features and the value function.
+  - it can only represent a limited number of features.
+- so how are tabular functions a special case of linear value function approximation?
+  - we can see from the figure that all we need is use one hot encoding for the features. Then the weighet vector will be the same as the value function in the table.
+  
+![Linear value function approximation failure](img/rl-linear-fn-fail.png){.column-margin}
+
+## There are many ways to parameterize an approximate value function {#sec-l1g4}
+
+![neural networks are non-linear fn approximators](img/rl-non-linear-fn-approximation.png){.column-margin}
+
+- We can use different types of functions to approximate the value function:
+  - one hot encoding
+  - linear functions
+  - tile coding
+  - neural networks
+  
+## Understanding generalization and discrimination {#sec-l1g5}
+
+
+![generalization and discrimination](img/rl-generalization-discrimination-matrix.png){.column-margin}
+
+- Generalization: 
+  - the ability to estimate the value of states that were not seen during training.
+  - in the case of policy evaluation, generalization is the ability of updates of value functions in one state to affect the value of other states.
+  - in the tabular case, generalization is not possible because we only update the value of the state we are in.
+  - in the case of function approximation, we can think of generalization as corresponding to an embedding of the state space into a lower-dimensional space.
+- Discrimination: the ability to distinguish between different states.
+
+
+## How generalization can be beneficial {#sec-l1g6}
+
+- generalization can be beneficial because:
+  - it allows us to estimate the value of states that were not seen during training.
+  - it allows us to estimate the value of states that are similar to states seen during training.
+  - it allows us to estimate the value of states that are far from states seen during training.
+    
+
+
+## Why we want both generalization and discrimination from our function approximation {#sec-l1g7}
+
+- we want both generalization and discrimination from our function approximation because:
+  - generalization allows us to estimate the value of states that were not seen during training.
+  - discrimination allows us to distinguish between different states.
+  - generalization allows us to estimate the value of states that are similar to states seen during training.
+  - discrimination allows us to estimate the value of states that are far from states seen during training.
+  
+::: callout-tip
+
+### Bias-variance tradeoff {.unnumbered}
+
+- an important result called the **[bias-variance tradeoff](https://en.wikipedia.org/wiki/Bias-variance_tradeoff)**:
+  - bias is the error introduced by approximating a real-world problem, 
+   which may be extremely complicated, by a much simpler model. This means that since 
+   we cannot discriminate between different states that share weights for the same 
+   feature vector we have errors we characterize as bias. 
+  - High bias corresponds to underfitting in our model.
+  - Variance is the opposite issue arising from having more features than we need
+    to discriminate between states. This means that updating certain weights will 
+    affect only some of these related states and not others. This type of error 
+    is called variance and is also undesirable.
+  - High variance corresponds to overfitting in our model which can be due to 
+    our model fitting the noise in the data rather than the underlying signal.
+  - In general for a model there is some optimal point where the bias and variance 
+    are balanced. Going forward from that point we observe a trade off between bias
+    and variance so we need to choose one or the other. 
+  - This choice is usually governed by business realities and the nature of the 
+    data or the problem we are trying to solve.
+   
+:::
+
+## How value estimation can be framed as a supervised learning problem {#sec-l1g8}
+
+- Sutton and Barto seem to frequently lament that thier colleagues in the field of RL often end up moving to supervised learning.
+- In this talk we may have the seeds for this behavior.
+- The problem of policy evaluation in reinforcement learning can be framed as supervised learning problem
+  - in the case of Monte Carlo methods, 
+    - the inputs are the states and 
+    - the outputs are the returns.
+  - in the case of TD methods,
+    - the inputs are the states and 
+    - the outputs are the one step bootstrapped returns.
+
+## Not all function approximation methods are well suited for reinforcement learning {#sec-l1g9}
+
+>  In principle, any function approximation technique from supervised learning can be applied to the policy evaluation task. However, not all are equally well-suited. -- Martha White
+
+- in RL the agent interacts with the environment and generates data, which correpsonds to the online setting in supervised learning.
+- When we want to use supervised learning we need to choose a method that is well suited for the online setting which can handle
+  - non-stationary data.
+  - non-stationary and correlated data (which is the case in RL).
+
+In fact much of the learning in RL is about learning such correllations and quickly adapting to non-stationary in the environment.
+
+
+
+# Lesson 2: The Objective for On-policy Prediction 
+
+::: callout-note
+### Learning Objectives {.unnumbered}
+
+-   [x] Understand the mean-squared value error objective for policy evaluation [\#](#sec-l2g1)
+-   [x] Explain the role of the state distribution in the objective [\#](#sec-l2g2)
+-   [x] Understand the idea behind gradient descent and stochastic gradient descent [\#](#sec-l2g3)
+-   [x] Outline the gradient Monte Carlo algorithm for value estimation [\#](#sec-l2g4)
+-   [x] Understand how state aggregation can be used to approximate the value function [\#](#sec-l2g5)
+-   [x] Apply Gradient Monte-Carlo with state aggregation [\#](#sec-l2g6)
+
+:::
+
+## The mean-squared value error objective for policy evaluation {#sec-l2g1}
+
+
+- The mean-squared value error objective for policy evaluation is to minimize the mean-squared error between the true value function and the approximate value function:
+
+$$
+\begin{align*}
+J(\mathbf{w}) & = \mathbb{E}[(v_\pi(S) - \hat{v}(S, \mathbf{w}))^2] \newline
+              & = \sum_{s \in S} d(s) (v_\pi(s) - \hat{v}(s, \mathbf{w}))^2 \qquad
+\end{align*}
+$$ {#eq-msve}
+
+- where:
+  - $J(\mathbf{w})$ is the mean-squared value error
+  - $d(s)$ is the state distribution
+  - $v_\pi(s)$ is the true value of state $s$
+  - $\hat{v}(s, \mathbf{w})$ is the approximate value of state $s$ with weights $\mathbf{w}$
+- the goal is to find the weights that minimize the mean-squared value error.
+
+## The role of the state distribution in the objective {#sec-l2g2}
+
+- The state distribution $d(s)$ is the probability of being in state $s$ under the policy $\pi$.
+- The state distribution is important because it determines how much we care about the error in each state.
+- The state distribution is usually unknown, so we have to estimate it from the data.
+- The state distribution can be estimated using the empirical distribution of states visited during training.
+
+## The idea behind gradient descent and stochastic gradient descent {#sec-l2g3}
+
+- Gradient descent is an optimization algorithm that minimizes a function by moving in the direction of the negative gradient.
+- Stochastic gradient descent is a variant of gradient descent that uses a random sample of the data to estimate the gradient.
+- Stochastic gradient descent is often used in reinforcement learning because it is computationally efficient and can handle large datasets.
+
+## The gradient Monte Carlo algorithm for value estimation {#sec-l2g4}
+
+- The gradient Monte Carlo algorithm is a policy evaluation algorithm that uses stochastic gradient descent to minimize the mean-squared value error.
+- The algorithm works as follows:
+  - Initialize the weights $\mathbf{w}$ to zero.
+  - Repeat until convergence:
+    - Generate an episode using the policy $\pi$.
+    - For each state $s$ in the episode:
+      - Compute the gradient of the mean-squared value error with respect to the weights $\mathbf{w}$.
+      - Update the weights $\mathbf{w}$ in the direction of the negative gradient.
+      
+## How state aggregation can be used to approximate the value function {#sec-l2g5}
+
+- State aggregation is a method for reducing the dimensionality of the state space by grouping similar states together.
+- State aggregation can be used to approximate the value function by representing each group of states as a single state.
+- State aggregation can be used to reduce the number of parameters in the value function and improve generalization.
+
+## Applying Gradient Monte-Carlo with state aggregation {#sec-l2g6}
+
+- Gradient Monte Carlo with state aggregation is a policy evaluation algorithm that uses state aggregation to approximate the value function.
+- The algorithm works as follows:
+  - Initialize the weights $\mathbf{w}$ to zero.
+  - Repeat until convergence:
+    - Generate an episode using the policy $\pi$.
+    - For each state $s$ in the episode:
+      - Compute the gradient of the mean-squared value error with respect to the weights $\mathbf{w}$.
+      - Update the weights $\mathbf{w}$ in the direction of the negative gradient.
+    - Aggregate the states using a state aggregation function.
+    - Update the weights $\mathbf{w}$ in the direction of the negative gradient.
+    
+
+# Lesson 3: The Objective for TD 
+
+::: callout-note
+
+### Learning Objectives {.unnumbered}
+
+-   [x] Understand the TD-update for function approximation [\#](#sec-l3g1)
+-   [x] Highlight the advantages of TD compared to Monte-Carlo [\#](#sec-l3g2)
+-   [x] Outline the Semi-gradient TD(0) algorithm for value estimation [\#](#sec-l3g3)
+-   [x] Understand that TD converges to a biased value estimate [\#](#sec-l3g4)
+-   [x] Understand that TD converges much faster than Gradient Monte Carlo [\#](#sec-l3g5)
+:::
+
+## The TD-update for function approximation {#sec-l3g1}
+
+- The TD-update for function approximation is a way to update the weights of the value function using the TD-error.
+- The TD-update works as follows:
+  - Compute the TD-error $\delta$ as the difference between the one-step bootstrapped return and the approximate value of the next state.
+  - Update the weights $\mathbf{w}$ in the direction of the TD-error.
+
+## Advantages of TD compared to Monte-Carlo {#sec-l3g2}
+
+- TD has several advantages over Monte-Carlo:
+  - TD can update the value function after every step, while Monte-Carlo can only update the value function after the episode is complete.
+  - TD can learn online, while Monte-Carlo can only learn offline.
+  - TD can learn from incomplete episodes, while Monte-Carlo requires complete episodes.
+  - TD can learn from non-episodic tasks, while Monte-Carlo can only learn from episodic tasks.
+  
+## The Semi-gradient TD(0) algorithm for value estimation {#sec-l3g3}
+
+- The Semi-gradient TD(0) algorithm is a policy evaluation algorithm that uses the TD-update for function approximation.
+- The algorithm works as follows:
+  - Initialize the weights $\mathbf{w}$ to zero.
+  - Repeat until convergence:
+    - Observe the current state $s$.
+    - Take an action $a$ using the policy $\pi$.
+    - Observe the reward $r$ and the next state $s'$.
+    - Compute the TD-error $\delta$ as the difference between the one-step bootstrapped return and the approximate value of the next state.
+    - Update the weights $\mathbf{w}$ in the direction of the TD-error.
+    
+## TD converges to a biased value estimate {#sec-l3g4}
+
+- TD converges to a biased value estimate because it updates the value function using an estimate of the next state.
+- The bias of TD can be reduced by using a smaller step size or by using a more accurate estimate of the next state.
+
+## TD converges much faster than Gradient Monte Carlo {#sec-l3g5}
+
+- TD converges much faster than Gradient Monte Carlo because it updates the value function after every step.
+- Gradient Monte Carlo can only update the value function after the episode is complete, which can be slow for long episodes.
+- TD can learn online, while Gradient Monte Carlo can only learn offline.
+- TD can learn from incomplete episodes, while Gradient Monte Carlo requires complete episodes.
+- TD can learn from non-episodic tasks, while Gradient Monte Carlo can only learn from episodic tasks.
+
+## Dorina Precup's talk on Building Knowledge for AI Agents with Reinforcement Learning {#sec-l3g6}
+
+![Dorina Precup](img/rl-dorina-precup.png){.column-margin}
+Dorina Precup is a professor at McGill University and a research team lead at DeepMind. 
+She is an expert in reinforcement learning and machine learning.
+Her intersts are in the areas of abstractions.
+
+- When I think about generelization in RL I think about:
+  - Learning a parameterized value function that can be used to estimate the value of any state.
+  - Learning a parameterized policy that can be used to select actions in any state.
+  - Being able to transfer this polict to a similar task
+  - Being able to learn using less interaction with the environment and more from replaying past experiences.
+  - Being able to learn from a small number of examples.
+  
+![options](img/rl-dorina-options.png){.column-margin}  
+
+Dorina talks about two other aspects of generalization:
+  - Action duration are one time step in an MDP.
+  - In reality some actions like travelig from one city to another require sticking to the action over an extended period of time.
+  - This might be happen through planning but idealy agents should be able to learn skills which are sequences of actions that are executed over an extended period of time.
+  - This has been formalised in the literature as options.
+  - She refernces two papers from 1999 and 2000 on options.
+  - Options consists of 
+    - an initiation set $\iota_\omega(s)$ the precondition which is a probability of starting the option in state $s$. 
+    - a policy $\pi_\omega(a\mid s)$ that is executed in the option
+    - a termination condition $\beta_\omega(s)$. the termination condition is a probability of terminating the option in state $s$.
+  - Options are chunks of behavior that can be executed over an extended period of time.
+  - The model will need to learn options and work with them.
+    - IT needs expected reward over the option.
+    - A transition model over the option.
+  - These models are predictive models obout outcomes conditioned on the model being executed.
+  - Adding options to the model weakes the MDP assumption, beacuse the option duration is not fixed
+    so state now have a longer dependnce is a sequence of actions that are not Markovian.
+::: callout-tip
+
+### Options & CI {.unnumbered}
+
+- This type of formulation seems very similar to that used by Judea Pearl in his
+graphical models of Causality. If we can express options as a graph of states
+we can use his algorithms to infer the best options to take in a given state.
+
+- options are like do oparations (interventnions)
+- choosing between options is like conterfactual reasoning.
+:::
+
+In this talk, Dorina Precup discusses the challenges of building knowledge for AI agents using reinforcement learning.
+
+
+
+# Lesson 4: Linear TD 
+
+::: callout-note
+### Learning Objectives {.unnumbered}
+
+-   [x] Derive the TD-update with linear function approximation [\#](#sec-l4g1)
+-   [x] Understand that tabular TD(0) is a special case of linear semi-gradient TD(0) [\#](#sec-l4g2)
+-   [x] Highlight the advantages of linear value function approximation over nonlinear [\#](#sec-l4g3)
+-   [x] Understand the fixed point of linear TD learning [\#](#sec-l4g4)
+-   [x] Describe a theoretical guarantee on the mean squared value error at the TD fixed point [\#](#sec-l4g5)
+
+:::
+
+## Deriving the TD-update with linear function approximation {#sec-l4g1}
+
+- The TD-update with linear function approximation is a way to update the weights of the value function using the TD-error.
+- The TD-update with linear function approximation works as follows:
+  - Compute the TD-error $\delta$ as the difference between the one-step bootstrapped return and the approximate value of the next state.
+  - Update the weights $\mathbf{w}$ in the direction of the TD-error.
+  
+## Tabular TD(0) is a special case of linear semi-gradient TD(0) {#sec-l4g2}
+
+- Tabular TD(0) is a special case of linear semi-gradient TD(0) where the features are one-hot encoded.
+- In the tabular case, the weights are the same as the value function in the table.
+- In the linear case, the weights are the parameters of the value function.
+- Tabular TD(0) can be seen as a special case of linear semi-gradient TD(0) where the features are one-hot encoded.
+
+## Advantages of linear value function approximation over nonlinear {#sec-l4g3}
+
+- Linear value function approximation has several advantages over nonlinear value function approximation:
+  - Linear value function approximation is computationally efficient and easy to implement.
+  - Linear value function approximation is easy to interpret and understand.
+  - Linear value function approximation is less prone to overfitting than nonlinear value function approximation.
+  - Linear value function approximation can be used to approximate any function, while nonlinear value function approximation is limited by the choice of features.
+  
+
+## The fixed point of linear TD learning {#sec-l4g4}
+
+- The fixed point of linear TD learning is the point where the weights of the value function do not change.
+- The fixed point of linear TD learning is the point where the TD-error is zero.
+- The fixed point of linear TD learning is the point where the value function is a fixed point of the Bellman equation.
+
+## Theoretical guarantee on the mean squared value error at the TD fixed point {#sec-l4g5}
+
+- There is a theoretical guarantee on the mean squared value error at the TD fixed point.
+- The mean squared value error at the TD fixed point is the minimum possible mean squared value error.
+- The mean squared value error at the TD fixed point is the mean squared value error of the optimal value function.
+
+## Semi-gradient TD(0) algorithm {#sec-l4g6}
+
+In the assignment I implemented the Semi-gradient TD(0) algorithm for value estimation.
+
+

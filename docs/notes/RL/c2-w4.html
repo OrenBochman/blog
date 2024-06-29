@@ -515,7 +515,7 @@ window.Quarto = {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="rl-wk5-random-sample-one-step-tabular-Q-learning.png_" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Q-planning alg overview"><img src="rl-wk5-random-sample-one-step-tabular-Q-learning.png_" class="img-fluid figure-img" alt="Q-planning alg overview"></a></p>
+<p><a href="img/rl-wk5-random-sample-one-step-tabular-Q-learning.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Q-planning alg overview"><img src="img/rl-wk5-random-sample-one-step-tabular-Q-learning.png" class="img-fluid figure-img" alt="Q-planning alg overview"></a></p>
 <figcaption>Q-planning alg overview</figcaption>
 </figure>
 </div><div class="quarto-figure quarto-figure-center">
@@ -585,10 +585,27 @@ window.Quarto = {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/rl-wk5-tabular-dyna-Q.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="The dyna-Q algortihm"><img src="img/rl-wk5-tabular-dyna-Q.png" class="img-fluid figure-img" alt="The dyna-Q algortihm"></a></p>
-<figcaption>The dyna-Q algortihm</figcaption>
+<p><a href="img/rl-wk5-tabular-dyna-Q.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="The Tabular Dyna-Q algorithm"><img src="img/rl-wk5-tabular-dyna-Q.png" class="img-fluid figure-img" alt="The Tabular Dyna-Q algorithm"></a></p>
+<figcaption>The Tabular Dyna-Q algorithm</figcaption>
 </figure>
-</div></div></section>
+</div></div><p>Exercise 8.2 Why did the Dyna agent with exploration bonus, Dyna-Q+, perform better in the first phase as well as in the second phase of the blocking and shortcut experiments?</p>
+<p>Dyna-Q+ is like a generalized UCB while Dyna-Q+ is like a generalized epsilon greedy alg. Dyna-Q+ is doing more efficent exploration. It will revisits will be more spread out more over time but it scheme also tends to increases in non independent way - probabilities for unvisited regions keep growing so if it starts exploring it may like doing an extended sequence till it gets to a dead end.<br>
+Dyna Q exploration is independent for each state,action combo so retrying sequences get asymptotically less likely with time.</p>
+<p>Exercise 8.3 Careful inspection of Figure 8.5 reveals that the difference between Dyna-Q+ and Dyna-Q narrowed slightly over the first part of the experiment. What is the reason for this?</p>
+<p>Dyna-Q+ is more efficient at exploring so it learned a better policy, but since the environment was static Dyna-Q got to catch up, but it never reached the same policy.</p>
+<p>Exercise 8.5 How might the tabular Dyna-Q algorithm shown on page 164 be modified to handle stochastic environments? How might this modification perform poorly on changing environments such as considered in this section? How could the algorithm be modified to handle stochastic environments and changing environments?</p>
+<p>to hadle a stochastic environment one would need to to model probabilities of stochastic dynamics. One way to do this is to use Bayesian updating with a dericlet prior and a multinomial posterior.<br>
+This modification would likely fare much worse since learning low probability transitions would require many visits to discover.<br>
+In the case of changing environment it would also take much longer for new state to be reflected in the model (if a state was visited 10 with just one transition and then the transition changed to another state then it would take many more than 10 vistis to quash the old probability and get the new one correct to 10%<br>
+This means that we adding a forgetting rule might be better then the plain derichlet-multinomial model.<br>
+To handle both stochastic and changing updates we may want to<br>
+1. track the recency of the last visit and reward this option like in dyna-q plus.<br>
+2. decay old probabilities - would require storing the time for each visit - i.e.&nbsp;path dependent model.<br>
+3. A better idea is to use a hirachial model with parial pooling representing short term and long term transitions - this could fix the problem of decay by simply giving greater weight to the smaller more recent model.<br>
+The short term would track the last k visits in each state and the long term all the visits. We could then do partial pooling between these two estimators with much greater emphasis on the recent one!<br>
+<br>
+</p>
+</section>
 <section id="sec-l3g5" class="level3">
 <h3 class="anchored" data-anchor-id="sec-l3g5">Direct-RL and planning updates in <strong>Tabular Dyna-Q</strong></h3>
 <ul>
@@ -657,9 +674,12 @@ window.Quarto = {
 <section id="sec-l4g4" class="level3">
 <h3 class="anchored" data-anchor-id="sec-l4g4">Model inaccuracies produce another exploration-exploitation trade-off</h3>
 <ul>
-<li>Model inaccuracies produce another exploration-exploitation trade-off</li>
-<li>Model inaccuracies can lead to suboptimal policies</li>
-<li>Model inaccuracies can lead to poor performance</li>
+<li><p>Model inaccuracies produce another exploration-exploitation trade-off</p></li>
+<li><p>exploit an inaccurate model to improve the policy</p></li>
+<li><p>revisit states/actions with low value to update the model</p></li>
+<li><p>Can we use an inverse sort of planning to identify states for which the model is inaccurate?</p></li>
+<li><p>Model inaccuracies can lead to suboptimal policies</p></li>
+<li><p>Model inaccuracies can lead to poor performance</p></li>
 </ul>
 </section>
 <section id="sec-l4g5" class="level3 page-columns page-full">
@@ -678,6 +698,27 @@ window.Quarto = {
 </section>
 <section id="drew-bagnell-on-self-driving-cars-robotics-and-model-based-reinforcement-learning" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="drew-bagnell-on-self-driving-cars-robotics-and-model-based-reinforcement-learning">Drew Bagnell on self-driving cars robotics and model-based reinforcement learning</h3>
+<p>Drew Bagnell is a professor at Carnegie Mellon University and the CTO at Aurora innovation.</p>
+<p>He has worked on self-driving cars and robotics. He has also worked on model-based reinforcement learning. He point out a dirty little secret that model-based reinforcement learning is a key technology for robotics.</p>
+<p>He points out that the real world is expensive and dangerous. Using model based reinforcement learning can reduce the number of interactions with the real world and along learning about risky actions in the simulated world to improve performance in the real world. Also as we pointer out before this can usually be done much faster than real-time interaction with the environment.</p>
+<p>Sample complexity: how many real-world samples are required to achieve high performance? It takes exponentially fewer interactions with a model than without. Not really sure what exponentially fewer means here - but it’s a lot fewer.</p>
+<p>Quadratic value function approximation goes back to optimal control in the 1960s. It’s continuous in states and actions. This is a method that should be part of the next course but isn’t covered there either</p>
+<p>For linear transition dynamics with quadratic costs/rewards, it’s exact. For local convex / concave points, it is a good approximation of the true action-value function.</p>
+<p>Here is the math from his slide:</p>
+<p>Quadratic value function approximation</p>
+<p><span id="eq-quadratic-value-function-approximation"><span class="math display">
+Q_t(x,a) = \begin{bmatrix}     x   \\ a   \\ \end{bmatrix}^T
+\begin{bmatrix}     Q_{xx}   &amp;&amp;  Q_{xa}   \\ Q_{xa}   &amp;&amp;  Q_{uu}   \\ \end{bmatrix}
+\begin{bmatrix} x   \\ a   \\ \end{bmatrix}^T +
+\begin{bmatrix}    q_x   \\ q_a \\ \end{bmatrix}^T
+\begin{bmatrix}     x   \\ a   \\ \end{bmatrix} + const
+\tag{1}</span></span></p>
+<p>The approximation allows for calculating the optimal action-value in closed form (finite number of standard operations) even with continuous actions.</p>
+<p>Differential dynamic programming takes advantage of the technique above.<br>
+<br>
+So this seems complicated - because of matrix maths. But intuitively this is something we like to do in physics - add the term for the second derivative<br>
+in the taylor series approximation of our function.</p>
+<p>The 2nd paper is particularly clear and easy to work through for the approach just described.</p>
 <div class="column-page">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
@@ -754,6 +795,12 @@ timeline
 <li><a href="https://slideslive.com/38930486/modelbased-methods-in-reinforcement-learning-part-2-modelbased-control">Part 2: Model-Based Control</a></li>
 <li><a href="https://slideslive.com/38930487/modelbased-methods-in-reinforcement-learning-part-3-modelbased-control-in-the-loop">Part 3: Model-Based Control in the Loop</a></li>
 <li><a href="https://slideslive.com/38930489/modelbased-methods-in-reinforcement-learning-part-4-beyond-vanilla-mbrl">Part 4: Beyond Vanilla MBRL</a></li>
+</ul>
+<p>From Bagnell’s talk:</p>
+<ul>
+<li><a href="https://macrl-book.github.io/">Modern Adaptive Control and Reinforcement Learning</a></li>
+<li><a href="https://homes.cs.washington.edu/~todorov/papers/TassaIROS12.pdf">Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization</a></li>
+<li><a href="https://katefvision.github.io/katefSlides/trajectoryoptimization_katef.pdf">Optimal Control, Trajectory Optimization, Learning Dynamics</a></li>
 </ul>
 
 
@@ -1511,7 +1558,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     })(document);
     </script>
   
-<script>var lightboxQuarto = GLightbox({"selector":".lightbox","loop":false,"openEffect":"zoom","closeEffect":"zoom","descPosition":"bottom"});
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","descPosition":"bottom","loop":false,"closeEffect":"zoom","openEffect":"zoom"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {

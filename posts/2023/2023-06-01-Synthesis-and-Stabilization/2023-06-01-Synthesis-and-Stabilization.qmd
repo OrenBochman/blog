@@ -1,0 +1,70 @@
+---
+title: "Summary: Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization"
+date: 2023-06-01
+categories: ["Reinforcement Learning", "Model Based RL", "Model Predictive Control","MPC","LQR", "MuJoCo", "iLQG", "Cost Functions", "Iterative LQG Method", "Numerical Methods", "Optimal Control", "Trajectory Optimization", "Complex Behaviors", "Humanoid Robots", "Physics Simulator", "Real-Time Control", "Robustness", "Planning", "Robtics", "Coursera" ]
+description: "This paper was referenced by Drew Bagnell in the Coursera RL specilization for using simple quadratic approximation to learn a model in a continous control setting. The paper presents a method for online trajectory optimization, particularly focusing on complex humanoid robots performing tasks such as getting up from an arbitrary pose and recovering from large disturbances using dexterous maneuvers."
+---
+
+## Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization
+
+In [@Tassa2012SynthesisAS] the authors presents a method for online trajectory optimization, 
+particularly focusing on complex humanoid robots performing tasks such as getting 
+up from an arbitrary pose and recovering from large disturbances using dexterous maneuvers.
+
+- RL setting & environment:
+  - This is a model based continuous control RL method that uses 
+    -  **MuJoCo** short for Multi Joint dynamics with Contact, is thie author's new **physics simulator**  c.f.[@Todorov2012MuJoCoAP]
+    - a humanoid robot is controlled in real time, using a physics simulator and has to get up from the ground and recover from disturbances.
+  - **MATLAB-Based Environment**: A real-time interactive environment where users can modify dynamics models, 
+    cost functions, or algorithm parameters, to model the dynamics of the robot with a Model Predictive Control (MPC) 
+    algorithm to synthesize control laws in real time. ^[worth considering in terms of interface/Notebook for future rl work]
+  - Note: [MuJoCo](https://mujoco.org/) soon became a standard part of RL environments.
+- Algorithm: 
+  - [Model Predictive Control](https://en.wikipedia.org/wiki/Model_predictive_control) (MPC) is used to synthesize control laws in real time.
+- Innovations:
+  - **MuJoCo Physics Engine**: A new C-based, platform-independent, multi-threaded physics simulator tailored for control applications, significantly speeding up the computation of dynamics derivatives.
+  - **Improved Iterative LQG Method**: Enhancements to the iterative [Linear Quadratic Gaussian](https://en.wikipedia.org/wiki/Linear%E2%80%93quadratic%E2%80%93Gaussian_control) (iLQG) method, including improved regularization and line-search techniques, resulting in increased efficiency and robustness.
+  - **Cost Functions**: Introduction of cost functions that create better-behaved energy landscapes, more suitable for trajectory optimization.
+- Innovations 
+  - MuJoCo Physics Engine: A new C-based, platform-independent, multi-threaded physics simulator tailored for control applications, significantly speeding up the computation of dynamics derivatives.
+  - Improved Iterative LQG Method: Enhancements to the iterative Linear Quadratic Gaussian (iLQG) method, including improved regularization and line-search techniques, resulting in increased efficiency and robustness.
+  - Cost Functions: Introduction of cost functions that create better-behaved energy landscapes, more suitable for trajectory optimization.
+  - MATLAB-Based Environment: A real-time interactive environment where users can modify dynamics models, cost functions, or algorithm parameters.
+- Experimental Results:
+  - MPC avoids extensive exploration by re-optimizing movement trajectories and control sequences at each time step, starting at the current state estimate.
+  - Demonstrated the synthesis of complex behaviors such as getting up from the ground and recovering from disturbances, computed at near real-time speeds on a standard PC.
+  - Applied the method to simpler problems like the acrobot, planar swimming, and one-legged hopping, solving these in real time without pre-computation or heuristic approximations.
+  - Showed robustness to state perturbations and modeling errors, optimizing trajectories with respect to one model while applying resulting controls to another.
+- Technical Details:
+  - The trajectory optimization involves solving a finite-horizon optimal control problem using iLQG.
+  - The backward pass involves regularization techniques to ensure robustness, while the forward pass includes an improved line-search to ensure cost reduction and convergence.
+  - The MuJoCo engine uses advanced contact modeling and parallel processing to handle the computational demands of online trajectory optimization. 
+
+
+So let's recap the main points of the paper:
+
+Wikipedia has some details on the subject of MPC
+
+> Model predictive control (MPC) is an advanced method of process control that is used to control a process while satisfying a set of constraints. ...
+> Model predictive controllers rely on dynamic models of the process, most often linear empirical models obtained by system identification.
+> The main advantage of MPC is the fact that it allows the current timeslot to be optimized, while keeping future timeslots in account. 
+> This is achieved by optimizing a finite time-horizon, but only implementing the current timeslot and then optimizing again, repeatedly, thus differing from a linear–quadratic regulator (LQR).
+> Also MPC has the ability to anticipate future events and can take control actions accordingly.
+> -- [@enwiki:MPC]
+
+for example, an example of a quadratic cost function for optimization is given by:
+
+
+$$
+{\displaystyle J=\sum _{i=1}^{N}w_{x_{i}}(r_{i}-x_{i})^{2}+\sum _{i=1}^{M}w_{u_{i}}{\Delta u_{i}}^{2}}
+$$
+
+where the goal is to minimize the difference between the reference and controlled variables without violating constraints (low/high limits) with
+
+here:
+
+- ${\displaystyle x_{i}}$ is the ith controlled variable (e.g. measured temperature)
+- ${\displaystyle r_{i}}$ is the ith reference variable (e.g. required temperature)
+- ${\displaystyle u_{i}}$ is the ith manipulated variable (e.g. control valve)
+- ${\displaystyle w_{x_{i}}}$ is a weighting coefficient reflecting the relative importance of ${\displaystyle x_{i}}$
+- ${\displaystyle w_{u_{i}}}$ is a weighting coefficient penalizing relative big changes in ${\displaystyle u_{i}}$

@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="keywords" content="deep learning, neural networks, dropout, regularization">
 
-<title>index – Oren Bochman's Blog</title>
+<title>Dropout: A Simple Way to Prevent Neural Networks from Overfitting – Oren Bochman’s Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,7 +21,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -73,13 +94,14 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta name="twitter:title" content="Oren Bochman’s Blog">
+<meta name="twitter:title" content="Dropout: A Simple Way to Prevent Neural Networks from Overfitting – Oren Bochman’s Blog">
+<meta name="twitter:description" content="paper review">
 <meta name="twitter:image" content="https://orenbochman.github.io/papers/2014/dropout-a-simple-way-to-prevent-neural-networks-from-overfitting/thumbnail_blog.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="nav-sidebar docked nav-fixed fullcontent">
+<body class="nav-sidebar docked nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -208,7 +230,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Dropout: A Simple Way to Prevent Neural Networks from Overfitting</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -229,12 +251,16 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content page-columns page-full" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
+<h1 class="title">Dropout: A Simple Way to Prevent Neural Networks from Overfitting</h1>
+<p class="subtitle lead">paper review</p>
 </div>
 
 
@@ -245,7 +271,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">Saturday, September 7, 2024</p>
+      <p class="date">Tuesday, September 10, 2024</p>
     </div>
   </div>
   
@@ -253,14 +279,121 @@ ul.task-list li input[type="checkbox"] {
   </div>
   
 
+<div>
+  <div class="keywords">
+    <div class="block-title">Keywords</div>
+    <p>deep learning, neural networks, dropout, regularization</p>
+  </div>
+</div>
 
 </header>
 
 
+<section id="tldr" class="level2">
+<h2 class="anchored" data-anchor-id="tldr">TL;DR</h2>
+<p>In <span class="citation" data-cites="JMLR:v15:srivastava14a">(<a href="#ref-JMLR:v15:srivastava14a" role="doc-biblioref">Srivastava et al. 2014</a>)</span> the authors, present a novel regularization technique for deep neural networks called “dropout.” The key idea behind dropout is to randomly drop units (along with their connections) from the neural network during training. This prevents units from co-adapting too much and significantly reduces overfitting. The authors show that dropout improves the performance of neural networks on supervised learning tasks in vision, speech recognition, document classification, and computational biology, obtaining state-of-the-art results on many benchmark data sets.</p>
+<p>The technique had been in use in some earlier works, but this paper popularized it and showed its effectiveness on a wide range of tasks. The idea behind drop out is pretty simple and people have since come up with many variations of it. It has become a standard technique in the deep learning toolbox.</p>
+</section>
+<section id="abstract" class="level2">
+<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<blockquote class="blockquote">
+<p>Deep neural nets with a large number of parameters are very powerful machine learning systems. However, overfitting is a serious problem in such networks. Large networks are also slow to use, making it difficult to deal with overfitting by combining the predictions of many different large neural nets at test time. Dropout is a technique for addressing this problem. The key idea is to randomly drop units (along with their connections) from the neural network during training. This prevents units from co-adapting too much. During training, dropout samples from an exponential number of different thinned networks. At test time, it is easy to approximate the effect of averaging the predictions of all these thinned networks by simply using a single unthinned network that has smaller weights. This significantly reduces overfitting and gives major improvements over other regularization methods. We show that dropout improves the performance of neural networks on supervised learning tasks in vision, speech recognition, document classification and computational biology, obtaining state-of-the-art results on many benchmark data sets.</p>
+<p>– <span class="citation" data-cites="JMLR:v15:srivastava14a">(<a href="#ref-JMLR:v15:srivastava14a" role="doc-biblioref">Srivastava et al. 2014</a>)</span></p>
+</blockquote>
+</section>
+<section id="review" class="level2">
+<h2 class="anchored" data-anchor-id="review">Review</h2>
+<p>In <span class="citation" data-cites="JMLR:v15:srivastava14a">(<a href="#ref-JMLR:v15:srivastava14a" role="doc-biblioref">Srivastava et al. 2014</a>)</span> the authors presents a regularization technique called Dropout, aimed at addressing the critical problem of overfitting in deep neural networks (DNNs). Dropout randomly drops units (neurons) during training to prevent co-adaptation of units, which can lead to overfitting. This novel technique is demonstrated to significantly improve the performance of neural networks across a wide range of tasks, including computer vision, speech recognition, and natural language processing.</p>
+</section>
+<section id="core-idea" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="core-idea">Core Idea</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><img src="./fig1.png" class="img-fluid" width="640"></p>
+</div></div><p>Dropout works by randomly removing units from the network during each training iteration. This prevents the network from becoming overly reliant on specific units, thus reducing overfitting. During testing, all units are used, but their weights are scaled to account for the dropout during training. This approximates the averaging of an exponential number of thinned networks that would otherwise be computationally infeasible.</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><img src="./fig2.png" class="img-fluid" width="640"></p>
+</div></div></section>
+<section id="methodology-and-theoretical-motivation" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="methodology-and-theoretical-motivation">Methodology and Theoretical Motivation</h2>
+<p>Dropout’s theoretical foundation stems from biological principles, specifically the idea of genetic robustness in sexual reproduction. In the analogy, a network’s hidden units act like genes that must learn to function independently of one another, preventing complex co-adaptations that may not generalize well to unseen data. The stochastic nature of dropout introduces noise during training, which acts as a form of model averaging and regularization.</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><img src="./fig3.png" class="img-fluid" width="640"></p>
+</div></div></section>
+<section id="key-contributions" class="level2">
+<h2 class="anchored" data-anchor-id="key-contributions">Key Contributions</h2>
+<ul>
+<li>Model Averaging: Dropout enables the training of many subnetworks (thinned networks) simultaneously, which leads to a more robust model.</li>
+<li>Regularization Effect: Dropout reduces overfitting more effectively than other methods such as L1/L2 regularization or early stopping.</li>
+<li>Efficiency: Dropout provides a computationally feasible approximation of model averaging by scaling weights at test time, as opposed to maintaining an ensemble of networks.</li>
+</ul>
+</section>
+<section id="experimental-results" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="experimental-results">Experimental Results</h2>
+<p>The authors demonstrate the efficacy of dropout across several benchmark datasets:</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><img src="./fig4.png" class="img-fluid" width="640"></p>
+</div></div><ul>
+<li>MNIST: Error rates are reduced from 1.60% (standard neural network) to 0.95% using dropout with additional max-norm regularization.</li>
+<li>CIFAR-10 and CIFAR-100: Dropout networks outperform previous methods, with an error reduction to 12.6% on CIFAR-10 and 37.2% on CIFAR-100.</li>
+<li>TIMIT (Speech Data): Dropout reduces the phone error rate from 23.4% to 21.8%, showing significant improvements over non-dropout models.</li>
+<li>ImageNet: Dropout helps achieve state-of-the-art results in image classification tasks, significantly lowering the top-5 error rate.</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><img src="./fig5.png" class="img-fluid" width="640"></p>
+</div></div></section>
+<section id="advantages-of-dropout" class="level2">
+<h2 class="anchored" data-anchor-id="advantages-of-dropout">Advantages of Dropout</h2>
+<ul>
+<li>Generality: Dropout works across a variety of architectures, including fully connected, convolutional, and recurrent neural networks.</li>
+<li>Ease of Use: Dropout is simple to implement, requiring only one additional hyperparameter (the dropout rate, typically 0.5 for hidden layers).</li>
+<li>Compatibility with Other Methods: Dropout can be combined with techniques like unsupervised pretraining, max-norm regularization, and momentum, further improving model performance.</li>
+</ul>
+</section>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
+<ul>
+<li>Increased Training Time: Dropout can significantly slow down training, typically requiring 2-3 times more iterations to converge.</li>
+<li>Tuning of Hyperparameters: While simple, the dropout rate must be carefully selected, and higher learning rates and momentum are generally required for optimal performance.</li>
+<li>Application-Specific Benefits: Although dropout improves performance in vision and speech recognition tasks, the improvements in certain domains like text classification (e.g., Reuters RCV1 dataset) are less pronounced. <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></li>
+</ul>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>The paper introduces dropout as a powerful and simple regularization technique that significantly reduces overfitting in deep neural networks. Dropout provides a computationally efficient method to approximate model averaging and works across a range of architectures and tasks, achieving state-of-the-art results on several benchmarks. However, it comes at the cost of increased training time, and some tuning is required for optimal performance.</p>
+<p>Dropout represents a substantial advancement in neural network training, and its adoption has since become widespread in the deep learning community.</p>
+</section>
+<section id="the-paper" class="level2">
+<h2 class="anchored" data-anchor-id="the-paper">The paper</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><embed src="./paper.pdf" class="col-page" style="width:8.5in;height:11in"></p>
+<figcaption>paper</figcaption>
+</figure>
+</div>
+</section>
+<section id="references" class="level2">
 
 
 
-</main> <!-- /main -->
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-JMLR:v15:srivastava14a" class="csl-entry" role="listitem">
+Srivastava, Nitish, Geoffrey Hinton, Alex Krizhevsky, Ilya Sutskever, and Ruslan Salakhutdinov. 2014. <span>“Dropout: A Simple Way to Prevent Neural Networks from Overfitting.”</span> <em>Journal of Machine Learning Research</em> 15 (56): 1929–58. <a href="http://jmlr.org/papers/v15/srivastava14a.html">http://jmlr.org/papers/v15/srivastava14a.html</a>.
+</div>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>I think this is because if we drop a few words from a sentence a reader can often guess them from the context and redundancy in natural languages.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

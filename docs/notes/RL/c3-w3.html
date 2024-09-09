@@ -8,7 +8,7 @@
 
 <meta name="author" content="Oren Bochman">
 
-<title>Oren Bochman's Blog – Prediction and Control with Function Approximation</title>
+<title>Oren Bochman's Blog – Control with Approximation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,7 +21,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -84,7 +104,8 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<meta name="twitter:title" content="Oren Bochman’s Blog - Prediction and Control with Function Approximation">
+<meta name="twitter:title" content="Oren Bochman’s Blog - Control with Approximation">
+<meta name="twitter:description" content="Prediction and Control with Function Approximation">
 <meta name="twitter:image" content="https://orenbochman.github.io//images/nlp-brain-wordcloud.jpg">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
@@ -219,7 +240,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Prediction and Control with Function Approximation</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Control with Approximation</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -232,7 +253,8 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Prediction and Control with Function Approximation</h1>
+      <h1 class="title">Control with Approximation</h1>
+            <p class="subtitle lead">Prediction and Control with Function Approximation</p>
                                 <div class="quarto-categories">
                 <div class="quarto-category">Coursera</div>
                 <div class="quarto-category">notes</div>
@@ -277,7 +299,15 @@ ul.task-list li input[type="checkbox"] {
         <div id="quarto-search" class="" title="Search"></div>
         </div>
         </div>
-    
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lesson-1-episodic-sarsa-with-function-approximation" id="toc-lesson-1-episodic-sarsa-with-function-approximation" class="nav-link active" data-scroll-target="#lesson-1-episodic-sarsa-with-function-approximation">Lesson 1: Episodic Sarsa with Function Approximation</a></li>
+  <li><a href="#lesson-2-exploration-under-function-approximation" id="toc-lesson-2-exploration-under-function-approximation" class="nav-link" data-scroll-target="#lesson-2-exploration-under-function-approximation">Lesson 2: Exploration under Function Approximation</a></li>
+  <li><a href="#lesson-3-average-reward" id="toc-lesson-3-average-reward" class="nav-link" data-scroll-target="#lesson-3-average-reward">Lesson 3: Average Reward</a></li>
+  </ul>
+</nav>
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
@@ -291,24 +321,125 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-
-
-
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="img/alg_selector.jpeg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="RL algorithms"><img src="img/alg_selector.jpeg" class="img-fluid figure-img" alt="RL algorithms"></a></p>
 <figcaption>RL algorithms</figcaption>
 </figure>
-</div></div><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
+</div></div><div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Readings
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked=""><span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, sec. 10</a> pp.&nbsp;243-246)</span> <a href="http://incompleteideas.net/book/RLbook2020.pdf#page=243">book</a></label></li>
+<li><label><input type="checkbox" checked=""><span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, sec. 10.3</a> pp.&nbsp;249-252)</span> <a href="http://incompleteideas.net/book/RLbook2020.pdf#page=249">book</a></label></li>
+</ul>
+</div>
+</div>
+</div>
+<section id="lesson-1-episodic-sarsa-with-function-approximation" class="level1">
+<h1>Lesson 1: Episodic Sarsa with Function Approximation</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked=""><em>Explain</em> the update for Episodic Sarsa with function approximation <a href="#sec-l1g1">#</a></label></li>
+<li><label><input type="checkbox" checked=""><em>Introduce</em> the feature choices, including passing actions to features or stacking state features <a href="#sec-l1g2">#</a></label></li>
+<li><label><input type="checkbox" checked=""><em>Visualize</em> value function and learning curves <a href="#sec-l1g3">#</a></label></li>
+<li><label><input type="checkbox" checked=""><em>Discuss</em> how this extends to Q-learning easily, since it is a subset of Expected Sarsa <a href="#sec-l1g4">#</a></label></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="lesson-2-exploration-under-function-approximation" class="level1">
+<h1>Lesson 2: Exploration under Function Approximation</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked=""><em>Understanding</em> optimistically initializing your value function as a form of exploration <a href="#sec-l2g1">#</a></label></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="lesson-3-average-reward" class="level1">
+<h1>Lesson 3: Average Reward</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul class="task-list">
+<li><label><input type="checkbox" checked=""><em>Describe</em> the average reward setting <a href="#sec-l3g1">#</a></label></li>
+<li><label><input type="checkbox" checked=""><em>Explain</em> when average reward optimal policies are different from discounted solutions <a href="#sec-l3g2">#</a></label></li>
+<li><label><input type="checkbox" checked=""><em>Understand</em> how differential value functions are different from discounted value functions <a href="#sec-l3g3">#</a></label></li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Discussion prompt
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p>What are the issues with extending some of the exploration methods we learned about bandits and Dyna to the full RL problem? How can we do visitation counts or UCB with function approximation?</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>A control agent with function approximation has to explore to find the best policy, learn a good state representation, and try to get a lot of reward, all at the same time. How might an agent balance these potentially conflicting goals?</p>
+</blockquote>
+</div>
+</div>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-sutton2018reinforcement" class="csl-entry" role="listitem">
+Sutton, R. S., and A. G. Barto. 2018. <em>Reinforcement Learning, Second Edition: An Introduction</em>. Adaptive Computation and Machine Learning Series. MIT Press. <a href="http://incompleteideas.net/book/RLbook2020.pdf">http://incompleteideas.net/book/RLbook2020.pdf</a>.
+</div>
+</div></section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
   author = {Bochman, Oren},
-  title = {Prediction and {Control} with {Function} {Approximation}},
+  title = {Control with {Approximation}},
   date = {2024-04-03},
   url = {https://orenbochman.github.io//notes/RL/c3-w3.html},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2024. <span>“Prediction and Control with Function
-Approximation.”</span> April 3, 2024. <a href="https://orenbochman.github.io//notes/RL/c3-w3.html">https://orenbochman.github.io//notes/RL/c3-w3.html</a>.
+Bochman, Oren. 2024. <span>“Control with Approximation.”</span> April 3,
+2024. <a href="https://orenbochman.github.io//notes/RL/c3-w3.html">https://orenbochman.github.io//notes/RL/c3-w3.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1030,7 +1161,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     })(document);
     </script>
   
-<script>var lightboxQuarto = GLightbox({"openEffect":"zoom","closeEffect":"zoom","selector":".lightbox","descPosition":"bottom","loop":false});
+<script>var lightboxQuarto = GLightbox({"openEffect":"zoom","closeEffect":"zoom","loop":false,"descPosition":"bottom","selector":".lightbox"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {

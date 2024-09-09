@@ -1,0 +1,107 @@
+---
+title: "LLM the good the bad and the ugly"
+subtitle: "An essay on the limitations of language models"
+format: html
+---
+
+## Language Models 
+
+Early when I saw the first text by gpt2 I was intrigued that some of the 
+researchers that did not get access to the early model and had to re-create the 
+model based on just the paper reported that that thier model had 'probabilities' 
+of generating all those texts given the prompt.
+
+This seems to be a rather *weak claim* - after all a million blindfolded 
+monkeys banging on type writers would have some probability of generating those 
+texts.
+
+::: {.column-margin}
+
+![One of a million [IID](https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables) monkeys at a typewriter <br> [credit](https://commons.wikimedia.org/wiki/File:Chimpanzee_seated_at_typewriter.jpg)](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Chimpanzee_seated_at_typewriter.jpg/512px-Chimpanzee_seated_at_typewriter.jpg?20120413234640){width=250 fig-align="left"}
+
+:::
+
+One point to make is that the monkeys might have a higher probability of generating the text then the researcher's model - but that is a different story.
+
+### The origen of seq2seq models
+
+If you learned the pre LLM language modeling you would be familiar with [N-grams](https://en.wikipedia.org/wiki/N-gram) you would be better equipped to be critical of LLMs. [N-grams]^[is an ordered sequence of tokens. It could be words, characters, or unicode code point.] More generally skip grams allow to model n-grams with gaps i.e. there are some tokens that are not specified or skipped. Another generalization was the introduction of a N-grams n representing unknown tokens.
+
+The N-grams abstraction allowed for development of probabilistic models that are the basis of LLMs.
+However these older models had one significant limitation - they could only model a fixed number of tokens. This is because the number of possible N-grams grows exponentially with the number of tokens.
+
+Related v.s. Similar 
+
+## The good 
+
+There are a few powerful ideas in this approach. 
+
+1. Capturing co-occurrence statistics.
+    - The word 'the' is followed by a noun 50% of the time. 
+    - Collocations may have gaps and this is where 
+    - Skip grams generalize N-grams by allowing for gaps in the sequence.
+2. Learning from positive examples is the forte of classical language models. You can learn the regular parts of a language using such a probabilistic quite fast. Unfortunately most languages are far from regular.
+3. Generalizing using [smoothing](https://en.wikipedia.org/wiki/Smoothing) - When the frequency of N-grams for some words is low enough we don't expect to see them in a corpus of some given size. You just can't fit all the N-grams  of a given size in a corpus of a given size.
+but we can use shorter N-grams to estimate the probability of longer N-grams. (And this is how language models can be used to generate text). We call this process smoothing as conceptually we are filling holes in the longer N-grams probability distribution by moving some of the mass from related N-grams - to look more like the distribution of formed by combining shorter N-grams.
+4. Learning negative examples. With enough data we may be infer that the absence of certain trigrams in the distribution where the associated bigrams are common  isn't due to chance but due some excluding factor. They might be linguistic
+or perhaps censoring. Regardless to detect get to a certain confidence level say 95% we need to see lots of bigrams and no trigram. Note though that we may have some broken english or some clumsy constructions that are in our corpus - they 
+tend to muddy the waters and render these negative examples particularly challenging to infer. In fact it is generally easier to learn more by increasing the size of the corpus and learning more from rarer positive examples and this is 
+what LLM do.
+not just from the corpus but from the language. However just as children learning to generelize have to be taught that the plural of goose is geese and not gooses, learning from positive  - 
+
+The problems with ngrams is that once n gets big enough and the corpus doesnt scale with it 
+ngrams learn to model the corpus rather than the language. This is because as the ngram gets longer
+around the central word eventuall the contexts is specific enough that there is only one 
+matching next ngram to for the given context - so the next word is certain. 
+
+> The egg hit the wall and **it** broke.
+
+- It must be the case that the egg hit the wall and it broke right.
+- Unless we are in feudal japan where internal walls are made to a large extent from rice paper on a frames.^[some gifted Samorai would need to catch the egg after it broke the wall to avoid `they broke`]
+- We could also be dealing with a decorative egg and a glass wall.
+- Or we could be dealing with a metaphorical egg and a metaphorical wall.
+
+If the first scenario is correct 99.999% of the time why do we need to consider the other scenarios?
+The answer is best considered as a black swan problem. If we only consider the most likely scenarios we will be unprepared for the unlikely ones which could be catastrophic.
+
+This suggests perhaps that while LLM should be great for learning a lexicon, a grammar, and some common sense knowledge - three very challanging tasks they are inadquate for making
+infrences about the world where different types of precise reasoning is required.
+
+## the bad
+
+- the black swan problem
+- tokenization 
+
+
+
+## the sad 
+
+- context windows
+
+
+## the ugly - Where are LLMs no good?
+
+Let's consider an analogy from physics. Classical physics is great for predicting phenomena at macro scales but quantum mechanics is required for the micro scale.
+
+Physicist like to think that quantum physics should converge to classical physics at the macro scale but this is not always the case. There are phenomena that are only explained by quantum mechanics.
+We may soon discover more phenomena like superconductivity, quantum computers and quantum cryptography manifsting in our macro world
+
+Fooled by randomness....
+
+In the case of LLM there is the effect of stochasticity which is built into the models. We don't care about this aspect so long as the model gives us good replies. But all replies are 
+inherently stochastic. While humans might express an utternce in many ways they should be able to agree on its meaning, the facts, the options, the reasoning and so on.
+Neural netowrks are universal function approximators and in the case of LLMs the are approximate the LM from above which are stochastic all the way down - there is no agreement excepts on the most basic probabilities.
+The nlp researcher can only say that an utterance is likely to be generated by the model - with some probability. Any counter claim also has some probability.The probabilities in these cases are far more dramaicaly affected by
+the utterance length, word choices, grammarticality, common sense knowledge then factuallity, structured knowledge 
+
+This is a problem because we are used to deterministic replies from humans. We are used to deterministic replies from classical language models. We are used to deterministic replies from classical AI systems.
+
+- hellucinations
+  - where there is sparse data or the data used in training isn't representative of the query we cannot expect the model to perform well.
+  - even where there is good data - if the queries are subtle enough the stochastic nature of the model will manifest.
+
+- prompt engineering
+
+
+## the ugly - through the hole in the coin
+

@@ -4,14 +4,25 @@ date: "2024-07-01"
 ---
 
 
-## feature selection problem
+## Feature selection problem
 
 the first idea comes from looking at regression and hyperparameter optimization tasks
 
-First we want to investigate the idea of finding the best values of individual parameters or hyperparameters. Next if these are second order effects corresponding to the interaction of two or more parameters, we will want to investigate if there are pairs of hyper/parameters that are more important than others.
+First we want to investigate the idea of finding the best values of individual parameters 
+or hyperparameters. Next if these are second order effects corresponding to the interaction 
+of two or more parameters, we will want to investigate if there are pairs of hyper/parameters 
+that are more important than others.
 
-- one way to orgenize this search might be characterised as **a reductionist search**, where we start with a simple model and add complexity as needed.
-- another way to orgenize this search might be characterised as **a covariance matrix bingo**, where we concieve of all the possible interactions reperesented by the covariance matrix, in reality the covariance matrix is a symmetric and sparse, we may discover that certain features are correlated with each other, or better yet collinear, and we may want to remove these features and retain perhaps better **orthonormal features**. In other words we might be able to plan our model selection by looking at how the covariance matrix evolves as we add features to the model. We will end up with a subset of the matrix similar to a bingo card, where we wish to get to this wininning combination of features faster than the other players.
+- one way to orgenize this search might be characterised as **a reductionist search**, where 
+we start with a simple model and add complexity as needed.
+- another way to orgenize this search might be characterised as **a covariance matrix bingo**, 
+where we concieve of all the possible interactions reperesented by the covariance matrix, in 
+reality the covariance matrix is a symmetric and sparse, we may discover that certain features 
+are correlated with each other, or better yet collinear, and we may want to remove these features 
+and retain perhaps better **orthonormal features**. In other words we might be able to plan our
+model selection by looking at how the covariance matrix evolves as we add features to the model. 
+We will end up with a subset of the matrix similar to a bingo card, where we wish to get to this 
+wininning combination of features faster than the other players.
 
 A second reality of this issues adressable by RL is that high order effects tend to be increasingly sparse so that if we have a hint of that certain slots in the covariance matrix are non zero we should defintely explore those efects more than others. This infact suggests an improvement to baysian search.
 
@@ -36,15 +47,20 @@ of subspaces - corresponding to features that are balance generlization and disc
 
 A second point is that in different contexts we might need to use different features.
 This is much easier to see in RL and NLP. Building a embedding that is localised to
-a just some features and some observations/states might allow the model to get good generalization then by considering all the features at once. This is an analogue of the idea of factoring a distribution into a product of marginals, particularly in the case of a 
+a just some features and some observations/states might allow the model to get good generalization 
+then by considering all the features at once. This is an analogue of the idea of factoring a 
+distribution into a product of marginals, particularly in the case of a 
 much larger bayesian network. In this case though we might be talking about using 
 two such factorizations, with some discriminator selecting the observations that are used in different contexts.
 
 We might think of a neural network as evolving system of that learns to bifurcate the
-distributed representation of the features of the data set in the input into any number of  smaller and more localised subspaces. The more Localised subspaces are more likely to be linearly separable and thus easier to learn. 
+distributed representation of the features of the data set in the input into any number of  
+smaller and more localised subspaces. The more Localised subspaces are more likely to be 
+linearly separable and thus easier to learn. 
 
 However all this happens by breaking symmetries using the random aspects of the learning
-algorithm. Minibatches present many random samples which carry differnt payloads of information. Certain such payloads may reinforce the current network weights, while the 
+algorithm. Minibatches present many random samples which carry differnt payloads of information. 
+Certain such payloads may reinforce the current network weights, while the 
 next may require a bifurcation of the representation into two to minimize the loss.
 Another might require many bifurcations and may not lead to any new bifurcations or 
 reinforcements. Drop out breaks symmetries by shutting down parts of the network temporarily.
@@ -64,11 +80,15 @@ the variance of the function approximation and thus improve generalization.
   - could we let all other nodes in the network have a residual connection to the feature?
 - if we wanted to further refine a representation of a localised subspace of verbs to
   intransitive verbs how would we do that?
-  - we would like to lean a discriminator that can tell the difference between transitive and intransitive verbs and then use it to gate the input to the verb feature.
-  - however we might prefer to do better than that and learn a better representation of the       transitive and intransitive verbs. This would need learning different weights for the 
-    different verbs. This means we want to bifurcate the verb fearture subnetwork into two
-    replicates but add the discriminator as a gate to the input of the two subnetworks.
-  - another point worth considering is that once we have learned a good representation of both  the transitive and intransitive verbs we can use these as features in the next layers of the network. We sould be able to combine them to get a better representation than just the original verb.
+  - we would like to lean a discriminator that can tell the difference between transitive and 
+  intransitive verbs and then use it to gate the input to the verb feature.
+  - however we might prefer to do better than that and learn a better representation of the       
+  transitive and intransitive verbs. This would need learning different weights for the 
+  different verbs. This means we want to bifurcate the verb fearture subnetwork into two
+  replicates but add the discriminator as a gate to the input of the two subnetworks.
+  - another point worth considering is that once we have learned a good representation of both  
+  the transitive and intransitive verbs we can use these as features in the next layers of the network. 
+  We sould be able to combine them to get a better representation than just the original verb.
   - I recon this happens many times in LLMs. What we might want is to have some way for the 
   model to attend to all the subspaces it has learned and use them to guide its learning.
   - The challange seems to be in identification of the subspaces. We may be using differnt
@@ -77,7 +97,10 @@ the variance of the function approximation and thus improve generalization.
 
 ## Attention heads
 
-It seems thogh that attention heads are a good way to orgenize and increase the diversity of the localised subspaces. This is because the attention heads can be trained to focus on different parts of the input and thus can be used to create a localised subspace embedding. This is a very powerful idea and is the basis of the transformer architecture.
+It seems thogh that attention heads are a good way to orgenize and increase the diversity of the 
+localised subspaces. This is because the attention heads can be trained to focus on different parts 
+of the input and thus can be used to create a localised subspace embedding. This is a very powerful 
+idea and is the basis of the transformer architecture.
 
 
 ## Residual rerouting

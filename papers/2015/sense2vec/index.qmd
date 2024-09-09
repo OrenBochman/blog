@@ -1,0 +1,96 @@
+---
+title: sense2vec - A Fast and Accurate Method for Word Sense Disambiguation In Neural Word Embeddings
+subtitle: paper review
+bibliography: ./bibliography.bib
+keywords: [stub, nlp, wsd, word-sense-disambiguation, word-embeddings, neural-word-embeddings, nlp, natural-language-processing, polysemy]
+#draft: true
+---
+
+**Sense2Vec** [@trask2015sense2vecfastaccurate] is an interesting deep learning model based on word2vec that can learn more interesting and detailed word vectors from large corpora. Sense2Vec embeddings are for word senses rather than for tokens.
+
+The shortcoming of word2vec is that it only learns one vector per word, which is not enough to capture the multiple meanings of a word. Sense2Vec addresses this issue by learning multiple embeddings for each word based on supervised disambiguation. This allows a consuming NLP model to select a sense-disambiguated embedding quickly and accurately.
+
+I thought that the next step would be to cluster these embeddings by contexts and thus arrive at a wordsense version - however it turns out this was computationally expensive and difficult to apply in a scalable fashion. The idea of this paper is to use a supervised approach to disambiguate the senses of words. This means that the words need to be tagged using thier part-of-speech (POS) tags or named entity resolution. This approach is faster and more accurate than the clustering approach. However there is a limitation that the supervised labels are required and there can be multiple wordsenses within a signle POS tag.
+
+Abstract
+
+> Neural word representations have proven useful in Natural Language Processing (NLP) tasks due to their ability to efficiently model complex semantic and syntactic word relationships. However, most techniques model only one representation per word, despite the fact that a single word can have multiple meanings or "senses". Some techniques model words by using multiple vectors that are clustered based on context. However, recent neural approaches rarely focus on the application to a consuming NLP algorithm. Furthermore, the training process of recent word-sense models is expensive relative to single-sense embedding processes. This paper presents a novel approach which addresses these concerns by modeling multiple embeddings for each word based on supervised disambiguation, which provides a fast and accurate way for a consuming NLP model to select a sense-disambiguated embedding. We demonstrate that these embeddings can disambiguate both contrastive senses such as nominal and verbal senses as well as nuanced senses such as sarcasm. We further evaluate Part-of-Speech disambiguated embeddings on neural dependency parsing, yielding a greater than 8% average error reduction in unlabeled attachment scores across 6 languages. 
+>
+> --- [@trask2015sense2vecfastaccurate]
+
+
+## Review 
+
+The paper [@trask2015sense2vecfastaccurate] the autors introduced a novel method for word sense disambiguation in neural word embeddings. Traditional word embedding techniques such as Word2Vec represent each word by a single vector, regardless of its multiple meanings or senses, which often leads to ambiguities. This challenge is known as the "superposition" problem, where multiple meanings of a word are combined into a single vector, potentially leading to suboptimal performance in downstream NLP tasks. SENSE2VEC addresses this limitation by generating multiple embeddings for each word, effectively disambiguating different senses.
+
+## Motivation and Related Work
+
+The motivation behind SENSE2VEC stems from the shortcomings of earlier models like Word2Vec and Wang2Vec. Word2Vec, while highly successful, does not consider the order of words in a sentence and struggles with polysemy—the phenomenon where a single word can have multiple meanings. Wang2Vec improves upon Word2Vec by incorporating word order, making it more suitable for syntactic tasks, yet still relies on single embeddings per word, making it less effective for handling polysemic words.
+
+Other approaches, such as multi-prototype vector-space models by Reisinger and Mooney (2010), attempt to tackle polysemy by clustering the contexts in which a word appears and generating different embeddings for each cluster. However, these methods often require unsupervised clustering, making the process computationally expensive and difficult to apply in a scalable fashion. SENSE2VEC circumvents these challenges by leveraging supervised learning with part-of-speech (POS) tagging or named entity resolution, reducing the computational overhead while providing more accurate disambiguation.
+
+## The SENSE2VEC Model
+
+The core innovation of SENSE2VEC lies in its use of supervised labels, such as POS tags, to disambiguate the senses of words. Unlike previous models that rely on unsupervised clustering methods, SENSE2VEC uses these labels to generate separate embeddings for each sense of a word. For example, the word "bank" can have distinct embeddings for its noun and verb forms.
+
+The model can be trained using traditional methods like Continuous Bag of Words (CBOW) or Skip-gram, with a key difference: instead of predicting words given surrounding words, SENSE2VEC predicts word senses given surrounding senses. This approach leads to more accurate representations of polysemic words in context, reducing the negative impact of superposition.
+
+## Evaluation and Results
+
+The authors evaluated SENSE2VEC on various NLP tasks, including dependency parsing and named entity resolution (NER). Notably, the disambiguation achieved by SENSE2VEC led to significant improvements in performance. For example, in dependency parsing across six languages (Bulgarian, German, English, French, Italian, and Swedish), SENSE2VEC embeddings resulted in an average error reduction of over 8% compared to the Wang2Vec baseline.
+
+The model also demonstrated its effectiveness in handling sentiment disambiguation, as shown in Table 5 of the paper, where the word "bad" was successfully disambiguated into a negative and positive sentiment sense. The positive sense captured sarcastic uses of "bad," which is often interpreted as "good" in informal language, while the negative sense retained the more classical meaning of "bad."
+
+## Strengths and Contributions
+
+SENSE2VEC's strengths lie in its efficiency and accuracy. By utilizing supervised labels, the model eliminates the need for expensive clustering algorithms, making it both faster and easier to scale. The ability to disambiguate nuanced senses of words, such as sentiment and named entities, showcases the flexibility and robustness of the approach.
+
+Additionally, the model's performance improvements in downstream tasks like dependency parsing and NER demonstrate its practical applicability in real-world NLP systems. The fact that SENSE2VEC outperforms earlier models like Wang2Vec and other clustering-based approaches highlights its contribution to the field of word sense disambiguation.
+
+## Limitations and Future Work
+
+
+One potential limitation of SENSE2VEC is its reliance on labeled data. While supervised learning offers many advantages in terms of accuracy, it also introduces a dependency on the availability of high-quality labels. For languages or domains where such labels are scarce, applying SENSE2VEC may be more challenging.
+
+The authors acknowledge this limitation and suggest that future work could explore the use of other types of supervised labels or investigate ways to combine both supervised and unsupervised methods to further enhance word sense disambiguation.
+
+## Conclusion
+
+Overall, SENSE2VEC presents a compelling and efficient solution to the problem of word sense disambiguation in neural word embeddings. By leveraging supervised NLP labels, the model significantly improves the accuracy of embeddings for polysemic words, leading to better performance in NLP tasks like dependency parsing and NER. Its contribution to the field is clear, and it paves the way for future advancements in sense-disambiguated word embeddings.
+
+
+
+
+## See also:
+
+- [paper](https://arxiv.org/abs/1511.06388)
+- [code](https://github.com/explosion/sense2vec) by Explosion AI
+- [demo](https://demos.explosion.ai/sense2vec)
+
+## The paper
+
+![paper](./paper.pdf){.col-page width=800px height=1000px}
+
+
+
+```python
+from sense2vec import Sense2Vec
+
+s2v = Sense2Vec().from_disk("/path/to/s2v_reddit_2015_md")
+query = "natural_language_processing|NOUN"
+assert query in s2v
+vector = s2v[query]
+freq = s2v.get_freq(query)
+most_similar = s2v.most_similar(query, n=3)
+# [('machine_learning|NOUN', 0.8986967),
+#  ('computer_vision|NOUN', 0.8636297),
+#  ('deep_learning|NOUN', 0.8573361)]
+```
+
+```python
+from sense2vec import Sense2Vec
+s2v = Sense2Vec().from_disk("./s2v_reddit_2015_md")
+vector = s2v["natural_language_processing|NOUN"]
+most_similar = s2v.most_similar("duck|VERB", n=10)
+print(most_similar)
+```

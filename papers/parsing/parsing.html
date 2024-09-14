@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="keywords" content="explainability">
 
-<title>Counterfactual Explanations and Algorithmic Recourses for Machine Learning: A Review – Oren Bochman’s Blog</title>
+<title>Dependency Parsing using Deep Learning – Oren Bochman’s Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -73,10 +72,53 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
-<meta name="twitter:title" content="Counterfactual Explanations and Algorithmic Recourses for Machine Learning: A Review – Oren Bochman’s Blog">
-<meta name="twitter:description" content="summary">
-<meta name="twitter:image" content="https://orenbochman.github.io/papers/Counterfactual Explanations and Algorithmic Recourses for Machine Learning: A Review/thumbnail_blog.png">
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Dependency Parsing using Deep Learning – Oren Bochman’s Blog">
+<meta name="twitter:description" content="Personal website, portfolio and blog">
+<meta name="twitter:image" content="https://orenbochman.github.io/papers/parsing/thumbnail_blog.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -210,7 +252,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Counterfactual Explanations and Algorithmic Recourses for Machine Learning: A Review</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Dependency Parsing using Deep Learning</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -237,8 +279,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Counterfactual Explanations and Algorithmic Recourses for Machine Learning: A Review</h1>
-<p class="subtitle lead">summary</p>
+<h1 class="title">Dependency Parsing using Deep Learning</h1>
 </div>
 
 
@@ -249,7 +290,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">Friday, September 6, 2024</p>
+      <p class="date">Tuesday, September 10, 2024</p>
     </div>
   </div>
   
@@ -257,18 +298,45 @@ ul.task-list li input[type="checkbox"] {
   </div>
   
 
-<div>
-  <div class="keywords">
-    <div class="block-title">Keywords</div>
-    <p>explainability</p>
-  </div>
-</div>
 
 </header>
 
 
+<section id="questions" class="level2">
+<h2 class="anchored" data-anchor-id="questions">Questions</h2>
+<div id="rem-transition-based-approach" class="proof remark">
+<p><span class="proof-title"><em>Remark 2</em>. </span>Explina the two approches to parsing</p>
+<ol type="1">
+<li><p>Constituency Grammar uses phrase structure grammar to organize words into nested constituents.</p></li>
+<li><p>Dependency structure of sentences shows which words depend on (modify or are arguments of) which other words. These binary asymmetric relations between the words are called dependencies and are depicted as arrows going from the head (or governor, superior, regent) to the dependent (or modifier, inferior, subordinate)</p></li>
+</ol>
+<p>Mathematicaly hhis means that there is an preorder relation on the words of a sentence. If needed we add a <mark>fake root element</mark> which makes the relation a tree.</p>
+<p>Also from a category theory point of view we are subordinate the the more specific Linguisticaly relations unifing them under the ageis of order to get a more homogenious view of the sentence</p>
+<p>Understainng this definition:</p>
+<ol type="1">
+<li><p>Can there be more than one relation between two words?</p></li>
+<li><p>Are there cases where a word has the same relations with multiple parents?</p></li>
+<li><p>Can words modify multiple words ? &gt; [[Jack [and Jill]] ascended] here we resolve this issue by</p></li>
+<li><p>How do we choose the root of a sentence or decicide to add a fake one?</p></li>
+<li></li>
+</ol>
+</div>
+<div id="rem-transition-based-approach" class="proof remark">
+<p><span class="proof-title"><em>Remark 2</em>. </span>what is the transition based approach from Nivre 2003</p>
+</div>
+<div id="rem-key-challenges" class="proof remark">
+<p><span class="proof-title"><em>Remark 3</em>. </span></p>
+</div>
+<p>can we visualize the textual parse tree as a tree</p>
+<p>(went (nsubj (Jack) (cc and) (conj Jill)) (prep up (pobj (det the) (hill))))</p>
+<p>(S (NP (NP (NNP Jack)) (CC and) (NP (NNP Jill))) (VP (VBD went) (PP (IN up) (NP (DT the) (NN hill)))))</p>
+<ol type="1">
+<li><p><strong>Learning</strong>: Given a training set D of sentences annotated with dependency graphs, induce a parsing model M that can be used to parse new sentences.ven a training set D of sentences annotated with dependency graphs, induce a parsing model M that can be used to parse new sentences.</p></li>
+<li><p><strong>Parsing</strong>: Given a parsing model <span class="math inline">M</span> and a sentence <span class="math inline">S</span>, derive the optimal dependency graph <span class="math inline">D</span> for <span class="math inline">S</span> according to <span class="math inline">M</span>. :::</p></li>
+</ol>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

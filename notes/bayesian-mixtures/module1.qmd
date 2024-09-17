@@ -1,0 +1,466 @@
+---
+title: "Mixture Models"
+subtitle: Course 3 of Bayesian Statistics Specialization
+description: "..."
+date: 2024-10-23
+categories: 
+  - Coursera 
+  - notes
+  - Bayesian Statistics
+  - Mixture Models
+  - Time Series
+keywords: 
+  - R code
+author: Oren Bochman
+image: course-banner.png
+fig-caption: Notes about ... Bayesian Statistics
+title-block-banner: banner_deep.jpg
+bibliography: bibliography.bib
+format: 
+    html: 
+        code-fold: true
+---
+
+# Week 1: Introduction to Time Series and the AR(1) process
+
+## Learning Objectives
+
+-   [x] List the goals of the course 
+-   [x] identify the basics of the R environment.
+-   [x] Explain stationary time series processes
+-   [ ] Define auto-correlation function (ACF) and partial auto-correlation function (PACF) and use R to plot the sample ACF and sample PACF of a time series
+-   [x] Explain the concepts of differencing and smoothing via moving averages to remove/highlight trends and seasonal components in a time series
+-   [ ] Define the zero-mean autoregressive process of order one or AR(1) and use R to obtain samples from this type of process
+-   [ ] Perform maximum likelihood estimation for the full and conditional likelihood in an AR(1)
+-   [ ] Perform Bayesian inference for the AR(1) under the conditional likelihood and the reference prior
+
+## Introduction
+
+### Welcome to Bayesian Statistics: Time Series
+
+-   [x] Obligatory introduction to the course and the instructors.
+- [Raquel Prado]() is a professor of statistics in the [Baskin School of Engineering](https://engineering.ucsc.edu/) at the University of California, Santa Cruz.  She was the reciepient 2022 Zellner Medal, see @BibEntry2024Sep
+
+### Introduction to R
+
+-   [x] [Introduction to R](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf)
+
+### List of References
+
+1.  [@prado2023time]
+2.  [@west2013bayesian]
+3.  [@theodoridis2015ML]
+4.  [@von2002statistical]
+
+-   The first two are the course textbooks.
+
+-   The third is a classic text on machine learning which covers Durban-Levinson recursion and the Yule-Walker equations mentioned in the course.
+
+-   The fourth is a classic text on statistical learning theory which covers the basics of time series analysis.
+
+## Stationarity the ACF and the PACF
+
+### Stationarity (video)
+
+Stationarity is a key concept in time series analysis. A time series is said to be stationary if its statistical properties such as mean, variance, and auto-correlation do not change over time.
+
+::: {#tip-notation .callout-tip}
+
+#### Notation
+
+-   $\{y_t\}$ - the time series process, where each $y_t$ is a univariate random variable.
+-   $y_{1:T}$ or $y_1, y_2, \ldots, y_T$ - the observed data.
+:::
+
+Strong Stationarity
+
+:   [Strong Stationarity]{.column-margin}
+
+:   given $\{y_t\}$ for any $n>0$ and any $h>0$ and any subsequence the distribution of $y_t, y_{t+1}, \ldots, y_{t+n}$ is the same as the distribution of $y_{t+h}, y_{t+h+1}, \ldots, y_{t+h+n}$.
+
+since it is difficult to verify strong stationarity in practice, we often work with weak stationarity.
+
+Weak Stationarity AKA Second-order Stationarity
+
+:   [Weak Stationarity]{.column-margin}
+
+:   the mean, variance, and auto-covariance are constant over time.
+
+-   strong stationarity implies weak stationarity, but
+-   the converse is not true.
+-   for a Gaussian process, our typical use case, they are equivalent!
+
+Let $y_t$ be a time series. We say that $y_t$ is stationary if the following conditions hold:
+
+### The auto-correlation function ACF (video)
+
+[auto-correlation AFC]{.column-margin}
+
+### The partial auto-correlation function PACF (Reading)
+
+Let ${y_t}$ be a zero-mean stationary process.
+
+Let
+
+$$
+\hat{y}_t^{h-1} = \beta_1 y_{t-1} + \beta_2 y_{t-2} + \ldots + \beta_{h-1} y_{t-(h-1)}
+$$
+
+be the best linear predictor of $y_t$ based on the previous $h − 1$ values $\{y_{t−1}, \ldots , y_{t−h+1}\}$. The best linear predictor of $y_t$ based on the previous $h − 1$ values of the process is the linear predictor that minimizes
+
+$$
+E[(y_t − \hat{y}_y^{h-1})^2]
+$$
+
+The partial autocorrelation of this process at lag h, denoted by $\phi(h, h)$ is defined as: [partial auto-correlation PAFC]{.column-margin}
+
+$$
+\phi(h, h) = Corr(y_{t+h} − \hat{y}_{t+h}^{h-1}, y_t − \hat{y}_t^{h-1})
+$$
+
+for $h ≥ 2$ and $\phi(1, 1) = Corr(y_{t+1}, y_{t}) = \rho(1)$.
+
+The partial autocorrelation function can also be computed via the Durbin-Levinson recursion for stationary processes as $\phi(0, 0) = 0$,
+
+$$
+\phi(n, n) = \frac{\rho(n) − \sum_{h=1}^{n-1} \phi(n − 1, h)\rho(n − h)}{1- \sum_{h=1}^{n-1}\phi(n − 1, h)\rho(h)}
+$$
+
+for $n ≥ 1$, and
+
+$$
+\phi(n, h) = \phi(n − 1, h) − \phi(n, n)\phi(n − 1, n − h),
+$$
+
+for $n ≥ 2$, and $h = 1, \ldots , (n − 1)$.
+
+Note that the sample PACF can be obtained by substituting the sample autocorrelations and the sample auto-covariances in the Durbin-Levinson recursion.
+
+### Durbin-Levinson recursion (Off-Course Reading)
+
+Like me, you might be curious about the Durbin-Levinson recursion mentioned above. This is not covered in the course, and turned out to be an enigma wrapped in a mystery.
+
+I present my finding in the note below - much of it is due to [@enwiki-LevinsonRecursion] and [@enwiki-YuleWalkerEquations]
+
+In [@yule1927periodicities] and [@walker1931periodicity], Yule and Walker proposed a method for estimating the parameters of an autoregressive model. The method is based on the Yule-Walker equations which are a set of linear equations that can be used to estimate the parameters of an autoregressive model.
+
+Due to the autoregressive nature of the model, the equations are take a special form called a Toeplitz matrix. However at the time they probably had to use the numerically unstable Gauss-Jordan elimination to solve these equations which is $O(n^3)$ in time complexity.
+
+A decade or two later in [@Levinson1947Wiener] and [@Durbin1960Fitting] the authors came up for with a weakly stable yet more efficient algorithm for solving these autocorrelated system of equations which requires only $O(n^2)$ in time complexity. Later their work was further refined in [@Trench1964ToeplitzMI] and [@Zohar1969ToeplitzMI] to just $3\times n^2$ multiplication. A cursory search reveals that Toeplitz matrix inversion is still an area of active research with papers covering parallel algorithms and stability studies. Not surprising as man of the more interesting deep learning models, including LLMs are autoregressive.
+
+So the [Durbin-Levinson recursion](https://en.wikipedia.org/wiki/Levinson_recursion) is just an elegant bit of linear algebra for solving the [Yule-Walker equations](https://w.wiki/9gVB#Estimation_of_AR_parameters) more efficiently.
+
+Here is what I dug up:
+
+### Durbin-Levinson and the Yule-Walker equations (Off-Course Reading)
+
+The Durbin-Levinson recursion is a method in linear algebra for computing the solution to an equation involving a *Toeplitz matrix* AKA a *diagonal-constant matrix* where descending diagonals are constant. The recursion runs in $O(n^2)$ time rather then $O(n^3)$ time required by Gauss-Jordan elimination.
+
+The recursion can be used to compute the coefficients of the autoregressive model of a stationary time series. It is based on the [Yule-Walker equations](https://w.wiki/9gVB#Estimation_of_AR_parameters) and is used to compute the PACF of a time series.
+
+The Yule-Walker equations can be stated as follows for an AR(p) process:
+
+$$
+\gamma_m = \sum_{k=1}^p \phi_k \gamma_{m-k} + \sigma_\epsilon^2\delta_{m,0} \qquad \text{(Yule-Walker equations)}
+$$ {#eq-yule-walker}
+
+where:
+
+-   $\gamma_m$ is the autocovariance function of the time series,
+-   $\phi_k$ are the AR coefficients,
+-   $\sigma_\epsilon^2$ is the variance of the white noise process, and
+-   $\delta_{m,0}$ is the Kronecker delta function.
+
+when $m=0$ the equation simplifies to:
+
+$$
+\gamma_0 = \sum_{k=1}^p \phi_k \gamma_{-k} + \sigma_\epsilon^2 \qquad \text{(Yule-Walker equations for m=0)}
+$$ {#eq-yule-walker-m-0}
+
+for $m > 0$ the equation simplifies to:
+
+$$ \begin{bmatrix}
+    \gamma_1 \newline
+    \gamma_2 \newline
+    \gamma_3 \newline
+    \vdots \newline
+    \gamma_p \newline
+ \end{bmatrix} =  \begin{bmatrix}
+    \gamma_0     & \gamma_{-1}  & \gamma_{-2}  & \cdots \newline
+    \gamma_1     & \gamma_0     & \gamma_{-1}  & \cdots \newline
+    \gamma_2     & \gamma_1     & \gamma_0     & \cdots \newline
+    \vdots       & \vdots       & \vdots       & \ddots \newline
+    \gamma_{p-1} & \gamma_{p-2} & \gamma_{p-3} & \cdots \newline
+ \end{bmatrix}  \begin{bmatrix}
+    \phi_{1} \newline
+    \phi_{2} \newline
+    \phi_{3} \newline
+    \vdots \newline
+    \phi_{p} \newline
+ \end{bmatrix}
+$$
+
+and since this matrix is Toeplitz, we can use Durbin-Levinson recursion to efficiently solve the system for $\phi_k \forall k$.
+
+Once $\{\phi_m ; m=1,2, \dots ,p \}$ are known, we can consider m=0 and solved for $\sigma_\epsilon^2$ by substituting the $\phi_k$ into @eq-yule-walker-m-0 Yule-Walker equations.
+
+Of course the Durbin-Levinson recursion is not the last word on solving this system of equations. There are today numerous improvements which are both faster and more numerically stable.
+
+### Differencing and smoothing (Reading)
+
+Many time series models are built under the assumption of stationarity. However, time series data often present non-stationary features such as trends or seasonality. Practitioners may consider techniques for detrending, deseasonalizing and smoothing that can be applied to the observed data to obtain a new time series that is consistent with the stationarity assumption.
+
+We briefly discuss two methods that are commonly used in practice for detrending and smoothing.
+
+#### Differencing
+
+The first method is differencing, which is generally used to remove trends in time series data. The first difference of a time series is defined in terms of the so called difference operator denoted as $D$, that produces the transformation [differencing operator]{.column-margin}
+
+$$
+Dy_t = y_t - y_{t-1}.
+$$
+
+Higher order differences are obtained by successively applying the operator $D$. For example, 
+
+$$
+D^2y_t = D(Dy_t) = D(y_t - y_{t-1}) = y_t - 2y_{t-1} + y_{t-2}.
+$$
+
+Differencing can also be written in terms of the so called backshift operator $B$, with [backshift operator]{.column-margin} 
+
+$$
+By_t = y_{t-1},
+$$
+
+so that 
+$$
+Dy_t = (1 - B)y_t
+$$ 
+
+and 
+
+$$
+D^dy_t = (1 - B)d y_t.
+$$
+
+#### Smoothing
+
+The second method we discuss is [moving averages, which is commonly used to "smooth" a time series by removing certain features]{.mark} (e.g., seasonality) [to highlight other features]{.mark} (e.g., trends). [A moving average is a weighted average of the time series around a particular time]{.mark} $t$. In general, if we have data $y1:T$ , we could obtain a new time series such that [moving average]{.column-margin}
+
+$$
+z_t = \sum_{j=-q}^{p} w_j y_{t+j},
+$$
+
+for $t = (q + 1) : (T − p)$, with weights $w_j ≥ 0$ and $\sum^p_{j=−q} w_j = 1$
+
+We will frequently work with *moving averages* for which 
+
+$$
+p = q \qquad \text{(centered)}
+$$
+
+and
+
+$$
+w_j = w_{−j} \forall j  \text{(symmetric)}
+$$
+
+Assume we have periodic data with period $d$. Then, symmetric and centered moving averages can be used to remove such periodicity as follows:
+
+-   If $d = 2q$ : 
+
+$$
+z_t = \frac{1}{2} (y_{t−q} + y_{t−q+1} + \ldots + y_{t+q−1} + y_{t+q}) 
+$$
+
+-   if $d = 2q + 1$ :
+
+$$
+z_t = \frac{1}{d} (y_{t−q} + y_{t−q+1} + \ldots + y_{t+q−1} + y_{t+q})
+$$
+
+Example: To remove seasonality in monthly data (i.e., seasonality with a period of d = 12 months), one can use a moving average with $p = q = 6$, $a_6 = a_{−6} = 1/24$, and $a_j = a_{−j} = 1/12$ for $j = 0, \ldots , 5$ , resulting in:
+
+$$
+z_t = \frac{1}{12} (y_{t−6} + y_{t−5} + \ldots + y_{t+5} + y_{t+6})
+$$
+
+### ACF PACF Differencing and Smoothing Examples (Video)
+
+{{< lipsum 2 >}}
+
+### R code for Differencing and filtering via moving averages (reading)
+
+```{r}
+#| label: "moving averages and differencing"
+
+# Load the CO2 dataset in R
+data(co2) 
+
+# Take first differences to remove the trend 
+co2_1stdiff=diff(co2,differences=1)
+
+# Filter via moving averages to remove the seasonality 
+co2_ma=filter(co2,filter=c(1/24,rep(1/12,11),1/24),sides=2)
+
+par(mfrow=c(3,1), cex.lab=1.2,cex.main=1.2)
+plot(co2) # plot the original data 
+plot(co2_1stdiff) # plot the first differences (removes trend, highlights seasonality)
+plot(co2_ma) # plot the filtered series via moving averages (removes the seasonality, highlights the trend)
+```
+
+### R Code: Simulate data from a white noise process
+
+```{r}
+#| label: "white noise simulation"
+
+#
+# Simulate data with no temporal structure (white noise)
+#
+set.seed(2021)
+T=200
+t =1:T
+y_white_noise=rnorm(T, mean=0, sd=1)
+#
+# Define a time series object in R: 
+# Assume the data correspond to annual observations starting in January 1960 
+#
+yt=ts(y_white_noise, start=c(1960), frequency=1)
+#
+# plot the simulated time series, their sample ACF and their sample PACF
+#
+par(mfrow = c(1, 3), cex.lab = 1.3, cex.main = 1.3)
+yt=ts(y_white_noise, start=c(1960), frequency=1)
+plot(yt, type = 'l', col='red', xlab = 'time (t)', ylab = "Y(t)")
+acf(yt, lag.max = 20, xlab = "lag",
+    ylab = "Sample ACF",ylim=c(-1,1),main="")
+pacf(yt, lag.max = 20,xlab = "lag",
+     ylab = "Sample PACF",ylim=c(-1,1),main="")
+```
+
+### Quiz 1: Stationarity, ACF, PACF, Differencing, and Smoothing
+
+omitted per coursera requirements
+
+## The AR(1) process: Definition and properties
+
+{{< lipsum 2 >}}
+
+### The AR(1) process (video)
+
+{{< lipsum 2 >}}
+
+### The PACF of the AR(1) process (reading)
+
+It is possible to show that the PACF of an autoregressive process of order one is zero after the first lag. We can use the Durbin-Levinson recursion to show this.
+
+For lag $n = 0$ we have $\phi(0, 0) = 0.$
+
+For lag $n = 1$ we have: 
+
+$$
+\phi(1, 1) =  \rho(1) = \phi
+$$
+
+For lag $n = 2$ we compute $\phi(2, 2)$ as:
+
+$$
+\phi(2, 2) = \frac{(\rho(2) − \phi(1, 1)\rho(1))}{ (1 − \phi(1, 1)\rho(1))} = \frac{\phi^2-\phi^2}{1- \phi^2}=0
+$$
+
+and we also obtain
+
+$$
+\phi(2, 1) = \phi(1, 1) − \phi(2, 2)\phi(1, 1) = \phi.
+$$
+
+For lag $n = 3$ we compute $\phi(3, 3)$ as
+
+$$
+\begin{align*}
+\phi(3, 3) &= \frac{(\rho(3) − \sum_{h=1}^2 \phi(2, h)\rho(3 − h))}{1 − \sum_{h=1}^2 \phi(2, h)\rho(h)} \newline
+&= \frac{\phi^3 - \phi(2,1) \rho(2) - \phi(2,2) \rho(1)}{1 - \phi(2,1)\rho(1) - \phi(2,2)\rho(2)} \newline
+&= \frac{\phi^3 - \phi^3 - 0}{1 - \phi^2 } \newline
+&= 0
+\end{align*}
+$$
+
+and we also obtain
+
+$$
+\phi(3, 1) = \phi(2, 1) − \phi(3, 3)\phi(2, 2) = \phi
+$$
+
+$$
+\phi(3, 2) = \phi(2, 2) − \phi(3, 3)\phi(2, 1) = 0
+$$
+
+We can prove by induction that in the case of an AR(1), for any lag n,
+
+$\phi(n, h) = 0, \phi(n, 1) = \phi$ and $\phi(n, h) = 0$ for $h ≥ 2$ and $n ≥ 2$.
+
+Then, the PACF of an AR(1) is zero for any lag above 1 and the PACF coefficient at lag 1 is equal to the AR coefficient $\phi$
+
+{{< lipsum 2 >}}
+
+### Sample data from AR(1) processes (Reading)
+
+```{r}
+#| label: "ar(1) sampling"
+
+# sample data from 2 ar(1) processes and plot their ACF and PACF functions
+#
+set.seed(2021)
+T=500 # number of time points
+#
+# sample data from an ar(1) with ar coefficient phi = 0.9 and variance 1
+#
+v=1.0 # innovation variance
+sd=sqrt(v) #innovation stantard deviation
+phi1=0.9 # ar coefficient
+yt1=arima.sim(n = T, model = list(ar = phi1), sd = sd)
+#
+# sample data from an ar(1) with ar coefficient phi = -0.9 and variance 1
+#
+phi2=-0.9 # ar coefficient
+yt2=arima.sim(n = T, model = list(ar = phi2), sd = sd)
+
+par(mfrow = c(2, 1), cex.lab = 1.3)
+plot(yt1,main=expression(phi==0.9))
+plot(yt2,main=expression(phi==-0.9))
+
+par(mfrow = c(3, 2), cex.lab = 1.3)
+lag.max=50 # max lag
+#
+## plot true ACFs for both processes
+#
+cov_0=sd^2/(1-phi1^2) # compute auto-covariance at h=0
+cov_h=phi1^(0:lag.max)*cov_0 # compute auto-covariance at h
+plot(0:lag.max, cov_h/cov_0, pch = 1, type = 'h', col = 'red',
+     ylab = "true ACF", xlab = "Lag",ylim=c(-1,1), main=expression(phi==0.9))
+
+cov_0=sd^2/(1-phi2^2) # compute auto-covariance at h=0
+cov_h=phi2^(0:lag.max)*cov_0 # compute auto-covariance at h
+# Plot autocorrelation function (ACF)
+plot(0:lag.max, cov_h/cov_0, pch = 1, type = 'h', col = 'red',
+     ylab = "true ACF", xlab = "Lag",ylim=c(-1,1),main=expression(phi==-0.9))
+
+## plot sample ACFs for both processes
+#
+acf(yt1, lag.max = lag.max, type = "correlation", ylab = "sample ACF",
+    lty = 1, ylim = c(-1, 1), main = " ")
+acf(yt2, lag.max = lag.max, type = "correlation", ylab = "sample ACF",
+    lty = 1, ylim = c(-1, 1), main = " ")
+## plot sample PACFs for both processes
+#
+pacf(yt1, lag.ma = lag.max, ylab = "sample PACF", ylim=c(-1,1),main="")
+pacf(yt2, lag.ma = lag.max, ylab = "sample PACF", ylim=c(-1,1),main="")
+```
+
+### Quiz 2: The AR(1) definition and properties
+
+Omitted per Coursera requirements
+
+## The AR(1) process:Maximum likelihood estimation and Bayesian inference
+
+{{< lipsum 2 >}}

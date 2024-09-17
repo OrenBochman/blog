@@ -4,75 +4,86 @@ subtitle: "summary"
 keywords: ["cross-lingual word embeddings", "bilingual lexicon induction", "retrofitting"]
 bibliography: bibliography.bib
 date: 2024-06-11
+cover: cover.jpg
 ---
 
+## TL;DR
 
-## TL;DR 
+This paper, "Why Overfitting Isn’t Always Bad: Retrofitting Cross-Lingual Word Embeddings to Dictionaries," challenges the traditional view that overfitting is inherently detrimental when developing cross-lingual word embeddings (CLWE)[^1] and that the evaluation of CLWE using Bilingual Lexicon Induction (BLI) is flawed.
 
-This paper, "Why Overfitting Isn’t Always Bad: Retrofitting Cross-Lingual Word Embeddings to Dictionaries," challenges the traditional view that overfitting is inherently detrimental when developing cross-lingual word embeddings (CLWE).
+[^1]: see my note below regarding this point.
 
+::: callout-tip
+## Cross Language Word Embeddings (CLWE) in a nutshell
 
+Since I have not looked into CLWE before I add this outline on how CLWE are being learned from in the video lined below.
+
+1.  embeddings are learned for each language
+2.  a Bilingual dictionary provides a mapping from word pairs which is used to tweak the embeddings so they align across languages.
+:::
 
 ## Abstract
 
 > Cross-lingual word embeddings (CLWE) are often evaluated on bilingual lexicon induction (BLI). Recent CLWE methods use linear projections, which underfit the training dictionary, to generalize on BLI. However, underfitting can hinder generalization to other downstream tasks that rely on words from the training dictionary. We address this limitation by retrofitting CLWE to the training dictionary, which pulls training translation pairs closer in the embedding space and overfits the training dictionary. This simple post-processing step often improves accuracy on two downstream tasks, despite lowering BLI test accuracy. We also retrofit to both the training dictionary and a synthetic dictionary induced from CLWE, which sometimes generalizes even better on downstream tasks. Our results confirm the importance of fully exploiting the training dictionary in downstream tasks and explains why BLI is a flawed CLWE evaluation.computational resources to train.
 >
-> --- [@Zhang2020XLingEmbedd] 
-
-
+> --- [@Zhang2020XLingEmbedd]
 
 ## Key Points:
 
-1. Traditional Evaluation of CLWE:
-    - Cross-lingual word embeddings (CLWE) typically aim to map words from different languages into a shared vector space.
-    - They are commonly evaluated using Bilingual Lexicon Induction (BLI), which tests the model's ability to translate words based on a set of test words.
-2. Underfitting in Projection-Based CLWE:
-    - Current CLWE methods, particularly linear projection-based ones, underfit the training dictionary. This means they don't perfectly align all translation pairs in the training data.
-    - The paper argues that this underfitting, while beneficial for BLI test accuracy, can hinder performance on downstream tasks where words from the training dictionary play a critical role.
-3. Retrofitting Approach:
-    - The authors propose retrofitting as a post-processing step to bring training translation pairs closer in the embedding space, essentially overfitting the training dictionary.
-    - This retrofitting involves modifying the embeddings to minimize distances between training translation pairs while retaining as much of the original structure as possible.
-4. Retrofitting to Synthetic Dictionaries:
-    - In addition to the training dictionary, the paper introduces retrofitting to a synthetic dictionary induced from the original CLWE using the Cross-Domain Similarity Local Scaling (CSLS) heuristic.
-    - This helps balance the need to fit the training dictionary while maintaining some generalization capability for unseen words.
+1.  **Traditional Evaluation of CLWE**:
+    -   Cross-lingual word embeddings (CLWE) typically aim to map words from different languages into a shared vector space.
+    -   They are commonly evaluated using Bilingual Lexicon Induction (BLI), which tests the model's ability to translate words based on a set of test words.
+2.  **Underfitting in Projection-Based CLWE**:
+    -   Current CLWE methods, particularly linear projection-based ones, underfit the training dictionary. This means they don't perfectly align all translation pairs in the training data.
+    -   The paper argues that this underfitting, while beneficial for BLI test accuracy, can hinder performance on downstream tasks where words from the training dictionary play a critical role.
+3.  **Retrofitting Approach**:
+    -   The authors propose retrofitting as a post-processing step to bring training translation pairs closer in the embedding space, essentially overfitting the training dictionary.
+    -   This retrofitting involves modifying the embeddings to minimize distances between training translation pairs while retaining as much of the original structure as possible.
+4.  Retrofitting to Synthetic Dictionaries:
+    -   In addition to the training dictionary, the paper introduces retrofitting to a synthetic dictionary induced from the original CLWE using the Cross-Domain Similarity Local Scaling (CSLS) heuristic.
+    -   This helps balance the need to fit the training dictionary while maintaining some generalization capability for unseen words.
 
 ## Experimental Results:
 
-1. BLI Accuracy:
-    - Retrofitting the embeddings to the training dictionary results in perfect alignment of training pairs, leading to decreased BLI test accuracy since the embeddings overfit the training data.
-    - However, retrofitting to a synthetic dictionary can achieve a balance, improving BLI test accuracy somewhat while still fitting the training data better.
-
-2. Downstream Tasks:
-    - The paper evaluates the retrofitted embeddings on two downstream tasks: document classification and dependency parsing.
-    - Despite lower BLI test accuracy, retrofitted embeddings often lead to improved performance on these tasks. This underscores the importance of fully exploiting the training dictionary for downstream performance.
+1.  **BLI Accuracy**:
+    -   Retrofitting the embeddings to the training dictionary results in perfect alignment of training pairs, leading to decreased BLI test accuracy since the embeddings overfit the training data.
+    -   However, retrofitting to a synthetic dictionary can achieve a balance, improving BLI test accuracy somewhat while still fitting the training data better.
+2.  **Downstream Tasks**:
+    -   The authors evaluates the retrofitted embeddings on two downstream tasks: **document classification** and **dependency parsing**.
+    -   Despite lower BLI test accuracy, retrofitted embeddings often lead to improved performance on these tasks. This underscores the importance of fully exploiting the training dictionary for downstream performance.
 
 ## Main Contributions:
 
-1. Challenge to BLI as a Sole Metric:
-    - The paper argues that BLI accuracy does not always correlate with downstream task performance, revealing the limitations of relying solely on BLI for evaluating CLWE.
-2. Retrofitting as a Beneficial Overfitting:
-    - It shows that overfitting to the training dictionary through retrofitting can be beneficial, enhancing the performance of downstream tasks even if it harms BLI test accuracy.
-3. Synthetic Dictionary for Balance: 
-    - Introducing the use of a synthetic dictionary for retrofitting provides a middle ground, balancing the need to fit the training dictionary while retaining some generalization ability.
+1.  **Challenge to BLI as a Sole Metric**:
+    -   The authors argues that BLI accuracy does not always correlate with downstream task performance, revealing the limitations of relying solely on BLI for evaluating CLWE.
+2.  **Retrofitting as a Beneficial Overfitting**:
+    -   It shows that overfitting to the training dictionary through retrofitting can be beneficial, enhancing the performance of downstream tasks even if it harms BLI test accuracy.
+3.  Synthetic Dictionary for Balance:
+    -   Introducing the use of a synthetic dictionary for retrofitting provides a middle ground, balancing the need to fit the training dictionary while retaining some generalization ability.
 
 ## Discussion:
 
 The authors suggest that the overemphasis on BLI as an evaluation metric for CLWE should be reconsidered, advocating instead for a focus on downstream tasks that better reflect the utility of the embeddings. They propose that future work might explore more complex non-linear projections to better fit the dictionary without compromising on generalization.
 
-##  Conclusion:
+## Conclusion:
 
 The paper's main takeaway is that overfitting to the training dictionary via retrofitting is not inherently harmful. In fact, it can lead to better performance on downstream NLP tasks. This insight invites a reconsideration of the evaluation metrics for cross-lingual word embeddings and opens the door for future work on more sophisticated retrofitting and projection methods.
 
+::: callout-note
+## overfitting
 
+-   It is not surprising that the authors 'discovered' that fitting the model on `test` + `train` + `validation` gives better results then fitting on `train` part only. After all the best way to reduce overfitting is to give it more data.
+-   This is a common practice in machine learning to train on the full dataset once we have used to get the best results when the model is deployed to production.
+-   Bayesian LOO Cross validation also allows one to measure the generalization error of the model without having to make the sacrifice of a train/test split.
+-   Considering that the dataset is a dictionary means there is probably little noise to overfit on.
 
+On the other hand their criticism of BLI as a metric is valid. There are lots of bad metrics and it is more so when we wish to use it to estimate performance on a different task. In RL one uses importance sampling to make the correction between on policy and off policy - perhaps this is something to look into, though it would be easier to do this if this was a RL problem rather than supervised ML.
 
-
-
-
+It is a common practice in machine learning to use a proxy metric to evaluate the model. The problem is that the proxy metric is not always a good indicator of the model's performance on the real task. This is why it is important to evaluate the model on the real task as well.
+:::
 
 ## See also
 
-
-- [Paper](http://users.umiacs.umd.edu/~jbg/docs/2020_acl_refine.pdf)
-- [Video](https://www.youtube.com/watch?v=yVN47wGkCko)
-- [Code](https://github.com/zhangmozhi/retrofit_clwe)
+-   [Paper](http://users.umiacs.umd.edu/~jbg/docs/2020_acl_refine.pdf)
+-   [Video](https://www.youtube.com/watch?v=yVN47wGkCko)
+-   [Code](https://github.com/zhangmozhi/retrofit_clwe)

@@ -1,0 +1,69 @@
+---
+date: "2016-12-10"
+title: "Learning both Weights and Connections for Efficient Neural Networks"
+subtitle: "paper review"
+keywords: [pruning, neural networks, deep learning, image recognition, computer vision, AlexNet, VGG-16, compression] 
+bibliography: ./bibliography.bib
+draft: true
+---
+
+## TL;DR
+
+In this paper [@han2015learningboth] the authors, Song Han and Jeff Pool and John Tran and William J. Dally,  investigated how to prune networks during training to keep only the most important connections resulting in a networks that are an order of magnitude smaller and faster to run without losing accuracy. 
+
+::: callout-info
+
+## Three Steps Method
+
+1. Train the network to learn which connections are important.
+2. Prune the unimportant connections. 
+3. Retrain the network to fine tune the weights of the remaining connections.
+
+:::
+
+
+## Abstract 
+
+> Neural networks are both computationally intensive and memory intensive, making them difficult to deploy on embedded systems. Also, conventional networks fix the architecture before training starts; as a result, training cannot improve the architecture. To address these limitations, we describe a method [to reduce the storage and computation required by neural networks by an order of magnitude without affecting their accuracy by learning only the important connections]{.mark}. Our method prunes redundant connections using a three-step method. First, we train the network to learn which connections are important. Next, we prune the unimportant connections. Finally, we retrain the network to fine tune the weights of the remaining connections. On the ImageNet dataset, our method reduced the number of parameters of AlexNet by a factor of 9x, from 61 million to 6.7 million, without incurring accuracy loss. Similar experiments with VGG-16 found that the number of parameters can be reduced by 13x, from 138 million to 10.3 million, again with no loss of accuracy.
+>
+> --- [@han2015learningboth]
+
+## Review
+
+![](./fig1.png)
+
+![](./fig2.png)
+
+![](./fig3.png)
+
+![](./table1.png)
+
+Dropout ratio adjustment - 0.5 to 0.9 since the network has been pruned has likely retained the bottlenecks thus we can say that the need for dropout has been reduced per reduction in network capacity.
+
+$$
+C_i=N_i \times N_{i+1} \qquad
+$$
+
+$$
+D_r=D_o\sqrt{\frac{C_ir}{C_io} }\qquad
+$$
+
+where
+
+- $C_i$ is the number of connections in layer $i$,
+- $N_i$ is the number of neurons in layer $i$, 
+- $D_r$ is the dropout ratio for layer $i$, $D_o$ is the original dropout ratio,
+- $r$ is the ratio of the number of connections in layer $i$ to the number of connections in the original network, and 
+- $C_io$ is the number of connections in the original network.
+
+## The paper
+
+![paper](./paper.pdf){.col-page width="800px" height="1000px"}
+
+## Resources
+
+{{< video https://www.youtube.com/embed/vouEMwDNopQ
+title="Song Han - Deep Compression, DSD Training and EIE: Deep Neural Network Model Compression, Regularization and Hardware Acceleration" >}}
+
+![TechViz - The Data Science Guy](https://youtu.be/2fy17SwDHUw)
+![Neural Nets - Prof. Mark Whitehorn](https://www.youtube.com/watch?v=mhiBZqQ7SbI)

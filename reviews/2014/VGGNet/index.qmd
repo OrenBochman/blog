@@ -1,0 +1,107 @@
+---
+title: "VGGNet: Very Deep Convolutional Networks for Large-Scale Image Recognition"
+date: "2015-12-10"
+subtitle: "paper review"
+bibliography: ./bibliography.bib
+keywords: [ "convolutional neural networks", "deep learning", "image recognition", "computer vision" ]
+---
+
+## TL;DR
+
+In this paper [@simonyan2015deepconvolutionalnetworkslargescale] the authors, Karen Simonyan and Andrew Zisserman from the Visual Geometry Group at Oxford,  investigated the effect of increasing the convolutional network depth on the  accuracy in the large-scale image recognition setting. The authors show that a significant improvement on the prior-art configurations can be achieved by pushing the depth to 16-19 weight layers.
+
+- By using 3x3 convolution filters with stride of 1 instead of larger ones like 5x5 or 7x7 the authors were able to reduce the number of parameters in the network which allowed them to use  deeper networks (16-19) layers with a similar capacity to earlier networks. This is possible as stack of three 3x3 convolutional layers has an effective receptive field of 7x7 with 81% fewer parameters than a single 7x7 convolutional layer. Once this was understood 3x3 became the standard convolutional filter size in modern CNN architectures.
+
+- The authors introduced a data augmentation method called 'image jittering' which varying image scales.
+
+- The authors later tweaked their model further including using 1x1 convolutional layers and Local Response Normalization (LRN) which improved the performance of the model as well as Xaiver initialization. And they were able to achieve state-of-the-art results on the ImageNet dataset.
+
+- The authors released weights for **VGG16** and **VGG19** Called D and E in the table below which were the basis of their ImageNet Challenge 2014 submission. And it is is these two models that are most commonly used in practice as thier weight are available in the Keras library [@chollet2015keras].
+
+## The abstract
+
+> In this work [we investigate the effect of the convolutional network depth on its accuracy]{.mark} in the large-scale image recognition setting. Our main contribution is a thorough evaluation of networks of increasing depth using an architecture with very small (3x3) convolution filters, which shows that a [significant improvement on the prior-art configurations can be achieved by pushing the depth to 16-19 weight layers]{.mark}. These findings were the basis of our ImageNet Challenge 2014 submission, where our team secured the first and the second places in the localisation and classification tracks respectively. We also show that our representations generalise well to other datasets, where they achieve state-of-the-art results. We have made our two best-performing ConvNet models publicly available to facilitate further research on the use of deep visual representations in computer vision.
+> --- [@simonyan2015deepconvolutionalnetworkslargescale]
+
+## Review
+
+The paper has a table with some network architectures and their performance on the ImageNet dataset. In many cases data scientist etc. like to copy the architectures of well known models and use them in their own work. So this paper is a good reference for giving a few more options for architectures to use.
+
+The paper uses 3x3 convolution filters which is a common practice in modern CNN architectures. 
+
+> We use very small 3 × 3 receptive fields throughout the whole net,
+which are convolved with the input at every pixel (with stride 1). It is easy to see that a stack of two 3 × 3 conv. layers (without spatial pooling in between) has an effective receptive field of 5 × 5; three such layers have a 7 × 7 effective receptive field. [So what have we gained by using, for instance, a
+stack of three 3 × 3 conv. layers instead of a single 7 × 7 layer? First, we incorporate three non-linear rectification layers instead of a single one, which makes the decision function more discriminative. Second, we decrease the number of parameters]{.mark}: assuming that both the input and the output of a three-layer 3 × 3 convolution stack has C channels, the stack is parametrised by 3 (32C2) = 27C^2 weights; at the same time, a single 7 × 7 conv. layer would require 72C2 = 49C2 parameters, i.e. 81% more. This can be seen as imposing a regularisation on the 7 × 7 conv. filters, forcing them to have a decomposition through the 3 × 3 filters (with non-linearity injected in between).
+
+The authors also reference 1 × 1 convolutions from [NiN] paper which also have large FC layers at the end.
+
+![architecture](./table1.png){width="800px"}
+
+Where:
+- A is 11 layered.
+- A-LRN is 11 layered but have Local Response Normalization.
+- B is 13 layered.
+- C is 16 layered but has 1x1 convolutional layers.
+- D is 16 layered but 1x1 convolutional layers in C are replaced with 3x3 convolutional layers.
+- E is 19 layered
+
+
+Training
+
+
+
+The result were state of the art but by 2018 [@DBLP:journals/corr/GoyalDGNWKTJH17] it would be possible to train a ResNet-50 imagenet classifier in under an hour of compute with just using 256 GPUs. There is little novelty in the methods. The authors simply increased the depth of the network and increase the umber of parameters.(but they also used them more efficiently).
+
+At [@BibEntry2024Sep] I found a Pytorch implementation of this paper.
+
+Many People ask what is the difference between VGG16 and VGG19. The difference is that VGG19 has 3 more convolutional layers than VGG16. Since these extra convolutional layers are stacked after two other layers, the receptive field of VGG19 is larger than that of VGG16. Also the CNN also have a RELU so that the network also has increased discriminative power.
+This means that VGG19 can capture more complex patterns in the input image than VGG16. However, this comes at the cost of more parameters and more computation. In practice, VGG16 is often used because it is simpler and faster to train than VGG19.
+
+![VGG16](./vgg16.png){width="800px"}
+![VGG19](./vgg19.png){width="800px"}
+
+
+
+<!--
+::: callout-warning
+
+:::: {.column-margin}
+
+![](captain_abvious.jpg){width="250px"} 
+
+
+
+
+@meme2013captainobvious
+
+> More layers $\implies$ more parameters <br>
+> more parameters $\implies$ more capacity <br>
+> more capacity $\implies$ better fit. <br>
+> BaZinga! 🚀
+
+::::
+
+It seems that the authors were aware of methods for speeding up training but they did not bother with them. They as using 4 GPUs gave them the results in 2-3 weeks per model.
+
+:::
+-->
+
+## Limitations
+
+- The authors did not use any data augmentation methods like random cropping, flipping, etc. which are common in modern CNN architectures. They also did not use any regularization methods like dropout, L2 regularization, etc. which are also common in modern CNN architectures.
+- The networks are pretty massive and require a lot of GPU memory in inference.
+
+
+
+## The paper
+
+![paper](./paper.pdf){.col-page width="800px" height="1000px"}
+
+## Resources
+
+- [home page](https://www.robots.ox.ac.uk/~vgg/research/very_deep/)
+- https://medium.com/@siddheshb008/vgg-net-architecture-explained-71179310050f
+- https://karan3-zoh.medium.com/paper-summary-very-deep-convolutional-networks-for-large-scale-image-recognition-e7437959d856
+- https://safakkbilici.github.io/summary-vggnet/
+- https://www.cs.toronto.edu/~frossard/post/vgg16/
+

@@ -1,13 +1,13 @@
 ---
-title: "Week 1: Introductions to time series analysis and the AR(1) process"
+title: "Week 3: Normal Dynamic Linear Models, Part 1"
 subtitle: Time Series Analysis
-description: "The AR(1) process, Stationarity, ACF, PACF, Differencing, and Smoothing"
-date: 2024-10-23
+description: "Normal Dynamic Linear Models, Part 1"
+date: 2024-10-25
 categories: 
   - Coursera 
   - notes
   - Bayesian Statistics
-  - Autoregressive Models
+  - Normal Dynamic Linear Models
   - Time Series
 keywords: 
   - time series
@@ -36,3 +36,252 @@ format:
     html: 
         code-fold: true
 ---
+
+# Week 3: Normal Dynamic Linear Models, Part 1
+
+Normal Dynamic Linear Models (NDLMs) are defined and illustrated in this module using several examples. Model building based on the forecast function via the superposition principle is explained. Methods for Bayesian filtering, smoothing and forecasting for NDLMs in the case of known observational variances and known system covariance matrices are discussed and illustrated.
+
+
+## Learning Objectives
+
+- Use R for analysis and forecasting of time series using NDLM (case of known observational and system variances)
+- Derive the equations to obtain posterior inference and forecasting in the NDLM with known observational and system variances, including the filtering, smoothing and forecasting equations
+- Apply the NDLM superposition principle and explain the role of the forecast function
+- efine trend and regression normal DLMs
+- Explain the general normal dynamic linear model (NDLM) representation
+
+## The Normal Dynamic Linear Model: Definition, model classes and the superposition principle
+
+### NDLM Definition (Video)
+
+![slide 1](m3_0001.png){.column-margin width="250px"}
+
+> In this part of the course, [We will discuss the class of **normal dynamic linear models** for analyzing and forecasting non-stationary time series. We will talk about Bayesian inference and forecasting within this class of models and describe model building as well]{.mark}. 
+
+
+#### A motivating example:
+
+- Let's say we have a very simple model and has no temporal structure, just a model that is as follows: 
+  - We have your time series $y_t$. 
+  - We are interested in thinking about the mean level of a time series which we will denote as $\mu$ and 
+  - we will also have some noise $\nu$ which is normally distributed. 
+
+$$
+y_t = \mu + v_t \qquad v_t \overset{\text{iid}}{\sim} N(0, V) \qquad 
+$$ {#eq-model-with-no-temporal-structure}
+
+where:
+
+- $\mu$ is the expected value of $y_t$ and 
+- $\nu_t$ is the noise 
+
+If we plot this model we might see the graph in the slide.
+
+> In this model the mean of the time series is  $\mu$ will be the the expected value of $y_t$, which is $\mu$. 
+
+$$
+E[y_t] = \mu
+$$
+
+> The variance here of $y_t$ is $\nu$ under this model.
+
+$$  
+Var[y_t] = \nu
+$$
+
+> What may happen in practice again, this model has no temporal structure. 
+
+> We may want to incorporate some temporal structure e.g. the level of the expected value of this time series, should be changing over time. To do that, we should write down a new model where the $\mu$ changes over time, so it's indexed in time. We will still have the same noise here. Let's again assume it is $N(0,V)$. We should have the following:
+
+
+$$
+y_t = \mu_t + \nu_t \qquad \nu_t \overset{\text{iid}}{\sim} N(0, V) \qquad \text{observation equation}
+$$ {#eq-nldm-model-observation}
+
+> We should make a decision on how to incorporate temporal structure by modeling the changes over time in this parameter $\mu_t$. We could consider different options. The simplest possible, probably that you can consider is something that looks like this:
+
+$$
+\mu_t = \mu_{t-1} + \omega_t \qquad \omega_t \overset{\text{iid}}{\sim} N(0, W) \qquad \text{system evolution equation}
+$$ {#eq-nldm-model-system-evolution}
+
+> We have that random walk type of structure where $mu_t$ will to be written as $\mu(t-1)$. The expected value of mu t, you'll think of it as $\mu(t-1) + \text{some noise}$. That error is once again, assumed to be normally distributed random variable centered at zero and with variance $W$. 
+
+> There is another assumption that we can make here and is that the $\nu_t$ and $\omega_t$ here, are also independent of each other. When I have this model, what am assuming here is that the mean level of the series is changing over time. 
+
+> These type of models have a few characteristics. This is an example of a **normal dynamic linear model**, as we will see later. 
+
+In this models, we usually have a few things: 
+
+1. We have two equations.
+  1. The **observation equation** that is relating your $y_t$, your observed process to some parameters in the model that are changing over time. 
+  2. The **system level equation or evolution equation** that tells us how that time varying parameter is going to be changing over time. 
+  
+2. We have a linear structure both in the observational level and in the system level. The linear structure, in the sense of the expected value of $y_t$ is just a linear function of that $\mu_t$. It happens to be $\mu_t$ in this particular case. In the second level, I can think of the expected value of $\mu_t$ as a linear function given $\mu(t-1)$, so it's a function that is linear in $\mu(t-1)$. 
+
+3. The other thing that we have here is at both levels, we have the **assumption of normality for the noise terms** in those equations. 
+
+This is an example of a *Gaussian or Normal dynamic*. These are time-varying parameters linear model. We will be discussing the general class of models. This is just an example. We will also discuss how to build different structures into the model, as well as how to perform Bayesian inference and forecasting.
+
+
+![slide 2](m3_0002.png){.column-margin width="250px"}
+
+
+> The general class of dynamic linear models can be written as follows. Again, we are going to have two equations. One is the so-called observation equation that relates the observations to the parameters in the model, and the notation we are going to use is as follows.
+
+$$
+y_t = F_t' \theta_t + \nu_t \qquad \nu_t \overset{\text{iid}}{\sim} N(0, \nu_t) \qquad \text{observation}
+$$
+
+where:
+
+- $y_t$ is the univariate observation at time $t$
+- $F_t$ is a vector of known values of dimension $k$
+- $\theta_t$ is a vector of parameters of dimension $k$
+- $\nu_t$ is the variance (noise) at the ovservation level.
+- The noise is assumed to be IID normal random variables $N(0, V_t)$.
+
+$$
+\theta_t = G_t \theta_{t-1} + \omega_t \qquad \omega_t \overset{\text{iid}}{\sim} N(0, W_t) \qquad \text{system}
+$$
+
+- $\theta_t$ is the vector of parameters.
+- $G_t$ is a known matrix of dimension $k \times k$.
+- $W_t$ is the variance-covariance matrix at the system level.
+
+
+> The W_t we are going to assume at the beginning that these two quantities are also known for all the values t. This is the variance-covariance matrix at the system level.
+
+> Again, if we think about these two equations, we have the model defined in this way. 
+
+> There is a next piece that we need to consider if we are going to perform based in inference for the model parameters. The next piece that we need to consider to just fully specify the model is what is the prior distribution. In a normal dynamic linear model, the prior distribution is assumed to be conjugate here. In the case again in which V_t and W_t are known, we are going to be assuming that, say that zero, the parameter vector before observing any data is going to be normally distributed. Multivariate normal with M_0 and C_0.
+
+$$
+\theta_0 \sim N(M_0, C_0)
+$$
+
+
+> The mean is a vector, again of the same dimension as Theta 0. Then I have k by k covariance matrix there as well. These are assumed to be also given to move forward with the model. In terms of the inference, there are different kinds of densities and quantities that we are interested in. One of the distributions that we are interested in finding is the so-called filtering distribution. We may be interested here in finding what is the density of Theta t given all the observations that we have up to time t. I'm going to call and all the information that I have up to time t.
+$$
+D_t= \{D_0, y_{1:T}\}
+$$
+
+> I'm going to call that D_t. It can also be, in some cases, I will just write down. So D_t, you can view with all the info up to time t. Usually, it is all the information I have at time zero. Then coupled, if there is no additional information that's going to be coupled with all the data points I have up to that time. Here I'm conditioning on all the observed quantities and the prior information up to time t, and I may be interested in just finding what is the distribution for Theta t. This is called filtering.
+
+$$
+p(\theta_t \mid D_t) \qquad \text{filtering}
+$$
+
+> Another quantity that is very important in time series analysis is forecasting. I may be interested in just what is the density, the distribution of yt plus h? Again, the number of steps ahead here, here I'm thinking of h, given that I have all this information up to time t. I'm interested in predictions here. We will be talking about forecasting.
+
+$$
+p(y_{t+h} \mid D_t) \qquad \text{forecasting}
+$$
+
+> Then another important quantity or an important set of distributions is what we call the smoothing distribution. Usually, you have a time series, when you get your data, you observe, I don't know, 300 data points. As you go with the filtering, you are going to start from zero all the way to 300 and you're going to update these filtering distributions as you go and move forward. But then you may want to revisit your parameter at time 10, for example, given that you now have observed all these 300 observations. In that case, you're interested in densities that are of the form. Let's say that you observe capital T in your process and now you are going to revisit that density for Theta t. This is now in the past. Here we assume that t is smaller than capital T. This is called smoothing. So you have more observation once you have seen the data. We will talk about how to perform Bayesian inference to obtain all these distributions under this model setting. 
+
+$$
+p(\theta_t \mid D_T)  \qquad t < T \qquad \text{smoothing}
+$$
+
+![slide 3](m3_0003.png){.column-margin width="250px"}
+
+> In addition to all the structure that we described before and all the densities that we are interested in finding, we also have as usual, the so-called forecast function, which is just instead of being the density is just expected value of y(t+h) given all the information I have up to time t. In the case of a general normal dynamic linear model, we have the structure for these just using the equations, the observation and the system of equations. We're going to have here G_(t+h_. We multiply all these all the way to G_(t+1), and then we have the expected value of Theta_t given Dt. This is the form of the forecast function. There are particular cases and particular models that we will be discussing in which the Ft is equal to F, so is constant for all t and G_t is also constant for all t. In those cases, the forecast function can be simplified and written as F transpose G to the power of h expected value.
+
+$$
+f_t(h) = E(y_{t+h} \mid D_t) = F'_{t+h} G_{t+h}\ldots G_{t+1} E(\theta_t \mid D_t)
+$$
+
+> One thing that we will learn is that the eigenstructure of this matrix is very important to define the form of the forecast function, and it's very important for model building and for adding components into your model. Finally, just in terms of short notation, we can always write down when we're working with normal dynamic linear models, we may be referring to the model instead of writing the two equations, the system and the observation equation. I can just write all the components that define my model.
+
+If $F_t=F$ and $G_t=G$ for all t, then the forecast function simplifies to:
+
+$$
+f_t(h) = E(y_{t+h} \mid D_t) = F' G^h E(\theta_t \mid D_t)
+$$
+
+> This fully specifies the model in terms of the two equations. If I know what Ft is, what Gt is, what Vt is, and the covariance at the system level. 
+
+> I sometimes will be just talking about just a short notation like this for defining the model.
+
+$$ 
+\{F_t, G_t, v_t, W_t\} 
+$$ {#eq-nldm-model-shothand-notation}
+
+### Polynomial Trend NDLM (Video)
+
+![slide 1](m3_0011.png){.column-margin width="250px"}
+
+{{< lipsum 1 >}}
+
+![slide 2](m3_0012.png){.column-margin width="250px"}
+
+{{< lipsum 1 >}}
+
+### Regression models (Video)
+
+![slide 1](m3_0021.png){.column-margin width="250px"}
+
+{{< lipsum 1 >}}
+
+
+### Summary of polynomial trend and regression models (Reading)
+
+### The superposition principle (Video)
+
+{{< lipsum 2 >}}
+
+### Superposition principle: General case
+
+{{< lipsum 2 >}}
+
+### Quiz: The Normal Dynamic Linear Model
+
+Omitted due to Coursera honor code
+
+## Bayesian Inference in the NDLM: Part 1
+
+{{< lipsum 2 >}}
+
+### Filtering
+
+{{< lipsum 2 >}}
+
+### Summary of filtering distributions
+
+{{< lipsum 2 >}}
+
+### Filtering in the NDLM: Example
+
+{{< lipsum 2 >}}
+
+### Smoothing and forecasting
+
+{{< lipsum 2 >}}
+
+### Summary of the smoothing and forecasting distributions
+
+{{< lipsum 2 >}}
+
+### Summary of the smoothing and forecasting distributions
+
+{{< lipsum 2 >}}
+
+### Rcode: Smoothing in the NDLM, Example
+
+{{< lipsum 2 >}}
+
+### Second order polynomial: Filtering and smoothing example
+
+{{< lipsum 2 >}}
+
+### Using the dlm package in R
+
+{{< lipsum 2 >}}
+
+### Rcode: Using the dlm package in R
+
+{{< lipsum 2 >}}
+
+### Practice Graded Assignment: NDLM: sensitivity to the model parameters
+
+{{< lipsum 2 >}}

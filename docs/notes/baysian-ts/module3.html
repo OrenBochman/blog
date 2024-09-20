@@ -8,9 +8,9 @@
 
 <meta name="author" content="Oren Bochman">
 <meta name="keywords" content="time series, strong stationarity, weak stationarity, autocorrelation function, ACF, partial autocorrelation function, PACF, smoothing, trend, seasonality, Durbin-Levinson recursion, Yule-Walker equations, differencing operator, back shift operator, moving average, AR(1) process, R code">
-<meta name="description" content="The AR(1) process, Stationarity, ACF, PACF, Differencing, and Smoothing">
+<meta name="description" content="Normal Dynamic Linear Models, Part 1">
 
-<title>Week 1: Introductions to time series analysis and the AR(1) process – Oren Bochman’s Blog</title>
+<title>Week 3: Normal Dynamic Linear Models, Part 1 – Oren Bochman’s Blog</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -47,6 +47,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script src="../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
 <link href="../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -83,9 +86,52 @@ background-size: cover;
       }
 </style>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
-<meta name="twitter:title" content="Week 1: Introductions to time series analysis and the AR(1) process – Oren Bochman’s Blog">
-<meta name="twitter:description" content="The AR(1) process, Stationarity, ACF, PACF, Differencing, and Smoothing">
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Week 3: Normal Dynamic Linear Models, Part 1 – Oren Bochman’s Blog">
+<meta name="twitter:description" content="Normal Dynamic Linear Models, Part 1">
 <meta name="twitter:image" content="https://orenbochman.github.io/notes/baysian-ts/course-banner.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
@@ -93,7 +139,7 @@ background-size: cover;
 <meta name="twitter:image-width" content="1200">
 </head>
 
-<body class="nav-sidebar floating nav-fixed">
+<body class="nav-sidebar floating nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -172,7 +218,7 @@ background-size: cover;
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Week 1: Introductions to time series analysis and the AR(1) process</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Week 3: Normal Dynamic Linear Models, Part 1</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -182,18 +228,18 @@ background-size: cover;
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Week 1: Introductions to time series analysis and the AR(1) process</h1>
+      <h1 class="title">Week 3: Normal Dynamic Linear Models, Part 1</h1>
             <p class="subtitle lead">Time Series Analysis</p>
                   <div>
         <div class="description">
-          The AR(1) process, Stationarity, ACF, PACF, Differencing, and Smoothing
+          Normal Dynamic Linear Models, Part 1
         </div>
       </div>
                           <div class="quarto-categories">
                 <div class="quarto-category">Coursera</div>
                 <div class="quarto-category">notes</div>
                 <div class="quarto-category">Bayesian Statistics</div>
-                <div class="quarto-category">Autoregressive Models</div>
+                <div class="quarto-category">Normal Dynamic Linear Models</div>
                 <div class="quarto-category">Time Series</div>
               </div>
                   </div>
@@ -212,7 +258,7 @@ background-size: cover;
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">Wednesday, October 23, 2024</p>
+        <p class="date">Friday, October 25, 2024</p>
       </div>
     </div>
     
@@ -2440,33 +2486,354 @@ background-size: cover;
         <li class="px-0"><hr class="sidebar-divider hi "></li>
     </ul>
     </div>
-    
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#week-3-normal-dynamic-linear-models-part-1" id="toc-week-3-normal-dynamic-linear-models-part-1" class="nav-link active" data-scroll-target="#week-3-normal-dynamic-linear-models-part-1">Week 3: Normal Dynamic Linear Models, Part 1</a>
+  <ul class="collapse">
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link" data-scroll-target="#learning-objectives">Learning Objectives</a></li>
+  <li><a href="#the-normal-dynamic-linear-model-definition-model-classes-and-the-superposition-principle" id="toc-the-normal-dynamic-linear-model-definition-model-classes-and-the-superposition-principle" class="nav-link" data-scroll-target="#the-normal-dynamic-linear-model-definition-model-classes-and-the-superposition-principle">The Normal Dynamic Linear Model: Definition, model classes and the superposition principle</a>
+  <ul class="collapse">
+  <li><a href="#ndlm-definition-video" id="toc-ndlm-definition-video" class="nav-link" data-scroll-target="#ndlm-definition-video">NDLM Definition (Video)</a></li>
+  <li><a href="#polynomial-trend-ndlm-video" id="toc-polynomial-trend-ndlm-video" class="nav-link" data-scroll-target="#polynomial-trend-ndlm-video">Polynomial Trend NDLM (Video)</a></li>
+  <li><a href="#regression-models-video" id="toc-regression-models-video" class="nav-link" data-scroll-target="#regression-models-video">Regression models (Video)</a></li>
+  <li><a href="#summary-of-polynomial-trend-and-regression-models-reading" id="toc-summary-of-polynomial-trend-and-regression-models-reading" class="nav-link" data-scroll-target="#summary-of-polynomial-trend-and-regression-models-reading">Summary of polynomial trend and regression models (Reading)</a></li>
+  <li><a href="#the-superposition-principle-video" id="toc-the-superposition-principle-video" class="nav-link" data-scroll-target="#the-superposition-principle-video">The superposition principle (Video)</a></li>
+  <li><a href="#superposition-principle-general-case" id="toc-superposition-principle-general-case" class="nav-link" data-scroll-target="#superposition-principle-general-case">Superposition principle: General case</a></li>
+  <li><a href="#quiz-the-normal-dynamic-linear-model" id="toc-quiz-the-normal-dynamic-linear-model" class="nav-link" data-scroll-target="#quiz-the-normal-dynamic-linear-model">Quiz: The Normal Dynamic Linear Model</a></li>
+  </ul></li>
+  <li><a href="#bayesian-inference-in-the-ndlm-part-1" id="toc-bayesian-inference-in-the-ndlm-part-1" class="nav-link" data-scroll-target="#bayesian-inference-in-the-ndlm-part-1">Bayesian Inference in the NDLM: Part 1</a>
+  <ul class="collapse">
+  <li><a href="#filtering" id="toc-filtering" class="nav-link" data-scroll-target="#filtering">Filtering</a></li>
+  <li><a href="#summary-of-filtering-distributions" id="toc-summary-of-filtering-distributions" class="nav-link" data-scroll-target="#summary-of-filtering-distributions">Summary of filtering distributions</a></li>
+  <li><a href="#filtering-in-the-ndlm-example" id="toc-filtering-in-the-ndlm-example" class="nav-link" data-scroll-target="#filtering-in-the-ndlm-example">Filtering in the NDLM: Example</a></li>
+  <li><a href="#smoothing-and-forecasting" id="toc-smoothing-and-forecasting" class="nav-link" data-scroll-target="#smoothing-and-forecasting">Smoothing and forecasting</a></li>
+  <li><a href="#summary-of-the-smoothing-and-forecasting-distributions" id="toc-summary-of-the-smoothing-and-forecasting-distributions" class="nav-link" data-scroll-target="#summary-of-the-smoothing-and-forecasting-distributions">Summary of the smoothing and forecasting distributions</a></li>
+  <li><a href="#summary-of-the-smoothing-and-forecasting-distributions-1" id="toc-summary-of-the-smoothing-and-forecasting-distributions-1" class="nav-link" data-scroll-target="#summary-of-the-smoothing-and-forecasting-distributions-1">Summary of the smoothing and forecasting distributions</a></li>
+  <li><a href="#rcode-smoothing-in-the-ndlm-example" id="toc-rcode-smoothing-in-the-ndlm-example" class="nav-link" data-scroll-target="#rcode-smoothing-in-the-ndlm-example">Rcode: Smoothing in the NDLM, Example</a></li>
+  <li><a href="#second-order-polynomial-filtering-and-smoothing-example" id="toc-second-order-polynomial-filtering-and-smoothing-example" class="nav-link" data-scroll-target="#second-order-polynomial-filtering-and-smoothing-example">Second order polynomial: Filtering and smoothing example</a></li>
+  <li><a href="#using-the-dlm-package-in-r" id="toc-using-the-dlm-package-in-r" class="nav-link" data-scroll-target="#using-the-dlm-package-in-r">Using the dlm package in R</a></li>
+  <li><a href="#rcode-using-the-dlm-package-in-r" id="toc-rcode-using-the-dlm-package-in-r" class="nav-link" data-scroll-target="#rcode-using-the-dlm-package-in-r">Rcode: Using the dlm package in R</a></li>
+  <li><a href="#practice-graded-assignment-ndlm-sensitivity-to-the-model-parameters" id="toc-practice-graded-assignment-ndlm-sensitivity-to-the-model-parameters" class="nav-link" data-scroll-target="#practice-graded-assignment-ndlm-sensitivity-to-the-model-parameters">Practice Graded Assignment: NDLM: sensitivity to the model parameters</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
 
 
 
 
 
+<section id="week-3-normal-dynamic-linear-models-part-1" class="level1 page-columns page-full">
+<h1>Week 3: Normal Dynamic Linear Models, Part 1</h1>
+<p>Normal Dynamic Linear Models (NDLMs) are defined and illustrated in this module using several examples. Model building based on the forecast function via the superposition principle is explained. Methods for Bayesian filtering, smoothing and forecasting for NDLMs in the case of known observational variances and known system covariance matrices are discussed and illustrated.</p>
+<section id="learning-objectives" class="level2">
+<h2 class="anchored" data-anchor-id="learning-objectives">Learning Objectives</h2>
+<ul>
+<li>Use R for analysis and forecasting of time series using NDLM (case of known observational and system variances)</li>
+<li>Derive the equations to obtain posterior inference and forecasting in the NDLM with known observational and system variances, including the filtering, smoothing and forecasting equations</li>
+<li>Apply the NDLM superposition principle and explain the role of the forecast function</li>
+<li>efine trend and regression normal DLMs</li>
+<li>Explain the general normal dynamic linear model (NDLM) representation</li>
+</ul>
+</section>
+<section id="the-normal-dynamic-linear-model-definition-model-classes-and-the-superposition-principle" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-normal-dynamic-linear-model-definition-model-classes-and-the-superposition-principle">The Normal Dynamic Linear Model: Definition, model classes and the superposition principle</h2>
+<section id="ndlm-definition-video" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="ndlm-definition-video">NDLM Definition (Video)</h3>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="m3_0001.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="slide 1"><img src="m3_0001.png" class="img-fluid figure-img" width="250" alt="slide 1"></a></p>
+<figcaption>slide 1</figcaption>
+</figure>
+</div></div><blockquote class="blockquote">
+<p>In this part of the course, <mark>We will discuss the class of <strong>normal dynamic linear models</strong> for analyzing and forecasting non-stationary time series. We will talk about Bayesian inference and forecasting within this class of models and describe model building as well</mark>.</p>
+</blockquote>
+<section id="a-motivating-example" class="level4 page-columns page-full">
+<h4 class="anchored" data-anchor-id="a-motivating-example">A motivating example:</h4>
+<ul>
+<li>Let’s say we have a very simple model and has no temporal structure, just a model that is as follows:
+<ul>
+<li>We have your time series <span class="math inline">y_t</span>.</li>
+<li>We are interested in thinking about the mean level of a time series which we will denote as <span class="math inline">\mu</span> and</li>
+<li>we will also have some noise <span class="math inline">\nu</span> which is normally distributed.</li>
+</ul></li>
+</ul>
+<p><span id="eq-model-with-no-temporal-structure"><span class="math display">
+y_t = \mu + v_t \qquad v_t \overset{\text{iid}}{\sim} N(0, V) \qquad
+\tag{1}</span></span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\mu</span> is the expected value of <span class="math inline">y_t</span> and</li>
+<li><span class="math inline">\nu_t</span> is the noise</li>
+</ul>
+<p>If we plot this model we might see the graph in the slide.</p>
+<blockquote class="blockquote">
+<p>In this model the mean of the time series is <span class="math inline">\mu</span> will be the the expected value of <span class="math inline">y_t</span>, which is <span class="math inline">\mu</span>.</p>
+</blockquote>
+<p><span class="math display">
+E[y_t] = \mu
+</span></p>
+<blockquote class="blockquote">
+<p>The variance here of <span class="math inline">y_t</span> is <span class="math inline">\nu</span> under this model.</p>
+</blockquote>
+<p><span class="math display">  
+Var[y_t] = \nu
+</span></p>
+<blockquote class="blockquote">
+<p>What may happen in practice again, this model has no temporal structure.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>We may want to incorporate some temporal structure e.g.&nbsp;the level of the expected value of this time series, should be changing over time. To do that, we should write down a new model where the <span class="math inline">\mu</span> changes over time, so it’s indexed in time. We will still have the same noise here. Let’s again assume it is <span class="math inline">N(0,V)</span>. We should have the following:</p>
+</blockquote>
+<p><span id="eq-nldm-model-observation"><span class="math display">
+y_t = \mu_t + \nu_t \qquad \nu_t \overset{\text{iid}}{\sim} N(0, V) \qquad \text{observation equation}
+\tag{2}</span></span></p>
+<blockquote class="blockquote">
+<p>We should make a decision on how to incorporate temporal structure by modeling the changes over time in this parameter <span class="math inline">\mu_t</span>. We could consider different options. The simplest possible, probably that you can consider is something that looks like this:</p>
+</blockquote>
+<p><span id="eq-nldm-model-system-evolution"><span class="math display">
+\mu_t = \mu_{t-1} + \omega_t \qquad \omega_t \overset{\text{iid}}{\sim} N(0, W) \qquad \text{system evolution equation}
+\tag{3}</span></span></p>
+<blockquote class="blockquote">
+<p>We have that random walk type of structure where <span class="math inline">mu_t</span> will to be written as <span class="math inline">\mu(t-1)</span>. The expected value of mu t, you’ll think of it as <span class="math inline">\mu(t-1) + \text{some noise}</span>. That error is once again, assumed to be normally distributed random variable centered at zero and with variance <span class="math inline">W</span>.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>There is another assumption that we can make here and is that the <span class="math inline">\nu_t</span> and <span class="math inline">\omega_t</span> here, are also independent of each other. When I have this model, what am assuming here is that the mean level of the series is changing over time.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>These type of models have a few characteristics. This is an example of a <strong>normal dynamic linear model</strong>, as we will see later.</p>
+</blockquote>
+<p>In this models, we usually have a few things:</p>
+<ol type="1">
+<li><p>We have two equations.</p></li>
+<li><p>The <strong>observation equation</strong> that is relating your <span class="math inline">y_t</span>, your observed process to some parameters in the model that are changing over time.</p></li>
+<li><p>The <strong>system level equation or evolution equation</strong> that tells us how that time varying parameter is going to be changing over time.</p></li>
+<li><p>We have a linear structure both in the observational level and in the system level. The linear structure, in the sense of the expected value of <span class="math inline">y_t</span> is just a linear function of that <span class="math inline">\mu_t</span>. It happens to be <span class="math inline">\mu_t</span> in this particular case. In the second level, I can think of the expected value of <span class="math inline">\mu_t</span> as a linear function given <span class="math inline">\mu(t-1)</span>, so it’s a function that is linear in <span class="math inline">\mu(t-1)</span>.</p></li>
+<li><p>The other thing that we have here is at both levels, we have the <strong>assumption of normality for the noise terms</strong> in those equations.</p></li>
+</ol>
+<p>This is an example of a <em>Gaussian or Normal dynamic</em>. These are time-varying parameters linear model. We will be discussing the general class of models. This is just an example. We will also discuss how to build different structures into the model, as well as how to perform Bayesian inference and forecasting.</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="m3_0002.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="slide 2"><img src="m3_0002.png" class="img-fluid figure-img" width="250" alt="slide 2"></a></p>
+<figcaption>slide 2</figcaption>
+</figure>
+</div></div><blockquote class="blockquote">
+<p>The general class of dynamic linear models can be written as follows. Again, we are going to have two equations. One is the so-called observation equation that relates the observations to the parameters in the model, and the notation we are going to use is as follows.</p>
+</blockquote>
+<p><span class="math display">
+y_t = F_t' \theta_t + \nu_t \qquad \nu_t \overset{\text{iid}}{\sim} N(0, \nu_t) \qquad \text{observation}
+</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">y_t</span> is the univariate observation at time <span class="math inline">t</span></li>
+<li><span class="math inline">F_t</span> is a vector of known values of dimension <span class="math inline">k</span></li>
+<li><span class="math inline">\theta_t</span> is a vector of parameters of dimension <span class="math inline">k</span></li>
+<li><span class="math inline">\nu_t</span> is the variance (noise) at the ovservation level.</li>
+<li>The noise is assumed to be IID normal random variables <span class="math inline">N(0, V_t)</span>.</li>
+</ul>
+<p><span class="math display">
+\theta_t = G_t \theta_{t-1} + \omega_t \qquad \omega_t \overset{\text{iid}}{\sim} N(0, W_t) \qquad \text{system}
+</span></p>
+<ul>
+<li><span class="math inline">\theta_t</span> is the vector of parameters.</li>
+<li><span class="math inline">G_t</span> is a known matrix of dimension <span class="math inline">k \times k</span>.</li>
+<li><span class="math inline">W_t</span> is the variance-covariance matrix at the system level.</li>
+</ul>
+<blockquote class="blockquote">
+<p>The W_t we are going to assume at the beginning that these two quantities are also known for all the values t. This is the variance-covariance matrix at the system level.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Again, if we think about these two equations, we have the model defined in this way.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>There is a next piece that we need to consider if we are going to perform based in inference for the model parameters. The next piece that we need to consider to just fully specify the model is what is the prior distribution. In a normal dynamic linear model, the prior distribution is assumed to be conjugate here. In the case again in which V_t and W_t are known, we are going to be assuming that, say that zero, the parameter vector before observing any data is going to be normally distributed. Multivariate normal with M_0 and C_0.</p>
+</blockquote>
+<p><span class="math display">
+\theta_0 \sim N(M_0, C_0)
+</span></p>
+<blockquote class="blockquote">
+<p>The mean is a vector, again of the same dimension as Theta 0. Then I have k by k covariance matrix there as well. These are assumed to be also given to move forward with the model. In terms of the inference, there are different kinds of densities and quantities that we are interested in. One of the distributions that we are interested in finding is the so-called filtering distribution. We may be interested here in finding what is the density of Theta t given all the observations that we have up to time t. I’m going to call and all the information that I have up to time t. <span class="math display">
+D_t= \{D_0, y_{1:T}\}
+</span></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>I’m going to call that D_t. It can also be, in some cases, I will just write down. So D_t, you can view with all the info up to time t. Usually, it is all the information I have at time zero. Then coupled, if there is no additional information that’s going to be coupled with all the data points I have up to that time. Here I’m conditioning on all the observed quantities and the prior information up to time t, and I may be interested in just finding what is the distribution for Theta t. This is called filtering.</p>
+</blockquote>
+<p><span class="math display">
+p(\theta_t \mid D_t) \qquad \text{filtering}
+</span></p>
+<blockquote class="blockquote">
+<p>Another quantity that is very important in time series analysis is forecasting. I may be interested in just what is the density, the distribution of yt plus h? Again, the number of steps ahead here, here I’m thinking of h, given that I have all this information up to time t. I’m interested in predictions here. We will be talking about forecasting.</p>
+</blockquote>
+<p><span class="math display">
+p(y_{t+h} \mid D_t) \qquad \text{forecasting}
+</span></p>
+<blockquote class="blockquote">
+<p>Then another important quantity or an important set of distributions is what we call the smoothing distribution. Usually, you have a time series, when you get your data, you observe, I don’t know, 300 data points. As you go with the filtering, you are going to start from zero all the way to 300 and you’re going to update these filtering distributions as you go and move forward. But then you may want to revisit your parameter at time 10, for example, given that you now have observed all these 300 observations. In that case, you’re interested in densities that are of the form. Let’s say that you observe capital T in your process and now you are going to revisit that density for Theta t. This is now in the past. Here we assume that t is smaller than capital T. This is called smoothing. So you have more observation once you have seen the data. We will talk about how to perform Bayesian inference to obtain all these distributions under this model setting.</p>
+</blockquote>
+<p><span class="math display">
+p(\theta_t \mid D_T)  \qquad t &lt; T \qquad \text{smoothing}
+</span></p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="m3_0003.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="slide 3"><img src="m3_0003.png" class="img-fluid figure-img" width="250" alt="slide 3"></a></p>
+<figcaption>slide 3</figcaption>
+</figure>
+</div></div><blockquote class="blockquote">
+<p>In addition to all the structure that we described before and all the densities that we are interested in finding, we also have as usual, the so-called forecast function, which is just instead of being the density is just expected value of y(t+h) given all the information I have up to time t. In the case of a general normal dynamic linear model, we have the structure for these just using the equations, the observation and the system of equations. We’re going to have here G_(t+h_. We multiply all these all the way to G_(t+1), and then we have the expected value of Theta_t given Dt. This is the form of the forecast function. There are particular cases and particular models that we will be discussing in which the Ft is equal to F, so is constant for all t and G_t is also constant for all t. In those cases, the forecast function can be simplified and written as F transpose G to the power of h expected value.</p>
+</blockquote>
+<p><span class="math display">
+f_t(h) = E(y_{t+h} \mid D_t) = F'_{t+h} G_{t+h}\ldots G_{t+1} E(\theta_t \mid D_t)
+</span></p>
+<blockquote class="blockquote">
+<p>One thing that we will learn is that the eigenstructure of this matrix is very important to define the form of the forecast function, and it’s very important for model building and for adding components into your model. Finally, just in terms of short notation, we can always write down when we’re working with normal dynamic linear models, we may be referring to the model instead of writing the two equations, the system and the observation equation. I can just write all the components that define my model.</p>
+</blockquote>
+<p>If <span class="math inline">F_t=F</span> and <span class="math inline">G_t=G</span> for all t, then the forecast function simplifies to:</p>
+<p><span class="math display">
+f_t(h) = E(y_{t+h} \mid D_t) = F' G^h E(\theta_t \mid D_t)
+</span></p>
+<blockquote class="blockquote">
+<p>This fully specifies the model in terms of the two equations. If I know what Ft is, what Gt is, what Vt is, and the covariance at the system level.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>I sometimes will be just talking about just a short notation like this for defining the model.</p>
+</blockquote>
+<p><span id="eq-nldm-model-shothand-notation"><span class="math display">
+\{F_t, G_t, v_t, W_t\}
+\tag{4}</span></span></p>
+</section>
+</section>
+<section id="polynomial-trend-ndlm-video" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="polynomial-trend-ndlm-video">Polynomial Trend NDLM (Video)</h3>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="m3_0011.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="slide 1"><img src="m3_0011.png" class="img-fluid figure-img" width="250" alt="slide 1"></a></p>
+<figcaption>slide 1</figcaption>
+</figure>
+</div></div><p>Duis ornare ex ac iaculis pretium. Maecenas sagittis odio id erat pharetra, sit amet consectetur quam sollicitudin. Vivamus pharetra quam purus, nec sagittis risus pretium at. Nullam feugiat, turpis ac accumsan interdum, sem tellus blandit neque, id vulputate diam quam semper nisl. Donec sit amet enim at neque porttitor aliquet. Phasellus facilisis nulla eget placerat eleifend. Vestibulum non egestas eros, eget lobortis ipsum. Nulla rutrum massa eget enim aliquam, id porttitor erat luctus. Nunc sagittis quis eros eu sagittis. Pellentesque dictum, erat at pellentesque sollicitudin, justo augue pulvinar metus, quis rutrum est mi nec felis. Vestibulum efficitur mi lorem, at elementum purus tincidunt a. Aliquam finibus enim magna, vitae pellentesque erat faucibus at. Nulla mauris tellus, imperdiet id lobortis et, dignissim condimentum ipsum. Morbi nulla orci, varius at aliquet sed, facilisis id tortor. Donec ut urna nisi.</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="m3_0012.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="slide 2"><img src="m3_0012.png" class="img-fluid figure-img" width="250" alt="slide 2"></a></p>
+<figcaption>slide 2</figcaption>
+</figure>
+</div></div><p>Duis ornare ex ac iaculis pretium. Maecenas sagittis odio id erat pharetra, sit amet consectetur quam sollicitudin. Vivamus pharetra quam purus, nec sagittis risus pretium at. Nullam feugiat, turpis ac accumsan interdum, sem tellus blandit neque, id vulputate diam quam semper nisl. Donec sit amet enim at neque porttitor aliquet. Phasellus facilisis nulla eget placerat eleifend. Vestibulum non egestas eros, eget lobortis ipsum. Nulla rutrum massa eget enim aliquam, id porttitor erat luctus. Nunc sagittis quis eros eu sagittis. Pellentesque dictum, erat at pellentesque sollicitudin, justo augue pulvinar metus, quis rutrum est mi nec felis. Vestibulum efficitur mi lorem, at elementum purus tincidunt a. Aliquam finibus enim magna, vitae pellentesque erat faucibus at. Nulla mauris tellus, imperdiet id lobortis et, dignissim condimentum ipsum. Morbi nulla orci, varius at aliquet sed, facilisis id tortor. Donec ut urna nisi.</p>
+</section>
+<section id="regression-models-video" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="regression-models-video">Regression models (Video)</h3>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="m3_0021.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="slide 1"><img src="m3_0021.png" class="img-fluid figure-img" width="250" alt="slide 1"></a></p>
+<figcaption>slide 1</figcaption>
+</figure>
+</div></div><p>Nulla eget cursus ipsum. Vivamus porttitor leo diam, sed volutpat lectus facilisis sit amet. Maecenas et pulvinar metus. Ut at dignissim tellus. In in tincidunt elit. Etiam vulputate lobortis arcu, vel faucibus leo lobortis ac. Aliquam erat volutpat. In interdum orci ac est euismod euismod. Nunc eleifend tristique risus, at lacinia odio commodo in. Sed aliquet ligula odio, sed tempor neque ultricies sit amet.</p>
+</section>
+<section id="summary-of-polynomial-trend-and-regression-models-reading" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-polynomial-trend-and-regression-models-reading">Summary of polynomial trend and regression models (Reading)</h3>
+</section>
+<section id="the-superposition-principle-video" class="level3">
+<h3 class="anchored" data-anchor-id="the-superposition-principle-video">The superposition principle (Video)</h3>
+<p>Etiam maximus accumsan gravida. Maecenas at nunc dignissim, euismod enim ac, bibendum ipsum. Maecenas vehicula velit in nisl aliquet ultricies. Nam eget massa interdum, maximus arcu vel, pretium erat. Maecenas sit amet tempor purus, vitae aliquet nunc. Vivamus cursus urna velit, eleifend dictum magna laoreet ut. Duis eu erat mollis, blandit magna id, tincidunt ipsum. Integer massa nibh, commodo eu ex vel, venenatis efficitur ligula. Integer convallis lacus elit, maximus eleifend lacus ornare ac. Vestibulum scelerisque viverra urna id lacinia. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aenean eget enim at diam bibendum tincidunt eu non purus. Nullam id magna ultrices, sodales metus viverra, tempus turpis.</p>
+<p>Duis ornare ex ac iaculis pretium. Maecenas sagittis odio id erat pharetra, sit amet consectetur quam sollicitudin. Vivamus pharetra quam purus, nec sagittis risus pretium at. Nullam feugiat, turpis ac accumsan interdum, sem tellus blandit neque, id vulputate diam quam semper nisl. Donec sit amet enim at neque porttitor aliquet. Phasellus facilisis nulla eget placerat eleifend. Vestibulum non egestas eros, eget lobortis ipsum. Nulla rutrum massa eget enim aliquam, id porttitor erat luctus. Nunc sagittis quis eros eu sagittis. Pellentesque dictum, erat at pellentesque sollicitudin, justo augue pulvinar metus, quis rutrum est mi nec felis. Vestibulum efficitur mi lorem, at elementum purus tincidunt a. Aliquam finibus enim magna, vitae pellentesque erat faucibus at. Nulla mauris tellus, imperdiet id lobortis et, dignissim condimentum ipsum. Morbi nulla orci, varius at aliquet sed, facilisis id tortor. Donec ut urna nisi.</p>
+</section>
+<section id="superposition-principle-general-case" class="level3">
+<h3 class="anchored" data-anchor-id="superposition-principle-general-case">Superposition principle: General case</h3>
+<p>Praesent ornare dolor turpis, sed tincidunt nisl pretium eget. Curabitur sed iaculis ex, vitae tristique sapien. Quisque nec ex dolor. Quisque ut nisl a libero egestas molestie. Nulla vel porta nulla. Phasellus id pretium arcu. Etiam sed mi pellentesque nibh scelerisque elementum sed at urna. Ut congue molestie nibh, sit amet pretium ligula consectetur eu. Integer consectetur augue justo, at placerat erat posuere at. Ut elementum urna lectus, vitae bibendum neque pulvinar quis. Suspendisse vulputate cursus eros id maximus. Duis pulvinar facilisis massa, et condimentum est viverra congue. Curabitur ornare convallis nisl. Morbi dictum scelerisque turpis quis pellentesque. Etiam lectus risus, luctus lobortis risus ut, rutrum vulputate justo. Nulla facilisi.</p>
+<p>Proin sodales neque erat, varius cursus diam tincidunt sit amet. Etiam scelerisque fringilla nisl eu venenatis. Donec sem ipsum, scelerisque ac venenatis quis, hendrerit vel mauris. Praesent semper erat sit amet purus condimentum, sit amet auctor mi feugiat. In hac habitasse platea dictumst. Nunc ac mauris in massa feugiat bibendum id in dui. Praesent accumsan urna at lacinia aliquet. Proin ultricies eu est quis pellentesque. In vel lorem at nisl rhoncus cursus eu quis mi. In eu rutrum ante, quis placerat justo. Etiam euismod nibh nibh, sed elementum nunc imperdiet in. Praesent gravida nunc vel odio lacinia, at tempus nisl placerat. Aenean id ipsum sed est sagittis hendrerit non in tortor.</p>
+</section>
+<section id="quiz-the-normal-dynamic-linear-model" class="level3">
+<h3 class="anchored" data-anchor-id="quiz-the-normal-dynamic-linear-model">Quiz: The Normal Dynamic Linear Model</h3>
+<p>Omitted due to Coursera honor code</p>
+</section>
+</section>
+<section id="bayesian-inference-in-the-ndlm-part-1" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-inference-in-the-ndlm-part-1">Bayesian Inference in the NDLM: Part 1</h2>
+<p>Maecenas turpis velit, ultricies non elementum vel, luctus nec nunc. Nulla a diam interdum, faucibus sapien viverra, finibus metus. Donec non tortor diam. In ut elit aliquet, bibendum sem et, aliquam tortor. Donec congue, sem at rhoncus ultrices, nunc augue cursus erat, quis porttitor mauris libero ut ex. Nullam quis leo urna. Donec faucibus ligula eget pellentesque interdum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean rhoncus interdum erat ut ultricies. Aenean tempus ex non elit suscipit, quis dignissim enim efficitur. Proin laoreet enim massa, vitae laoreet nulla mollis quis.</p>
+<p>Vestibulum ultrices, tortor at mattis porta, odio nisi rutrum nulla, sit amet tincidunt eros quam facilisis tellus. Fusce eleifend lectus in elementum lacinia. Nam auctor nunc in massa ullamcorper, sit amet auctor ante accumsan. Nam ut varius metus. Curabitur eget tristique leo. Cras finibus euismod erat eget elementum. Integer vel placerat ex. Ut id eros quis lectus lacinia venenatis hendrerit vel ante.</p>
+<section id="filtering" class="level3">
+<h3 class="anchored" data-anchor-id="filtering">Filtering</h3>
+<p>Etiam quis tortor luctus, pellentesque ante a, finibus dolor. Phasellus in nibh et magna pulvinar malesuada. Ut nisl ex, sagittis at sollicitudin et, sollicitudin id nunc. In id porta urna. Proin porta dolor dolor, vel dapibus nisi lacinia in. Pellentesque ante mauris, ornare non euismod a, fermentum ut sapien. Proin sed vehicula enim. Aliquam tortor odio, vestibulum vitae odio in, tempor molestie justo. Praesent maximus lacus nec leo maximus blandit.</p>
+<p>Maecenas turpis velit, ultricies non elementum vel, luctus nec nunc. Nulla a diam interdum, faucibus sapien viverra, finibus metus. Donec non tortor diam. In ut elit aliquet, bibendum sem et, aliquam tortor. Donec congue, sem at rhoncus ultrices, nunc augue cursus erat, quis porttitor mauris libero ut ex. Nullam quis leo urna. Donec faucibus ligula eget pellentesque interdum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean rhoncus interdum erat ut ultricies. Aenean tempus ex non elit suscipit, quis dignissim enim efficitur. Proin laoreet enim massa, vitae laoreet nulla mollis quis.</p>
+</section>
+<section id="summary-of-filtering-distributions" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-filtering-distributions">Summary of filtering distributions</h3>
+<p>Etiam non efficitur urna, quis elementum nisi. Mauris posuere a augue vel gravida. Praesent luctus erat et ex iaculis interdum. Nulla vestibulum quam ac nunc consequat vulputate. Nullam iaculis lobortis sem sit amet fringilla. Aliquam semper, metus ut blandit semper, nulla velit fermentum sapien, fermentum ultrices dolor sapien sed leo. Vestibulum molestie faucibus magna, at feugiat nulla ullamcorper a. Aliquam erat volutpat. Praesent scelerisque magna a justo maximus, sit amet suscipit mauris tempor. Nulla nec dolor eget ipsum pellentesque lobortis a in ipsum. Morbi turpis turpis, fringilla a eleifend maximus, viverra nec neque. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
+<p>Duis urna urna, pellentesque eu urna ut, malesuada bibendum dolor. Suspendisse potenti. Vivamus ornare, arcu quis molestie ultrices, magna est accumsan augue, auctor vulputate erat quam quis neque. Nullam scelerisque odio vel ultricies facilisis. Ut porta arcu non magna sagittis lacinia. Cras ornare vulputate lectus a tristique. Pellentesque ac arcu congue, rhoncus mi id, dignissim ligula.</p>
+</section>
+<section id="filtering-in-the-ndlm-example" class="level3">
+<h3 class="anchored" data-anchor-id="filtering-in-the-ndlm-example">Filtering in the NDLM: Example</h3>
+<p>Aenean placerat luctus tortor vitae molestie. Nulla at aliquet nulla. Sed efficitur tellus orci, sed fringilla lectus laoreet eget. Vivamus maximus quam sit amet arcu dignissim, sed accumsan massa ullamcorper. Sed iaculis tincidunt feugiat. Nulla in est at nunc ultricies dictum ut vitae nunc. Aenean convallis vel diam at malesuada. Suspendisse arcu libero, vehicula tempus ultrices a, placerat sit amet tortor. Sed dictum id nulla commodo mattis. Aliquam mollis, nunc eu tristique faucibus, purus lacus tincidunt nulla, ac pretium lorem nunc ut enim. Curabitur eget mattis nisl, vitae sodales augue. Nam felis massa, bibendum sit amet nulla vel, vulputate rutrum lacus. Aenean convallis odio pharetra nulla mattis consequat.</p>
+<p>Ut ut condimentum augue, nec eleifend nisl. Sed facilisis egestas odio ac pretium. Pellentesque consequat magna sed venenatis sagittis. Vivamus feugiat lobortis magna vitae accumsan. Pellentesque euismod malesuada hendrerit. Ut non mauris non arcu condimentum sodales vitae vitae dolor. Nullam dapibus, velit eget lacinia rutrum, ipsum justo malesuada odio, et lobortis sapien magna vel lacus. Nulla purus neque, hendrerit non malesuada eget, mattis vel erat. Suspendisse potenti.</p>
+</section>
+<section id="smoothing-and-forecasting" class="level3">
+<h3 class="anchored" data-anchor-id="smoothing-and-forecasting">Smoothing and forecasting</h3>
+<p>Duis ornare ex ac iaculis pretium. Maecenas sagittis odio id erat pharetra, sit amet consectetur quam sollicitudin. Vivamus pharetra quam purus, nec sagittis risus pretium at. Nullam feugiat, turpis ac accumsan interdum, sem tellus blandit neque, id vulputate diam quam semper nisl. Donec sit amet enim at neque porttitor aliquet. Phasellus facilisis nulla eget placerat eleifend. Vestibulum non egestas eros, eget lobortis ipsum. Nulla rutrum massa eget enim aliquam, id porttitor erat luctus. Nunc sagittis quis eros eu sagittis. Pellentesque dictum, erat at pellentesque sollicitudin, justo augue pulvinar metus, quis rutrum est mi nec felis. Vestibulum efficitur mi lorem, at elementum purus tincidunt a. Aliquam finibus enim magna, vitae pellentesque erat faucibus at. Nulla mauris tellus, imperdiet id lobortis et, dignissim condimentum ipsum. Morbi nulla orci, varius at aliquet sed, facilisis id tortor. Donec ut urna nisi.</p>
+<p>Aenean placerat luctus tortor vitae molestie. Nulla at aliquet nulla. Sed efficitur tellus orci, sed fringilla lectus laoreet eget. Vivamus maximus quam sit amet arcu dignissim, sed accumsan massa ullamcorper. Sed iaculis tincidunt feugiat. Nulla in est at nunc ultricies dictum ut vitae nunc. Aenean convallis vel diam at malesuada. Suspendisse arcu libero, vehicula tempus ultrices a, placerat sit amet tortor. Sed dictum id nulla commodo mattis. Aliquam mollis, nunc eu tristique faucibus, purus lacus tincidunt nulla, ac pretium lorem nunc ut enim. Curabitur eget mattis nisl, vitae sodales augue. Nam felis massa, bibendum sit amet nulla vel, vulputate rutrum lacus. Aenean convallis odio pharetra nulla mattis consequat.</p>
+</section>
+<section id="summary-of-the-smoothing-and-forecasting-distributions" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-the-smoothing-and-forecasting-distributions">Summary of the smoothing and forecasting distributions</h3>
+<p>Duis urna urna, pellentesque eu urna ut, malesuada bibendum dolor. Suspendisse potenti. Vivamus ornare, arcu quis molestie ultrices, magna est accumsan augue, auctor vulputate erat quam quis neque. Nullam scelerisque odio vel ultricies facilisis. Ut porta arcu non magna sagittis lacinia. Cras ornare vulputate lectus a tristique. Pellentesque ac arcu congue, rhoncus mi id, dignissim ligula.</p>
+<p>Praesent ornare dolor turpis, sed tincidunt nisl pretium eget. Curabitur sed iaculis ex, vitae tristique sapien. Quisque nec ex dolor. Quisque ut nisl a libero egestas molestie. Nulla vel porta nulla. Phasellus id pretium arcu. Etiam sed mi pellentesque nibh scelerisque elementum sed at urna. Ut congue molestie nibh, sit amet pretium ligula consectetur eu. Integer consectetur augue justo, at placerat erat posuere at. Ut elementum urna lectus, vitae bibendum neque pulvinar quis. Suspendisse vulputate cursus eros id maximus. Duis pulvinar facilisis massa, et condimentum est viverra congue. Curabitur ornare convallis nisl. Morbi dictum scelerisque turpis quis pellentesque. Etiam lectus risus, luctus lobortis risus ut, rutrum vulputate justo. Nulla facilisi.</p>
+</section>
+<section id="summary-of-the-smoothing-and-forecasting-distributions-1" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-the-smoothing-and-forecasting-distributions-1">Summary of the smoothing and forecasting distributions</h3>
+<p>Etiam quis tortor luctus, pellentesque ante a, finibus dolor. Phasellus in nibh et magna pulvinar malesuada. Ut nisl ex, sagittis at sollicitudin et, sollicitudin id nunc. In id porta urna. Proin porta dolor dolor, vel dapibus nisi lacinia in. Pellentesque ante mauris, ornare non euismod a, fermentum ut sapien. Proin sed vehicula enim. Aliquam tortor odio, vestibulum vitae odio in, tempor molestie justo. Praesent maximus lacus nec leo maximus blandit.</p>
+<p>Maecenas turpis velit, ultricies non elementum vel, luctus nec nunc. Nulla a diam interdum, faucibus sapien viverra, finibus metus. Donec non tortor diam. In ut elit aliquet, bibendum sem et, aliquam tortor. Donec congue, sem at rhoncus ultrices, nunc augue cursus erat, quis porttitor mauris libero ut ex. Nullam quis leo urna. Donec faucibus ligula eget pellentesque interdum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean rhoncus interdum erat ut ultricies. Aenean tempus ex non elit suscipit, quis dignissim enim efficitur. Proin laoreet enim massa, vitae laoreet nulla mollis quis.</p>
+</section>
+<section id="rcode-smoothing-in-the-ndlm-example" class="level3">
+<h3 class="anchored" data-anchor-id="rcode-smoothing-in-the-ndlm-example">Rcode: Smoothing in the NDLM, Example</h3>
+<p>Etiam congue quam eget velit convallis, eu sagittis orci vestibulum. Vestibulum at massa turpis. Curabitur ornare ex sed purus vulputate, vitae porta augue rhoncus. Phasellus auctor suscipit purus, vel ultricies nunc. Nunc eleifend nulla ac purus volutpat, id fringilla felis aliquet. Duis vitae porttitor nibh, in rhoncus risus. Vestibulum a est vitae est tristique vehicula. Proin mollis justo id est tempus hendrerit. Praesent suscipit placerat congue. Aliquam eu elit gravida, consequat augue non, ultricies sapien. Nunc ultricies viverra ante, sit amet vehicula ante volutpat id. Etiam tempus purus vitae tellus mollis viverra. Donec at ornare mauris. Aliquam sodales hendrerit ornare. Suspendisse accumsan lacinia sapien, sit amet imperdiet dui molestie ut.</p>
+<p>Etiam non efficitur urna, quis elementum nisi. Mauris posuere a augue vel gravida. Praesent luctus erat et ex iaculis interdum. Nulla vestibulum quam ac nunc consequat vulputate. Nullam iaculis lobortis sem sit amet fringilla. Aliquam semper, metus ut blandit semper, nulla velit fermentum sapien, fermentum ultrices dolor sapien sed leo. Vestibulum molestie faucibus magna, at feugiat nulla ullamcorper a. Aliquam erat volutpat. Praesent scelerisque magna a justo maximus, sit amet suscipit mauris tempor. Nulla nec dolor eget ipsum pellentesque lobortis a in ipsum. Morbi turpis turpis, fringilla a eleifend maximus, viverra nec neque. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
+</section>
+<section id="second-order-polynomial-filtering-and-smoothing-example" class="level3">
+<h3 class="anchored" data-anchor-id="second-order-polynomial-filtering-and-smoothing-example">Second order polynomial: Filtering and smoothing example</h3>
+<p>Praesent ornare dolor turpis, sed tincidunt nisl pretium eget. Curabitur sed iaculis ex, vitae tristique sapien. Quisque nec ex dolor. Quisque ut nisl a libero egestas molestie. Nulla vel porta nulla. Phasellus id pretium arcu. Etiam sed mi pellentesque nibh scelerisque elementum sed at urna. Ut congue molestie nibh, sit amet pretium ligula consectetur eu. Integer consectetur augue justo, at placerat erat posuere at. Ut elementum urna lectus, vitae bibendum neque pulvinar quis. Suspendisse vulputate cursus eros id maximus. Duis pulvinar facilisis massa, et condimentum est viverra congue. Curabitur ornare convallis nisl. Morbi dictum scelerisque turpis quis pellentesque. Etiam lectus risus, luctus lobortis risus ut, rutrum vulputate justo. Nulla facilisi.</p>
+<p>Proin sodales neque erat, varius cursus diam tincidunt sit amet. Etiam scelerisque fringilla nisl eu venenatis. Donec sem ipsum, scelerisque ac venenatis quis, hendrerit vel mauris. Praesent semper erat sit amet purus condimentum, sit amet auctor mi feugiat. In hac habitasse platea dictumst. Nunc ac mauris in massa feugiat bibendum id in dui. Praesent accumsan urna at lacinia aliquet. Proin ultricies eu est quis pellentesque. In vel lorem at nisl rhoncus cursus eu quis mi. In eu rutrum ante, quis placerat justo. Etiam euismod nibh nibh, sed elementum nunc imperdiet in. Praesent gravida nunc vel odio lacinia, at tempus nisl placerat. Aenean id ipsum sed est sagittis hendrerit non in tortor.</p>
+</section>
+<section id="using-the-dlm-package-in-r" class="level3">
+<h3 class="anchored" data-anchor-id="using-the-dlm-package-in-r">Using the dlm package in R</h3>
+<p>Etiam non efficitur urna, quis elementum nisi. Mauris posuere a augue vel gravida. Praesent luctus erat et ex iaculis interdum. Nulla vestibulum quam ac nunc consequat vulputate. Nullam iaculis lobortis sem sit amet fringilla. Aliquam semper, metus ut blandit semper, nulla velit fermentum sapien, fermentum ultrices dolor sapien sed leo. Vestibulum molestie faucibus magna, at feugiat nulla ullamcorper a. Aliquam erat volutpat. Praesent scelerisque magna a justo maximus, sit amet suscipit mauris tempor. Nulla nec dolor eget ipsum pellentesque lobortis a in ipsum. Morbi turpis turpis, fringilla a eleifend maximus, viverra nec neque. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
+<p>Duis urna urna, pellentesque eu urna ut, malesuada bibendum dolor. Suspendisse potenti. Vivamus ornare, arcu quis molestie ultrices, magna est accumsan augue, auctor vulputate erat quam quis neque. Nullam scelerisque odio vel ultricies facilisis. Ut porta arcu non magna sagittis lacinia. Cras ornare vulputate lectus a tristique. Pellentesque ac arcu congue, rhoncus mi id, dignissim ligula.</p>
+</section>
+<section id="rcode-using-the-dlm-package-in-r" class="level3">
+<h3 class="anchored" data-anchor-id="rcode-using-the-dlm-package-in-r">Rcode: Using the dlm package in R</h3>
+<p>Ut ut condimentum augue, nec eleifend nisl. Sed facilisis egestas odio ac pretium. Pellentesque consequat magna sed venenatis sagittis. Vivamus feugiat lobortis magna vitae accumsan. Pellentesque euismod malesuada hendrerit. Ut non mauris non arcu condimentum sodales vitae vitae dolor. Nullam dapibus, velit eget lacinia rutrum, ipsum justo malesuada odio, et lobortis sapien magna vel lacus. Nulla purus neque, hendrerit non malesuada eget, mattis vel erat. Suspendisse potenti.</p>
+<p>Nullam dapibus cursus dolor sit amet consequat. Nulla facilisi. Curabitur vel nulla non magna lacinia tincidunt. Duis porttitor quam leo, et blandit velit efficitur ut. Etiam auctor tincidunt porttitor. Phasellus sed accumsan mi. Fusce ut erat dui. Suspendisse eu augue eget turpis condimentum finibus eu non lorem. Donec finibus eros eu ante condimentum, sed pharetra sapien sagittis. Phasellus non dolor ac ante mollis auctor nec et sapien. Pellentesque vulputate at nisi eu tincidunt. Vestibulum at dolor aliquam, hendrerit purus eu, eleifend massa. Morbi consectetur eros id tincidunt gravida. Fusce ut enim quis orci hendrerit lacinia sed vitae enim.</p>
+</section>
+<section id="practice-graded-assignment-ndlm-sensitivity-to-the-model-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="practice-graded-assignment-ndlm-sensitivity-to-the-model-parameters">Practice Graded Assignment: NDLM: sensitivity to the model parameters</h3>
+<p>Etiam maximus accumsan gravida. Maecenas at nunc dignissim, euismod enim ac, bibendum ipsum. Maecenas vehicula velit in nisl aliquet ultricies. Nam eget massa interdum, maximus arcu vel, pretium erat. Maecenas sit amet tempor purus, vitae aliquet nunc. Vivamus cursus urna velit, eleifend dictum magna laoreet ut. Duis eu erat mollis, blandit magna id, tincidunt ipsum. Integer massa nibh, commodo eu ex vel, venenatis efficitur ligula. Integer convallis lacus elit, maximus eleifend lacus ornare ac. Vestibulum scelerisque viverra urna id lacinia. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aenean eget enim at diam bibendum tincidunt eu non purus. Nullam id magna ultrices, sodales metus viverra, tempus turpis.</p>
+<p>Duis ornare ex ac iaculis pretium. Maecenas sagittis odio id erat pharetra, sit amet consectetur quam sollicitudin. Vivamus pharetra quam purus, nec sagittis risus pretium at. Nullam feugiat, turpis ac accumsan interdum, sem tellus blandit neque, id vulputate diam quam semper nisl. Donec sit amet enim at neque porttitor aliquet. Phasellus facilisis nulla eget placerat eleifend. Vestibulum non egestas eros, eget lobortis ipsum. Nulla rutrum massa eget enim aliquam, id porttitor erat luctus. Nunc sagittis quis eros eu sagittis. Pellentesque dictum, erat at pellentesque sollicitudin, justo augue pulvinar metus, quis rutrum est mi nec felis. Vestibulum efficitur mi lorem, at elementum purus tincidunt a. Aliquam finibus enim magna, vitae pellentesque erat faucibus at. Nulla mauris tellus, imperdiet id lobortis et, dignissim condimentum ipsum. Morbi nulla orci, varius at aliquet sed, facilisis id tortor. Donec ut urna nisi.</p>
 
 
+</section>
+</section>
+</section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
   author = {Bochman, Oren},
-  title = {Week 1: {Introductions} to Time Series Analysis and the
-    {AR(1)} Process},
-  date = {2024-10-23},
+  title = {Week 3: {Normal} {Dynamic} {Linear} {Models,} {Part} 1},
+  date = {2024-10-25},
   url = {https://orenbochman.github.io/notes/baysian-ts/module3.html},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2024. <span>“Week 1: Introductions to Time Series
-Analysis and the AR(1) Process.”</span> October 23, 2024. <a href="https://orenbochman.github.io/notes/baysian-ts/module3.html">https://orenbochman.github.io/notes/baysian-ts/module3.html</a>.
+Bochman, Oren. 2024. <span>“Week 3: Normal Dynamic Linear Models, Part
+1.”</span> October 25, 2024. <a href="https://orenbochman.github.io/notes/baysian-ts/module3.html">https://orenbochman.github.io/notes/baysian-ts/module3.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -3188,6 +3555,38 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     })(document);
     </script>
   
+<script>var lightboxQuarto = GLightbox({"loop":false,"closeEffect":"zoom","descPosition":"bottom","openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 

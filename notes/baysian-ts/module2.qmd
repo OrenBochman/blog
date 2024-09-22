@@ -349,7 +349,7 @@ cat("\n MLE of conditional likelihood for phi: ", phi_MLE, "\n",
 
 {{< lipsum 2 >}}
 
-Rcode: Bayesian inference, AR(p), conditional likelihood (Reading)
+## Rcode: Bayesian inference, AR(p), conditional likelihood (Reading)
 
 ```{r}
 #| label: ar-bayesian-inference
@@ -507,6 +507,7 @@ p <- which.min(bic) # We set up the moder order
 print(paste0("The chosen model order by BIC: ", p))
 ```
 
+
 ### Spectral representation of the AR(p) (video)
 
 {{< lipsum 2 >}}
@@ -517,7 +518,7 @@ print(paste0("The chosen model order by BIC: ", p))
 
 ### Rcode: Spectral density of AR(p) (Reading)
 
-```r
+```{r}
 #| label: ar-spectral-density
 ### Simulate 300 observations from an AR(2) prcess with a pair of complex-valued roots 
 set.seed(2021)
@@ -563,23 +564,27 @@ library("astsa")
 ## plot spectral density of simulated data with posterior sampled 
 ## ar coefficients and innvovation variance
 par(mfrow = c(1, 1))
-result_MLE=arma.spec(ar=phi_MLE, var.noise = s2, log='yes',main = '')
+#result_MLE=arma.spec(ar=phi_MLE, var.noise = s2, log='yes',main = '')
+result_MLE=arma.spec(ar=phi_MLE, var.noise = s2, main = '')
 freq=result_MLE$freq
   
 spec=matrix(0,nrow=n_sample,ncol=length(freq))
+
 for (i in 1:n_sample){
-result=arma.spec(ar=phi_sample[i,], var.noise = v_sample[i], log='yes',
+result=arma.spec(ar=phi_sample[i,], var.noise = v_sample[i],# log='yes',
                  main = '')
 spec[i,]=result$spec
 }
 
 plot(2*pi*freq,log(spec[1,]),type='l',ylim=c(-3,12),ylab="log spectra",
      xlab="frequency",col=0)
-for (i in 1:n_sample){
+#for (i in 1:n_sample){
+for (i in 1:2){
 lines(2*pi*freq,log(spec[i,]),col='darkgray')
 }
 lines(2*pi*freq,log(result_MLE$spec))
 abline(v=2*pi/12,lty=2,col='red')
+
 
 ```
 
@@ -603,7 +608,7 @@ You will use an AR(8) to model this dataset and obtain maximum likelihood estima
 
 Modify the code below to use the function polyroot and obtain the moduli and periods of the reciprocal roots of the AR polynomial evaluated at the posterior mean $\hat\phi$.
 
-```r
+```{r}
 set.seed(2021)
 r=0.95
 lambda=12 
@@ -691,7 +696,7 @@ This condition implies stationarity.
 An ARMA process is **invertible** if the roots of the MA **characteristic polynomial** given by [invertible]{.column-margin}
 
 $$
-\Theta(u) = 1 + \theta_1 u + \dots + \theta_q u^q,
+\Theta(u) = 1 + \theta_1 u + \ldots + \theta_q u^q,
 $$
 
 lie outside the unit circle.
@@ -717,7 +722,7 @@ Estimation in ARIMA processes can be done via *least squares*, *maximum likeliho
 For a given AR(p) process with AR coefficients $\phi_1, \dots, \phi_p$ and variance $v$, we can obtain its **spectral density** as
 
 $$
-f(\omega) = \frac{v}{2\pi |\Phi(e^{-i\omega})|^2} = \frac{v}{2\pi |1 - \phi_1 e^{-i\omega} - \dots - \phi_p e^{-ip\omega}|^2},
+f(\omega) = \frac{v}{2\pi |\Phi(e^{-i\omega})|^2} = \frac{v}{2\pi |1 - \phi_1 e^{-i\omega} - \ldots - \phi_p e^{-ip\omega}|^2},
 $$
 
 with $\omega$ a frequency in $(0, \pi)$.

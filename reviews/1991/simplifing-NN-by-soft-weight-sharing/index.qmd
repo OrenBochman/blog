@@ -3,15 +3,34 @@ title: "Simplifying Neural Networks by soft weight sharing"
 date: "2022-06-22"
 subtitle: "paper review"
 bibliography: "./bibliography.bib"
+categories: ["neural networks", "regularization", "stub"]
 keywords: ["neural networks", "weight sharing", "pruning","weight decay"]
 cover: cover.jpg
 ---
+
+
+This paper was mentioned in Geoffrey Hinton's [Coursera course](https://www.coursera.org/learn/neural-networks-deep-learning/) as a way to simplify neural networks. 
+
+The main  takeaway is that of modeling the loss using a mixture of Gaussians to cluster the weights and penalize the complexity of the model. 
+
+::: {.callout-warning collapse="true"}
+
+
+## To Dos
+
+1. [ ] add categories
+1. [ ] add a citation for the course.
+1. [ ] It would be worth-while to look through what he says about this paper if only to ensure the main result is made to stand out from some of the others.
+1. [ ] Do a from scratch implementation of the paper
+1. [ ] Do a Python implementation of the paper.
+1. [ ] Why isn't this technique easier to implement in practice?
+::: 
+
 
 ## TL;DR
 
 The primary aim of the paper [@nowlan2018simplifying] is reducing the complexity of neural networks by employing a mixture of Gaussian priors to the weights, creating a "soft" weight-sharing mechanism. Instead of simply penalizing large weights (as in L2 regularization), this method clusters the weights, allowing some to stay close to zero and others to remain non-zero, depending on their usefulness. Soft weight sharing along with weight decay, improving generalization and making the model more interpretable.
 
-This paper is mentioned in Geoffrey Hinton's [Coursera course](https://www.coursera.org/learn/neural-networks-deep-learning/lecture/1z1eT/weight-sharing) as a way to simplify neural networks. And the key takeaway is that of modeling the loss using a mixture of Gaussians to cluster the weights and penalize the complexity of the model.
 
 ## Abstract
 
@@ -19,20 +38,26 @@ This paper is mentioned in Geoffrey Hinton's [Coursera course](https://www.cours
 >
 > -- [@nowlan2018simplifying]
 
-::: callout-warning
-## The perplexing idea of clustering weights and some associated quandaries
+::: {.callout-warning}
 
-This notion of clustering weights is odd to say the least as these are just numbers in a data structure. Viewed as a method to reduce the effective number of parameters in the model, then begins to make more sense. What this idea seems to boil down to is that we are prioritizing neural net architectures with some abstract symmetry in the weights and thus a lower capacity and thus less prone to overfitting.
+## Weight clustering - a perplexing idea & Other quandaries
+
+This notion of clustering weights is odd to say the least as these are just numbers in a data structure. Viewed as a method to reduce the effective number of parameters in the model, it makes some convoluted sense. What this idea seems to boil down to is that we are prioritizing neural net architectures with some abstract symmetry in the weights and thus a lower capacity and thus less prone to overfitting.
+
+- We shall shall soon see that the authors have attempted to motivate this idea in at least two ways:
+    1.  **Weight decay** - the penalty is a function of the weights themselves based on [@plaut1986experiments]
+    2.  **A Bayesian perspective** - is a negative log density of the weights under a Gaussian prior.
+- it might also help if we learned that mixture models are often used to do clustering in unsupervised learning.
 
 A few quandaries then arise:
 
 1.  How can we figure for different layers having weights, gradients and learning rates being more correlated then between layers.
-2.  That there may be other structure so that the weights are not independent of each other.
+1.  That there may be other structure so that the weights are not independent of each other.
     1.  In classifiers the are continuous approximation of logic gates.
-    2.  In regression settings their values approximate continuous variables ?
-3.  In many networks most of the weights are in the last layer, so we can use a different penalty for the last layer.
-4.  Is there a way to impose an abstract symmetry on the weights of a neural network such that is commensurate with the problem?
-5.  Can we impose multiple such symmetries on the network to give it other advantages?
+    1.  In regression settings their values approximate continuous variables ?
+1.  In many networks most of the weights are in the last layer, so we can use a different penalty for the last layer.
+1.  Is there a way to impose an abstract symmetry on the weights of a neural network such that is commensurate with the problem?
+1.  Can we impose multiple such symmetries on the network to give it other advantages?
     -   Invariance to certain transformations,
     -   using it for initialization,
     -   making the model more interpretable,
@@ -48,6 +73,8 @@ This main problem in this paper is that of supervised ML
 In deep learning this problem is exacerbated by the fact that neural networks require fitting lots of parameters while the data for training is limited. This naturally leads to overfitting - memorizing the data and noise rather than learning the underlying data generating process.
 
 ## Related work
+
+How have others tried to solve this problem?
 
 -   **Weight Sharing**: Reducing effective numbers of *free* parameters in a neural network by using a prior distribution over the weights. This is equivalent to adding a penalty term to the loss function. c.f. [@lang1990time]
 -   **Early Stopping**: Does not restricts the parameters instead detecting the point when training and test scores diverge and stopping the training early. In reality weights are saved after each epoch and once we are certain that a divergence in say accuracy we restore the earlier weights c.f. [@morgan1989generalization], [@weigend1990predicting].

@@ -1,0 +1,166 @@
+---
+title: "Learning a manifold of fonts"
+subtitle: "paper review"
+bibliography: ./bibliography.bib
+categories: [paper-review, neural-networks, typography, manifold-learning]    
+keywords: []
+---
+
+## TL;DR
+
+This paper presents a method for learning a manifold of fonts. The manifold is a generative model that can be used to interpolate between existing fonts and generate new ones. The authors show that the manifold can be used to edit fonts in a way that preserves the overall style of the font.
+
+
+
+## Questions
+
+- Can we make aspects of the manifold interpretable?
+- Can we make the specific aspects of the manifold parametrize?
+    - weights
+    - serif style (slab, old style, transitional, didone, hairline, decorative, wedge  etc)
+- has there been follow up work on this?
+    - handling outliers better
+    - finding and matching motifs
+- can we use this to generate new fonts?
+- is the code available?
+- Can I think of a generative model with low and high level features?
+    - low level features are the points, lines, splines, strokes, glyph topology.
+    - mid level features are the combine geometry and style like cross bars, stems risers, descenders,  
+    - high level features are typographic motifs, serif style, and weight, and thier parameters.
+- Can we use a parametric prior to cluster glyphs before constructing the manifold?
+- Can we indeed use priors for different levels of the generative model, thier parameters, and certain constraints?
+- Can we detect outliers glyphs and map them to 
+- Can we learn priors for hinting and other typographic features?
+
+## Abstract
+
+> The design and manipulation of typefaces and fonts is an area requiring substantial expertise; it can take many years of study to become a proficient typographer. At the same time, the use of typefaces is ubiquitous; there are many users who, while not experts, would like to be more involved in tweaking or changing existing fonts without suffering the learning curve of professional typography packages.
+> Given the wealth of fonts that are available today, we would like to exploit the expertise used to produce these fonts, and to enable everyday users to create, explore, and edit fonts. To this end, we build a generative manifold of standard fonts. Every location on the manifold corresponds to a unique and novel typeface, and is obtained by learning a non-linear mapping that intelligently interpolates and extrapolates existing fonts. Using the manifold, we can smoothly interpolate and move between existing fonts. We can also use the manifold as a constraint that makes a variety of new applications possible. For instance, when editing a single character, we can update all the other glyphs in a font simultaneously to keep them compatible with our changes.
+>
+> -- [@Campbell2014ManifoldFonts]
+
+- There is an a good bibliography.
+- There is an excellent presentation
+- There is a great demo of the system in action online.
+- The computational load for this work isn't as bad as many other deep learning tasks.
+- Can we rethink this via a skeleton path tracing curve with a pen on and off and then each segment is expanded to an outline and mapped via a poly line?
+    -c.f. [@suveeranont2010example]
+        takes a single example + 
+- can abstract the line to a grammar of elements see [@shamir1998Feature]
+    - key point 
+    - topology
+    - branching and merging points
+- Can we use a normalizing flow to map each glyph to a more basic shape like a line segment or a circle?
+
+
+## The problem
+
+- Designing and editing fonts requires mastery of the rules of typography and the use of professional typography software packages and is a highly labour intensive task. How can we use unsupervised learning simplify font
+design?
+
+## Prior work
+
+- Metafont by Donald Knuth
+- Multiple Masters by Adobe
+
+## Main ideas
+
+- all closed 2d shapes consist in a big manifold
+- a polyline^[what is this?] representation of a font is a much smaller manifold
+- used a **Gaussian Process Latent Variable** Model (GP-LVM) to map high-dimensional font data into a lower-dimensional manifold that allows smooth interpolation and extrapolation
+- Err what are GP-LVMs?
+    > The GP-LVM is a nonlinear dimensionality reduction technique that uses Gaussian Processes to learn a low-dimensional latent space representation of high-dimensional data. It provides a probabilistic framework, meaning it doesn’t just give a point estimate for the latent representation, but also an uncertainty measure on the mappings.
+    > Unlike PCA which finds a linear mapping from high-dimensional to low-dimensional space, GP-LVM finds a nonlinear mapping due to the flexibility of Gaussian Processes. This makes GP-LVM much more powerful for capturing complex data relationships.
+
+
+    - see [The Kernel Cookbook:
+Advice on Covariance functions fir GPML](https://www.cs.toronto.edu/~duvenaud/cookbook/)
+    - [Gaussian Process Latent Variable Models for
+Visualisation of High Dimensional Data](lawrence2003gaussian)
+    -[Automatic Model Construction
+with Gaussian Processes](https://www.cs.toronto.edu/~duvenaud/thesis.pdf) c.f. [@duvenaud2014automatic]
+    - A tensorfow implementation of a GP-LVM is available [here](https://www.tensorflow.org/probability/examples/Gaussian_Process_Latent_Variable_Model)
+- a energy model specifically designed to provide dense correspondences between character outlines across
+multiple fonts.
+
+<!-- add a mermaid polyline mind map -->
+
+- poly line 
+    - [Ramer–Douglas–Peucker_algorithm](https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm) simplification of a polyline by removing points
+    - non-parametric version
+    - [Visvalingam–Whyatt algorithm](https://en.wikipedia.org/wiki/Visvalingam%E2%80%93Whyatt_algorithm)
+
+- bezier curve
+
+
+
+## The magic
+
+## Introduction
+
+The design of fonts is typically complex and requires significant expertise. However, with access to many existing fonts, a generative model can help everyday users create, explore, and manipulate fonts by learning a low-dimensional manifold. The key contribution of this paper is a probabilistic font manifold that interpolates and extrapolates between existing fonts to generate new typefaces.
+
+## Font Manifold
+
+The paper presents a **Gaussian Process Latent Variable Model (GP-LVM)** to map high-dimensional font data into a lower-dimensional manifold that allows smooth interpolation and extrapolation.
+
+Given an input space $\mathbf{X}$ and output space $\mathbf{Y}$, the GP models the probability distribution of outputs:
+
+$$
+P(\mathbf{Y}|\mathbf{X}) = \mathcal{N}(\mathbf{Y} | \mathbf{M}(\mathbf{X}), \mathbf{C}(\mathbf{X}, \mathbf{X}|\theta))
+$$
+
+Where $\mathbf{C}$ is a covariance function dependent on hyperparameters $\theta$. The manifold is trained using existing fonts, and the GP-LVM finds the optimal mapping that generates fonts by maximizing the likelihood:
+
+$$
+X^*, \theta^* = \arg\max_{X, \theta} \log P(\mathbf{Y}| \mathbf{X}, \theta)
+$$
+
+## Character Matching
+
+To create a font manifold, character outlines are matched across different fonts. This involves optimizing an energy model that encourages consistent curvature and normal variations. The energy model is:
+
+$$
+E(t) = E_{\kappa}(t) + \lambda_{\text{el}} E_{\text{el}}(t) + \lambda_{\eta} E_{\eta}^{\text{up}}(t) + \lambda_{\eta} E_{\eta}^{\text{down}}(t)
+$$
+
+Where $E_{\kappa}$ represents curvature variation and $E_{\eta}$ enforces normal matching. 
+
+### Elastic Regularization
+
+To ensure smooth correspondence between characters, an elastic regularization term prevents the optimization from collapsing the characters into regions of low curvature:
+
+$$
+E_{\text{el}}(t) = \sum_{i=1}^{N} \sum_{m=1}^{M} \left(t_{(i+1) \mod N, m} - t_{i, m} - \frac{1}{N}\right)^2
+$$
+
+## Generating New Fonts
+
+Once the manifold is trained, a new font can be generated by projecting a new location $\mathbf{x}$ in the latent space back to the high-dimensional font space:
+
+$$
+\mathbf{y} = \mathbf{C}(\mathbf{x}, \mathbf{X^*}|\theta^*) \left[\mathbf{C}(\mathbf{X^*}, \mathbf{X^*}|\theta^*)\right]^{-1} \mathbf{Y}
+$$
+
+This approach allows users to explore the manifold and discover novel fonts, as shown in the example of interpolation between serif and sans-serif regions.
+
+![](fig_1.png)
+
+## Applications
+
+Several applications arise from this framework:
+
+- **Interactive Editing**: Users can edit one character, and the changes propagate to the entire font family.
+- **Smooth Interpolation**: New fonts are created by interpolating between two existing fonts.
+
+![](fig_2.png)
+
+## Conclusion
+
+The paper introduces a novel, unsupervised learning method for generating fonts, offering smooth interpolation and the ability for users to edit fonts interactively without formal typographic knowledge.
+
+
+
+## The paper
+
+![paper](./paper.pdf){.col-page width="8.5in" height="11in"}

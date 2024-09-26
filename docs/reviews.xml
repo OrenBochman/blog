@@ -10,7 +10,399 @@
 <atom:link href="https://orenbochman.github.io/reviews.xml" rel="self" type="application/rss+xml"/>
 <description>Personal website, portfolio and blog</description>
 <generator>quarto-1.5.54</generator>
-<lastBuildDate>Mon, 16 Sep 2024 21:25:10 GMT</lastBuildDate>
+<lastBuildDate>Thu, 26 Sep 2024 12:40:58 GMT</lastBuildDate>
+<item>
+  <title>Handwriting beautification using token means</title>
+  <link>https://orenbochman.github.io/reviews/2013/HandwritingBeautification/</link>
+  <description><![CDATA[ 
+
+
+
+
+<div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://orenbochman.github.io/reviews/2013/HandwritingBeautification/fig_1.png" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: beautification
+</figcaption>
+</figure>
+</div>
+<section id="tldr" class="level2">
+<h2 class="anchored" data-anchor-id="tldr">TL;DR</h2>
+<p>In <span class="citation" data-cites="Zitnick2013Beautification">(Zitnick 2013)</span> the author shows how we can use a model for beautifying handwriting. The problem raised is that there is lots of variation in handwriting for a single individual and come up this a method to reduce this by a clever form of avaraging.</p>
+<p>The data is captured from a tablet and thus had a three dimensional structure. Central to this paper is are two ideas:</p>
+<ol type="1">
+<li>How to effectively average similar tokens to get a suitable mean token.
+<ul>
+<li>they use a moving window</li>
+<li>the sample using a curvature based sampling
+<ul>
+<li><span class="citation" data-cites="Whitney1937Regular">(Whitney 1937)</span></li>
+<li><span class="citation" data-cites="mokhtarian1992theory">(Mokhtarian and Mackworth 1992)</span></li>
+<li><span class="citation" data-cites="dudek1997shape">(Dudek and Tsotsos 1997)</span></li>
+</ul></li>
+<li>they use a fine alignment using
+<ul>
+<li>affinity matrix</li>
+<li>dynamic programming to find the best warping between two sequences.</li>
+</ul></li>
+<li>they also use a visual similarity metric to make the model more <strong>robust</strong> to graphemes with similar strokes but different shapes.</li>
+</ul></li>
+<li>How to decide which tokens are similar.</li>
+</ol>
+<p>Once these are solved, it becomes a matter of clustering tokens by similarity and then averaging the tokens in each cluster to get a mean token.</p>
+<p>The mean token are then used to replace the original token in the handwriting data. The authors show that this method can be used to improve the quality of handwriting data.</p>
+<p>Q. As time goes by there is more data and the replacements pool towards the cluster avarage. It seems that replacement might be more uniform if the earlier replacements were updated as their cluster avarage drifts…</p>
+<p>This naturally leads to a kind of time series.</p>
+<p>Perhaps the key idea is how the authors convert the text to a sequence of vectors use a token mean to represent the data. This is a simple idea but</p>
+</section>
+<section id="the-approach" class="level2">
+<h2 class="anchored" data-anchor-id="the-approach">3. The approach</h2>
+<p>We represent the stylus’s samples by storing the difference vectors between the stylus positions</p>
+<p>i.e.&nbsp;<img src="https://latex.codecogs.com/png.latex?%5CPhi%20=%20%5C%7B%5Cphi_1,%20%5Cldots%20,%20%5Cphi_a%5C%7D"> with</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cphi_i%20=%20%5C%7Bx_i,%20y_i,%20p_i%5C%7D"></p>
+<p>where <img src="https://latex.codecogs.com/png.latex?(x_i,%20y_i)"> is the difference in the stylus’s pixel position between samples i − 1 and i.</p>
+<p><img src="https://latex.codecogs.com/png.latex?p_i"> is the stylus’s pressure.</p>
+</section>
+<section id="stroke-resampling" class="level2">
+<h2 class="anchored" data-anchor-id="stroke-resampling">3.1 Stroke resampling</h2>
+<p>As I understand it data is captured uniformly from a tablet and thus had a three dimensional structure. The authors then to resample the data to more faithfully represent the the curvature that is the building block of strokes within the handwriting.</p>
+<div id="fig-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://orenbochman.github.io/reviews/2013/HandwritingBeautification/fig_2.png" class="img-fluid figure-img" style="width:80.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: stroke resampling - uniform v.s. curvature based
+</figcaption>
+</figure>
+</div>
+<p>They represent samples taken at regular distance intervals using <img src="https://latex.codecogs.com/png.latex?%5CPhi%5Ed%20=%20%5C%7B%20%5Cphi%5Ed%20_1%20,%20%5Cldots,%20%5Cphi%5Ed_n%20%5C%7D"> where the sample magnitude <img src="https://latex.codecogs.com/png.latex?r_i"> is constant for all samples. c.f. Figure&nbsp;2</p>
+<p>Curvature based sampling:</p>
+<p>We compute a stroke representation <img src="https://latex.codecogs.com/png.latex?%CE%A6%5Ec%20=%20%5C%7B%5Cphi%5Ec_1,%20%5Cldots%20,%20%5Cphi%5Ec_n%5C%7D"> with the same parameterization as <img src="https://latex.codecogs.com/png.latex?%CE%A6">, i.e.&nbsp;<img src="https://latex.codecogs.com/png.latex?%CF%86%5Ec_i%20=%5C%7Bx_i,%20y_i,%20p_i%20%5C%7D"></p>
+<p><span id="eq-stroke"><img src="https://latex.codecogs.com/png.latex?%0Az_i=z_%7Bi-1%7D+min(1,%20%5Cfrac%7B%5Calpha%20%5CDelta_%5Ctheta%20%5Cbeta_j%7D%7B2%5Cpi%7D)%20%5Cqquad%0A%5Ctag%7B1%7D"></span></p>
+<p>where:</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?z_i"> is the point on the curve.</li>
+<li><img src="https://latex.codecogs.com/png.latex?z_%7Bi-1%7D"> is the previous point on the curve.</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5Calpha"> is the sampling density parameter (minimum value = 24)</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5CDelta_%5Ctheta%20%5Cin%20(0,%5Cpi%5D"> is the angle between samples <img src="https://latex.codecogs.com/png.latex?%CF%86_%7Bi%E2%88%921%7D"> and <img src="https://latex.codecogs.com/png.latex?%CF%86_i"></li>
+<li><img src="https://latex.codecogs.com/png.latex?r_j"> is the stroke magnitude.</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5Cbeta_j%20=%20max(0,%20min(1,%20r_j%20%E2%88%92%20%5Csqrt%7B2%7D))."> is a parameter that controls for discretization of the stylus.</li>
+</ul>
+<!-- todo try to understand this better find/create an implementation -->
+</section>
+<section id="refining-strokes" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="refining-strokes">3.2 Refining strokes</h2>
+<p>When a user writes they generate a large set of stroke samples, denoted <img src="https://latex.codecogs.com/png.latex?%CE%A6"> (for the rest of the paper we assume a curvature-based sampling and drop the superscript c.) From <img src="https://latex.codecogs.com/png.latex?%CE%A6"> we create overlapping fixed length sequences of stroke samples called tokens c.f. Figure&nbsp;1. Each token contains n stroke samples.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+matrix profiles
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Using matrix profiles math behind stumpy might be usefull in making this work faster and better, not sure about real time.</p>
+</div>
+</div>
+<section id="fine-scale-alignment" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="fine-scale-alignment">Fine-scale alignment</h3>
+
+<div class="no-row-height column-margin column-container"><div id="fig-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://orenbochman.github.io/reviews/2013/HandwritingBeautification/fig_3.png" class="img-fluid figure-img" width="250">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: fine alignment
+</figcaption>
+</figure>
+</div></div><p>The <strong>match cost</strong> <img src="https://latex.codecogs.com/png.latex?%5Cbeta_%7Bk,l%7D"> is found using a linear combination of three features,</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbeta_%7Bk,l%7D%20=%20%5CDelta_%7B%5Chat%20r%7D%20+%20%5CDelta_%5Ctheta%20+%20%5Cdelta_p%20%5Cqquad%0A"></p>
+<p>computed from:</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?t_%7Bi,k%7D"> and <img src="https://latex.codecogs.com/png.latex?t_%7Bj,l%7D">.</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5CDelta%20%5Chat%20r"> is the absolute difference between <img src="https://latex.codecogs.com/png.latex?%5Chat%20r_k"> and <img src="https://latex.codecogs.com/png.latex?%5Chat%20r_l">.</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5CDelta_%5Ctheta"> is the absolute angular distance between <img src="https://latex.codecogs.com/png.latex?%CE%B8_k"> and <img src="https://latex.codecogs.com/png.latex?%CE%B8_l">.</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5Cdelta_p"> measures if both strokes have consistent visibility. That is, <img src="https://latex.codecogs.com/png.latex?%5Cdelta_p%20=%201"> if <img src="https://latex.codecogs.com/png.latex?p_k%20=%200"> and <img src="https://latex.codecogs.com/png.latex?p_l%20=%200">, or <img src="https://latex.codecogs.com/png.latex?p_k%20%3E%200"> and <img src="https://latex.codecogs.com/png.latex?p_l%20%3E%200">, and <img src="https://latex.codecogs.com/png.latex?%5Cdelta_p%20=%200"> otherwise.</li>
+</ul>
+</section>
+<section id="merging-stroke-sets" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="merging-stroke-sets">Merging stroke sets</h3>
+<blockquote class="blockquote">
+<p>Once two or more tokens are aligned, we can merge them by averaging the stroke samples.</p>
+</blockquote>
+
+<div class="no-row-height column-margin column-container"><div id="fig-4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://orenbochman.github.io/reviews/2013/HandwritingBeautification/fig_4.png" class="img-fluid figure-img" width="250">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: matches
+</figcaption>
+</figure>
+</div></div></section>
+</section>
+<section id="the-paper" class="level2">
+<h2 class="anchored" data-anchor-id="the-paper">The paper</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><embed src="./paper.pdf" class="col-page" width="800" height="1000"></p>
+<figcaption>paper</figcaption>
+</figure>
+</div>
+</section>
+<section id="see-also" class="level2">
+<h2 class="anchored" data-anchor-id="see-also">See also</h2>
+<ul>
+<li>http://larryzitnick.org/</li>
+</ul>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
+<div id="ref-dudek1997shape" class="csl-entry">
+Dudek, Gregory, and John K Tsotsos. 1997. <span>“Shape Representation and Recognition from Multiscale Curvature.”</span> <em>Computer Vision and Image Understanding</em> 68 (2): 170–89.
+</div>
+<div id="ref-mokhtarian1992theory" class="csl-entry">
+Mokhtarian, Farzin, and Alan K Mackworth. 1992. <span>“A Theory of Multiscale, Curvature-Based Shape Representation for Planar Curves.”</span> <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em> 14 (8): 789–805.
+</div>
+<div id="ref-Whitney1937Regular" class="csl-entry">
+Whitney, Hassler. 1937. <span>“On Regular Closed Curves in the Plane.”</span> <em>Compositio Mathematica</em> 4: 276–84. <a href="http://www.numdam.org/item/CM_1937__4__276_0/">http://www.numdam.org/item/CM_1937__4__276_0/</a>.
+</div>
+<div id="ref-Zitnick2013Beautification" class="csl-entry">
+Zitnick, C. Lawrence. 2013. <span>“Handwriting Beautification Using Token Means.”</span> <em>ACM Trans. Graph.</em> 32 (4). <a href="https://doi.org/10.1145/2461912.2461985">https://doi.org/10.1145/2461912.2461985</a>.
+</div>
+</div></section></div> ]]></description>
+  <guid>https://orenbochman.github.io/reviews/2013/HandwritingBeautification/</guid>
+  <pubDate>Thu, 26 Sep 2024 12:40:58 GMT</pubDate>
+</item>
+<item>
+  <title>Learning a manifold of fonts</title>
+  <link>https://orenbochman.github.io/reviews/2014/learning-font-manifold/</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="tldr" class="level2">
+<h2 class="anchored" data-anchor-id="tldr">TL;DR</h2>
+<p>This paper presents a method for learning a manifold of fonts. The manifold is a generative model that can be used to interpolate between existing fonts and generate new ones. The authors show that the manifold can be used to edit fonts in a way that preserves the overall style of the font.</p>
+</section>
+<section id="questions" class="level2">
+<h2 class="anchored" data-anchor-id="questions">Questions</h2>
+<ul>
+<li>Can we make aspects of the manifold interpretable?</li>
+<li>Can we make the specific aspects of the manifold parametrize?
+<ul>
+<li>weights</li>
+<li>serif style (slab, old style, transitional, didone, hairline, decorative, wedge etc)</li>
+</ul></li>
+<li>has there been follow up work on this?
+<ul>
+<li>handling outliers better</li>
+<li>finding and matching motifs</li>
+</ul></li>
+<li>can we use this to generate new fonts?</li>
+<li>is the code available?</li>
+<li>Can I think of a generative model with low and high level features?
+<ul>
+<li>low level features are the points, lines, splines, strokes, glyph topology.</li>
+<li>mid level features are the combine geometry and style like cross bars, stems risers, descenders,<br>
+</li>
+<li>high level features are typographic motifs, serif style, and weight, and thier parameters.</li>
+</ul></li>
+<li>Can we use a parametric prior to cluster glyphs before constructing the manifold?</li>
+<li>Can we indeed use priors for different levels of the generative model, thier parameters, and certain constraints?</li>
+<li>Can we detect outliers glyphs and map them to</li>
+<li>Can we learn priors for hinting and other typographic features?</li>
+</ul>
+</section>
+<section id="abstract" class="level2">
+<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<blockquote class="blockquote">
+<p>The design and manipulation of typefaces and fonts is an area requiring substantial expertise; it can take many years of study to become a proficient typographer. At the same time, the use of typefaces is ubiquitous; there are many users who, while not experts, would like to be more involved in tweaking or changing existing fonts without suffering the learning curve of professional typography packages. Given the wealth of fonts that are available today, we would like to exploit the expertise used to produce these fonts, and to enable everyday users to create, explore, and edit fonts. To this end, we build a generative manifold of standard fonts. Every location on the manifold corresponds to a unique and novel typeface, and is obtained by learning a non-linear mapping that intelligently interpolates and extrapolates existing fonts. Using the manifold, we can smoothly interpolate and move between existing fonts. We can also use the manifold as a constraint that makes a variety of new applications possible. For instance, when editing a single character, we can update all the other glyphs in a font simultaneously to keep them compatible with our changes.</p>
+<p>– <span class="citation" data-cites="Campbell2014ManifoldFonts">(Campbell and Kautz 2014)</span></p>
+</blockquote>
+<ul>
+<li>There is an a good bibliography.</li>
+<li>There is an excellent presentation</li>
+<li>There is a great demo of the system in action online.</li>
+<li>The computational load for this work isn’t as bad as many other deep learning tasks.</li>
+<li>Can we rethink this via a skeleton path tracing curve with a pen on and off and then each segment is expanded to an outline and mapped via a poly line? -c.f. <span class="citation" data-cites="suveeranont2010example">(Suveeranont and Igarashi 2010)</span> takes a single example +</li>
+<li>can abstract the line to a grammar of elements see <span class="citation" data-cites="shamir1998Feature">(<strong>shamir1998Feature?</strong>)</span>
+<ul>
+<li>key point</li>
+<li>topology</li>
+<li>branching and merging points</li>
+</ul></li>
+<li>Can we use a normalizing flow to map each glyph to a more basic shape like a line segment or a circle?</li>
+</ul>
+</section>
+<section id="the-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem">The problem</h2>
+<ul>
+<li>Designing and editing fonts requires mastery of the rules of typography and the use of professional typography software packages and is a highly labour intensive task. How can we use unsupervised learning simplify font design?</li>
+</ul>
+</section>
+<section id="prior-work" class="level2">
+<h2 class="anchored" data-anchor-id="prior-work">Prior work</h2>
+<ul>
+<li>Metafont by Donald Knuth</li>
+<li>Multiple Masters by Adobe</li>
+</ul>
+</section>
+<section id="main-ideas" class="level2">
+<h2 class="anchored" data-anchor-id="main-ideas">Main ideas</h2>
+<ul>
+<li><p>all closed 2d shapes consist in a big manifold</p></li>
+<li><p>a polyline<sup>1</sup> representation of a font is a much smaller manifold</p></li>
+<li><p>used a <strong>Gaussian Process Latent Variable</strong> Model (GP-LVM) to map high-dimensional font data into a lower-dimensional manifold that allows smooth interpolation and extrapolation</p></li>
+<li><p>Err what are GP-LVMs? &gt; The GP-LVM is a nonlinear dimensionality reduction technique that uses Gaussian Processes to learn a low-dimensional latent space representation of high-dimensional data. It provides a probabilistic framework, meaning it doesn’t just give a point estimate for the latent representation, but also an uncertainty measure on the mappings. &gt; Unlike PCA which finds a linear mapping from high-dimensional to low-dimensional space, GP-LVM finds a nonlinear mapping due to the flexibility of Gaussian Processes. This makes GP-LVM much more powerful for capturing complex data relationships.</p>
+<ul>
+<li>see <a href="https://www.cs.toronto.edu/~duvenaud/cookbook/">The Kernel Cookbook: Advice on Covariance functions fir GPML</a></li>
+<li><a href="lawrence2003gaussian">Gaussian Process Latent Variable Models for Visualisation of High Dimensional Data</a> -<a href="https://www.cs.toronto.edu/~duvenaud/thesis.pdf">Automatic Model Construction with Gaussian Processes</a> c.f. <span class="citation" data-cites="duvenaud2014automatic">(Duvenaud 2014)</span></li>
+<li>A tensorfow implementation of a GP-LVM is available <a href="https://www.tensorflow.org/probability/examples/Gaussian_Process_Latent_Variable_Model">here</a></li>
+</ul></li>
+<li><p>a energy model specifically designed to provide dense correspondences between character outlines across multiple fonts.</p></li>
+</ul>
+<!-- add a mermaid polyline mind map -->
+<ul>
+<li>poly line
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm">Ramer–Douglas–Peucker_algorithm</a> simplification of a polyline by removing points</li>
+<li>non-parametric version</li>
+<li><a href="https://en.wikipedia.org/wiki/Visvalingam%E2%80%93Whyatt_algorithm">Visvalingam–Whyatt algorithm</a></li>
+</ul></li>
+<li>bezier curve</li>
+</ul>
+</section>
+<section id="the-magic" class="level2">
+<h2 class="anchored" data-anchor-id="the-magic">The magic</h2>
+</section>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>The design of fonts is typically complex and requires significant expertise. However, with access to many existing fonts, a generative model can help everyday users create, explore, and manipulate fonts by learning a low-dimensional manifold. The key contribution of this paper is a probabilistic font manifold that interpolates and extrapolates between existing fonts to generate new typefaces.</p>
+</section>
+<section id="font-manifold" class="level2">
+<h2 class="anchored" data-anchor-id="font-manifold">Font Manifold</h2>
+<p>The paper presents a <strong>Gaussian Process Latent Variable Model (GP-LVM)</strong> to map high-dimensional font data into a lower-dimensional manifold that allows smooth interpolation and extrapolation.</p>
+<p>Given an input space <img src="https://latex.codecogs.com/png.latex?%5Cmathbf%7BX%7D"> and output space <img src="https://latex.codecogs.com/png.latex?%5Cmathbf%7BY%7D">, the GP models the probability distribution of outputs:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AP(%5Cmathbf%7BY%7D%7C%5Cmathbf%7BX%7D)%20=%20%5Cmathcal%7BN%7D(%5Cmathbf%7BY%7D%20%7C%20%5Cmathbf%7BM%7D(%5Cmathbf%7BX%7D),%20%5Cmathbf%7BC%7D(%5Cmathbf%7BX%7D,%20%5Cmathbf%7BX%7D%7C%5Ctheta))%0A"></p>
+<p>Where <img src="https://latex.codecogs.com/png.latex?%5Cmathbf%7BC%7D"> is a covariance function dependent on hyperparameters <img src="https://latex.codecogs.com/png.latex?%5Ctheta">. The manifold is trained using existing fonts, and the GP-LVM finds the optimal mapping that generates fonts by maximizing the likelihood:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AX%5E*,%20%5Ctheta%5E*%20=%20%5Carg%5Cmax_%7BX,%20%5Ctheta%7D%20%5Clog%20P(%5Cmathbf%7BY%7D%7C%20%5Cmathbf%7BX%7D,%20%5Ctheta)%0A"></p>
+</section>
+<section id="character-matching" class="level2">
+<h2 class="anchored" data-anchor-id="character-matching">Character Matching</h2>
+<p>To create a font manifold, character outlines are matched across different fonts. This involves optimizing an energy model that encourages consistent curvature and normal variations. The energy model is:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AE(t)%20=%20E_%7B%5Ckappa%7D(t)%20+%20%5Clambda_%7B%5Ctext%7Bel%7D%7D%20E_%7B%5Ctext%7Bel%7D%7D(t)%20+%20%5Clambda_%7B%5Ceta%7D%20E_%7B%5Ceta%7D%5E%7B%5Ctext%7Bup%7D%7D(t)%20+%20%5Clambda_%7B%5Ceta%7D%20E_%7B%5Ceta%7D%5E%7B%5Ctext%7Bdown%7D%7D(t)%0A"></p>
+<p>Where <img src="https://latex.codecogs.com/png.latex?E_%7B%5Ckappa%7D"> represents curvature variation and <img src="https://latex.codecogs.com/png.latex?E_%7B%5Ceta%7D"> enforces normal matching.</p>
+<section id="elastic-regularization" class="level3">
+<h3 class="anchored" data-anchor-id="elastic-regularization">Elastic Regularization</h3>
+<p>To ensure smooth correspondence between characters, an elastic regularization term prevents the optimization from collapsing the characters into regions of low curvature:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AE_%7B%5Ctext%7Bel%7D%7D(t)%20=%20%5Csum_%7Bi=1%7D%5E%7BN%7D%20%5Csum_%7Bm=1%7D%5E%7BM%7D%20%5Cleft(t_%7B(i+1)%20%5Cmod%20N,%20m%7D%20-%20t_%7Bi,%20m%7D%20-%20%5Cfrac%7B1%7D%7BN%7D%5Cright)%5E2%0A"></p>
+</section>
+</section>
+<section id="generating-new-fonts" class="level2">
+<h2 class="anchored" data-anchor-id="generating-new-fonts">Generating New Fonts</h2>
+<p>Once the manifold is trained, a new font can be generated by projecting a new location <img src="https://latex.codecogs.com/png.latex?%5Cmathbf%7Bx%7D"> in the latent space back to the high-dimensional font space:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cmathbf%7By%7D%20=%20%5Cmathbf%7BC%7D(%5Cmathbf%7Bx%7D,%20%5Cmathbf%7BX%5E*%7D%7C%5Ctheta%5E*)%20%5Cleft%5B%5Cmathbf%7BC%7D(%5Cmathbf%7BX%5E*%7D,%20%5Cmathbf%7BX%5E*%7D%7C%5Ctheta%5E*)%5Cright%5D%5E%7B-1%7D%20%5Cmathbf%7BY%7D%0A"></p>
+<p>This approach allows users to explore the manifold and discover novel fonts, as shown in the example of interpolation between serif and sans-serif regions.</p>
+<p><img src="https://orenbochman.github.io/reviews/2014/learning-font-manifold/fig_1.png" class="img-fluid"></p>
+</section>
+<section id="applications" class="level2">
+<h2 class="anchored" data-anchor-id="applications">Applications</h2>
+<p>Several applications arise from this framework:</p>
+<ul>
+<li><strong>Interactive Editing</strong>: Users can edit one character, and the changes propagate to the entire font family.</li>
+<li><strong>Smooth Interpolation</strong>: New fonts are created by interpolating between two existing fonts.</li>
+</ul>
+<p><img src="https://orenbochman.github.io/reviews/2014/learning-font-manifold/fig_2.png" class="img-fluid"></p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>The paper introduces a novel, unsupervised learning method for generating fonts, offering smooth interpolation and the ability for users to edit fonts interactively without formal typographic knowledge.</p>
+</section>
+<section id="the-paper" class="level2">
+<h2 class="anchored" data-anchor-id="the-paper">The paper</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><embed src="./paper.pdf" class="col-page" style="width:8.5in;height:11in"></p>
+<figcaption>paper</figcaption>
+</figure>
+</div>
+
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
+<div id="ref-Campbell2014ManifoldFonts" class="csl-entry">
+Campbell, Neill D. F., and Jan Kautz. 2014. <span>“Learning a Manifold of Fonts.”</span> <em>ACM Trans. Graph.</em> 33 (4). <a href="https://doi.org/10.1145/2601097.2601212">https://doi.org/10.1145/2601097.2601212</a>.
+</div>
+<div id="ref-duvenaud2014automatic" class="csl-entry">
+Duvenaud, David. 2014. <span>“Automatic Model Construction with Gaussian Processes.”</span> PhD thesis.
+</div>
+<div id="ref-suveeranont2010example" class="csl-entry">
+Suveeranont, Rapee, and Takeo Igarashi. 2010. <span>“Example-Based Automatic Font Generation.”</span> In <em>International Symposium on Smart Graphics</em>, 127–38. Springer.
+</div>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>what is this?↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>paper-review</category>
+  <category>neural-networks</category>
+  <category>typography</category>
+  <category>manifold-learning</category>
+  <guid>https://orenbochman.github.io/reviews/2014/learning-font-manifold/</guid>
+  <pubDate>Thu, 26 Sep 2024 10:00:12 GMT</pubDate>
+</item>
+<item>
+  <title>FontCLIP: A Semantic Typography Visual-Language Model for Multilingual Font Applications</title>
+  <link>https://orenbochman.github.io/reviews/2024/FontCLIP/</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="abstract" class="level2">
+<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<blockquote class="blockquote">
+<p>Acquiring the desired font for various design tasks can be challenging and requires professional typographic knowledge. While previous font retrieval or generation works have alleviated some of these difficulties, they often lack support for multiple languages and semantic attributes beyond the training data domains. To solve this problem, we present FontCLIP: a model that connects the semantic understanding of a large vision-language model with typographical knowledge. We integrate typography-specific knowledge into the comprehensive vision-language knowledge of a pretrained CLIP model through a novel finetuning approach. We propose to use a compound descriptive prompt that encapsulates adaptively sampled attributes from a font attribute dataset focusing on Roman alphabet characters. FontCLIP’s semantic typographic latent space demonstrates two unprecedented generalization abilities. First, FontCLIP generalizes to different languages including Chinese, Japanese, and Korean (CJK), capturing the typographical features of fonts across different languages, even though it was only finetuned using fonts of Roman characters. Second, FontCLIP can recognize the semantic attributes that are not presented in the training data. FontCLIP’s dual-modality and generalization abilities enable multilingual and cross-lingual font retrieval and letter shape optimization, reducing the burden of obtaining desired fonts.</p>
+<p>— <span class="citation" data-cites="Tatsukawa2024Fontclip">(Tatsukawa et al. 2024)</span></p>
+</blockquote>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
+<div id="ref-Tatsukawa2024Fontclip" class="csl-entry">
+Tatsukawa, Yuki, I‐Chao Shen, Anran Qi, Yuki Koyama, Takeo Igarashi, and Ariel Shamir. 2024. <span>“FontCLIP: A Semantic Typography Visual‐language Model for Multilingual Font Applications.”</span> <em>Computer Graphics Forum</em> 43 (2). <a href="https://doi.org/10.1111/cgf.15043">https://doi.org/10.1111/cgf.15043</a>.
+</div>
+</div></section></div> ]]></description>
+  <category>paper-review</category>
+  <category>typography</category>
+  <category>vision-language-model</category>
+  <category>CLIP</category>
+  <category>multilingual</category>
+  <category>cross-lingual</category>
+  <category>semantic attributes</category>
+  <guid>https://orenbochman.github.io/reviews/2024/FontCLIP/</guid>
+  <pubDate>Tue, 24 Sep 2024 18:29:25 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/reviews/2024/FontCLIP/cover.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Why bother reviewing papers?</title>
   <link>https://orenbochman.github.io/reviews/meta/meta.html</link>
@@ -1389,361 +1781,6 @@ Trask, Andrew, Phil Michalak, and John Liu. 2015. <span>“Sense2vec - a Fast an
 </div></section></div> ]]></description>
   <guid>https://orenbochman.github.io/reviews/2015/sense2vec/</guid>
   <pubDate>Sat, 25 Jun 2022 21:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Skeletonization: A Technique for Trimming the Fat from a Network via Relevance Assessment</title>
-  <link>https://orenbochman.github.io/reviews/1989/skeletonization/</link>
-  <description><![CDATA[ 
-
-
-
-
-<section id="tldr" class="level2">
-<h2 class="anchored" data-anchor-id="tldr">TL;DR</h2>
-<p>This pre GPU era Nips 1988 paper that talks about simplifying neural networks by removing redundant units. The authors present a novel approach to simplifying neural networks by systematically identifying and removing redundant or less-relevant units. The authors address a key challenge in connectionist models: understanding and optimizing the network’s behavior by trimming unnecessary components without losing functionality.</p>
-</section>
-<section id="summary" class="level2">
-<h2 class="anchored" data-anchor-id="summary">Summary</h2>
-<p>In <span class="citation" data-cites="mozer1988skeletonization">(Mozer and Smolensky 1988)</span> the authors presents a novel approach to simplifying neural networks by systematically identifying and removing redundant or less-relevant units. The authors address a key challenge in connectionist models: understanding and optimizing the network’s behavior by trimming unnecessary components without losing functionality.</p>
-</section>
-<section id="summary-1" class="level2">
-<h2 class="anchored" data-anchor-id="summary-1">Summary</h2>
-<p>The core idea of the paper is to iteratively train a network, compute a relevance metric for each input or hidden unit, and eliminate the units that are least relevant to the network’s performance. The skeletonization process offers several practical benefits:</p>
-<ul>
-<li><p><strong>Constraining Generalization</strong>: By reducing redundant units, skeletonization effectively limits the network’s complexity, which can enhance its generalization capability.</p></li>
-<li><p><strong>Improving Learning Performance</strong>: Networks often require many hidden units to quickly learn a dataset. Skeletonization accelerates initial learning with excess units and trims unnecessary ones later, leading to better generalization without sacrificing learning speed.</p></li>
-<li><p><strong>Simplifying Network Behavior</strong>: The authors argue that skeletonization can transform complex networks into simpler models, effectively capturing core decision-making rules.</p></li>
-</ul>
-<p>The technique contrasts with other approaches such as weight decay methods by opting for an all-or-none removal of units, motivated by the desire to identify the most critical components through explicit relevance metrics. These metrics are determined by computing the network’s error with and without specific units, using a time-averaged relevance estimate.</p>
-</section>
-<section id="key-contributions" class="level2">
-<h2 class="anchored" data-anchor-id="key-contributions">Key Contributions</h2>
-<ol type="1">
-<li><p><strong>Relevance Metric and Error Propagation</strong>: Mozer and Smolensky introduce a <mark>relevance measure derived from the network’s error response to the removal of a unit</mark>. The metric can be computed via an error propagation procedure similar to backpropagation, making the approach computationally feasible for larger networks.</p></li>
-<li><p><strong>Practical Application in Simple Examples</strong>:</p>
-<ul>
-<li>In the <strong>cue salience problem</strong>, the relevance metric highlights the most critical input unit, effectively eliminating irrelevant units.</li>
-<li>In the <strong>rule-plus-exception problem</strong>, the method identifies the hidden unit responsible for most general cases, while distinguishing another unit that handles exceptions, reflecting the nuanced task structure.</li>
-<li>The <strong>train problem</strong> demonstrates the technique’s ability to reduce inputs to a minimal set of features needed to differentiate categories.</li>
-</ul></li>
-<li><p><strong>Skeletonization in More Complex Tasks</strong>: Mozer and Smolensky apply skeletonization to more sophisticated problems like the <strong>four-bit multiplexor</strong> and the random mapping problem, showing that skeletonized networks can outperform standard ones in terms of both failure rate and learning speed.</p></li>
-</ol>
-</section>
-<section id="strengths" class="level2">
-<h2 class="anchored" data-anchor-id="strengths">Strengths</h2>
-<ul>
-<li><p><strong>Effective Reduction of Network Size</strong>: One of the most impressive outcomes is the ability of skeletonized networks to match or exceed the performance of larger networks with fewer units. The networks show resilience in maintaining their functionality even as units are removed.</p></li>
-<li><p><strong>Improvement in Learning Time</strong>: The authors provide evidence that learning with an initially large network and then trimming it can lead to faster convergence than training a smaller network from the start. This result challenges conventional thinking that fewer hidden units should always be preferable from the outset.</p></li>
-<li><p><strong>Rule Abstraction</strong>: The skeletonization process successfully identifies essential “rules” that govern network behavior, making it easier to interpret a network’s decisions in a simplified and concise manner.</p></li>
-</ul>
-</section>
-<section id="limitations-and-open-questions" class="level2">
-<h2 class="anchored" data-anchor-id="limitations-and-open-questions">Limitations and Open Questions</h2>
-<ul>
-<li><p><strong>Predefined Trimming Limit</strong>: One limitation of the paper’s approach is the need to predefine how much of the network to trim. While the authors acknowledge that magnitudes of relevance values may offer insights, an automatic stopping criterion based on these values is not fully explored.</p></li>
-<li><p><strong>Error Function Sensitivity</strong>: The paper highlights an issue with using quadratic error functions to compute relevance. The authors propose an alternative linear error function, but the sensitivity of results to different error metrics could benefit from further investigation.</p></li>
-</ul>
-</section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>Mozer and Smolensky’s skeletonization technique represents a significant step toward optimizing neural networks by removing redundant units without losing core functionality. The method not only improves learning performance but also offers valuable insights into the internal workings of neural networks. By focusing on relevance metrics, the authors pave the way for more interpretable, efficient, and generalized neural models.</p>
-<p>Overall, skeletonization remains an influential contribution to the study of neural network optimization, providing both theoretical insights and practical improvements in learning systems.</p>
-</section>
-<section id="the-paper" class="level2">
-<h2 class="anchored" data-anchor-id="the-paper">The Paper</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><embed src="./paper.pdf" class="col-page" width="800" height="1000"></p>
-<figcaption>paper</figcaption>
-</figure>
-</div>
-
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
-<div id="ref-mozer1988skeletonization" class="csl-entry">
-Mozer, Michael C, and Paul Smolensky. 1988. <span>“Skeletonization: A Technique for Trimming the Fat from a Network via Relevance Assessment.”</span> <em>Advances in Neural Information Processing Systems</em> 1.
-</div>
-</div></section></div> ]]></description>
-  <guid>https://orenbochman.github.io/reviews/1989/skeletonization/</guid>
-  <pubDate>Tue, 21 Jun 2022 21:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/reviews/1989/skeletonization/cover.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Simplifying Neural Networks by soft weight sharing</title>
-  <link>https://orenbochman.github.io/reviews/1991/simplifing-NN-by-soft-weight-sharing/</link>
-  <description><![CDATA[ 
-
-
-
-
-<section id="tldr" class="level2">
-<h2 class="anchored" data-anchor-id="tldr">TL;DR</h2>
-<p>The primary aim of the paper <span class="citation" data-cites="nowlan2018simplifying">(Nowlan and Hinton 1992)</span> is reducing the complexity of neural networks by employing a mixture of Gaussian priors to the weights, creating a “soft” weight-sharing mechanism. Instead of simply penalizing large weights (as in L2 regularization), this method clusters the weights, allowing some to stay close to zero and others to remain non-zero, depending on their usefulness. Soft weight sharing along with weight decay, improving generalization and making the model more interpretable.</p>
-<p>This paper is mentioned in Geoffrey Hinton’s <a href="https://www.coursera.org/learn/neural-networks-deep-learning/lecture/1z1eT/weight-sharing">Coursera course</a> as a way to simplify neural networks. And the key takeaway is that of modeling the loss using a mixture of Gaussians to cluster the weights and penalize the complexity of the model.</p>
-</section>
-<section id="abstract" class="level2">
-<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
-<blockquote class="blockquote">
-<p><mark>One way of simplifying neural networks so they generalize better is to add an extra term to the error function that will penalize complexity</mark>. Simple versions of this approach include penalizing the sum of the squares of the weights or penalizing the number of nonzero weights. We propose a more complicated penalty term in which the distribution of weight values is modeled as a mixture of multiple Gaussians. <mark>A set of weights is <em>simple</em> if the weights have high probability density under the mixture model</mark>. This can be achieved by clustering the weights into subsets with the weights in each cluster having very similar values. Since we do not know the appropriate means or variances of the clusters in advance, we allow the parameters of the mixture model to adapt at the same time as the network learns. Simulations on two different problems demonstrate that this complexity term is more effective than previous complexity terms</p>
-<p>– <span class="citation" data-cites="nowlan2018simplifying">(Nowlan and Hinton 1992)</span></p>
-</blockquote>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-The perplexing idea of clustering weights and some associated quandaries
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>This notion of clustering weights is odd to say the least as these are just numbers in a data structure. Viewed as a method to reduce the effective number of parameters in the model, then begins to make more sense. What this idea seems to boil down to is that we are prioritizing neural net architectures with some abstract symmetry in the weights and thus a lower capacity and thus less prone to overfitting.</p>
-<p>A few quandaries then arise:</p>
-<ol type="1">
-<li>How can we figure for different layers having weights, gradients and learning rates being more correlated then between layers.</li>
-<li>That there may be other structure so that the weights are not independent of each other.
-<ol type="1">
-<li>In classifiers the are continuous approximation of logic gates.</li>
-<li>In regression settings their values approximate continuous variables ?</li>
-</ol></li>
-<li>In many networks most of the weights are in the last layer, so we can use a different penalty for the last layer.</li>
-<li>Is there a way to impose an abstract symmetry on the weights of a neural network such that is commensurate with the problem?</li>
-<li>Can we impose multiple such symmetries on the network to give it other advantages?
-<ul>
-<li>Invariance to certain transformations,</li>
-<li>using it for initialization,</li>
-<li>making the model more interpretable,</li>
-<li>Once we learn these mixture distribution of weights, can we use its parameters in, batch normalization, layer norm and with other regularization techniques like dropout?</li>
-</ul></li>
-</ol>
-</div>
-</div>
-</section>
-<section id="the-problem" class="level2">
-<h2 class="anchored" data-anchor-id="the-problem">The problem:</h2>
-<p>This main problem in this paper is that of supervised ML</p>
-<blockquote class="blockquote">
-<p>How to train a model so it will generalize well on unseen data?</p>
-</blockquote>
-<p>In deep learning this problem is exacerbated by the fact that neural networks require fitting lots of parameters while the data for training is limited. This naturally leads to overfitting - memorizing the data and noise rather than learning the underlying data generating process.</p>
-</section>
-<section id="related-work" class="level2">
-<h2 class="anchored" data-anchor-id="related-work">Related work</h2>
-<ul>
-<li><strong>Weight Sharing</strong>: Reducing effective numbers of <em>free</em> parameters in a neural network by using a prior distribution over the weights. This is equivalent to adding a penalty term to the loss function. c.f. <span class="citation" data-cites="lang1990time">(Lang, Waibel, and Hinton 1990)</span></li>
-<li><strong>Early Stopping</strong>: Does not restricts the parameters instead detecting the point when training and test scores diverge and stopping the training early. In reality weights are saved after each epoch and once we are certain that a divergence in say accuracy we restore the earlier weights c.f. <span class="citation" data-cites="morgan1989generalization">(Morgan and Bourlard 1989)</span>, <span class="citation" data-cites="weigend1990predicting">(Weigend, Huberman, and Rumelhart 1990)</span>.</li>
-<li><strong>Pruning</strong>: Removing weight from the network <span class="citation" data-cites="mozer1989using">(Mozer and Smolensky 1989)</span>,
-<ol type="1">
-<li>keep track of the importance of each unit and drop the least important ones - could work well in RL where we keep track of the importance of each state/action/features we might also care more about prioritizing certain states and discarding others. c.f. <span class="citation" data-cites="mozer1989using">(Mozer and Smolensky 1989)</span></li>
-<li>Use second order gradient information to estimate network sensitivity to weight changes and prune based on that. c.f. <span class="citation" data-cites="lecun-90b">(LeCun et al. 1990)</span></li>
-</ol></li>
-<li><strong>Penalty Term</strong>: Adding a term in the loss penelizing for the network’s complexity. c.f. <span class="citation" data-cites="mozer1989using">(Mozer and Smolensky 1989)</span> <span class="citation" data-cites="lecun-90b">(LeCun et al. 1990)</span><sup>1</sup>.
-<ol type="1">
-<li>Complexity can be approximated using sum of the squares of the weights.</li>
-<li>Differentiating the sum of the squares of the weights leads to weight decay. <span class="citation" data-cites="plaut1986experiments">(Plaut, Nowlan, and Hinton 1986)</span></li>
-</ol></li>
-</ul>
-<p>Just a few ideas from this paper: <span class="citation" data-cites="nowlan2018simplifying">(Nowlan and Hinton 1992)</span></p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Ctext%7Bcost%7D%20=%20%5Ctext%7Bdata-misfit%7D%20+%20%5Clambda%20%5Ctimes%20%5Ctext%7Bcomplexity%7D%20%5Cqquad%0A"></p>
-<p>penalties:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Csum_%7Bi%7D%20w_i%5E2%20%5Cqquad%20%5Ctext%7B(L2%20penalty)%7D%0A"></p>
-<p>the authors provide two ways to think about this penalty:</p>
-<ol type="1">
-<li><strong>Weight decay</strong> - the penalty is a function of the weights themselves based on <span class="citation" data-cites="plaut1986experiments">(Plaut, Nowlan, and Hinton 1986)</span></li>
-<li><strong>a Bayesian perspective</strong> - is a negative log density of the weights under a Gaussian prior.</li>
-</ol>
-<p>The authors point out that the problem with L2 penalty term is that it prefers two weak interactions over a strong one.</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cleft(%5Cfrac%7Bw%7D%7B2%7D%5Cright)%5E2+%5Cleft(%5Cfrac%7Bw%7D%7B2%7D%5Cright)%5E2%20%3C%20w%5E2%20+%200%20%5Cqquad%0A"></p>
-<p>we want to keep larger weights and drop the smaller ones</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0Ap(w)%20=%20%5Cpi_n%20%5Cfrac%7B1%7D%7B2%20%5Cpi%5Csigma_n%7De%5E%7B-w%5E2/2%5Csigma%5E2_n%7D%20+%20%5Cpi_b%20%5Cfrac%7B1%7D%7B2%20%5Cpi%5Csigma_b%7De%5E%7B-w%5E2/2%5Csigma%5E2_b%7D%20%5Cqquad%0A"></p>
-<p>This is equivalent to the L2 penalty. <span class="citation" data-cites="mackay1991bayesian">(MacKay 1991)</span> showed that we can do better with:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0Ap(w)%20=%5Csum_i%20%5Clambda_i%20%5Csum_%7Bj%7D%20w_j%5E2%20%5Cqquad%20%5Ctext%7B(L2%20penalty)%7D%0A"></p>
-<p>where</p>
-<ul>
-<li><img src="https://latex.codecogs.com/png.latex?i"> is the layer and</li>
-<li><img src="https://latex.codecogs.com/png.latex?j"> is the weight in that layer</li>
-</ul>
-<p>Different layers has a different penalty, which is equivalent to a Gaussian prior with different variances for each layer.<sup>2</sup></p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Csum_%7Bi%7D%20%5Cdelta(w%7B_i%5Cne%200%7D)%20%5Cqquad%20%5Ctext%7B(L0%20penalty)%7D%0A"></p>
-<p><img src="https://latex.codecogs.com/png.latex?%0Ap(w)%20=%20%5Csum_%7Bi%7D%20%5Cdelta(w_i%20%5Cne%200)%20+%20%5Clambda%20%5Csum_%7Bi%7D%20w_i%5E2%0A"></p>
-</section>
-<section id="the-paper" class="level2">
-<h2 class="anchored" data-anchor-id="the-paper">The paper</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><embed src="./paper.pdf" class="col-page" width="800" height="1000"></p>
-<figcaption>paper</figcaption>
-</figure>
-</div>
-</section>
-<section id="resources" class="level2">
-<h2 class="anchored" data-anchor-id="resources">Resources</h2>
-<ul>
-<li>Article <a href="https://machinelearningmastery.com/introduction-to-weight-constraints-to-reduce-generalization-error-in-deep-learning/">using weight constraints to reduce generalization</a></li>
-<li>The paper is available at https://www.cs.utoronto.ca/~hinton/absps/sunspots.pdf</li>
-</ul>
-</section>
-<section id="an-after-thought" class="level2">
-<h2 class="anchored" data-anchor-id="an-after-thought">An after thought</h2>
-<p>Can we use a Bayesian RL to tune the hyper-parameters of model and dataset. We can perhaps create an RL alg that controls the many aspects of training of a model. It can explore/exploit different setups on subsets of the data. Find variants that converge faster and are more robust by adding constraints at different levels. It can identify problems in the datasets (possible bad labels etc) . Ensambles, mixtures of experts, different regularization strategies. Different Learning rates and schedules globaly or per layer.</p>
-
-
-
-</section>
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
-<div id="ref-lang1990time" class="csl-entry">
-Lang, Kevin J, Alex H Waibel, and Geoffrey E Hinton. 1990. <span>“A Time-Delay Neural Network Architecture for Isolated Word Recognition.”</span> <em>Neural Networks</em> 3 (1): 23–43.
-</div>
-<div id="ref-lecun-90b" class="csl-entry">
-LeCun, Yann, J. S. Denker, S. Solla, R. E. Howard, and L. D. Jackel. 1990. <span>“Optimal Brain Damage.”</span> In <em>Advances in Neural Information Processing Systems (NIPS 1989)</em>, edited by David Touretzky. Vol. 2. Denver, CO: Morgan Kaufman. <a href="https://proceedings.neurips.cc/paper_files/paper/1989/file/6c9882bbac1c7093bd25041881277658-Paper.pdf">https://proceedings.neurips.cc/paper_files/paper/1989/file/6c9882bbac1c7093bd25041881277658-Paper.pdf</a>.
-</div>
-<div id="ref-mackay1991bayesian" class="csl-entry">
-MacKay, David JC. 1991. <span>“Bayesian Modeling and Neural Networks.”</span> <em>PhD Thesis, Dept. Of Computation and Neural Systems, CalTech</em>. <a href="https://www.inference.org.uk/mackay/thesis.pdf">https://www.inference.org.uk/mackay/thesis.pdf</a>.
-</div>
-<div id="ref-morgan1989generalization" class="csl-entry">
-Morgan, Nelson, and Hervé Bourlard. 1989. <span>“Generalization and Parameter Estimation in Feedforward Nets: Some Experiments.”</span> <em>Advances in Neural Information Processing Systems</em> 2.
-</div>
-<div id="ref-mozer1989using" class="csl-entry">
-Mozer, Michael C, and Paul Smolensky. 1989. <span>“Using Relevance to Reduce Network Size Automatically.”</span> <em>Connection Science</em> 1 (1): 3–16.
-</div>
-<div id="ref-nowlan2018simplifying" class="csl-entry">
-Nowlan, Steven J., and Geoffrey E. Hinton. 1992. <span>“<span class="nocase">Simplifying Neural Networks by Soft Weight-Sharing</span>.”</span> <em>Neural Computation</em> 4 (4): 473–93. <a href="https://doi.org/10.1162/neco.1992.4.4.473">https://doi.org/10.1162/neco.1992.4.4.473</a>.
-</div>
-<div id="ref-plaut1986experiments" class="csl-entry">
-Plaut, D. C., S. J. Nowlan, and G. E. Hinton. 1986. <span>“Experiments on Learning by Back-Propagation.”</span> CMU-CS-86-126. Pittsburgh, PA: Carnegie–Mellon University. <a href="https://ni.cmu.edu/~plaut/papers/pdf/PlautNowlanHinton86TR.backprop.pdf">https://ni.cmu.edu/~plaut/papers/pdf/PlautNowlanHinton86TR.backprop.pdf</a>.
-</div>
-<div id="ref-weigend1990predicting" class="csl-entry">
-Weigend, Andreas S, Bernardo A Huberman, and David E Rumelhart. 1990. <span>“Predicting the Future: A Connectionist Approach.”</span> <em>International Journal of Neural Systems</em> 1 (03): 193–209.
-</div>
-</div></section><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>in the paper this citation is ambiguous, but I think this is the correct one - based on the abstract↩︎</p></li>
-<li id="fn2"><p>note: this answers the first of my question above.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <guid>https://orenbochman.github.io/reviews/1991/simplifing-NN-by-soft-weight-sharing/</guid>
-  <pubDate>Tue, 21 Jun 2022 21:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>VGGNet: Very Deep Convolutional Networks for Large-Scale Image Recognition</title>
-  <link>https://orenbochman.github.io/reviews/2014/VGGNet/</link>
-  <description><![CDATA[ 
-
-
-
-
-<section id="tldr" class="level2">
-<h2 class="anchored" data-anchor-id="tldr">TL;DR</h2>
-<p>In this paper <span class="citation" data-cites="simonyan2015deepconvolutionalnetworkslargescale">(Simonyan and Zisserman 2015)</span> the authors, Karen Simonyan and Andrew Zisserman from the Visual Geometry Group at Oxford, investigated the effect of increasing the convolutional network depth on the accuracy in the large-scale image recognition setting. The authors show that a significant improvement on the prior-art configurations can be achieved by pushing the depth to 16-19 weight layers.</p>
-<ul>
-<li><p>By using 3x3 convolution filters with stride of 1 instead of larger ones like 5x5 or 7x7 the authors were able to reduce the number of parameters in the network which allowed them to use deeper networks (16-19) layers with a similar capacity to earlier networks. This is possible as stack of three 3x3 convolutional layers has an effective receptive field of 7x7 with 81% fewer parameters than a single 7x7 convolutional layer. Once this was understood 3x3 became the standard convolutional filter size in modern CNN architectures.</p></li>
-<li><p>The authors introduced a data augmentation method called ‘image jittering’ which varying image scales.</p></li>
-<li><p>The authors later tweaked their model further including using 1x1 convolutional layers and Local Response Normalization (LRN) which improved the performance of the model as well as Xaiver initialization. And they were able to achieve state-of-the-art results on the ImageNet dataset.</p></li>
-<li><p>The authors released weights for <strong>VGG16</strong> and <strong>VGG19</strong> Called D and E in the table below which were the basis of their ImageNet Challenge 2014 submission. And it is is these two models that are most commonly used in practice as thier weight are available in the Keras library <span class="citation" data-cites="chollet2015keras">(Chollet et al. 2015)</span>.</p></li>
-</ul>
-</section>
-<section id="the-abstract" class="level2">
-<h2 class="anchored" data-anchor-id="the-abstract">The abstract</h2>
-<blockquote class="blockquote">
-<p>In this work <mark>we investigate the effect of the convolutional network depth on its accuracy</mark> in the large-scale image recognition setting. Our main contribution is a thorough evaluation of networks of increasing depth using an architecture with very small (3x3) convolution filters, which shows that a <mark>significant improvement on the prior-art configurations can be achieved by pushing the depth to 16-19 weight layers</mark>. These findings were the basis of our ImageNet Challenge 2014 submission, where our team secured the first and the second places in the localisation and classification tracks respectively. We also show that our representations generalise well to other datasets, where they achieve state-of-the-art results. We have made our two best-performing ConvNet models publicly available to facilitate further research on the use of deep visual representations in computer vision. — <span class="citation" data-cites="simonyan2015deepconvolutionalnetworkslargescale">(Simonyan and Zisserman 2015)</span></p>
-</blockquote>
-</section>
-<section id="review" class="level2">
-<h2 class="anchored" data-anchor-id="review">Review</h2>
-<p>The paper has a table with some network architectures and their performance on the ImageNet dataset. In many cases data scientist etc. like to copy the architectures of well known models and use them in their own work. So this paper is a good reference for giving a few more options for architectures to use.</p>
-<p>The paper uses 3x3 convolution filters which is a common practice in modern CNN architectures.</p>
-<blockquote class="blockquote">
-<p>We use very small 3 × 3 receptive fields throughout the whole net, which are convolved with the input at every pixel (with stride 1). It is easy to see that a stack of two 3 × 3 conv. layers (without spatial pooling in between) has an effective receptive field of 5 × 5; three such layers have a 7 × 7 effective receptive field. <mark>So what have we gained by using, for instance, a stack of three 3 × 3 conv. layers instead of a single 7 × 7 layer? First, we incorporate three non-linear rectification layers instead of a single one, which makes the decision function more discriminative. Second, we decrease the number of parameters</mark>: assuming that both the input and the output of a three-layer 3 × 3 convolution stack has C channels, the stack is parametrised by 3 (32C2) = 27C^2 weights; at the same time, a single 7 × 7 conv. layer would require 72C2 = 49C2 parameters, i.e.&nbsp;81% more. This can be seen as imposing a regularisation on the 7 × 7 conv. filters, forcing them to have a decomposition through the 3 × 3 filters (with non-linearity injected in between).</p>
-</blockquote>
-<p>The authors also reference 1 × 1 convolutions from [NiN] paper which also have large FC layers at the end.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://orenbochman.github.io/reviews/2014/VGGNet/table1.png" class="img-fluid figure-img" width="800"></p>
-<figcaption>architecture</figcaption>
-</figure>
-</div>
-<p>Where: - A is 11 layered. - A-LRN is 11 layered but have Local Response Normalization. - B is 13 layered. - C is 16 layered but has 1x1 convolutional layers. - D is 16 layered but 1x1 convolutional layers in C are replaced with 3x3 convolutional layers. - E is 19 layered</p>
-<p>Training</p>
-<p>The result were state of the art but by 2018 <span class="citation" data-cites="DBLP:journals/corr/GoyalDGNWKTJH17">(Goyal et al. 2017)</span> it would be possible to train a ResNet-50 imagenet classifier in under an hour of compute with just using 256 GPUs. There is little novelty in the methods. The authors simply increased the depth of the network and increase the umber of parameters.(but they also used them more efficiently).</p>
-<p>At <span class="citation" data-cites="BibEntry2024Sep">(Appalapuri 2016)</span> I found a Pytorch implementation of this paper.</p>
-<p>Many People ask what is the difference between VGG16 and VGG19. The difference is that VGG19 has 3 more convolutional layers than VGG16. Since these extra convolutional layers are stacked after two other layers, the receptive field of VGG19 is larger than that of VGG16. Also the CNN also have a RELU so that the network also has increased discriminative power. This means that VGG19 can capture more complex patterns in the input image than VGG16. However, this comes at the cost of more parameters and more computation. In practice, VGG16 is often used because it is simpler and faster to train than VGG19.</p>
-<p><img src="https://orenbochman.github.io/reviews/2014/VGGNet/vgg16.png" class="img-fluid" width="800" alt="VGG16"> <img src="https://orenbochman.github.io/reviews/2014/VGGNet/vgg19.png" class="img-fluid" width="800" alt="VGG19"></p>
-<!--
-::: callout-warning
-
-:::: {.column-margin}
-
-![](captain_abvious.jpg){width="250px"} 
-
-
-
-
-@meme2013captainobvious
-
-> More layers $\implies$ more parameters <br>
-> more parameters $\implies$ more capacity <br>
-> more capacity $\implies$ better fit. <br>
-> BaZinga! 🚀
-
-::::
-
-It seems that the authors were aware of methods for speeding up training but they did not bother with them. They as using 4 GPUs gave them the results in 2-3 weeks per model.
-
-:::
--->
-</section>
-<section id="limitations" class="level2">
-<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
-<ul>
-<li>The authors did not use any data augmentation methods like random cropping, flipping, etc. which are common in modern CNN architectures. They also did not use any regularization methods like dropout, L2 regularization, etc. which are also common in modern CNN architectures.</li>
-<li>The networks are pretty massive and require a lot of GPU memory in inference.</li>
-</ul>
-</section>
-<section id="the-paper" class="level2">
-<h2 class="anchored" data-anchor-id="the-paper">The paper</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><embed src="./paper.pdf" class="col-page" width="800" height="1000"></p>
-<figcaption>paper</figcaption>
-</figure>
-</div>
-</section>
-<section id="resources" class="level2">
-<h2 class="anchored" data-anchor-id="resources">Resources</h2>
-<ul>
-<li><a href="https://www.robots.ox.ac.uk/~vgg/research/very_deep/">home page</a></li>
-<li>https://medium.com/<span class="citation" data-cites="siddheshb008/vgg-net-architecture-explained-71179310050f">(<strong>siddheshb008/vgg-net-architecture-explained-71179310050f?</strong>)</span></li>
-<li>https://karan3-zoh.medium.com/paper-summary-very-deep-convolutional-networks-for-large-scale-image-recognition-e7437959d856</li>
-<li>https://safakkbilici.github.io/summary-vggnet/</li>
-<li>https://www.cs.toronto.edu/~frossard/post/vgg16/</li>
-</ul>
-
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
-<div id="ref-BibEntry2024Sep" class="csl-entry">
-Appalapuri, Prabhu. 2016. <span>“<span class="nocase">Very-Deep-Convolutional-Networks-for-Large-Scale-Image-Recognition</span>.”</span> <a href="https://github.com/Prabhu204/Very-Deep-Convolutional-Networks-for-Large-Scale-Image-Recognition" class="uri">https://github.com/Prabhu204/Very-Deep-Convolutional-Networks-for-Large-Scale-Image-Recognition</a>; GitHub.
-</div>
-<div id="ref-chollet2015keras" class="csl-entry">
-Chollet, François et al. 2015. <span>“Keras.”</span> <a href="https://keras.io" class="uri">https://keras.io</a>.
-</div>
-<div id="ref-DBLP:journals/corr/GoyalDGNWKTJH17" class="csl-entry">
-Goyal, Priya, Piotr Dollár, Ross B. Girshick, Pieter Noordhuis, Lukasz Wesolowski, Aapo Kyrola, Andrew Tulloch, Yangqing Jia, and Kaiming He. 2017. <span>“Accurate, Large Minibatch <span>SGD:</span> Training ImageNet in 1 Hour.”</span> <em>CoRR</em> abs/1706.02677. <a href="http://arxiv.org/abs/1706.02677">http://arxiv.org/abs/1706.02677</a>.
-</div>
-<div id="ref-simonyan2015deepconvolutionalnetworkslargescale" class="csl-entry">
-Simonyan, Karen, and Andrew Zisserman. 2015. <span>“Very Deep Convolutional Networks for Large-Scale Image Recognition.”</span> <a href="https://arxiv.org/abs/1409.1556">https://arxiv.org/abs/1409.1556</a>.
-</div>
-</div></section></div> ]]></description>
-  <guid>https://orenbochman.github.io/reviews/2014/VGGNet/</guid>
-  <pubDate>Wed, 09 Dec 2015 22:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>

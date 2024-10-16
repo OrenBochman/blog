@@ -64,8 +64,6 @@ format:
 
 -   [x] [Introduction to R](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf)
 
-
-
 ## Stationarity the ACF and the PACF
 
 Before diving into the material here is a brief overview of the notations for timer series.
@@ -82,6 +80,8 @@ Before diving into the material here is a brief overview of the notations for ti
 - under tildes $\utilde{y}$ are used to denote estimates of the true values $y$.
 - E matrix of eigenvalues
 - $\Lambda = diagonal(\alpha_1, \alpha_2, \ldots , \alpha_p)$ is a diagonal matrix with the eigenvalues of Σ on the diagonal.
+- $J_p(1)$ = a p by p Jordan form matrix with 1 on the superdiagonal
+
 
 also see [@prado2023time pp. 2-3]
 :::
@@ -272,75 +272,6 @@ for $n \ge 2$, and $h = 1, \ldots , (n − 1)$.
 
 Note that the sample PACF can be obtained by substituting the sample autocorrelations and the sample auto-covariances in the Durbin-Levinson recursion.
 
-### Durbin-Levinson recursion (Off-Course Reading)
-
-Like me, you might be curious about the Durbin-Levinson recursion mentioned above. This is not covered in the course, and turned out to be an enigma wrapped in a mystery.
-
-I present my finding in the note below - much of it is due to [@enwiki-LevinsonRecursion] and [@enwiki-YuleWalkerEquations]
-
-In [@yule1927periodicities] and [@walker1931periodicity], Yule and Walker proposed a method for estimating the parameters of an autoregressive model. The method is based on the Yule-Walker equations which are a set of linear equations that can be used to estimate the parameters of an autoregressive model.
-
-Due to the autoregressive nature of the model, the equations are take a special form called a Toeplitz matrix. However at the time they probably had to use the numerically unstable Gauss-Jordan elimination to solve these equations which is $O(n^3)$ in time complexity.
-
-A decade or two later in [@Levinson1947Wiener] and [@Durbin1960Fitting] the authors came up for with a weakly stable yet more efficient algorithm for solving these autocorrelated system of equations which requires only $O(n^2)$ in time complexity. Later their work was further refined in [@Trench1964ToeplitzMI] and [@Zohar1969ToeplitzMI] to just $3\times n^2$ multiplication. A cursory search reveals that Toeplitz matrix inversion is still an area of active research with papers covering parallel algorithms and stability studies. Not surprising as man of the more interesting deep learning models, including LLMs are autoregressive.
-
-So the [Durbin-Levinson recursion](https://en.wikipedia.org/wiki/Levinson_recursion) is just an elegant bit of linear algebra for solving the [Yule-Walker equations](https://w.wiki/9gVB#Estimation_of_AR_parameters) more efficiently.
-
-Here is what I dug up:
-
-### Durbin-Levinson and the Yule-Walker equations (Off-Course Reading)
-
-The Durbin-Levinson recursion is a method in linear algebra for computing the solution to an equation involving a *Toeplitz matrix* AKA a *diagonal-constant matrix* where descending diagonals are constant. The recursion runs in $O(n^2)$ time rather then $O(n^3)$ time required by Gauss-Jordan elimination.
-
-The recursion can be used to compute the coefficients of the autoregressive model of a stationary time series. It is based on the [Yule-Walker equations](https://w.wiki/9gVB#Estimation_of_AR_parameters) and is used to compute the PACF of a time series.
-
-The Yule-Walker equations can be stated as follows for an AR(p) process:
-
-$$
-\gamma_m = \sum_{k=1}^p \phi_k \gamma_{m-k} + \sigma_\epsilon^2\delta_{m,0} \qquad \text{(Yule-Walker equations)}
-$$ {#eq-yule-walker}
-
-where:
-
--   $\gamma_m$ is the autocovariance function of the time series,
--   $\phi_k$ are the AR coefficients,
--   $\sigma_\epsilon^2$ is the variance of the white noise process, and
--   $\delta_{m,0}$ is the Kronecker delta function.
-
-when $m=0$ the equation simplifies to:
-
-$$
-\gamma_0 = \sum_{k=1}^p \phi_k \gamma_{-k} + \sigma_\epsilon^2 \qquad \text{(Yule-Walker equations for m=0)}
-$$ {#eq-yule-walker-m-0}
-
-for $m > 0$ the equation simplifies to:
-
-$$ \begin{bmatrix}
-    \gamma_1 \newline
-    \gamma_2 \newline
-    \gamma_3 \newline
-    \vdots \newline
-    \gamma_p \newline
- \end{bmatrix} =  \begin{bmatrix}
-    \gamma_0     & \gamma_{-1}  & \gamma_{-2}  & \cdots \newline
-    \gamma_1     & \gamma_0     & \gamma_{-1}  & \cdots \newline
-    \gamma_2     & \gamma_1     & \gamma_0     & \cdots \newline
-    \vdots       & \vdots       & \vdots       & \ddots \newline
-    \gamma_{p-1} & \gamma_{p-2} & \gamma_{p-3} & \cdots \newline
- \end{bmatrix}  \begin{bmatrix}
-    \phi_{1} \newline
-    \phi_{2} \newline
-    \phi_{3} \newline
-    \vdots \newline
-    \phi_{p} \newline
- \end{bmatrix}
-$$
-
-and since this matrix is Toeplitz, we can use Durbin-Levinson recursion to efficiently solve the system for $\phi_k \forall k$.
-
-Once $\{\phi_m ; m=1,2, \dots ,p \}$ are known, we can consider m=0 and solved for $\sigma_\epsilon^2$ by substituting the $\phi_k$ into @eq-yule-walker-m-0 Yule-Walker equations.
-
-Of course the Durbin-Levinson recursion is not the last word on solving this system of equations. There are today numerous improvements which are both faster and more numerically stable.
 
 ### Differencing and smoothing (Reading)
 

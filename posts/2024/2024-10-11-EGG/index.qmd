@@ -1,35 +1,61 @@
 ---
-title: "Linkage"
+title: "Egg"
 draft: true
 ---
 
 
-from https://marcobaroni.org/tools_and_resources.html
+state space: verb
 
-- [EGG](https://github.com/facebookresearch/EGG) a toolkit to implement language emergence games
-- [CommAI-env]() is an environment to train and benchmark communication-based AIs [paper](https://arxiv.org/abs/1511.08130) [Meta](https://research.facebook.com/publications/commai-evaluating-the-first-steps-towards-a-useful-general-ai/) Dead
-- [SCAN](https://github.com/brendenlake/SCAN) simplified CommAI navigation tasks to evaluate compositional learning and zero-shot generalization;
-- [WaCky](https://wacky.sslmit.unibo.it/doku.php?id=start) project a very large Web-derived, POS-tagged and lemmatized corpora of English (with dependency parsing), German, Italian and French: to download them, visit the ;
-- [LAMBADA dataset](https://zenodo.org/records/2630551#.XKdhTkNS_CI) for testing broad context understanding of language models;
-- The [DISSECT toolkit](https://github.com/composes-toolkit/dissect) to construct and compose distributional semantic representations; [Docs](https://wiki.cimec.unitn.it/tiki-index.php?page=CLIC)
-- High-performance distributional semantic vectors;
-- The SICK data set for large-scale evaluation of compositional semantic models (for other tools and data sets produced by the COMPOSES project please visit the project page);
-- MEN, human-elicited semantic similarity data for the evaluation of computational models;
-- BLIND (BLind Italian Norming Data), semantic norms collected from congenitally blind and highly comparable sighted subjects;
-- BLESS (Baroni-Lenci Evaluation of Semantic Similarity), a large data set to evaluate computational models of semantic similarity;
-- DM: trained model (weighted word-link-word tuples) and utility scripts;
-- Semantic norms for German and Italian: available in this archive and documented in this article;
-- [zipfR](http://purl.org/stefan.evert/zipfR): a toolkit for lexical statistics in R;
-- BootCaT: a toolkit for bootstrapping specialized language corpora and terms from the web;
-- Morph-it!, a free Italian morphological lexicon;
-- Access to the La Repubblica corpus, a large corpus of Italian newspaper text;
-- Web as Corpus post-processing tools, for boilerplate stripping and near-duplicate identification;
-- [Knorpora](http://sslmit.unibo.it/~baroni/welcome_to_knorpora.html): the Knoppix Linux live CD remastered with tools and resources for corpus-based computational linguistics students;
-- [English token and document frequency lists](http://sslmit.unibo.it/~baroni/brown_lob_fq_lists.html) from the LOB and Brown corpora;
-- [regexp_tokenizer](http://sslmit.unibo.it/~baroni/regexp_tokenizer.html): a simple tokenizer based on regular expressions.
+```python
+#| label: state_space_generator
+
+import random
+import numpy as np
 
 
+predators = ['cat', 'eagle', 'hawk','coyotes', 'wolves', 'bear', 'weasels','raptors','snake']
+preys = ['frog','snail', 'lizard', 'spider' 'egg', 'bird']
+location_z = ['ground', 'tree', 'sky', 'water']
+location_x = ['dist_left', 'left', 'right', 'dist_right']
+location_y = ['dist_front', 'front', 'back', 'dist_back']
+location_t = ['day', 'night', 'dawn', 'dusk']
 
-NLP
-- The [TreeTagger](https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/) --- a part-of-speech tagger for many languages
 
+negation = ['not','epsilon']
+conjunction = ['and', 'or', 'epsilon']
+gender = ['masculine', 'feminine', 'neuter']
+number = ['singular', 'plural']
+tense = ['past', 'present', 'future']
+mood = ['indicative', 'subjunctive', 'imperative']
+aspect = ['simple', 'progressive', 'perfect', 'perfect_progressive']
+voice = ['active', 'passive']
+case = ['nominative', 'accusative', 'genitive', 'dative', 'ablative', 'vocative', 'locative', 'instrumental']
+degree = ['positive', 'comparative', 'superlative']
+animacy = ['animate', 'inanimate']
+person = ['1st', '2nd', '3rd']
+definite = ['definite', 'indefinite']
+
+
+
+
+
+attributes = [predator, prey, location_z, location_x, location_y, location_t]
+
+def generate_state_space(n_attributes, n_values):
+    state_space = []
+    for i in range(n_attributes):
+        state_space.append([random.randint(0, n_values-1) for _ in range(n_values)])
+    return state_space
+
+state_space = generate_state_space(5, 10)
+print(state_space)
+
+```
+
+
+
+
+
+
+
+python -m egg.zoo.basic_games.play --mode 'gs' --train_data "train_file.txt" --validation_data "valid_file.txt" --n_attributes 5 --n_values 10 --n_epochs 50 --batch_size 512 --validation_batch_size 1000 --max_len 4 --vocab_size 100 --sender_hidden 256 --receiver_hidden 512 --sender_embedding 5 --receiver_embedding 30 --receiver_cell "gru" --sender_cell "gru" --lr 0.01 --print_validation_events

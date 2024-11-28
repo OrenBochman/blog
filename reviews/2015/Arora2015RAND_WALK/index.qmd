@@ -1,0 +1,165 @@
+
+---
+title: "RAND-WALK: A latent variable model approach to word embeddings"
+subtitle: "paper review"
+bibliography: "./bibliography.bib"
+image: cover.jpg
+categories: [draft,review,distributional semantics,word embeddings,nlp]
+keywords: [review]
+draft: true
+---
+
+My interest in this paper is to try to get a better mathematical intuition on word embeddings. This model is mentioned in the follow up papers on word sense embeddings. A bayesian formulation of the log-linear model can be useful to develop better representations for Bayesian or RL agents that can derive distributional semantics of thier environment.
+
+::: {.callout-note}
+
+## Some questions
+
+some questions before reading this paper about word embeddings:
+
+Word embeddings are defined in live in a high-dimensional space with (300-2000) dimensions, how do they overcome the curse of dimensionality? ^[Hint: perhaps they exist in much lower-dimensional manifolds within the high-dimensional space]
+
+
+:::
+
+
+## TL;DR
+
+This paper introduces a generative model for word embeddings. This paper is long (33 pages) and contains four mathematical derivations. 
+
+Going over the paper there are many problems with the model or at least the way it is presented in the paper. Assuming it is ok then we get a number of interesting results that can be used to understand word embeddings better.
+
+
+
+### Abstract
+
+> Semantic word embeddings represent the meaning of a word via a vector, and are created by diverse methods. Many use nonlinear operations on co-occurrence statistics, and have hand-tuned hyperparameters and reweighting methods.
+This paper proposes a new generative model, a dynamic version of the log-linear topic model of Mnih and Hinton (2007). The methodological novelty is to use the prior to compute closed form expressions for word statistics. This provides a theoretical justification for nonlinear models like PMI, word2vec, and GloVe, as well as some hyperparameter choices. It also helps explain why low-dimensional semantic embeddings contain linear algebraic structure that allows solution of word analogies, as shown by Mikolov et al. (2013a) and many subsequent papers. Experimental support is provided for the generative model assumptions, the most important of which is that latent word vectors are fairly uniformly dispersed in space.
+>
+> --- [@arora2015alatent]
+
+## The Review 
+
+This paper posits a model that can explain why popular word embedding methods like PMI, word2vec, and GloVe work as well as the reason why these embeddings can solve word analogies.
+
+
+So the first issues for me has to do with PMI, Let's demystify (Pointwise Mutual Information)
+
+PMI is a local measure of how much the occurrence of 𝑋 and 𝑌 together differs from their expected co-occurrence under independence. 
+
+It would seem that if we want to model a topic X we would do well to consider the words with high PMI and to disregard word with low PMI.wh 
+
+Let's demystify (Pointwise Mutual Information) for two words $X$ and $Y$:
+
+$$
+PMI(X,Y) = \log \frac{P(X,Y)}{P(X)P(Y)} = \log {P(X,Y)} - \log {P(X)} - \log {P(Y)} =
+$$
+
+where:
+
+- $P(X,Y)$ is the joint probability i.e. the probability of both $X$ and $Y$ co-occurring in a given context.
+- $P(X)$ is the probabilities of $X$ occurring in that context.
+- $P(Y)$ is the probabilities of $Y$ occurring in that context.
+- The context is usually a window of N words around the target word X but could be the document or the corpus.
+- log with base 2 converts the units of information to bits.
+
+Let's consider three cases: 
+
+since independent events have the property that $P(X,Y) = P(X)P(Y)$, we can see that:
+
+- If X and Y are independent we expect to see a PMI of 0
+- If X and Y are associated i.e. more likely together then each alone we should expect a positive PMI
+- If X and Y are exclusive i.e. less likely together then alone we should expect a negative PMI
+
+Note: $P(X)$ and $P(Y)$ are the marginal probabilities of the words X and Y, in the Joint probability distribution of the words in the context. So we can get $P(X)$ by summing the joint probabilities of X and all other words in the context and the same for $P(Y)$.
+
+
+Another point is that in NLP PMI is problematic. We can have unrelated words close together. In a garden path sentence, e.g. "The cow jumped over the moon" Cow and Moon are close together but are not related.
+
+Relation to Entropy: PMI is related to the entropy of the joint distribution of the words in the context. The entropy of the joint distribution is the sum of the entropies of the marginal distributions minus the entropy of the joint distribution. The PMI is the difference between the joint entropy and the sum of the marginal entropies.
+
+$$
+PMI(X,Y) = H(X) + H(Y) - H(X,Y)
+$$
+
+
+
+::: {.callout-note}
+
+### PMI in high-dimensional spaces
+
+
+In higher dimensions, PMI faces the following challenges:
+
+1. **Curse of Dimensionality**: As the dimensionality increases, the data points become more sparse. High-dimensional vectors tend to exhibit the "curse of dimensionality," where data points are generally far apart, making co-occurrence statistics less reliable. PMI relies heavily on meaningful co-occurrence counts, which become sparse and noisy in high-dimensional spaces, potentially leading to instability in the calculated PMI values.
+
+2. **Noise Amplification**: PMI tends to amplify noise, especially when dealing with rare word pairs. In a high-dimensional setting, the noise introduced by less frequent co-occurrences becomes more pronounced, making the PMI metric less reliable.
+
+3. **Dependency on Co-occurrence Sparsity**: The higher the dimension, the more complex the relationships among words become, leading to very sparse co-occurrence matrices. Sparse data can result in PMI values that either overestimate or underestimate associations, because the metric depends on a robust statistical sample for accuracy.
+
+4. **Poor Representations of Non-Frequent Terms**: PMI is particularly vulnerable when words have uneven frequencies, which is exacerbated in high-dimensional spaces where less frequent words appear in fewer contexts. The resulting PMI values for rare words are often unstable, leading to poor representations for such words.
+
+While PMI is useful for extracting the strength of associations between words, its application in high-dimensional contexts typically requires additional techniques, such as dimensionality reduction (like SVD) or smoothing, to handle sparsity and noise effectively
+
+:::
+
+## The Model
+
+Some models like the random walk is widely applicable. What we know of the random walk is often closely matched by the Normal Distribution through the law of large numbers and more so the central limit theorem. I.e. that we can make assumptions of normalcy in the random walk. Intutions serve us well but up to a point. Random walks in high dimensions are like the randomly walks in 1 or 2 dimensions. If the underlying distribution is not normal then the random walk may aggregate according to the central limit theorem.
+
+So I'm not happy that the model is rather vague about details like what is the context vector. What are the interpretations of dimensions of the context and word vectors. How often and how much can the context vectors change at each step and so on. But I can understand that the authors might be stating a more abstract model that might then be widely applied. 
+
+The generative model assigns each word a vector $v_w\in \mathcal{R}^d$ and the 'goal' is to determine the these vectors.
+THe authors posit that at time step $t$ there is a small change in a latent  context vector $c_t\in \mathcal{R}^d$. with dimensions $d$.
+The idea being that in a conversation the subject drifts slowly over time. The author also point out that it is ok if the subject jumps around 
+occasionally.
+
+::: {.callout-note}
+
+## First issue - aggregation and semantic drift local v.s. global.
+
+Topic models suggest that semantic drift exist in large enough aggregates. But as we look at the atomic units of meaning like words we can see that the drift is no longer smooths. If we think about it this is not how language works at the word level- semantics (meaning) when viewed at the resolution of words tends to jumps around a lot. There are clusters of grammatical words that are highly predictable^[low entropy] but don't carry much semantics e.g. "She had wanted to ..." can take on an infinite number of continuations i.e. contexts. Also for non grammatical words semantics can diverge a lot and quickly. Both Grammatically and Semantically related words are clustered together and different clusters can be mixed together in the same sentence. 
+
+Note though that if we look deeper into morphemes and in co-locations where aggregation is concatenative we tend to see smaller and smoother semantic drift - though again in grammatical words (in English at least) there are is little morphology in this case the changes are indeed like the authors describe, but he does not seem to be discussing morphology. 
+
+So this is a model with so called theoretical bounds but without being more precise (i.e. how frequently and how much can context vectors change) it is hard to see how this model can be correct.
+:::
+
+::: {.callout-note}
+
+
+### Measuring Semantic Drift and Semantic Aggregation
+
+What the above raises is a more fundamental question how can we actually measure semantic drift and semantic aggregation. 
+
+To measure drift We need to be able to sample the smallest semantic units and to see how they and thier aggregate changes as we progress though the text. 
+
+- pointwise mutual information between characters (not semantics)
+- pointwise mutual information between phonemes (not semantics)
+- pointwise mutual information between morphemes
+- pointwise mutual information between words
+- pointwise mutual information between phrases
+- pointwise mutual information between clauses
+- pointwise mutual information between sentences
+
+While at each boundary of each aggregation unit one could expect a jump in meaning. In terms of the aggregation of meaning we can see that the meaning of a phrase tends to be the sum of the meaning of the words in the phrase. "Race car" and "Car Race" might not be the same but their meaning is closely related and belong in some broader semantic category.
+Considered this wat I think that up to the level of a phrase at least there is a slow drift. 
+
+If we think deeper the real point here is that the aggregate sematics make larger and lager jumps as we go up the aggregation hierarchy but that that larger jumps are somewhat less frequent. (I also depends on the type of text we are looking at).
+
+:::
+
+
+If we observe V but not its vector and not the Context how can we determine these vectors?
+
+
+
+
+
+![figure 1](./fig_1.jpg){#fig-1 .column-margin width="250px" group="figures"}
+
+{{< lipsum 2 >}}
+
+## The paper
+
+![paper](./paper.pdf){.col-page width="800px" height="1000px"}

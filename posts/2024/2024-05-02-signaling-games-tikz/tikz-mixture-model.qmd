@@ -1,0 +1,63 @@
+---
+title: "Bayesian Gaussian mixture model"
+subtitle: "tikz in Quarto!"
+categories: ["tikz", "Bayesian Statistics", "mixture models"]
+
+---
+
+this is a chart from https://en.wikipedia.org/wiki/File:Bayesian-gaussian-mixture-vb.svg by https://en.wikipedia.org/wiki/User:Benwing
+
+```{r include=FALSE}
+font_opts <- list(dvisvgm.opts = "--font-format=woff")
+```
+
+```{tikz mixture-model, engine.opts=font_opts}
+#| echo: false
+#| fig-cap: "Bayesian Gaussian mixture model"
+#| fig-align: center
+#| fig-ext: svg
+#| out-width: 100%
+
+\usetikzlibrary{arrows,snakes,backgrounds,patterns,matrix,shapes,fit,calc,shadows,plotmarks}
+
+\begin{tikzpicture}
+\tikzstyle{main}=[circle, minimum size = 10mm, thick, draw =black!80, node distance = 16mm]
+\tikzstyle{hyparam}=[rectangle, minimum size = 5mm, thick, draw =black!80, fill = black!10, node distance = 16mm]
+\tikzstyle{connect}=[-latex, thick]
+\tikzstyle{selector}=[-latex, -|, snake=snake,segment amplitude=.4mm,segment length=2mm,line after snake=1mm, thick]
+\tikzstyle{shortconnect}=[-latex, thin]
+\tikzstyle{box}=[rectangle, draw=black!100]
+\tikzstyle{switch}=[circle, minimum size = 1mm, fill = black!100, draw=black!100]
+  \node[hyparam] (alpha0) [label=below:$\alpha_0$] { };
+  \node[main] (pi) [right of=alpha0,label=below:$\boldsymbol\pi$] {[K]};
+  \node[main] (z) [right of=pi,label=below:$z_i$] {K};
+  \node[main] (mu) [above of=pi,yshift=10mm, label=below:$\boldsymbol\mu_k$] {[D]};
+  \node[main, fill = black!10] (x) [right of= z,label=below:$\mathbf{x}_i$] {[D]};
+  \node[main] (Lambda) [above of=z,yshift=10mm, label=below:$\boldsymbol\Lambda_k$] {[D,D]};
+  \node[hyparam] (nu0) [above of=Lambda, label=$\nu_0$] { };
+  \node[hyparam] (W0) [right of=nu0, label=$\mathbf{W}_0$] {[D,D]};
+  \node[hyparam] (beta0) [above of=mu, label=$\beta_0$] { };
+  \node[hyparam] (mu0) [left of=beta0, label=$\boldsymbol\mu_0$] {[D]};
+  %\node[switch] (xz) [above left of=x] {};
+  \path (alpha0) edge [connect] (pi)
+        (pi) edge [connect] (z)
+        %(z) edge [selector] (xz)
+        %(mu) edge [connect] (xz)
+        %(Lambda) edge [connect] (xz)
+        %(xz) edge [shortconnect] (x)
+        (z) edge [selector] (x)
+        (mu) edge [connect] (x)
+        (Lambda) edge [connect] (x)
+        (Lambda) edge [connect] (mu)
+        (nu0) edge [connect] (Lambda)
+        (W0) edge [connect] (Lambda)
+        (beta0) edge [connect] (mu)
+        (mu0) edge [connect] (mu);
+  %\node[rectangle, inner sep=0mm, fit= (z) (x) (xz),label=below right:N, yshift=-1.5mm, xshift=7mm] {};
+  \node[rectangle, inner sep=0mm, fit= (z) (x),label=below right:N, yshift=-1.5mm, xshift=7mm] {};
+  \node[rectangle, inner sep=4.4mm,draw=black!100, fit= (z) (x), yshift=-1.5mm, xshift=0.5mm] {};
+  \node[rectangle, inner sep=0mm, fit= (mu) (Lambda),label=below right:K, yshift=-2mm, xshift=11mm] {};
+  \node[rectangle, inner sep=4.4mm,draw=black!100, fit= (mu) (Lambda), yshift=-2mm, xshift=3mm] {};
+\end{tikzpicture}
+
+```

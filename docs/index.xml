@@ -9,8 +9,681 @@
 <link>https://orenbochman.github.io/</link>
 <atom:link href="https://orenbochman.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Personal website, portfolio and blog</description>
-<generator>quarto-1.5.54</generator>
-<lastBuildDate>Thu, 28 Nov 2024 17:19:45 GMT</lastBuildDate>
+<generator>quarto-1.6.39</generator>
+<lastBuildDate>Fri, 29 Nov 2024 11:27:34 GMT</lastBuildDate>
+<item>
+  <title>Misbehaviour of Markets and Scaling in financial prices 1-4</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="./cover.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="The Multifractal Landscape"><img src="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/cover.webp" class="img-fluid figure-img" data-float="left" width="400" alt="The Multifractal Landscape"></a></p>
+<figcaption>The Multifractal Landscape</figcaption>
+</figure>
+</div><div id="ref-mandelbrot2010mis" class="csl-entry">
+Mandelbrot, B. B., and R. L. Hudson. 2010. <em>The (Mis)behaviour of Markets: A Fractal View of Risk, Ruin and Reward</em>. Profile. <a href="https://books.google.co.il/books?id=zg91TAIs6bgC">https://books.google.co.il/books?id=zg91TAIs6bgC</a>.
+</div></div><p>One of the most popular books for quants is “The (Mis)behaviour of Markets” <span class="citation" data-cites="mandelbrot2010mis">(Mandelbrot and Hudson 2010)</span>. This is more a popular science book than a technical tome with relatively less math and some fascinating figures. The book was his last book published in 2004 and is based on lots of research. As far as I can tell the most pertinent was a paper titled Scaling in financial markets that came out in four parts just three years before the book in 2001. The papers are:</p>
+<ol type="1">
+<li><a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part1/index.html">Scaling in financial prices: I. Tails and dependence</a></li>
+<li><a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part2/index.html">Scaling in financial prices: II. Multifractals and the star equation</a></li>
+<li><a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part3/index.html">Scaling in financial prices: III. Cartoon Brownian motions in multifractal time</a></li>
+<li><a href="part4/index.qmd">Scaling in financial prices: VI. IV. Multifractal concentration</a></li>
+<li><a href="part5/index.qmd">The (Mis)behaviour of Markets</a></li>
+</ol>
+<p>These are very interesting papers but like much of Mandelbrot’s work they are not easy to read. More so as he tend to quote from his earlier in extensive detail while preferring to avoid the literature of by others to the chagrin of his contemporaries, making it harder to follow the argument.</p>
+<p>I have read them and will try to summarize them in a way that is more accessible. I will also try to provide some context and background to the papers and provide a few lighthearted podcasts that discuss the papers and the book.</p>
+<p>Also I was interested in reproducing some of the work from the book but instead I think I can make use of some code released by others. That came out in the last few year since I read the book. The point is that these ideas can be applied to time series modeling.</p>
+<p>So what are multifractals? Although multifractals are rooted in probability, much of the related literature comes from the physics and mathematics arena. Here is one definition:</p>
+<div class="page-columns page-full"><blockquote class="blockquote">
+<p>A multifractal system is a generalization of a fractal system in which a single exponent (the fractal dimension) is not enough to describe its dynamics; instead, a continuous spectrum of exponents (the so-called singularity spectrum) is needed. — <span class="citation" data-cites="harte2001multifractals">(Harte 2001)</span></p>
+</blockquote><div class="no-row-height column-margin column-container"><div id="ref-harte2001multifractals" class="csl-entry">
+Harte, D. 2001. <em>Multifractals: Theory and Applications</em>. CRC Press. <a href="https://www.routledge.com/Multifractals-Theory-and-Applications/Harte/p/book/9780367455200">https://www.routledge.com/Multifractals-Theory-and-Applications/Harte/p/book/9780367455200</a>.
+</div></div></div>
+<section id="the-development-of-the-multifractal-model-for-financial-prices" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-development-of-the-multifractal-model-for-financial-prices">The development of the multifractal model for financial prices</h2>
+<div class="column-screen-right">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">timeline
+    title The Multifractal Model Timeline
+    1853: Augustin-Louis Cauchy introduces the base-free star equation
+    1896: Vilfredo Pareto observes and analyzes power-law distributions in income &amp; wealth
+    1900: Louis Bachelier proposes the first model of price variation using Brownian motion, essentially a "coin-tossing" model.
+    1925: Paul Lévy expands upon Cauchy's work by providing a comprehensive solution to the star equation, including asymmetric distributions
+    1960s: Benoit B. Mandelbrot challenges the adequacy of the Brownian motion model.
+    1962: Benoit Mandelbrot early work on cotton prices
+    1963: Eugene F. Fama publishes papers analyzing stock price variations
+        : Mandelbrot's "M 1963" uses Lévy stable processes to handle long-tailed distributions in price changes.
+    1965: Mandelbrot's "M 1965" model used fractional Brownian motions to handle long-range dependence in price fluctuations.
+    1967: Mandelbrot and Taylor pioneer the concept of subordination in finance.
+    1972: Mandelbrot's limit log-normal multifractals
+    1974: Mandelbrot's multifractal star equation, 
+    1997: Mandelbrot's "M1972/97 model," AKA BMMT &lt;br&gt; combines fractional Brownian motion &amp; multifractal time &lt;br&gt; captures both long-tailed distributions &amp; long-range dependence in financial price variations.
+    2000: Jean Barral and Mandelbrot introduce Multifractal Products of Cylindrical Pulses (MPCP).
+    2001: Mandelbrot's "cartoon" representations of BMMT &lt;br&gt; a simple recursive constructions to illustrate its key features. It places BMMT within the context of earlier models.
+
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="cast-of-characters" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="cast-of-characters">Cast of Characters:</h2>
+<p>Multifractal models in financial markets were developed by a diverse cast of characters. Their research challenged conventional wisdom and revolutionized the way we understand the complex dynamics of asset price movements.</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://upload.wikimedia.org/wikipedia/commons/d/d1/Augustin_Louis_Cauchy_Litho_%28cropped%29.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Augustin-Louis Cauchy"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d1/Augustin_Louis_Cauchy_Litho_%28cropped%29.jpg" class="img-fluid figure-img" width="400" alt="Augustin-Louis Cauchy"></a></p>
+<figcaption>Augustin-Louis Cauchy</figcaption>
+</figure>
+</div></div><p>Augustin-Louis Cauchy (1789-1857): A French mathematician known for his significant contributions to analysis, number theory, and mathematical physics. In 1853, he introduced a functional equation (later termed the “star equation”) that implicitly linked scaling behavior to power-law distributions, paving the way for later advancements in multifractal modeling.</p>
+<hr>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://upload.wikimedia.org/wikipedia/commons/a/a8/Paul_Pierre_Levy_1886-1971.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Paul Lévy"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Paul_Pierre_Levy_1886-1971.jpg" class="img-fluid figure-img" width="400" alt="Paul Lévy"></a></p>
+<figcaption>Paul Lévy</figcaption>
+</figure>
+</div></div><p>Paul Lévy (1886-1971): A prominent French mathematician specializing in probability theory. Building upon Cauchy’s work, Lévy provided a comprehensive solution to the star equation, including asymmetric distributions. He formalized the concept of stable distributions, which are essential in modeling financial prices and other phenomena exhibiting heavy tails.</p>
+<hr>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://upload.wikimedia.org/wikipedia/commons/e/e9/Benoit_Mandelbrot_mg_1804-d.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Benoit B. Mandelbrot"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Benoit_Mandelbrot_mg_1804-d.jpg" class="img-fluid figure-img" width="400" alt="Benoit B. Mandelbrot"></a></p>
+<figcaption>Benoit B. Mandelbrot</figcaption>
+</figure>
+</div></div><p>Benoit B. Mandelbrot (1924-2010): A Polish-born French-American mathematician recognized as the father of fractal geometry. He revolutionized the understanding of financial markets by introducing fractal and multifractal models to capture their complex, non-Gaussian behavior. His work challenged the traditional reliance on Brownian motion and provided a new framework for risk assessment and portfolio management.</p>
+<hr>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://upload.wikimedia.org/wikipedia/commons/f/fd/Vilfredo_Pareto_1870s2.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Vilfredo Pareto"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Vilfredo_Pareto_1870s2.jpg" class="img-fluid figure-img" width="400" alt="Vilfredo Pareto"></a></p>
+<figcaption>Vilfredo Pareto</figcaption>
+</figure>
+</div></div><p>Vilfredo Pareto (1848-1923): An Italian engineer, sociologist, economist, and philosopher renowned for his observations on income distribution and his contributions to the development of microeconomics. He identified the Pareto distribution, a power-law function that accurately described the unequal distribution of wealth in society.</p>
+<hr>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://upload.wikimedia.org/wikipedia/commons/b/b0/DIMG_7519_%2811253479133%29.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Eugene F. Fama"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/DIMG_7519_%2811253479133%29.jpg" class="img-fluid figure-img" width="400" alt="Eugene F. Fama"></a></p>
+<figcaption>Eugene F. Fama</figcaption>
+</figure>
+</div></div><p>Eugene F. Fama (1939-present): An American economist known for his empirical analysis of asset prices and his contributions to the efficient-market hypothesis. His research on stock price variations, including his test of Mandelbrot’s stable Paretian hypothesis, ignited discussions on the appropriate statistical models for financial markets.</p>
+<hr>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://upload.wikimedia.org/wikipedia/commons/f/fd/Laurent_E._Calvet.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Laurent Calvet"><img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Laurent_E._Calvet.jpg" class="img-fluid figure-img" width="400" alt="Laurent Calvet"></a></p>
+<figcaption>Laurent Calvet</figcaption>
+</figure>
+</div></div><p>Laurent Calvet: An economist who, along with Adlai Fisher, collaborated with Mandelbrot in the late 1990s to further develop and apply the multifractal model to financial data. Their work provided crucial empirical evidence and expanded the theoretical understanding of multifractal time subordination in financial markets.</p>
+<hr>
+<p>Adlai Fisher: An economist who partnered with Laurent Calvet and Benoit Mandelbrot to advance the application of multifractal models to financial data analysis. Their joint research focused on empirically validating the model and exploring its implications for risk management.</p>
+<hr>
+<p>Jean Barral: A French mathematician who collaborated with Mandelbrot in the late 1990s and early 2000s to develop the Multifractal Products of Cylindrical Pulses (MPCP). Their work generalized the multifractal framework by moving beyond b-adic cascades and introduced a more flexible model capable of capturing complex multiscaling behavior.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Misbehaviour of {Markets} and {Scaling} in Financial Prices
+    1-4},
+  date = {2024-11-29},
+  url = {https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2024. <span>“Misbehaviour of Markets and Scaling in
+Financial Prices 1-4.”</span> November 29, 2024. <a href="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/">https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/</a>.
+</div></div></section></div> ]]></description>
+  <category>Scaling Laws</category>
+  <category>Fractals</category>
+  <category>Financial Markets</category>
+  <category>Time series</category>
+  <category>Reviews</category>
+  <category>Popular Science</category>
+  <guid>https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/</guid>
+  <pubDate>Fri, 29 Nov 2024 11:27:34 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/cover.webp" medium="image" type="image/webp"/>
+</item>
+<item>
+  <title>Scaling in financial prices 3</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part3/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="scaling-in-financial-prices-iii.-cartoon-brownian-motions-in-multifractal-time" class="level1 page-columns page-full">
+<h1>Scaling in financial prices: III. Cartoon Brownian Motions in Multifractal Time</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+TL-DR
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In the paper “Scaling in financial prices: II. Cartoon Brownian Motions in Multifractal Time” <span class="citation" data-cites="mandelbrot2001Scaling3">(Mandelbrot 2001)</span> Mandelbrot continus his exploration of fractal and multifractal geometry to model financial price fluctuations. It introduces “cartoon” functions – simplified, visually illustrative models – to capture key characteristics of financial prices, such as continuously varying volatility, discontinuities, and extreme price changes. These cartoons, parameterized within a “phase diagram,” offer intuitive representations of various existing models, including Mandelbrot’s own earlier work and the standard Brownian motion. The core concept is Brownian motion in multifractal time (BMMT), a new model that accounts for the observed complexities in financial data better than previous approaches. The paper aims to provide a more accessible understanding of BMMT, emphasizing the limitations and strengths of the cartoon approximations while highlighting the importance of scaling invariance and the concept of trading time in capturing the dynamics of financial markets.</p>
+<audio controls="1">
+<source src="podcast.mp3" data-external="1" type="audio/mpeg">
+
+</audio>
+</div>
+</div>
+<div class="no-row-height column-margin column-container"><div id="ref-mandelbrot2001Scaling3" class="csl-entry">
+Mandelbrot, B. B. 2001. <span>“Scaling in Financial Prices: III. Cartoon Brownian Motions in Multifractal Time.”</span> <em>Quantitative Finance</em> 1 (4): 427–40. <a href="https://doi.org/10.1080/713665836">https://doi.org/10.1080/713665836</a>.
+</div></div><section id="summary-of-the-third-paper" class="level2">
+<h2 class="anchored" data-anchor-id="summary-of-the-third-paper">Summary of the third paper</h2>
+<section id="main-themes" class="level3">
+<h3 class="anchored" data-anchor-id="main-themes">Main Themes:</h3>
+<ul>
+<li><strong>Inadequacy of traditional financial models</strong>: Classic models like the Brownian motion fail to capture the key features of financial price variations, including fluctuating volatility and large, discontinuous jumps.</li>
+<li><strong>Fractal and multifractal geometry for financial modeling</strong>: Mandelbrot advocates for using fractal and multifractal models to better represent the complex and volatile nature of financial markets.</li>
+<li><strong>Cartoon Brownian Motions in Multifractal Time (BMMT)</strong>: Mandelbrot presents BMMT, a new family of random processes, as a promising model for financial prices. BMMT builds upon the concepts of fractional Brownian motion and introduces the idea of “trading time.”</li>
+<li><strong>Recursive interpolation to create cartoons</strong>: The paper focuses on creating simplified, visual representations of BMMT, termed “cartoons,” using recursive interpolation techniques. These cartoons help visualize and understand the complex behaviors of BMMT.</li>
+<li><strong>Phase diagram for classifying price behaviors</strong>: A “phase diagram” is introduced to map the diverse behaviors generated by these cartoons based on two key parameters. Different regions in the phase diagram correspond to different types of price variations, including Fickian, unifractal, mesofractal, and multifractal.</li>
+</ul>
+</section>
+<section id="most-important-ideasfacts" class="level3">
+<h3 class="anchored" data-anchor-id="most-important-ideasfacts">Most Important Ideas/Facts:</h3>
+<ol type="1">
+<li><strong>Limitations of standard Brownian motion</strong>: “Financial prices, such as those of securities, commodities, foreign exchange or interest rates, are largely unpredictable but one must evaluate the odds for or against some desired or feared outcomes, the most extreme being ‘ruin’. Those odds are essential to the scientist who seeks to understand the financial markets and other aspects of the economy. They must also be used as inputs for decisions concerning economic policy or institutional arrangements. To handle all those issues, the first step—but far from the last!—is to represent different prices’ variation by random processes that fit them well.” This quote highlights the need for a model that accurately reflects the inherent volatility of financial markets, which the Brownian motion fails to do.</li>
+<li><strong>Recursive interpolation for financial modeling</strong>: “In the case of BMMT, the random walk has no direct counterpart. However, splendid cartoons in a very different style were developed and sketched in Mandelbrot (1997), chapter E6, and Mandelbrot (1999a), chapter N1. They are limits of discrete-parameter sequences of successive interpolations drawn on a continually refined temporal grid.” This explains the construction of simplified “cartoon” models using recursive interpolation, offering a visual and conceptual understanding of BMMT.</li>
+<li><strong>The importance of the Hölder exponent (H)</strong>: “This replacement of ratios of infinitesimals by ratios of logarithms of infinitesimals is an essential innovation. It was not directed by trial and error. Neither did its early use in classical ‘fine’ mathematical analysis suggest that H and many variants thereof could become concretely meaningful, quite the contrary. H became important because of its intimate connection with certain invariances.” This passage emphasizes the significance of the Hölder exponent in capturing the scaling and self-affinity properties of financial data, which traditional methods like derivatives fail to address.</li>
+<li><strong>Distinction between absence of correlation and statistical independence</strong>: “Mathematicians know that whiteness does not express statistical independence, only absence of correlation. But the temptation existed to view that distinction as mathematical nit-picking. The existence of such sharply non-Gaussian white noises proves that the hasty assimilation of spectral whiteness to independence was understandable but untenable. White spectral whiteness is highly significant for Gaussian processes, but otherwise is a weak characterization of reality.” This section debunks the misconception that uncorrelated data implies independence. Multifractal cartoons with uncorrelated increments can still exhibit significant structure and dependence.</li>
+<li><strong>Introduction of “trading time” to capture varying market speed</strong>: “Less mathematically oriented observers describe the panels at the bottom of figure 1 (both the real data and forgeries) as corresponding to markets that proceed at different ‘speeds’ at different times. This description may be very attractive but remains purely qualitative until ‘speed’ and the process that controls the variation of speed are quantified.” This introduces the concept of “trading time” as a way to quantify the subjective experience of varying market speed, a key element of the BMMT model.</li>
+</ol>
+</section>
+<section id="limitations-of-cartoon-models" class="level3">
+<h3 class="anchored" data-anchor-id="limitations-of-cartoon-models">Limitations of Cartoon Models:</h3>
+<ul>
+<li><strong>Inability to fully predict power-law tails</strong>: The cartoons, being based on multinomial cascades, struggle to accurately represent the long-tailed distributions observed in real financial data.</li>
+<li><strong>Coupling of H and multifractal time</strong>: Unlike their continuous-time counterparts, the cartoon models impose a dependence between the Hölder exponent (H) and the multifractal time.</li>
+<li><strong>Singular perturbation in mesofractal cartoons</strong>: The specific construction of the mesofractal cartoons introduces an undesirable singular perturbation, highlighting a limitation of the three-interval symmetric generators.</li>
+</ul>
+</section>
+</section>
+<section id="qa" class="level2">
+<h2 class="anchored" data-anchor-id="qa">Q&amp;A</h2>
+<ol type="1">
+<li><p>What are Cartoon Brownian Motions and why are they used to model financial prices?</p>
+<p>Cartoon Brownian Motions (CBMs) are simplified, recursively generated functions designed to mimic the complex behavior of financial prices. They are called “cartoons” because they intentionally emphasize and distort certain features of real market data while remaining computationally simple and easy to visualize. These cartoons offer an intuitive way to understand the more complex model of Brownian Motion in Multifractal Time (BMMT), which is a more accurate but mathematically challenging model.</p></li>
+<li><p>What makes financial price data challenging to model, and how do CBMs address those challenges?</p>
+<p>Financial price data exhibits several characteristics that defy traditional modeling approaches:</p>
+<ul>
+<li>Continually varying volatility: The magnitude of price fluctuations changes over time, exhibiting periods of high activity interspersed with periods of relative calm.</li>
+<li>Discontinuity or concentration: Prices can jump abruptly, creating sharp spikes in price charts.</li>
+<li>Non-normality: Many price changes fall far outside the expectations of the bell curve, signifying fat-tailed distributions.</li>
+</ul>
+<p>CBMs address these features by using a recursive interpolation scheme. A simple geometric shape, called the “generator,” is used to repeatedly refine a starting trend line, producing increasingly complex patterns that capture the roughness, variability, and discontinuity observed in financial markets.</p></li>
+<li><p>What is the “phase diagram” and how does it relate to different types of CBMs?</p>
+<p>The “phase diagram” is a two-dimensional map representing the space of possible CBM generators. Each point in this diagram corresponds to a unique generator shape, and different regions of the diagram give rise to distinct classes of CBMs:</p>
+<ul>
+<li>Fickian: This corresponds to the classic Brownian Motion, where volatility is constant.</li>
+<li>Unifractal: These CBMs exhibit long-range dependence or persistence, meaning past price changes influence future ones.</li>
+<li>Mesofractal: These CBMs incorporate discontinuous jumps in prices.</li>
+<li>Multifractal: This most general class combines features of the previous types, capturing the full complexity of financial price behavior.</li>
+</ul></li>
+<li><p>What are the key parameters controlling CBM behavior, and how do they manifest in price charts?</p>
+<p>CBMs are controlled by two main parameters:</p>
+<ul>
+<li>H (Hölder exponent): Determines the degree of roughness or smoothness of the price curve. Higher H values indicate smoother trends, while lower values indicate more jagged, volatile behavior.</li>
+<li>Generator shape: Dictates the pattern of price fluctuations. Different shapes lead to varying degrees of volatility clustering, jumps, and long-term trends.</li>
+</ul></li>
+<li><p>What is “trading time” and how does it explain varying volatility in multifractal CBMs?</p>
+<p>Trading time is a concept used to explain the non-uniform speed at which multifractal CBMs evolve. It contrasts with the regular “clock time” of physics. Multifractal CBMs move uniformly in their own subjective trading time, which can speed up or slow down relative to clock time. This variation in speed gives rise to the observed periods of high and low volatility in financial markets.</p></li>
+<li><p>What are the limitations of using CBMs to model financial prices?</p>
+<p>While offering valuable insights, CBMs are simplifications and possess certain limitations:</p>
+<ul>
+<li>Constrained tail behavior: Unlike real price data, CBMs based on simple generators do not exhibit the extreme power-law tails associated with rare but significant market events.</li>
+<li>Interdependence of parameters: In some CBMs, the choice of H and the multifractal trading time are linked, restricting the model’s flexibility compared to continuous-time models.</li>
+<li>Singular perturbations: Certain mesofractal CBMs exhibit a peculiar behavior where slight changes in parameters lead to drastic changes in price patterns, which may not accurately reflect real market dynamics.</li>
+</ul></li>
+<li><p>How do CBMs relate to other fractal models of financial prices?</p>
+<p>CBMs serve as stepping stones to understand more complex continuous-time fractal models:</p>
+<ul>
+<li>Fractional Brownian Motion (FBM): Unifractal CBMs are simplified versions of FBM, which incorporates long-range dependence.</li>
+<li>Lévy Stable Processes (LSP): Mesofractal CBMs relate to LSP, which features discontinuous jumps in prices.</li>
+<li>Brownian Motion in Multifractal Time (BMMT): This sophisticated model, for which multifractal CBMs are cartoons, combines FBM with a multifractal trading time to capture the full complexity of financial price dynamics.</li>
+</ul></li>
+<li><p>What are the practical implications of using CBMs in finance?</p>
+<p>CBMs, despite their limitations, offer a powerful tool for:</p>
+<ul>
+<li>Visualizing market complexity: They provide an intuitive way to understand and communicate the irregular and multi-scale nature of financial price behavior.</li>
+<li>Testing hypotheses: Their computational simplicity allows for rapid exploration of various market scenarios and model parameter sensitivity.</li>
+<li>Developing trading strategies: While not directly predictive, CBMs can inform the design of trading algorithms that are robust to varying volatility and extreme price movements.</li>
+</ul></li>
+</ol>
+</section>
+<section id="a-study-guide" class="level2">
+<h2 class="anchored" data-anchor-id="a-study-guide">A Study Guide</h2>
+<section id="quiz" class="level3">
+<h3 class="anchored" data-anchor-id="quiz">Quiz</h3>
+<p>Instructions: Answer the following questions in 2-3 sentences each.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question 1
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Explain the concept of self-affinity and its relevance to financial market charts.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Self-affinity refers to the property of a geometric shape where its parts resemble the whole when scaled differently along different axes. Financial market charts exhibit self-affinity, meaning they appear similar when zoomed in or out, with time and price scales adjusted accordingly.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question 2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Describe the construction process of a Fickian cartoon function using recursive interpolation.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The construction starts with a linear “initiator.” A three-interval “generator” replaces the initiator, creating an oscillation. Each generator interval is then recursively replaced by a scaled and potentially reflected version of the generator, continuing indefinitely.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question 3
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Why is the “square-root rule” relevant in the context of Fickian diffusion and Brownian motion?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The “square-root rule” states that the standard deviation of a sum of independent random variables scales with the square root of their number. In Fickian diffusion and Brownian motion, this rule manifests as the displacement of a particle being proportional to the square root of time.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question 4
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Define unifractality and explain how it differs from the Fickian case in terms of the Hölder exponent.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Unifractality implies a single Hölder exponent (H) governs the scaling behavior of the function at all scales. While Fickian behavior is a specific case of unifractality with <img src="https://latex.codecogs.com/png.latex?H=1/2">, other values of H within <img src="https://latex.codecogs.com/png.latex?0%3CH%3C1"> lead to different types of unifractal behavior.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question 5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Discuss the concept of persistence in unifractal cartoons and its implications for market behavior.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Persistence describes the tendency of a function to continue its current trend. In unifractal cartoons, H&gt;1/2 signifies positive persistence, implying trends are more likely to continue. H&lt;1/2 indicates anti-persistence, implying frequent trend reversals.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question 6
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>How do mesofractal cartoons incorporate price discontinuity, and what is the role of the exponent α?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Mesofractal cartoons incorporate discontinuity by assigning a zero Hölder exponent (H2=0) to the middle interval of the generator. The exponent α (1/H̃) governs the distribution of jump sizes, with larger α indicating smaller and more frequent jumps.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question 7
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Explain the limitations of the Lévy stable exponent α exceeding 2.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>When α&gt;2 in L-stable processes, the sum of absolute values of jumps and moves diverges, leading to unbounded variation. Upon randomization, this divergence creates infinities that cannot be renormalized away, rendering the model mathematically inconsistent.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question 8
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What is the condition for multifractality, and how does it differ from unifractality and mesofractality?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Multifractality occurs when the Hölder exponents (Hm) associated with different generator intervals are all non-zero and distinct. This implies a multiplicity of scaling behaviors across different time scales, contrasting with the single H of unifractality and the two exponents of mesofractality.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question 9
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Explain the concept of “trading time” and its role in relating unifractal and multifractal cartoons.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>“Trading time” is a subjective time scale that maps a unifractal cartoon onto a multifractal one. It allows for varying “speeds” of price changes, accounting for the observed volatility clustering in financial markets.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Question 10
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Describe one limitation of multifractal cartoons compared to continuous-time multifractal models.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Multifractal cartoons generated from a three-interval symmetric generator constrain the choice of the unifractal oscillation and the multifractal time. They cannot be chosen independently, unlike continuous-time models where they can be independent random variables.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="essay-questions" class="level3">
+<h3 class="anchored" data-anchor-id="essay-questions">Essay Questions</h3>
+<ol type="1">
+<li>Compare and contrast the three fractal models of price variation proposed by Mandelbrot: the M 1963 model, the M 1965 model, and the M 1972/97 model. Discuss their strengths, weaknesses, and applicability to real financial data.</li>
+<li>Explain the “baby theorem” and its significance in understanding multifractal cartoons. How does the concept of trading time contribute to this understanding?</li>
+<li>Discuss the limitations of traditional “root-mean-square” volatility as a measure of price fluctuations in the context of multifractal models. What alternative measures of volatility are more appropriate, and why?</li>
+<li>Critically evaluate the use of cartoons as representations of complex financial phenomena. Discuss their advantages, limitations, and the potential pitfalls of relying solely on cartoon models.</li>
+<li>Elaborate on the concept of “spontaneous resonances” in financial markets and how multifractality might provide insights into understanding these resonances. How might this understanding contribute to improved economic policy and institutional arrangements?</li>
+</ol>
+</section>
+<section id="glossary-of-key-terms" class="level3">
+<h3 class="anchored" data-anchor-id="glossary-of-key-terms">Glossary of Key Terms</h3>
+<dl>
+<dt>Self-affinity</dt>
+<dd>
+A property of a geometric shape where its parts resemble the whole when scaled differently along different axes.
+</dd>
+<dt>Recursive Interpolation</dt>
+<dd>
+A process of repeatedly subdividing and interpolating a function using a predefined “generator” shape.
+</dd>
+<dt>Fickian Diffusion</dt>
+<dd>
+A type of diffusion characterized by the square-root rule, where the displacement of a particle is proportional to the square root of time.
+</dd>
+<dt>Brownian Motion</dt>
+<dd>
+A random process exhibiting continuous, erratic movement, often used to model financial price changes.
+</dd>
+<dt>Hölder Exponent</dt>
+<dd>
+(H)A measure of the local scaling behavior of a function, quantifying its roughness or smoothness.
+</dd>
+<dt>Unifractality</dt>
+<dd>
+A property of a function where a single Hölder exponent governs its scaling behavior at all scales.
+</dd>
+<dt>Persistence</dt>
+<dd>
+The tendency of a function to continue its current trend. Positive persistence indicates trends are more likely to continue, while negative persistence (anti-persistence) implies frequent trend reversals.
+</dd>
+<dt>Mesofractality</dt>
+<dd>
+A property of a function exhibiting discontinuities with a specific scaling behavior governed by an exponent α.
+</dd>
+<dt>L-stable Process</dt>
+<dd>
+A type of random process with heavy-tailed distributions, characterized by the exponent α, which determines the tail behavior.
+</dd>
+<dt>Multifractality</dt>
+<dd>
+A property of a function exhibiting a range of Hölder exponents across different time scales.
+</dd>
+<dt>Volatility Clustering</dt>
+<dd>
+The tendency of large price fluctuations to be followed by other large fluctuations, and small fluctuations to be followed by small fluctuations.
+</dd>
+<dt>Trading Time</dt>
+<dd>
+A subjective time scale that accounts for the varying “speeds” of price changes in financial markets.
+</dd>
+<dt>Compound Function</dt>
+<dd>
+A function created by composing two or more functions, where the output of one function becomes the input of another.
+</dd>
+<dt>Subordination</dt>
+<dd>
+A specific type of compounding where the inner function is a random process with independent increments.
+</dd>
+<dt>Multinomial Cascade</dt>
+<dd>
+A specific mathematical construction used to generate multifractal measures with a limited range of possible outcomes.
+</dd>
+<dt>Lacunarity</dt>
+<dd>
+A measure of the distribution of gaps or holes in a fractal or multifractal structure.
+</dd>
+<dt>Singular Perturbation</dt>
+<dd>
+A mathematical concept where a small change in a parameter leads to a large and discontinuous change in the solution of a problem.
+</dd>
+<dt>Dimension Anomalies</dt>
+<dd>
+Deviations from the expected relationship between fractal dimension and other properties of a fractal, often arising from complex scaling behaviors.LocalizationThe concentration of a function’s values within a specific range or region.
+</dd>
+</dl>
+
+
+
+</section>
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Scaling in Financial Prices 3},
+  date = {2024-11-29},
+  url = {https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part3/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2024. <span>“Scaling in Financial Prices 3.”</span>
+November 29, 2024. <a href="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part3/">https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part3/</a>.
+</div></div></section></div> ]]></description>
+  <category>Scaling Laws</category>
+  <category>Fractals</category>
+  <category>Financial Markets</category>
+  <category>Time series</category>
+  <category>Reviews</category>
+  <guid>https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part3/</guid>
+  <pubDate>Fri, 29 Nov 2024 11:20:08 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part3/cover.webp" medium="image" type="image/webp"/>
+</item>
 <item>
   <title>Scaling in financial prices 2</title>
   <dc:creator>Oren Bochman</dc:creator>
@@ -23,9 +696,6 @@
 
 <section id="scaling-in-financial-prices-ii.-multifractals-and-the-star-equation" class="level1 page-columns page-full">
 <h1>Scaling in financial prices: II. Multifractals and the star equation</h1>
-<blockquote class="blockquote page-columns page-full">
-<div class="page-columns page-full"><p>“The ideal market completely disregards those spikes—but a realistic model cannot.” </p><div class="no-row-height column-margin column-container"><span class="margin-aside">Mandelbrot highlights the inadequacy of models ignoring extreme price movements, emphasizing the need for a framework that can accommodate them.</span></div></div>
-</blockquote>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -36,7 +706,7 @@ TL-DR
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>In the paper “Scaling in financial prices: II. Multifractals and the star equation” <span class="citation" data-cites="mandelbrot2001Scaling2">(Mandelbrot 2001)</span> Mandelbrot continus his exploration of financial price scaling. He focuses on refining and extending the mathematical model of Cauchy’s “star equation,” which describes the distribution of financial prices. The paper progresses from Cauchy’s original equation, limited to power-law distributions with an exponent α less than 2, to Mandelbrot’s multifractal generalization, allowing for 1 &lt; α &lt; ∞. This extension incorporates multifractal dependence, moving beyond the assumption of independence inherent in Cauchy’s model. The paper concludes by presenting a new model, Multifractal Products of Cylindrical Pulses (MPCP), offering a more realistic and flexible approach to modeling financial price fluctuations, and supporting the observation that financial data exhibit multifractal behavior.</p>
+<p>In the paper “Scaling in financial prices: II. Multifractals and the star equation” <span class="citation" data-cites="mandelbrot2001Scaling2">(Mandelbrot 2001)</span> Mandelbrot continus his exploration of financial price scaling. He focuses on refining and extending the mathematical model of Cauchy’s “star equation,” which describes the distribution of financial prices. The paper progresses from Cauchy’s original equation, limited to power-law distributions with an exponent α less than 2, to Mandelbrot’s multifractal generalization, allowing for <img src="https://latex.codecogs.com/png.latex?1%20%3C%20%CE%B1%20%3C%20%E2%88%9E">. This extension incorporates multifractal dependence, moving beyond the assumption of independence inherent in Cauchy’s model. The paper concludes by presenting a new model, Multifractal Products of Cylindrical Pulses (MPCP), offering a more realistic and flexible approach to modeling financial price fluctuations, and supporting the observation that financial data exhibit multifractal behavior.</p>
 <audio controls="1">
 <source src="podcast.mp3" data-external="1" type="audio/mpeg">
 
@@ -45,52 +715,47 @@ TL-DR
 </div>
 <div class="no-row-height column-margin column-container"><div id="ref-mandelbrot2001Scaling2" class="csl-entry">
 Mandelbrot, B. B. 2001. <span>“Scaling in Financial Prices: II. Multifractals and the Star Equation.”</span> <em>Quantitative Finance</em> 1 (1): 124–30. <a href="https://doi.org/10.1080/713665540">https://doi.org/10.1080/713665540</a>.
-</div></div><section id="summary-of-the-first-paper" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="summary-of-the-first-paper">Summary of the first paper</h2>
+</div></div><section id="summary-of-the-second-paper" class="level2">
+<h2 class="anchored" data-anchor-id="summary-of-the-second-paper">Summary of the second paper</h2>
 <section id="main-themes" class="level3">
 <h3 class="anchored" data-anchor-id="main-themes">Main Themes:</h3>
-<ul>
-<li><strong>Non-Gaussianity of financial price changes</strong>: Empirical evidence strongly suggests that price changes are not normally distributed, exhibiting “fat tails” with a higher frequency of extreme events than predicted by the standard Brownian motion model.</li>
-<li><strong>Scaling and self-affinity</strong>: Financial price series exhibit similar patterns across different time scales, a concept mathematically described as self-affinity. This suggests the presence of underlying rules governing price variations across various time horizons.</li>
-<li><strong>Limitations of traditional models</strong>: Models assuming independent and identically distributed price changes with finite variance, like the Brownian motion model, fail to capture the observed characteristics of financial data, particularly extreme price swings and volatility clustering.</li>
-<li><strong>Multifractality as a potential solution</strong>: The concept of multifractality, which incorporates both long-range dependence and scale invariance, offers a promising framework for modeling financial price variations more realistically.</li>
-</ul>
+<p>This paper reviews the evolution of Mandelbrot’s model for understanding financial price fluctuations, transitioning from his early work in 1963 based on stable distributions with independent increments to the more recent multifractal model with dependent increments.</p>
 </section>
-<section id="most-important-ideasfacts" class="level3 page-columns page-full">
+<section id="most-important-ideasfacts" class="level3">
 <h3 class="anchored" data-anchor-id="most-important-ideasfacts">Most Important Ideas/Facts:</h3>
 <ol type="1">
-<li><p>Empirical evidence of power laws: Studies reveal power-law distributions for both the tail probabilities of price changes (exponent α) and long-range dependence (exponent 2H-2).</p>
-<ul>
-<li>Fat tails: Mandelbrot’s early work (1963) showed evidence of power-law tails in cotton prices, later confirmed by Fama (1965) for a broader range of securities. These findings challenged the Gaussian assumption of price changes.</li>
-<li>Infinite dependence: The Hurst puzzle highlighted long-range dependence in price series, suggesting that price changes are not independent. Mandelbrot (1965) proposed a power law to describe this dependence.</li>
-</ul></li>
-<li><p><strong>Challenges to traditional scaling</strong>: Officer (1972) demonstrated deviations from scaling in financial data when applying the collapse test across different time increments, questioning the validity of models like Mandelbrot’s 1963 model based on Lévy stable distributions.</p></li>
-<li><p><strong>States of Variability and Randomness</strong> - Mandelbrot introduced this concept to categorize randomness into mild (Gaussian-like), slow (requiring adjustments for short-term behavior), and wild (exhibiting persistent non-Gaussianity across time scales). He argued that financial markets belong to the “wild” category.</p></li>
-<li><p><strong>Shortcomings of truncated power-law distributions</strong>: While some researchers have attempted to reconcile observed data with the Gaussian framework by truncating the tails of power-law distributions, this approach is criticized for being ad-hoc and destroying the scaling properties observed in financial markets.</p></li>
-<li><p>The promise of multifractals: Mandelbrot proposed a model combining fractional Brownian motion and multifractal trading time to capture both long-range dependence and scale invariance in financial prices. This model has the potential to address the limitations of earlier models and provide a more accurate representation of financial market dynamics.</p></li>
+<li><strong>Limitations of the Gaussian Model and Stable Distributions</strong>: Early models based on the Gaussian distribution (and later, stable distributions with <img src="https://latex.codecogs.com/png.latex?%CE%B1%20%3C%202">) fail to capture the observed high variability in financial data. Specifically, the restriction of <img src="https://latex.codecogs.com/png.latex?%CE%B1%20%3C%202"> for stable distributions cannot explain empirical findings of power-law distributions with exponents greater than 2.</li>
 </ol>
-<div class="page-columns page-full"><blockquote class="blockquote">
-<p>“I disagree that non-stationarity is obvious and do my best to avoid it.” <sup>1</sup>{.aside}</p>
-</blockquote><div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;This quote reflects Mandelbrot’s stance on the misleading emphasis on non-stationarity in financial data, advocating for the search for generalized forms of stationarity and corresponding models.</p></div></div></div>
-<p>What are the key limitations of existing financial models?</p>
-<ol type="1">
-<li><p>Traditional models often assume that price changes are normally distributed, but empirical evidence suggests that this is not the case. [1] Financial prices tend to exhibit “fat tails,” meaning that extreme events are more common than a normal distribution would predict. [1, 2] This limitation is particularly important because models that fail to account for extreme price swings can be unreliable for risk management and other financial applications. [3]</p></li>
-<li><p>Many financial models assume that price changes are independent and identically distributed, but this is also not supported by the data. [4, 5] Financial prices often exhibit long-range dependence, meaning that past price changes can influence future price changes. [5] Mandelbrot referred to this as the “Hurst puzzle.” [5]</p></li>
-<li><p>Some researchers have tried to address these limitations by truncating the tails of power-law distributions, but this approach is problematic. [6] Truncating the tails can destroy the scaling properties observed in financial markets, leading to models that are not accurate. [6]</p></li>
-<li><p>Mandelbrot argued that financial markets are “wildly variable” and that this variability cannot be ignored. [7] He suggested that models need to incorporate both long-range dependence and scale invariance to accurately capture financial market dynamics. [8]</p></li>
-<li><p>Multifractal models offer a promising approach to address these limitations. [8-10] These models combine fractional Brownian motion and multifractal trading time to capture both long-range dependence and scale invariance in financial prices. [8] However, more research is needed to assess the effectiveness of multifractal models and to develop practical applications. [11, 12]</p></li>
-</ol>
-<blockquote class="blockquote page-columns page-full">
-<div class="page-columns page-full"><p>“Financial reality is not mildly variable even on the scale of a century. All things considered, one must adjust to the fact that financial reality is wildly variable. It would be totally unmanageable, unless there is some underlying property of invariance.” </p><div class="no-row-height column-margin column-container"><span class="margin-aside">This quote underscores the persistent non-Gaussianity of financial data and the crucial need for finding an invariance principle to model this “wild” behavior.</span></div></div>
+<blockquote class="blockquote">
+<p>“Many writers concluded that, whenever data yield <img src="https://latex.codecogs.com/png.latex?%CE%B1%20%3E%202">, scaling is inadequate and should be abandoned. My alternative proposal is to foresake independence and generalize scaling into multiscaling.”</p>
 </blockquote>
-</section>
-<section id="next-steps" class="level3">
-<h3 class="anchored" data-anchor-id="next-steps">Next Steps:</h3>
+<ol start="2" type="1">
+<li><strong>Introduction of Multifractality</strong>: Mandelbrot proposes the multifractal model as a solution to the limitations of previous models. This model incorporates dependent increments and can generate power-law distributions with exponents <img src="https://latex.codecogs.com/png.latex?%CE%B1%20%3E%202">, aligning with empirical observations.</li>
+</ol>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Csum_%7Bn=1%7D%5E%7Bb%7D%20W_n%20X_n%20%5Cequiv%20%5Cwidetilde%7BW%7D(W_1,%20W_2,%20%5Cldots,%20W_b)%20X%0A"></p>
+<p>where ≡ denotes identity in distribution</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cvarphi%5En(s)=%20%5Cvarphi%5B%5Cwidetilde%7BW%7D(n)s%5D%0A"></p>
+<ol start="3" type="1">
+<li><p><strong>The Star Equation</strong>: Both the Gaussian and the multifractal model can be represented by a “star equation,” a functional equation that describes the self-similarity and scaling properties of the underlying process. The key difference lies in the nature of the weights in the equation:</p>
 <ul>
-<li>Further exploration of multifractal models: Delve deeper into the mathematical framework of multifractals and their application to financial markets.</li>
-<li>Empirical testing of multifractal models: Conduct rigorous statistical analysis to assess the effectiveness of multifractal models in capturing the observed properties of financial data.</li>
-<li>Developing practical applications: Explore the potential of multifractal models for risk management, portfolio optimization, and other practical applications in finance.</li>
-</ul>
+<li>Gaussian: Non-random weights, leading to <img src="https://latex.codecogs.com/png.latex?%CE%B1%20%3C%202">.</li>
+<li>Multifractal: Random weights, allowing for <img src="https://latex.codecogs.com/png.latex?1%20%3C%20%CE%B1%20%3C%20%E2%88%9E">.</li>
+</ul></li>
+<li><p><strong>Cascades and the Multifractal Star Equation</strong>: The concept of multiplicative cascades provides a concrete mechanism for generating multifractal measures. Within this framework, the “canonical” cascade, characterized by independent random weights, emerges as the most relevant for financial modeling.</p></li>
+</ol>
+<blockquote class="blockquote">
+<p>“The canonical cascade can be rationalized by assuming that investigating a financial time series by itself amounts to extracting a linear cross section from that full system. As section 6 will elaborate, multiplication by a weight is meant to model the effects of a cause.”</p>
+</blockquote>
+<ol start="5" type="1">
+<li><strong>Beyond Cascades: MPCP (Multifractal Products of Cylindrical Pulses)</strong>: Mandelbrot argues that the restriction to b-adic grids in cascade models is artificial. He introduces the MPCP model, where cylindrical pulses are distributed randomly, further generalizing the multifractal framework and reinforcing the prevalence of <img src="https://latex.codecogs.com/png.latex?q_%7Bcrit%7D%20%3C%20%E2%88%9E"> (leading to power-law distributions with <img src="https://latex.codecogs.com/png.latex?%CE%B1%20%3E%201">).</li>
+</ol>
+<blockquote class="blockquote">
+<p>“The sequence from ‘microcanonical’ to ‘canonical’ and on to MPCP, teaches several lessons. As the processes’ randomness becomes increasingly unconstrained, <img src="https://latex.codecogs.com/png.latex?q_%7Bcrit%7D%20%3C%20%E2%88%9E"> becomes an increasingly general rule with increasingly special exceptions.”</p>
+</blockquote>
+<ol start="6" type="1">
+<li><p><strong>Empirical Validation</strong>: Mandelbrot references empirical studies (Calvet and Fisher 2001, Mandelbrot, Calvet, and Fisher 1997) demonstrating the good fit of the multifractal model to financial data, particularly highlighting the multifractal nature of the Deutschmark/US Dollar exchange rate.</p></li>
+<li><p><strong>Conclusion</strong>: While acknowledging that the multifractal model is not definitive, Mandelbrot advocates for its potential in capturing the complexity and high variability observed in financial markets, offering a more realistic assessment of risk compared to traditional Brownian motion-based models. He also suggests that the concepts developed in finance, like the distinction between mild, slow, and wild randomness, could be valuable in other scientific domains.</p></li>
+</ol>
 </section>
 </section>
 <section id="qa" class="level2">
@@ -99,15 +764,18 @@ Mandelbrot, B. B. 2001. <span>“Scaling in Financial Prices: II. Multifractals 
 <li><p>What is the “star equation” and why is it important in the context of financial models?</p>
 <p>The star equation is a functional equation that describes how the distribution of a random variable changes when it is summed or multiplied by random weights. It plays a crucial role in understanding scaling properties in various phenomena, including financial price fluctuations. The solutions to the star equation can help us understand how asset returns are distributed, especially when those returns exhibit fat tails.</p></li>
 <li><p>How does the Gaussian distribution relate to the star equation?</p>
-<p>The Gaussian distribution is a solution to the star equation when the weights are non-random and independent. This implies that the sum of independent Gaussian random variables with non-random weights will also follow a Gaussian distribution. However, this solution only works when a key parameter, often labeled as α, is less than 2.</p></li>
-<li><p>Why is the limitation of α &lt; 2 in traditional financial models a problem?</p>
-<p>The restriction α &lt; 2 implies that price changes can only be modeled with distributions that have finite variance. However, empirical data from financial markets often show that price changes have fat tails, implying infinite variance and a higher probability of extreme events than predicted by a Gaussian distribution. This makes traditional models inadequate for accurately capturing market risks.</p></li>
+<p>The Gaussian distribution is a solution to the star equation when the weights are non-random and independent. This implies that the sum of independent Gaussian random variables with non-random weights will also follow a Gaussian distribution. However, this solution only works when a key parameter, often labeled as <img src="https://latex.codecogs.com/png.latex?%CE%B1">, is less than 2.</p></li>
+<li><p>Why is the limitation of <img src="https://latex.codecogs.com/png.latex?%CE%B1%20%3C%202"> in traditional financial models a problem?</p>
+<p>The restriction <img src="https://latex.codecogs.com/png.latex?%CE%B1%20%3C%202"> implies that price changes can only be modeled with distributions that have finite variance. However, empirical data from financial markets often show that price changes have fat tails, implying infinite variance and a higher probability of extreme events than predicted by a Gaussian distribution. This makes traditional models inadequate for accurately capturing market risks.</p></li>
 <li><p>How do multifractals address the limitations of traditional models based on the Gaussian distribution?</p>
-<p>Multifractals introduce random weights into the star equation, generalizing it to account for the complex dependencies and scaling properties observed in financial data. This generalization allows for solutions with α &gt; 2, capturing the fat tails and intermittent bursts of volatility characteristic of financial time series.</p></li>
-<li><p>What is the key difference between “uniscaling” and “multiscaling” behavior? Uniscaling processes, like standard Brownian motion, exhibit the same scaling behavior across all time scales. Their statistical properties are self-similar, meaning they look the same when viewed at different zoom levels.</p>
-<p>Multiscaling processes, like financial time series, exhibit different scaling behaviors at different time scales. Their statistical properties are more complex and cannot be described by a single scaling exponent.</p></li>
-<li><p>What is qcrit and why is it significant in multifractal models?</p>
-<p><img src="https://latex.codecogs.com/png.latex?q_%7Bcrit%7D"> is a critical exponent that emerges in multifractal models when the function τ(q), which describes the scaling of moments of the distribution, becomes negative for values of q greater than qcrit. This signifies a power law behavior in the distribution with an exponent related to qcrit. The existence of a finite qcrit indicates that the distribution has fat tails and infinite moments, consistent with the empirical observations of financial returns.</p></li>
+<p>Multifractals introduce random weights into the star equation, generalizing it to account for the complex dependencies and scaling properties observed in financial data. This generalization allows for solutions with <img src="https://latex.codecogs.com/png.latex?%CE%B1%20%3E%202">, capturing the fat tails and intermittent bursts of volatility characteristic of financial time series.</p></li>
+<li><p>What is the key difference between “uniscaling” and “multiscaling” behavior?</p>
+<ul>
+<li><p>Uniscaling processes, like standard Brownian motion, exhibit the same scaling behavior across all time scales. Their statistical properties are self-similar, meaning they look the same when viewed at different zoom levels.</p></li>
+<li><p>Multiscaling processes, like financial time series, exhibit different scaling behaviors at different time scales. Their statistical properties are more complex and cannot be described by a single scaling exponent.</p></li>
+</ul></li>
+<li><p>What is <img src="https://latex.codecogs.com/png.latex?q_%7Bcrit%7D"> and why is it significant in multifractal models?</p>
+<p><img src="https://latex.codecogs.com/png.latex?q_%7Bcrit%7D"> is a critical exponent that emerges in multifractal models when the function τ(q), which describes the scaling of moments of the distribution, becomes negative for values of q greater than <img src="https://latex.codecogs.com/png.latex?q_%7Bcrit%7D">. This signifies a power law behavior in the distribution with an exponent related to <img src="https://latex.codecogs.com/png.latex?q_%7Bcrit%7D">. The existence of a finite <img src="https://latex.codecogs.com/png.latex?q_%7Bcrit%7D"> indicates that the distribution has fat tails and infinite moments, consistent with the empirical observations of financial returns.</p></li>
 <li><p>How does the concept of “cylindrical pulses” contribute to the development of multifractal models?</p>
 <p>“Cylindrical pulses” offer a way to move beyond the limitations of traditional cascade models. By randomly distributing these pulses across various scales, the models can capture the intermittent and clustered nature of volatility in financial markets. This approach leads to a more flexible and realistic framework for modeling multifractal behavior.</p></li>
 <li><p>What are the practical implications of using multifractal models in finance?</p>
@@ -414,11 +1082,11 @@ Answer
 <section id="essay-questions" class="level3">
 <h3 class="anchored" data-anchor-id="essay-questions">Essay Questions</h3>
 <ol type="1">
-<li>Compare and contrast Cauchy’s star equation and the multifractal star equation. Discuss their underlying assumptions, solutions, and implications for modeling financial data.</li>
-<li>Explain the concept of multifractality in detail. Discuss the different types of multiplicative cascades and their role in generating multifractal measures. Provide examples of how multifractality manifests in financial time series.</li>
-<li>Analyze the significance of the critical exponent qcrit in multifractal models. Explain how the value of qcrit affects the distribution of the measure and its moments. Discuss the conditions under which qcrit is finite and its implications for understanding the behavior of financial markets</li>
-<li>Discuss the limitations of b-adic cascade models and explain how the concept of cylindrical pulses helps in overcoming those limitations. Describe the Multifractal Product of Cylindrical Pulses (MPCP) process and its key properties. Explain how MPCP allows for a wider range of multifractal behavior compared to traditional cascade models.</li>
-<li>Evaluate the strengths and weaknesses of using multifractal models to represent financial markets. Compare and contrast the multifractal approach with other alternative models. Discuss the empirical evidence supporting the use of multifractals in finance and the potential benefits they offer for risk management and portfolio optimization.</li>
+<li><p>Compare and contrast Cauchy’s star equation and the multifractal star equation. Discuss their underlying assumptions, solutions, and implications for modeling financial data.</p></li>
+<li><p>Explain the concept of multifractality in detail. Discuss the different types of multiplicative cascades and their role in generating multifractal measures. Provide examples of how multifractality manifests in financial time series.</p></li>
+<li><p>Analyze the significance of the critical exponent qcrit in multifractal models. Explain how the value of qcrit affects the distribution of the measure and its moments. Discuss the conditions under which qcrit is finite and its implications for understanding the behavior of financial markets</p></li>
+<li><p>Discuss the limitations of b-adic cascade models and explain how the concept of cylindrical pulses helps in overcoming those limitations. Describe the Multifractal Product of Cylindrical Pulses (MPCP) process and its key properties. Explain how MPCP allows for a wider range of multifractal behavior compared to traditional cascade models.</p></li>
+<li><p>Evaluate the strengths and weaknesses of using multifractal models to represent financial markets. Compare and contrast the multifractal approach with other alternative models. Discuss the empirical evidence supporting the use of multifractals in finance and the potential benefits they offer for risk management and portfolio optimization.</p></li>
 </ol>
 </section>
 <section id="glossary-of-key-terms" class="level3">
@@ -465,9 +1133,9 @@ Multifractal Product of Cylindrical Pulses, a generalization of cascade models t
 <dd>
 The scaling exponent function that relates the moments of a multifractal measure to the size of the intervals. Its behavior determines the existence and value of the critical exponent
 </dd>
-<dt>qcrit.</dt>
+<dt><img src="https://latex.codecogs.com/png.latex?q_%7Bcrit%7D"></dt>
 <dd>
-qcrit The critical exponent that characterizes the power-law distribution of a multifractal measure. It indicates the point at which the moments of the measure become infinite.
+The critical exponent that characterizes the power-law distribution of a multifractal measure. It indicates the point at which the moments of the measure become infinite.
 </dd>
 <dt>Fractional Brownian Motion</dt>
 <dd>
@@ -481,17 +1149,16 @@ A generalization of Brownian motion that incorporates long-range dependence, lea
 </section>
 </section>
 
-
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
   author = {Bochman, Oren},
   title = {Scaling in Financial Prices 2},
-  date = {2024-11-28},
+  date = {2024-11-29},
   url = {https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part2/},
   langid = {en}
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2024. <span>“Scaling in Financial Prices 2.”</span>
-November 28, 2024. <a href="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part2/">https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part2/</a>.
+November 29, 2024. <a href="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part2/">https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part2/</a>.
 </div></div></section></div> ]]></description>
   <category>Scaling Laws</category>
   <category>Fractals</category>
@@ -500,7 +1167,7 @@ November 28, 2024. <a href="https://orenbochman.github.io/posts/2024/2024-11-28-
   <category>Reviews</category>
   <category>Popular Science</category>
   <guid>https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part2/</guid>
-  <pubDate>Thu, 28 Nov 2024 17:19:45 GMT</pubDate>
+  <pubDate>Thu, 28 Nov 2024 23:43:31 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part2/cover.webp" medium="image" type="image/webp"/>
 </item>
 <item>
@@ -1014,71 +1681,6 @@ November 28, 2024. <a href="https://orenbochman.github.io/posts/2024/2024-11-28-
   <guid>https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part1/</guid>
   <pubDate>Thu, 28 Nov 2024 17:02:29 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part1/cover.webp" medium="image" type="image/webp"/>
-</item>
-<item>
-  <title>Misbehaviour of Markets and Scaling in financial prices 1-4</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>One of the most popular books for quants is “The (Mis)behaviour of Markets” <span class="citation" data-cites="mandelbrot2010mis">(Mandelbrot and Hudson 2010)</span>. This is more a popular science book than a technical tome with relatively less math and some fascinating figures. The book was his last book published in 2004 and is based on lots of research. As far as I can tell the most pertinent was a paper titled Scaling in financial markets that came out in four parts just three years before the book in 2001. The papers are:</p>
-<div class="no-row-height column-margin column-container page-columns page-full"><div id="ref-mandelbrot2010mis" class="csl-entry">
-Mandelbrot, B. B., and R. L. Hudson. 2010. <em>The (Mis)behaviour of Markets: A Fractal View of Risk, Ruin and Reward</em>. Profile. <a href="https://books.google.co.il/books?id=zg91TAIs6bgC">https://books.google.co.il/books?id=zg91TAIs6bgC</a>.
-</div><div id="fig-multifractal" class="quarto-float quarto-figure quarto-figure-center anchored page-columns page-full" alt="A highly detailed multifractal landscape showcasing rugged mountains, intricate valleys, and diverse natural features. The terrain exhibits self-similarity at different scales, with patterns of varying complexity blending seamlessly. The landscape has vivid textures, sharp contrasts, and includes lush greenery, rocky cliffs, and flowing rivers. The sky above is clear with dynamic cloud formations, complementing the fractal nature of the terrain. The scene is rendered in a realistic style to emphasize the mathematical and natural beauty of the multifractal patterns.">
-<figure class="quarto-float quarto-float-fig figure page-columns page-full">
-<div aria-describedby="fig-multifractal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./cover.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: multifractal landscape"><img src="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/cover.webp" class="img-fluid figure-img" alt="A highly detailed multifractal landscape showcasing rugged mountains, intricate valleys, and diverse natural features. The terrain exhibits self-similarity at different scales, with patterns of varying complexity blending seamlessly. The landscape has vivid textures, sharp contrasts, and includes lush greenery, rocky cliffs, and flowing rivers. The sky above is clear with dynamic cloud formations, complementing the fractal nature of the terrain. The scene is rendered in a realistic style to emphasize the mathematical and natural beauty of the multifractal patterns."></a>
-</div>
-<figcaption class="quarto-float-caption-margin quarto-float-caption quarto-float-fig margin-caption" id="fig-multifractal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: multifractal landscape
-</figcaption>
-</figure>
-</div></div>
-<ol type="1">
-<li><a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part1/index.html">Scaling in financial prices: I. Tails and dependence</a></li>
-<li><a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part2/index.html">Scaling in financial prices: II. Multifractals and the star equation</a></li>
-<li><a href="part3/index.qmd">Scaling in financial prices: III. Cartoon Brownian motions in multifractal time</a></li>
-<li><a href="part4/index.qmd">Scaling in financial prices: VI. IV. Multifractal concentration</a></li>
-<li><a href="part5/index.qmd">The (Mis)behaviour of Markets</a></li>
-</ol>
-<p>These are very interesting papers but like much of Mandelbrot’s work they are not easy to read. More so as he tend to quote from his earlier in extensive detail while preferring to avoid the literature of by others to the chagrin of his contemporaries, making it harder to follow the argument.</p>
-<p>I have read them and will try to summarize them in a way that is more accessible. I will also try to provide some context and background to the papers and provide a few lighthearted podcasts that discuss the papers and the book.</p>
-<p>Also I was interested in reproducing some of the work from the book but instead I think I can make use of some code released by others. That came out in the last few year since I read the book. The point is that these ideas can be applied to time series modeling.</p>
-<p>So what are multifractals? Although multifractals are rooted in probability, much of the related literature comes from the physics and mathematics arena. Here is one definition:</p>
-<div class="page-columns page-full"><blockquote class="blockquote">
-<p>A multifractal system is a generalization of a fractal system in which a single exponent (the fractal dimension) is not enough to describe its dynamics; instead, a continuous spectrum of exponents (the so-called singularity spectrum) is needed. — <span class="citation" data-cites="harte2001multifractals">(Harte 2001)</span></p>
-</blockquote><div class="no-row-height column-margin column-container"><div id="ref-harte2001multifractals" class="csl-entry">
-Harte, D. 2001. <em>Multifractals: Theory and Applications</em>. CRC Press. <a href="https://www.routledge.com/Multifractals-Theory-and-Applications/Harte/p/book/9780367455200">https://www.routledge.com/Multifractals-Theory-and-Applications/Harte/p/book/9780367455200</a>.
-</div></div></div>
-
-
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
-  author = {Bochman, Oren},
-  title = {Misbehaviour of {Markets} and {Scaling} in Financial Prices
-    1-4},
-  date = {2024-11-28},
-  url = {https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2024. <span>“Misbehaviour of Markets and Scaling in
-Financial Prices 1-4.”</span> November 28, 2024. <a href="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/">https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/</a>.
-</div></div></section></div> ]]></description>
-  <category>Scaling Laws</category>
-  <category>Fractals</category>
-  <category>Financial Markets</category>
-  <category>Time series</category>
-  <category>Reviews</category>
-  <category>Popular Science</category>
-  <guid>https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/</guid>
-  <pubDate>Thu, 28 Nov 2024 16:50:06 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/cover.webp" medium="image" type="image/webp"/>
 </item>
 <item>
   <title>The Many Path To A Signaling System</title>
@@ -4106,117 +4708,6 @@ Bochman, Oren. 2024. <span>“NLP with RL.”</span> September 3, 2024. <a href=
 </div></div></section></div> ]]></description>
   <guid>https://orenbochman.github.io/posts/2024/2024-09-30-LLMs/rl.html</guid>
   <pubDate>Tue, 03 Sep 2024 14:44:12 GMT</pubDate>
-</item>
-<item>
-  <title>LLM the good the bad and the ugly</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2024/2024-09-30-LLMs/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<section id="language-models" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="language-models">Language Models</h2>
-<p>Early when I saw the first text by gpt2 I was intrigued that some of the researchers that did not get access to the early model and had to re-create the model based on just the paper reported that that thier model had ‘probabilities’ of generating all those texts given the prompt.</p>
-<p>This seems to be a rather <em>weak claim</em> - after all a million blindfolded monkeys banging on type writers would have some probability of generating those texts.</p>
-
-<div class="no-row-height column-margin column-container"><div class="">
-<div class="quarto-figure quarto-figure-left">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-left">
-<figure class="figure">
-<p><a href="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Chimpanzee_seated_at_typewriter.jpg/512px-Chimpanzee_seated_at_typewriter.jpg?20120413234640" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="One of a million IID monkeys at a typewriter   credit"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Chimpanzee_seated_at_typewriter.jpg/512px-Chimpanzee_seated_at_typewriter.jpg?20120413234640" class="img-fluid quarto-figure quarto-figure-left figure-img" width="250" alt="One of a million IID monkeys at a typewriter   credit"></a></p>
-</figure>
-</div>
-<figcaption>One of a million <a href="https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables">IID</a> monkeys at a typewriter <br> <a href="https://commons.wikimedia.org/wiki/File:Chimpanzee_seated_at_typewriter.jpg">credit</a></figcaption>
-</figure>
-</div>
-</div></div><p>One point to make is that the monkeys might have a higher probability of generating the text then the researcher’s model - but that is a different story.</p>
-<section id="the-origen-of-seq2seq-models" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="the-origen-of-seq2seq-models">The origen of seq2seq models</h3>
-<p>If you learned the pre LLM language modeling you would be familiar with <a href="https://en.wikipedia.org/wiki/N-gram">N-grams</a> you would be better equipped to be critical of LLMs. [N-grams]<sup>1</sup> More generally skip grams allow to model n-grams with gaps i.e.&nbsp;there are some tokens that are not specified or skipped. Another generalization was the introduction of a N-grams n representing unknown tokens.</p>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;is an ordered sequence of tokens. It could be words, characters, or unicode code point.</p></div></div><p>The N-grams abstraction allowed for development of probabilistic models that are the basis of LLMs. However these older models had one significant limitation - they could only model a fixed number of tokens. This is because the number of possible N-grams grows exponentially with the number of tokens.</p>
-<p>Related v.s. Similar</p>
-</section>
-</section>
-<section id="the-good" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="the-good">The good</h2>
-<p>There are a few powerful ideas in this approach.</p>
-<ol type="1">
-<li>Capturing co-occurrence statistics.
-<ul>
-<li>The word ‘the’ is followed by a noun 50% of the time.</li>
-<li>Collocations may have gaps and this is where</li>
-<li>Skip grams generalize N-grams by allowing for gaps in the sequence.</li>
-</ul></li>
-<li>Learning from positive examples is the forte of classical language models. You can learn the regular parts of a language using such a probabilistic quite fast. Unfortunately most languages are far from regular.</li>
-<li>Generalizing using <a href="https://en.wikipedia.org/wiki/Smoothing">smoothing</a> - When the frequency of N-grams for some words is low enough we don’t expect to see them in a corpus of some given size. You just can’t fit all the N-grams of a given size in a corpus of a given size. but we can use shorter N-grams to estimate the probability of longer N-grams. (And this is how language models can be used to generate text). We call this process smoothing as conceptually we are filling holes in the longer N-grams probability distribution by moving some of the mass from related N-grams - to look more like the distribution of formed by combining shorter N-grams.</li>
-<li>Learning negative examples. With enough data we may be infer that the absence of certain trigrams in the distribution where the associated bigrams are common isn’t due to chance but due some excluding factor. They might be linguistic or perhaps censoring. Regardless to detect get to a certain confidence level say 95% we need to see lots of bigrams and no trigram. Note though that we may have some broken english or some clumsy constructions that are in our corpus - they tend to muddy the waters and render these negative examples particularly challenging to infer. In fact it is generally easier to learn more by increasing the size of the corpus and learning more from rarer positive examples and this is what LLM do. not just from the corpus but from the language. However just as children learning to generelize have to be taught that the plural of goose is geese and not gooses, learning from positive -</li>
-</ol>
-<p>The problems with ngrams is that once n gets big enough and the corpus doesnt scale with it ngrams learn to model the corpus rather than the language. This is because as the ngram gets longer around the central word eventuall the contexts is specific enough that there is only one matching next ngram to for the given context - so the next word is certain.</p>
-<blockquote class="blockquote">
-<p>The egg hit the wall and <strong>it</strong> broke.</p>
-</blockquote>
-<ul>
-<li>It must be the case that the egg hit the wall and it broke right.</li>
-<li>Unless we are in feudal japan where internal walls are made to a large extent from rice paper on a frames.<sup>2</sup></li>
-<li>We could also be dealing with a decorative egg and a glass wall.</li>
-<li>Or we could be dealing with a metaphorical egg and a metaphorical wall.</li>
-</ul>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;some gifted Samorai would need to catch the egg after it broke the wall to avoid <code>they broke</code></p></div></div><p>If the first scenario is correct 99.999% of the time why do we need to consider the other scenarios? The answer is best considered as a black swan problem. If we only consider the most likely scenarios we will be unprepared for the unlikely ones which could be catastrophic.</p>
-<p>This suggests perhaps that while LLM should be great for learning a lexicon, a grammar, and some common sense knowledge - three very challanging tasks they are inadquate for making infrences about the world where different types of precise reasoning is required.</p>
-</section>
-<section id="the-bad" class="level2">
-<h2 class="anchored" data-anchor-id="the-bad">the bad</h2>
-<ul>
-<li>the black swan problem</li>
-<li>tokenization</li>
-</ul>
-</section>
-<section id="the-sad" class="level2">
-<h2 class="anchored" data-anchor-id="the-sad">the sad</h2>
-<ul>
-<li>context windows</li>
-</ul>
-</section>
-<section id="the-ugly---where-are-llms-no-good" class="level2">
-<h2 class="anchored" data-anchor-id="the-ugly---where-are-llms-no-good">the ugly - Where are LLMs no good?</h2>
-<p>Let’s consider an analogy from physics. Classical physics is great for predicting phenomena at macro scales but quantum mechanics is required for the micro scale.</p>
-<p>Physicist like to think that quantum physics should converge to classical physics at the macro scale but this is not always the case. There are phenomena that are only explained by quantum mechanics. We may soon discover more phenomena like superconductivity, quantum computers and quantum cryptography manifsting in our macro world</p>
-<p>Fooled by randomness….</p>
-<p>In the case of LLM there is the effect of stochasticity which is built into the models. We don’t care about this aspect so long as the model gives us good replies. But all replies are inherently stochastic. While humans might express an utternce in many ways they should be able to agree on its meaning, the facts, the options, the reasoning and so on. Neural netowrks are universal function approximators and in the case of LLMs the are approximate the LM from above which are stochastic all the way down - there is no agreement excepts on the most basic probabilities. The nlp researcher can only say that an utterance is likely to be generated by the model - with some probability. Any counter claim also has some probability.The probabilities in these cases are far more dramaicaly affected by the utterance length, word choices, grammarticality, common sense knowledge then factuallity, structured knowledge</p>
-<p>This is a problem because we are used to deterministic replies from humans. We are used to deterministic replies from classical language models. We are used to deterministic replies from classical AI systems.</p>
-<ul>
-<li>hellucinations
-<ul>
-<li>where there is sparse data or the data used in training isn’t representative of the query we cannot expect the model to perform well.</li>
-<li>even where there is good data - if the queries are subtle enough the stochastic nature of the model will manifest.</li>
-</ul></li>
-<li>prompt engineering</li>
-</ul>
-</section>
-<section id="the-ugly---through-the-hole-in-the-coin" class="level2">
-<h2 class="anchored" data-anchor-id="the-ugly---through-the-hole-in-the-coin">the ugly - through the hole in the coin</h2>
-
-
-</section>
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
-  author = {Bochman, Oren},
-  title = {LLM the Good the Bad and the Ugly},
-  date = {2024-09-02},
-  url = {https://orenbochman.github.io/posts/2024/2024-09-30-LLMs/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2024. <span>“LLM the Good the Bad and the Ugly.”</span>
-September 2, 2024. <a href="https://orenbochman.github.io/posts/2024/2024-09-30-LLMs/">https://orenbochman.github.io/posts/2024/2024-09-30-LLMs/</a>.
-</div></div></section></div> ]]></description>
-  <guid>https://orenbochman.github.io/posts/2024/2024-09-30-LLMs/</guid>
-  <pubDate>Mon, 02 Sep 2024 18:16:45 GMT</pubDate>
 </item>
 </channel>
 </rss>

@@ -10,12 +10,17 @@ categories:
   - notes
   - rl
   - reinforcement learning
-  - the k-armed bandit problem
-  - bandit algorithms
-  - exploration 
-  - explotation
-  - epsilon greedy algorithm
-  - sample avarage method
+keywords:
+    - neural networks
+    - feature construction
+    - coarse coding
+    - feed-forward architecture
+    - activation functions
+    - deep networks
+    - online setting
+    - offline setting
+    - representation
+    - learning capacity
 image: /images/nlp-brain-wordcloud.jpg
 title-block-banner: /images/banner_black_3.jpg
 ---
@@ -42,12 +47,12 @@ title-block-banner: /images/banner_black_3.jpg
 -   We will see some simple linear function approximation methods and later
 -   We will see modern nonlinear approximation methods using deep neural networks.
 
-I did not find the derivation of the SGD alg particularly enlightening and I have seen it serveral times. However the online setting is the best motivation for the use of SGD and makes perfect sense in the context of reinforcement learning. Minibatches are then a natural extension of this idea.
+I did not find the derivation of the SGD alg particularly enlightening and I have seen it several times. However the online setting is the best motivation for the use of SGD and makes perfect sense in the context of reinforcement learning. Minibatches are then a natural extension of this idea.
 
 ::: {.callout-tip collapse="true"}
 ### Readings {.unnumbered}
 
--   [x] [@sutton2018reinforcement§91.-9.4, pp. 194-209] \[book\]\[http://incompleteideas.net/book/RLbook2020.pdf#page=194)\]
+-   [x] [@sutton2018reinforcement§9.1-9.4, pp. 194-209] [book](http://incompleteideas.net/book/RLbook2020.pdf#page=194)
 :::
 
 # Lesson 1: Estimating Value Functions as Supervised Learning
@@ -61,12 +66,35 @@ In this lesson we will cover some important notation that will remain with us ti
 -   [x] *Explain* the meaning of **linear value function approximation** [\#](#sec-l1g2)
 -   [x] *Recognize* that the tabular case is a special case of linear value function approximation [\#](#sec-l1g3)
 -   [x] *Understand* that there are many ways to parameterize an approximate value function [\#](#sec-l1g4)
+
 -   [x] *Understand* what is meant by **generalization** and **discrimination** [\#](#sec-l1g5)
 -   [x] *Understand* how generalization can be beneficial [\#](#sec-l1g6)
 -   [x] *Explain* why we want both generalization and discrimination from our function approximation [\#](#sec-l1g7)
 -   [x] *Understand* how value estimation can be framed as a **supervised learning** problem [\#](#sec-l1g8)
 -   [x] *Recognize* not all function approximation methods are well suited for reinforcement learning [\#](#sec-l1g9)
 :::
+
+
+## Moving to Parameterized Policies (video) 
+
+This video covers the first four learning objectives.
+
+This video covers parameterized policies and how they can be used to approximate value functions. 
+The idea is that using a table has some limitations/ The first is that the tables can be very large. For continuous states they can become infinite.
+
+The second is that the tables can be very sparse and in a table we don't generalize between states.
+
+We see that we don't really want functions that directly approximate the value function. We want functions that have some structure that we can learn.
+
+This is called a parameterized function. The ideas is to use a weighted sum of the features of the state. This allows us to learn the weights and use them to approximate the value function. This is called linear function approximation.
+The way to get around this which is two fold. We first represent the salient properties of a states into features. 
+
+Then we use weights to combine these features to approximate the value function. This is called linear function approximation. 
+
+More generally we can use non linear parameterized functions to approximate value functions.
+
+Adam shows that is the features are not picked wisely we may not be able to discriminate between states - out function for one state will be the same as for another dissimilar state. Learning about one will make us forget what we learned about the other. This is called bias. On the other hand if we have too many features we may not be able to generalize between states. This is called variance. The goal is to balance between bias and variance.
+
 
 ## Understanding parameterized functions {#sec-l1g1}
 
@@ -90,7 +118,7 @@ $$ {#eq-fn-approx}
 -   We can write the approximate value function as a linear combination of features:
 
 $$
-\hat{v}(s, \mathbb{w}) \dot = w_1 X + w_2 + Y    \qquad
+\hat{v}(s, \mathbb{w}) \dot = w_1 X + w_2 + Y \qquad
 $$ {#eq-lin-fn-approx}
 
 -   where:
@@ -102,8 +130,7 @@ finding the weights that minimize the error between the approximate value functi
 
 ## Tabular case is a special case of linear value function approximation {#sec-l1g3}
 
-![tabular case](img/rl-tabular-is-linear-fn.png){#fig-tabular-fn .column-margin}
-
+![Linear value function generalize the tabular case](img/c3-w2-parametrized_functions.png){#fig-rl-linear-approximation .column-margin}
 $$
 \begin{align*}
 \hat{v}(s, \mathbb{w}) & \dot = \sum w_i x_i(s) \newline
@@ -120,9 +147,12 @@ $$
     -   it can only represent linear relationships between the features and the value function.
     -   it can only represent a limited number of features.
 -   so how are tabular functions a special case of linear value function approximation?
-    -   we can see from the figure that all we need is use one hot encoding for the features. Then the weighet vector will be the same as the value function in the table.
+    -   we can see from the figure that all we need is use one hot encoding for the features. Then the weighted vector will be the same as the value function in the table.
 
 ![Linear value function approximation failure](img/rl-linear-fn-fail.png){#fig-rl-failure .column-margin}
+
+
+
 
 ## There are many ways to parameterize an approximate value function {#sec-l1g4}
 
@@ -134,9 +164,19 @@ $$
     -   tile coding
     -   neural networks
 
+
+
+## Generalization and Discrimination (video)
+
+In this video Martha covers the next three learning objectives.
+The video is about:
+
+- Generalization - using knowledge (V,Q,Pi) about similar states.
+- Discrimination - being able to distinguish between different states.
+
 ## Understanding generalization and discrimination {#sec-l1g5}
 
-![generalization and discrimination](img/rl-generalization-discrimination-matrix.png){#fig-generelization-discrimination-chart .column-margin}
+![generalization and discrimination](img/rl-generalization-discrimination-matrix.png){#fig-generalization-discrimination-chart .column-margin}
 
 -   Generalization:
     -   the ability to estimate the value of states that were not seen during training.
@@ -147,24 +187,27 @@ $$
 
 ## How generalization can be beneficial {#sec-l1g6}
 
--   generalization can be beneficial because:
-    -   it allows us to estimate the value of states that were not seen during training.
-    -   it allows us to estimate the value of states that are similar to states seen during training.
-    -   it allows us to estimate the value of states that are far from states seen during training.
+-   Generalization can be beneficial because:
+    -   It allows us to estimate the value of states that are similar to states seen during training.
+    -   This includes states that were not seen during training.
+    -   It allows us to estimate the value of states that are far from states seen during training. (So long as they are similar in terms of the features we are using to approximate the value function)
 
 ## Why we want both generalization and discrimination from our function approximation {#sec-l1g7}
 
--   we want both generalization and discrimination from our function approximation because:
+-   We want both generalization and discrimination from our function approximation because:
     -   generalization allows us to estimate the value of states that were not seen during training.
     -   discrimination allows us to distinguish between different states.
     -   generalization allows us to estimate the value of states that are similar to states seen during training.
     -   discrimination allows us to estimate the value of states that are far from states seen during training.
 
+
+We hear a lot about function approximation and gradient methods having a bias or high variance. I tracked this from wikipedia and statistical learning. While it makes sense for a Bayesian regression I'm not sure that it is quite correct for RL. Unfortunately I don't have a better explanation, though reviewing [this policy gradient lecture might be helpful](https://www.youtube.com/watch?v=y3oqOjHilio)
+
 ::: callout-tip
 ### Bias-variance tradeoff {.unnumbered}
 
 -   an important result called the [**bias-variance tradeoff**](https://en.wikipedia.org/wiki/Bias-variance_tradeoff):
-    -   bias is the error introduced by approximating a real-world problem, which may be extremely complicated, by a much simpler model. This means that since we cannot discriminate between different states that share weights for the same feature vector we have errors we characterize as bias.
+    -   Bias is the error introduced by approximating a real-world problem, which may be extremely complicated, by a much simpler model. This means that since we cannot discriminate between different states that share weights for the same feature vector we have errors we characterize as bias.
     -   High bias corresponds to underfitting in our model.
     -   Variance is the opposite issue arising from having more features than we need to discriminate between states. This means that updating certain weights will affect only some of these related states and not others. This type of error is called variance and is also undesirable.
     -   High variance corresponds to overfitting in our model which can be due to our model fitting the noise in the data rather than the underlying signal.
@@ -172,20 +215,56 @@ $$
     -   This choice is usually governed by business realities and the nature of the data or the problem we are trying to solve.
 :::
 
+## Framing Value Estimation as Supervised Learning (video)
+
+In this video we cover the next two learning objectives. Martha has a good background in supervised learning and she explains how many parts of RL can be framed as supervised learning problems. 
+
+Things we like to learn in RL in this course:
+
+- Value fn approximation (V)
+- Action fn values (Q)
+- Policies (Pi)
+
+In reality we may want to learn other things as well which can be framed as supervised learning problems:
+
+- State representations - i.e. better features (CNNs, RNNs, etc)
+- Models of Dynamics i.e. Transition probabilities (P)
+- Reward precesses (R) What is a good reward function? How do we learn it? This is an inverse reinforcement learning problem. It is ill posed because there are many reward functions that can explain the data. We need to find the simplest one that explains the data. This is intertwined with learning internal motivations and goals. c.f. [Satinder Singh](https://www.youtube.com/watch?v=jn1NE8uIxgw)'s work on intrinsic motivation.
+- Generalized Value functions (Gvfs) c.f. [Martha and Adam White's work on GVFs](https://www.youtube.com/watch?v=GmGL9cVfJG4&t=1889s).
+- Options (Spatial or Temporal Aggregations of actions) c.f. Doina Precup's work on options and semi-markov decision processes.
+
+Even more things that we might want to learn in RL that might be framed as supervised learning problems:
+
+- Approximate/Compressed policies for sub goals AKA heuristics
+    - Fully Pooled policies (all states are the same) - Think random uniform policy
+    - Partial pooled policies, (some states are the same)
+    - Unpooled policies (all states are different - tabular setting)
+    - Priors for Policies
+    - Hierarchies of options - Think Nethack
+- Beliefs about policies
+- Beliefs about other agents (theory of mind)
+- Beliefs about the environment.
+- Causal models of the environment
+    - what can we influence and what can't we influence.
+- Coordination and communication with other agents c.f. work by [Jakob Foerster](https://www.jakobfoerster.com/), [Natasha Jacques](https://natashajaques.ai/), and [Marco Baroni]() on emergent communication.
+    - What part of communication is cheap talk
+    - What part of communication is credible
+
+
 ## How value estimation can be framed as a supervised learning problem {#sec-l1g8}
 
 -   The problem of policy evaluation in reinforcement learning can be framed as supervised learning problem
 
-    -   in the case of Monte Carlo methods,
+    -   In the case of Monte Carlo methods,
         -   the inputs are the states and
-        -   the outputs are the returns.
-    -   in the case of TD methods,
+        -   the outputs are the returns $G$.
+    -   In the case of TD methods,
         -   the inputs are the states and
-        -   the outputs are the one step bootstrapped returns.
+        -   the outputs are the one step bootstrapped returns.  $U_t \dot=R_{t+1} + \gamma \hat{v}(S_{t+1}, \mathbf{w})$
 
 ## Not all function approximation methods are well suited for reinforcement learning {#sec-l1g9}
 
-> In principle, any function approximation technique from supervised learning can be applied to the policy evaluation task. However, not all are equally well-suited. -- Martha White
+> In principle, any function approximation technique from supervised learning can be applied to the **policy evaluation task**. However, not all are equally well-suited. -- Martha White
 
 -   in RL the agent interacts with the environment and generates data, which corresponds to the online setting in supervised learning.
 -   When we want to use supervised learning we need to choose a method that is well suited for the online setting which can handle
@@ -193,6 +272,8 @@ $$
     -   non-stationary and correlated data (which is the case in RL).
 
 In fact much of the learning in RL is about learning such correlations and quickly adapting to non-stationary in the environment.
+
+In TD learning the target depends on $w$ but in supervised learning the target is fixed and given.
 
 # Lesson 2: The Objective for On-policy Prediction
 
@@ -209,7 +290,26 @@ In fact much of the learning in RL is about learning such correlations and quick
 -   [x] *Apply* **Gradient Monte-Carlo** with state aggregation [\#](#sec-l2g6)
 :::
 
-## The mean-squared value error objective for policy evaluation {#sec-l2g1}
+## The Value Error Objective (Video)
+
+In this video Adam White covers the first two learning objectives of the unit.  
+The main subject about using the mean squared error as a loss for the approximate value function. 
+
+we get a sequence of $(S_1,v_{\pi}(S_1) ),(S_2,v_{\pi}(S_2) ),(S_3,v_{\pi}(S_3) ), \ldots$ and we want to approximate the value function . We can track how well we are approximating $v_{\pi}(s)$ by using $\hat{v}(s,\mathbb{w})$. The difference can be positive or negative so if we average it the sum will tend to cancel out. If we square the error we get a positive number we have a much better estimate of the error. And if normalize it by taking the mean we can get use it to compare runs of different lengths. This is called the mean squared  error.
+
+It turns out that this is not enough for RL and we need to take a weighted average using the state distribution $\mu(s)$. This is because we care more about some states than others. The state distribution is the long run probability of visiting the state $s$ under the policy $\pi$. This weighted average is called *the mean squared **value** error*.
+
+::: {.callout-tip collapse="true"}
+
+### Your Objective is My Loss
+
+In the optimization literature the **loss** function is called the **objective** function. This is because we are trying to optimize the weights of the function to minimize the loss. So we will often hear the term objective function or just objective. Life is simpler if we recall that this is just a loss function for a supervised learning problem.
+
+A related point is that if we want to optimize our approximate value we can swap the with a different loss function or with a different approximation function and the outcome should remain the same, at least under certain conditions. This is how we can switch from the mean squared value error objective to the Monte Carlo objective and then to the TD learning objective.
+
+:::
+
+## Understanding the mean-squared value error objective for policy evaluation {#sec-l2g1}
 
 ![mean-squared value error objective](img/rl-mean-squared-value-error.png){#fig-mse .column-margin}
 
@@ -234,7 +334,7 @@ $$ {#eq-msve}
     -   $\hat{v}(s, \mathbf{w})$ is the approximate value of state $s$ with weights $\mathbf{w}$
 -   the goal is to find the weights that minimize the mean-squared value error.
 
-## The role of the state distribution in the objective {#sec-l2g2}
+## Explaining the role of the state distribution in the objective {#sec-l2g2}
 
 -   The state distribution $\mu(s)$ is the long run probability of visiting the state $s$ under the policy $\pi$.
 -   This makes more sense if our markov chain is ergodic - i.e. we can reach any state from any other state by following some transition trajectory.
@@ -288,12 +388,15 @@ $$ {#eq-grad-descent}
 
 ## How to use Gradient descent and Stochastic gradient descent to minimize the value error {#sec-l2g8}
 
-\$\$ \begin{align*}
-\nabla J(\mathbf{w}) & = \nabla \sum_{s\in S} \mu(s)[v_\pi(s) - \hat{v}(s, \mathbf{w})]^2 \qquad  \qquad  \hat{v}(s, \mathbf{w}) = <\mathbf{w},\mathbf{x}(s)>\\
-                     & =  \sum_{s\in S}  \mu(s) \nabla [v_\pi(s) - \hat{v}(s, \mathbf{w})]^2 \qquad  \qquad \nabla   \hat{v}(s, \mathbf{w}) = \mathbf{x}(s)\\
-                     & =  \sum_{s\in S} \mu(s) 2 [v_\pi(s) - \hat{v}(s, \mathbf{w})]\nabla \hat{v}(s, \mathbf{w}) \qquad \\
 
-\end{align*} \$\$
+$$
+\begin{align*}
+\nabla J(\mathbf{w}) & = \nabla \sum_{s\in S} \mu(s)[v_\pi(s) - \hat{v}(s, \mathbf{w})]^2 \qquad  \qquad  \hat{v}(s, \mathbf{w}) = <\mathbf{w},\mathbf{x}(s)>\newline
+                    & =  \sum_{s\in S}  \mu(s) \nabla [v_\pi(s) - \hat{v}(s, \mathbf{w})]^2 \qquad  \qquad \nabla   \hat{v}(s, \mathbf{w}) = \mathbf{x}(s)\newline
+                    & =  \sum_{s\in S} \mu(s) 2 [v_\pi(s) - \hat{v}(s, \mathbf{w})]\nabla \hat{v}(s, \mathbf{w})
+\end{align*} \qquad 
+$$
+
 
 ### Stochastic Gradient Descent
 
@@ -316,7 +419,9 @@ recall that
 
 $$ 
 v_\pi(s) = \mathbb{E}[G_t \mid S_t = s] \qquad
-$$ so we can substitute the true value with the return from the state $s_1$.
+$$ 
+
+so we can substitute the true value with the return from the state $s_1$.
 
 $$
 \begin{align*}
@@ -385,9 +490,13 @@ $$
 w \leftarrow w + \alpha [G_t - \hat{v}(S_t, \mathbf{w})] \nabla \hat{v}(S_t, \mathbf{w})
 $$
 
-and the gradient of the approximate value function is given by: $$
+and the gradient of the approximate value function is given by: 
+
+$$
 \nabla \hat{v}(S_t, \mathbf{w}) = \mathbf{x}(S_t)
-$$ which is either 1 or 0 depending on the group of states.
+$$ 
+
+which is either 1 or 0 depending on the group of states.
 
 ## Applying Gradient Monte-Carlo with state aggregation {#sec-l2g6}
 
@@ -404,6 +513,7 @@ $$ which is either 1 or 0 depending on the group of states.
 -   [x] *Outline* the **Semi-gradient TD(0)** algorithm for value estimation [\#](#sec-l3g3)
 -   [x] *Understand* that TD converges to a **biased** value estimate [\#](#sec-l3g4)
 -   [x] *Understand* that TD converges much **faster** than Gradient Monte Carlo [\#](#sec-l3g5)
+
 :::
 
 ## The TD-update for function approximation {#sec-l3g1}
@@ -413,6 +523,8 @@ $$ which is either 1 or 0 depending on the group of states.
 $$
 w \leftarrow w + \alpha [G_t - \hat{v}(S_t, \mathbf{w})] \nabla \hat{v}(S_t, \mathbf{w})
 $$
+
+
 - we can use other targets for the update rule than the return $G_t$.
 - we can replace the return with any estimate of the value of the next state.
 - we can call this target $U_t$ and if it is unbiased it converge to a local minimum of the mean squared value error.
@@ -436,7 +548,7 @@ $$ {#eq-td-target}
 $$
 \begin{align*}
 \nabla J(\mathbf{w}) & = \nabla \frac{1}{2}[U_t - \hat{v}(S_t, \mathbf{w})]^2 \newline
-                     & = (U_t - \hat{v}(S_t, \mathbf{w})) (\nabla U_t - \nabla \hat{v}(S_t, \mathbf{w})\\
+                     & = (U_t - \hat{v}(S_t, \mathbf{w})) (\nabla U_t - \nabla \hat{v}(S_t, \mathbf{w})) \\
                      & \ne - (U_t - \hat{v}(S_t, \mathbf{w})) \nabla \hat{v}(S_t, \mathbf{w}) \quad \text{unless} \quad \nabla  U_t = 0
 \end{align*}
 $$ {#eq-td-grad}
@@ -445,7 +557,7 @@ $$ {#eq-td-grad}
 
 $$
 \begin{align*}
-\nabla U_t = & = \nabla (R_{t+1} + \gamma \hat{v}(S_{t+1}, \mathbf{w}) \newline
+\nabla U_t = & = \nabla (R_{t+1} + \gamma \hat{v}(S_{t+1}, \mathbf{w})) \newline
             & = \gamma \nabla \hat{v}(S_{t+1}, \mathbf{w}) \newline
             & \ne 0
 \end{align*}
@@ -493,7 +605,7 @@ $$ {#eq-td-grad-ut}
 \State Initialize:
   \State $\qquad value function weights w \leftarrow x \in \mathbb{R}^d \quad \forall s \in \mathcal{S}$ (e.g. w=0)
 \FORALL {episode $e$:}
-  \State $Initilize S$
+  \State $Initialize S$
   \FORALL {step $S \in e$:}
     \State $\text{Choose } A \sim \pi(\cdot \mid S)$
     \State Take action $A$, observe $R, S'$
@@ -526,11 +638,16 @@ $$ {#eq-td-grad-ut}
 -   TD can learn from incomplete episodes, while Gradient Monte Carlo requires complete episodes.
 -   TD can learn from non-episodic tasks, while Gradient Monte Carlo can only learn from episodic tasks.
 
-## Dorina Precup's talk on Building Knowledge for AI Agents with Reinforcement Learning {#sec-l3g6}
+## Doina Precup's talk on Building Knowledge for AI Agents with Reinforcement Learning {#sec-l3g6}
+
+
 
 ![Dorina Precup](img/rl-dorina-precup.png){#fig-generelization .column-margin}
 
-![Options are a temoral generelization](img/rl-dorina-options.png){#fig-options .column-margin}
+![Options are a temporal generalization](img/rl-dorina-options.png){#fig-options .column-margin}
+
+In this talk, [Dorina Precup](https://rl.cs.mcgill.ca/people/doina-precup/) discusses the challenges of building knowledge for AI agents using reinforcement learning.
+
 
 -   Dorina Precup is a professor at McGill University and a research team lead at DeepMind.
 -   She is an expert in reinforcement learning and machine learning.
@@ -562,7 +679,7 @@ $$ {#eq-td-grad-ut}
 -   She also points out that the model needs to learn the options and the value function at the same time.
 -   According to her profile Precup has a number of students working on this problem. Some additional references are:
     -   [@Bacon2016TheOA] a paper from 2016 on option-critic architecture which extends actor-critic algorithms to work with options.
--   Earlier work uses the term macto-actions to refer to options.
+-   Earlier work uses the term macro-actions to refer to options.
     -   [@bradtke1994reinforcement] a paper from 1994 on reinforcement learning with hierarchies of machines.
 
 [^1]: the property that the future is independent of the past given the present
@@ -570,85 +687,12 @@ $$ {#eq-td-grad-ut}
 ::: callout-tip
 ### Options & CI {.unnumbered}
 
--   This type of formulation seems very similar to that used by \[Judea Pearl\] in his structureal graphical model of Causality. If we can express options as a graph of states we can use his algorithms to infer the best options to take in a given state.
+-   This type of formulation seems very similar to that used by [Judea Pearl](https://www.youtube.com/watch?v=JxzjdTc15A0) in his structureal graphical model of Causality. If we can express options as a graph of states we can use his algorithms to infer the best options to take in a given state.
 -   options are like do operations (interventions)
 -   choosing between options is like conterfactual reasoning.
 :::
 
-In this talk, [Dorina Precup](https://rl.cs.mcgill.ca/people/doina-precup/) discusses the challenges of building knowledge for AI agents using reinforcement learning.
 
-::: callout-info
-### a few ideas on generization and discrimination {.unnumbered}
-
-there are a couple of issues on generalization.
-
-3.  The problem for a general ai is very much the problem of transfer learning in RL.
-
--   agents learn a very specific policy for a very specific task
--   the representation isn't abstract and cant be mapped to a slightly different task (e.g. changing a few pixels in a game)
--   we definitely can't map the representation to a different task.
--   idealy we would like to deal with challanging problems by reusing knowledge from agents trained on other problems.
--   the learned representation cannot be mapped to other tasks or even other states in the same task.
--   it might be better to decompose learning into goals and subgoals, startegies and tactics and basic moves.
--   learning should be aggregational and compositional.
-
-1.  heuristic are:
-
--   a minimal policies that isn't optimal but is good enough to get the agent to the goal.
--   heuristics don't always work but overall they capture the essence of the solution to the problem.
--   heuristics are usually more general than an optimal policy.
--   a heuristic might be a very good behavior policy for off policy learning the optimal policy.
--   I don't see RL algorithms for heuristics.
-
-2.  models in RL try to approximate MDP dynamics using its transition and rewards
-    -   in ML we often use boosting and bagging to aggregate very simple models.
-    -   in RL we may want to learn basic skills and then compose them into more complex skills.
-3.  The problem for a general ai is very much the problem of transfer learning in RL.
-
--   agents learm a very specific policy for a very specific task - the learned representation cannot be mapped to other tasks or even other states in the same task.
--   if agents learning was decomposed into
-    -   learning very general policies that solved more abstract problems and then
-    -   learning a good composition of these policies to solve the specific problem.
-    -   only after getting to this point would the agent try to optimize the policy for the specific task.
-    -   e.g. chess
-        -   learn the basic moves and avarage value of pieces
-        -   learning tactics - short term goals
-        -   learning about end game
-            -   update the value of pieces based on the ending
-        -   learning about strategy
-            -   positional play
-                -   learn about pawn formations and weak square
-                    -   value of pawn formations
-                    -   how they can be used with learned tactics.
-                -   the center
-                    -   add value to pieces based on their position on the board
-                -   open files and diagonals
-            -   long term plans
-                -   minority attack, king side attack, central breakthough
-                -   creating a passed pawn
-                -   exchanging to win in the end game
-                -   sacrificing material to get a better position
-                -   attacking the king
-            -   castling
-            -   piece development and the center
-            -   tempo
-        -   localize value of pieces in different positions on the board using the learned tactics and strategy.
-
-2.  Bayesian models and hierarchical model encode knowledge using priors which can pool or bias beliefs towards a certain outcome.
-    -   learning in Bayesian models is about updating the initial beliefs based on incoming evidence.
-3.  CI may be useful here
-
--   is in a big way about mapping knowledge into
-    -   statistical joint probabilities,
-    -   casual concepts that are not in the joint distributions like interventions and counterfactuals, latent, missing, mediators, confounders, etc
-    -   hypothesisizng a causal structural model, deriving a statistical model and testing it aganst the data.
-    -   interventions in the form of actions and options -
--   many key ideas in RL are counterfactual reasoning
-    -   off policy learning is about learning from data generated by a different policy.
-    -   options are like do operations (interventions)
-    -   choosing between actions and options is like conterfactual reasoning.
--   Using and verifying CI models could be the way to unify the spatial and temporal abstraction in RL.
-:::
 
 # Lesson 4: Linear TD
 
@@ -729,25 +773,24 @@ using this definition we can write the update rule as:
 $$
 \begin{align*}
 w_{t+1} & = w_t + \alpha [R_{t+1} + \gamma \mathbf{w}^T \mathbf{x}_{t+1} - \mathbf{w}^T \mathbf{x}] \mathbf{x}_t \newline
-        &=  w_t + \alpha [R_{t+1} \mathbf{x}_t -  \mathbf{x}_t( \mathbf{x}_t - \gamma \mathbf{x_{t+1})}^T \mathbf{w_t}] \newline
+        &=  w_t + \alpha [R_{t+1} \mathbf{x}_t -  \mathbf{x}_t( \mathbf{x}_t - \gamma \mathbf{x_{t+1}})^T \mathbf{w_t}] \newline
 \end{align*}
 $$
+
 let us now consider what this update looks like in expectation:
 
 we can think about it as an expected update plus a noise term
 but the noise term is dominated by the behaviour of the expected update.
 
 $$
-\begin{align*}
-\mathbb{E}[\Delta w_{t}] & = \alpha(b-Aw_t)
-\end{align*}
+\mathbb{E}[\Delta w_{t}]  = \alpha(b-Aw_t)
 $$
 where:
 
 -  $b = \mathbb{E}[R_{t+1} \mathbf{x}_t]$ - expectation over the features and the rewards
--  $A = \mathbb{E}[\mathbf{x}_t( \mathbf{x}_t - \gamma \mathbf{x_{t+1})}^T]$ - an expectation over the rewards
+-  $A = \mathbb{E}[\mathbf{x}_t( \mathbf{x}_t - \gamma \mathbf{x_{t+1}})^T]$ - an expectation over the rewards
 
-note: this is a linear system of equations that looks like a linear regression problem.
+note: this is a linear system of equations that looks like a **linear regression problem**.
 
 when the weights do not change we have a fixed point:
 
@@ -763,6 +806,7 @@ $$
 (b-Aw)^T(b-Aw)
 $$ {#eq-min-lin-td}
 
+
 this is related to Bellman equations via the projected Bellman error.
 
 ## Theoretical guarantee on the mean squared value error at the TD fixed point {#sec-l4g6}
@@ -770,7 +814,6 @@ this is related to Bellman equations via the projected Bellman error.
 $$
 \overline{VE}(w_{TD}) \leq \frac{1}{1-\gamma} \min_{w} \overline{VE}(w)
 $$ {#eq-td-fixed-point-and-minimum-ve}
-
 
 
 - if $\gamma \approx 1$ then the mean squared value error at the TD fixed point can be large

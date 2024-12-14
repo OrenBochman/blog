@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
+<meta name="keywords" content="reinforcement learning, neural networks, feature construction, tile coding, coarse coding, feed-forward architecture, activation functions, deep networks, gradient, online setting, offline setting, representation">
 
 <title>Constructing Features for Prediction – Oren Bochman’s Blog</title>
 <style>
@@ -115,6 +116,49 @@ div.csl-indent {
       }
 </style>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta name="twitter:title" content="Constructing Features for Prediction – Oren Bochman’s Blog">
 <meta name="twitter:description" content="Prediction and Control with Function Approximation">
@@ -219,12 +263,6 @@ div.csl-indent {
                 <div class="quarto-category">notes</div>
                 <div class="quarto-category">rl</div>
                 <div class="quarto-category">reinforcement learning</div>
-                <div class="quarto-category">the k-armed bandit problem</div>
-                <div class="quarto-category">bandit algorithms</div>
-                <div class="quarto-category">exploration</div>
-                <div class="quarto-category">explotation</div>
-                <div class="quarto-category">epsilon greedy algorithm</div>
-                <div class="quarto-category">sample avarage method</div>
               </div>
                   </div>
   </div>
@@ -249,6 +287,13 @@ div.csl-indent {
       
     </div>
     
+
+  <div>
+    <div class="keywords">
+      <div class="block-title">Keywords</div>
+      <p>reinforcement learning, neural networks, feature construction, tile coding, coarse coding, feed-forward architecture, activation functions, deep networks, gradient, online setting, offline setting, representation</p>
+    </div>
+  </div>
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
@@ -2664,6 +2709,12 @@ div.csl-indent {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../posts/2024/2024-11-28-misbahaviour-of-markets/part4/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling in financial prices 4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../posts/2024/2024-11-28-misbahaviour-of-markets/part2/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Scaling in financial prices 2</span></a>
   </div>
@@ -2690,7 +2741,15 @@ div.csl-indent {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#lesson-1-feature-construction-for-linear-methods" id="toc-lesson-1-feature-construction-for-linear-methods" class="nav-link" data-scroll-target="#lesson-1-feature-construction-for-linear-methods">Lesson 1: Feature Construction for Linear Methods</a></li>
+  <li><a href="#lesson-1-feature-construction-for-linear-methods" id="toc-lesson-1-feature-construction-for-linear-methods" class="nav-link" data-scroll-target="#lesson-1-feature-construction-for-linear-methods">Lesson 1: Feature Construction for Linear Methods</a>
+  <ul class="collapse">
+  <li><a href="#coarse-coding-video" id="toc-coarse-coding-video" class="nav-link" data-scroll-target="#coarse-coding-video">Coarse Coding (Video)</a></li>
+  <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">Define the difference between <strong>coarse coding</strong> and tabular representations</a></li>
+  <li><a href="#generalization-properties-of-coarse-coding-video" id="toc-generalization-properties-of-coarse-coding-video" class="nav-link" data-scroll-target="#generalization-properties-of-coarse-coding-video">Generalization Properties of Coarse Coding (Video)</a></li>
+  <li><a href="#sec-l1g2" id="toc-sec-l1g2" class="nav-link" data-scroll-target="#sec-l1g2">The trade-off between discrimination and generalization</a></li>
+  <li><a href="#tile-coding-video" id="toc-tile-coding-video" class="nav-link" data-scroll-target="#tile-coding-video">Tile Coding (Video)</a></li>
+  <li><a href="#using-tile-coding-in-td-video" id="toc-using-tile-coding-in-td-video" class="nav-link" data-scroll-target="#using-tile-coding-in-td-video">Using Tile Coding in TD (Video)</a></li>
+  </ul></li>
   <li><a href="#lesson-2-neural-networks" id="toc-lesson-2-neural-networks" class="nav-link" data-scroll-target="#lesson-2-neural-networks">Lesson 2: Neural Networks</a></li>
   <li><a href="#lesson-3-training-neural-networks" id="toc-lesson-3-training-neural-networks" class="nav-link" data-scroll-target="#lesson-3-training-neural-networks">Lesson 3: Training Neural Networks</a></li>
   </ul>
@@ -2736,7 +2795,7 @@ Readings
 </div>
 </div>
 </section>
-<section id="lesson-1-feature-construction-for-linear-methods" class="level1">
+<section id="lesson-1-feature-construction-for-linear-methods" class="level1 page-columns page-full">
 <h1>Lesson 1: Feature Construction for Linear Methods</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -2758,6 +2817,86 @@ Learning Objectives
 </ul>
 </div>
 </div>
+<section id="coarse-coding-video" class="level2">
+<h2 class="anchored" data-anchor-id="coarse-coding-video">Coarse Coding (Video)</h2>
+<p>In this video, Adam White introduces the concept of <strong>coarse coding</strong>, covering the first learning objective of this lesson.</p>
+<p>Coarse coding are a way to represent states in a more general way than tabular representations. This allows for generalization across states. The trade-off is that the representation is less discriminative.</p>
+</section>
+<section id="sec-l1g1" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-l1g1">Define the difference between <strong>coarse coding</strong> and tabular representations</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-coding_states.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="approximation"><img src="img/rl-coding_states.png" class="img-fluid figure-img" alt="approximation"></a></p>
+<figcaption>approximation</figcaption>
+</figure>
+</div></div><p>Recall that linear function approximation are paramertized by a weight vector <span class="math inline">\mathbf{w}</span> and a feature vector <span class="math inline">\mathbf{x}(s)</span>.</p>
+<p>As we saw in the previous unit tabular representations associates one feature per state, this is called a one-hot encoding of the state space.</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-tabular_coding.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="one hot coding"><img src="img/rl-tabular_coding.png" class="img-fluid figure-img" alt="one hot coding"></a></p>
+<figcaption>one hot coding</figcaption>
+</figure>
+</div></div><p>We associate one hot encoding with an indicator function <span class="math inline">\delta_{ij}(s)</span>. This is a very discriminative representation but it does generalize.</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-state-aggregation.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="state aggregation"><img src="img/rl-state-aggregation.png" class="img-fluid figure-img" alt="state aggregation"></a></p>
+<figcaption>state aggregation</figcaption>
+</figure>
+</div></div><p>We also discussed using <strong>state aggregation</strong> for the 1000 state random walk example. In state aggregation we break the continuous state space into discrete regions and associate a feature with each region. This is a more general representation than tabular representations but less discriminative.</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/rl-coarse-coding.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="coarse coding"><img src="img/rl-coarse-coding.png" class="img-fluid figure-img" alt="coarse coding"></a></p>
+<figcaption>coarse coding</figcaption>
+</figure>
+</div></div><p><strong>Coarse coding</strong> uses multiple overlapping shapes to represent states. This is a more General representation than state aggregation but less discriminative. Features are the circles they are in. If the circles overlap, we can have items that are in multiple circles. I.e. they are characterized by multiple features. In the example shown there can be from one to three active features.</p>
+<p>So the difference is that tabular representations are one hot encodings while coarse coding uses membership in multiple overlapping shapes to represent states.</p>
+<p>How does coarse coding relates to state aggregation?</p>
+<p>Coarse coding is also a generalization of state aggregation. In state aggregation we break the state space into discrete regions and associate a feature with each region. But we don’t let these regions overlap. In coarse coding we allow the regions to overlap which can give greater generalization as regions can share features.</p>
+<p>In this video the term Reception Field is used to describe the region of the state space that a feature is associated with. This is an idea that comes from CNNs.</p>
+</section>
+<section id="generalization-properties-of-coarse-coding-video" class="level2">
+<h2 class="anchored" data-anchor-id="generalization-properties-of-coarse-coding-video">Generalization Properties of Coarse Coding (Video)</h2>
+<p>In this video Martha White discusses the generalization properties of coarse coding.</p>
+<p>She looks at using small overlapping 1-d intervals to represent a 1-d function.</p>
+<p>We see that changing shape size and number of effects the generalization properties of the representation.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="rl-scale-generalization.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="scale"><img src="rl-scale-generalization.png" class="img-fluid figure-img" alt="scale"></a></p>
+<figcaption>scale</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="rl-shape-generalization.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="shape"><img src="rl-shape-generalization.png" class="img-fluid figure-img" alt="shape"></a></p>
+<figcaption>shape</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="rl-shape-discrimination.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="discrimination"><img src="rl-shape-discrimination.png" class="img-fluid figure-img" alt="discrimination"></a></p>
+<figcaption>discrimination</figcaption>
+</figure>
+</div>
+<p>Next we looked at using short interval vs longer intervals to approximate a 1-d function. We see that the longer intervals give a smoother approximation.</p>
+</section>
+<section id="sec-l1g2" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l1g2">The trade-off between discrimination and generalization</h2>
+</section>
+<section id="tile-coding-video" class="level2">
+<h2 class="anchored" data-anchor-id="tile-coding-video">Tile Coding (Video)</h2>
+<p>In this video, Martha White introduces the concept of <strong>tile coding</strong>, covering the last learning objective of this lesson</p>
+<p>This is a computationally efficient implementation of coarse coding. We use multiple overlapping tilings to represent states. Each tiling is a grid of tiles. Each tile is a feature.</p>
+<p>If we use one tiling we get state aggregation. If we use multiple tilings we get coarse coding. One tiling means we don’t discriminate between states that are in the same tile. Multiple tilings means we can discriminate between states that are in the same tile in one tiling but not in another.</p>
+<p>The textbook goes into some more details about how we can generelize using tile coding - using regular tilings generates in a diagonal pattern. Using random tilings generates more spherical regions.</p>
+<p>One caveat is that in high dimensional spaces we end up an exponential number of features. This is called the curse of dimensionality.</p>
+</section>
+<section id="using-tile-coding-in-td-video" class="level2">
+<h2 class="anchored" data-anchor-id="using-tile-coding-in-td-video">Using Tile Coding in TD (Video)</h2>
+</section>
 </section>
 <section id="lesson-2-neural-networks" class="level1">
 <h1>Lesson 2: Neural Networks</h1>

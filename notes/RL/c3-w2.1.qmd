@@ -1,0 +1,222 @@
+---
+date: 2024-04-02
+lastmod: 2024-04-02
+title: Constructing Features for Prediction
+subtitle: Prediction and Control with Function Approximation
+author: Oren Bochman
+draft: false
+categories:
+  - Coursera
+  - notes
+  - rl
+  - reinforcement learning
+keywords:
+  - reinforcement learning
+  - neural networks
+  - feature construction
+  - tile coding
+  - coarse coding
+  - feed-forward architecture
+  - activation functions
+  - deep networks
+  - gradient
+  - online setting
+  - offline setting
+  - representation
+image: /images/nlp-brain-wordcloud.jpg
+title-block-banner: /images/banner_black_3.jpg
+---
+
+![RL algorithms](img/alg_selector.jpeg){.column-margin}
+
+# Introduction
+
+::: {.callout-tip collapse="true"}
+### Readings {.unnumbered}
+
+-   [x] [@sutton2018reinforcement§9.4-9.5.0, pp. 204-210] [book](http://incompleteideas.net/book/RLbook2020.pdf#page=194)
+-   [x] [@sutton2018reinforcement§9.5.3-9.5.4, pp. 215-222] [book](http://incompleteideas.net/book/RLbook2020.pdf#page=194)
+-   [x] [@sutton2018reinforcement§9.7, pp. 223-228] [book](http://incompleteideas.net/book/RLbook2020.pdf#page=194)
+
+:::
+
+
+In this module I wish to cover some material from the chapter 9 of the book by Sutton and Barto. The bulk of the material is covered in  the notes. 
+
+In this module we consider environments that allow to consider simple state aggregationI'd like to cover the following topics:
+
+1. create gymnasium compatible environment for the 1000 step Random Walk environment. This will allow to use it with many RL agents built using many libraries. I'd also want to extend this environment to include a neighborhood size parameter - this will set the bound how far a left or right step will move us. A second extension is to add a dimension parameter to control dimensions of the state space. This can allow us to consider state aggregation in one two and three dimensions.
+2. implement Gradient MC agent
+3. implement Semi Gradient TD(0) agent
+4. use these agents with and without state aggregation to learn the value function of the Random Walk 1000 environment.
+5. implement coarse coding via tile coding to create features for the Random Walk 1000 environment.
+6. implement use of **polynomial features** to create features for the Random Walk 1000 environment.
+7. implement use of **radial basis functions** to create features for the Random Walk 1000 environment.
+8. implement use of **Fourier basis functions** to create features for the Random Walk 1000 environment.
+9. implement use of 
+
+In this chapter we use a simple environment called the 1000 state Random walk. I implemented this independently in Python. 
+
+We also learned  the MC prediction algorithm and the TD(0) algorithms for function approximation.
+ We will use these algorithms to learn the value function of the Random Walk 1000 environment. We will also use tile coding and coarse coding to create features for the Random Walk 1000 environment.
+
+# Feature Construction & linear Function approximation
+
+::: callout-note
+### Learning Objectives {.unnumbered}
+
+:::
+
+In this lesson we use the Random Walk 1000 environment to demonstrate how to construct features for linear methods. We will use tile coding and coarse coding to create features for the Random Walk 1000 environment.
+
+```{python}
+
+import gymnasium as gym
+from gymnasium import spaces
+import numpy as np
+
+class RandomWalk1000(gym.Env):
+    def __init__(self, num_states=1000, neighborhood_size=100, seed=None):
+        super().__init__()
+        self.num_states = num_states
+        self.neighborhood_size = neighborhood_size
+        self.observation_space = spaces.Discrete(num_states + 2) # add two states 0 and num_states + 1 as terminal states
+        self.action_space = spaces.Discrete(2)  # 0 for left, 1 for right
+        self.current_state = 500 # start in the middle
+        self.np_random, seed = gym.utils.seeding.np_random(seed)
+        self.trajectory = [500]
+
+    def reset(self, *, seed=None, options=None):
+        super().reset(seed=seed)
+        self.current_state = 500
+        self.trajectory = [500]
+        return self.current_state, {}
+
+    def step(self, action):
+
+        if action == 0: # move left
+             # left neighbours
+            left_start = max(1, self.current_state - self.neighborhood_size)
+            left_end = self.current_state
+            num_left = left_end - left_start
+
+            if left_start == 1:
+                prob_terminate_left = (self.neighborhood_size - num_left) / self.neighborhood_size
+            else:
+                prob_terminate_left = 0
+            
+            if self.np_random.random() < prob_terminate_left:
+               
+                return 0, -1, True, False, {} # terminate left
+
+            next_state = self.np_random.integers(low=left_start, high=left_end)
+
+
+        elif action == 1: # move right
+             # right neighbours
+            right_start = self.current_state + 1
+            right_end = min(self.num_states + 1, self.current_state + self.neighborhood_size + 1)
+            num_right = right_end - right_start
+            if right_end == self.num_states + 1:
+                 prob_terminate_right = (self.neighborhood_size - num_right) / self.neighborhood_size
+            else:
+                prob_terminate_right = 0
+            
+            if self.np_random.random() < prob_terminate_right:
+
+                return self.num_states + 1, 1, True, False, {} # terminate right
+
+            next_state = self.np_random.integers(low=right_start, high=right_end)
+        else:
+            raise ValueError("Invalid action")
+
+        self.current_state = next_state
+
+        self.trajectory.append(self.current_state)
+        return self.current_state, 0, False, False, {} # not terminated or truncated
+
+
+import matplotlib.pyplot as plt
+
+
+def plot_trajectory(trajectory, num_states):
+    """Plots the trajectory of the random walk."""
+    x = np.arange(len(trajectory))
+    y = np.array(trajectory)
+    
+    plt.figure(figsize=(12, 4))
+    plt.plot(x, y, marker='o', linestyle='-', markersize=3)
+    plt.xlabel('Time Step')
+    plt.ylabel('State')
+    plt.title('Random Walk Trajectory')
+    plt.yticks(np.arange(0, num_states+2, 100))
+    plt.grid(axis='y')
+
+    plt.tight_layout()
+    plt.show()
+
+```
+
+
+```{python}
+#import gymnasium as gym
+#from random_walk_gym import RandomWalk1000
+
+env = RandomWalk1000()
+
+# Reset the env
+obs, info = env.reset()
+terminated = False
+
+while not terminated:
+    # For this environment, an action is not needed.
+    # Here we pass in a dummy value
+    obs, reward, terminated, truncated, info = env.step(0)
+    print(f"State: {obs + 1}, Reward: {reward}, Terminated: {terminated}")
+
+env.close()
+
+plot_trajectory(env.trajectory, num_states=env.num_states)
+
+
+```
+
+
+
+```{python}
+
+env = RandomWalk1000(num_states=1000, neighborhood_size=100)
+obs, info = env.reset()
+terminated = False
+truncated = False
+trajectory = []
+while not terminated and not truncated:
+    action = env.action_space.sample()  # Replace with your policy
+    obs, reward, terminated, truncated, info = env.step(action)
+    print(f'{obs=}, {action=}, {reward=}, {terminated=}')
+
+plot_trajectory(env.trajectory, num_states=env.num_states)
+
+```
+
+Lets simulate the random walk till success and plot its trajectory.
+
+
+```{python}
+
+
+
+
+env = RandomWalk1000(num_states=1000, neighborhood_size=100)
+obs, info = env.reset()
+terminated = False
+truncated = False
+while not terminated and not truncated:
+    action = env.action_space.sample()  # Replace with your policy
+    obs, reward, terminated, truncated, info = env.step(action)
+
+
+plot_trajectory(env.trajectory, num_states=env.num_states)
+```
+
+

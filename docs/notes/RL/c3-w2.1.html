@@ -2732,7 +2732,10 @@ div.csl-indent {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#feature-construction-linear-function-approximation" id="toc-feature-construction-linear-function-approximation" class="nav-link" data-scroll-target="#feature-construction-linear-function-approximation">Feature Construction &amp; linear Function approximation</a></li>
+  <li><a href="#feature-construction-linear-function-approximation" id="toc-feature-construction-linear-function-approximation" class="nav-link" data-scroll-target="#feature-construction-linear-function-approximation">Feature Construction &amp; linear Function approximation</a>
+  <ul class="collapse">
+  <li><a href="#the-1000-step-random-walk-environment" id="toc-the-1000-step-random-walk-environment" class="nav-link" data-scroll-target="#the-1000-step-random-walk-environment">The 1000 Step Random Walk Environment</a></li>
+  </ul></li>
   </ul>
 </nav>
 </nav>
@@ -2775,21 +2778,31 @@ Readings
 </div>
 </div>
 </div>
-<p>In this module I wish to cover some material from the chapter 9 of the book by Sutton and Barto. The bulk of the material is covered in the notes.</p>
-<p>In this module we consider environments that allow to consider simple state aggregationI’d like to cover the following topics:</p>
-<ol type="1">
-<li>create gymnasium compatible environment for the 1000 step Random Walk environment. This will allow to use it with many RL agents built using many libraries. I’d also want to extend this environment to include a neighborhood size parameter - this will set the bound how far a left or right step will move us. A second extension is to add a dimension parameter to control dimensions of the state space. This can allow us to consider state aggregation in one two and three dimensions.</li>
-<li>implement Gradient MC agent</li>
-<li>implement Semi Gradient TD(0) agent</li>
-<li>use these agents with and without state aggregation to learn the value function of the Random Walk 1000 environment.</li>
-<li>implement coarse coding via tile coding to create features for the Random Walk 1000 environment.</li>
-<li>implement use of <strong>polynomial features</strong> to create features for the Random Walk 1000 environment.</li>
-<li>implement use of <strong>radial basis functions</strong> to create features for the Random Walk 1000 environment.</li>
-<li>implement use of <strong>Fourier basis functions</strong> to create features for the Random Walk 1000 environment.</li>
-<li>implement use of</li>
-</ol>
+<p>This is not a video lecture or notes for a learning goal. This is however my attempts to cover some material from the readings from chapter 9 of <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018</a>)</span> mentioned above.</p>
+<p>I’ve added this material about a year after completing the specialization as I have been taking a course on deep reinforcement learning. I had felt that the material in this course had been both challenging on occasion and rather basic on others.</p>
+<p>What I felt was that I was not happy about the basics in this chapter. This includes the parameterization of the value function, the convergence results regarding linear function approximation. The ideas about why TD is a semi-gradient method etc.</p>
+<p>I am also having many idea about both creating algorithms for creating features for RL environments. As I get familiar with gridwolds, atari games, sokoban etc I had many good ideas for making progress in both these environments and for improving algorithms for more general cases.</p>
+<p>For example it appears that in many papers it turns out the agents are not learning very basic abilities. My DQN agent for space invaders was very poor at shooting bullets. I had an few ideas that should make a big difference. Like adding features for bullets, the invaders and so on. This are kind of challenging to implement in the current gymnasium environments. However I soon had a much more interesting idea that seems to be good for many of the atari environments and quite possibly even more broadly to most cnn based agents.</p>
+<ul>
+<li>In brief this would combine
+<ul>
+<li>a multiframe YOLO,</li>
+<li>a generelised value function to replace YOLO’s supervision</li>
+<li>a ‘robust’ causal attention mechanism to decide which pixels are more or less important
+<ul>
+<li>dropping them would not impact performance. e.g.&nbsp;bullets</li>
+<li>which affect survival e.g.&nbsp;certain bullets</li>
+<li>for scoring e.g.&nbsp;mother ship</li>
+<li>which ones we can influence e.g.&nbsp;standing under an invader gets it to shoot at us.</li>
+</ul></li>
+</ul></li>
+</ul>
+<p>Note this is not the causal attention mechanism from NLP where one censored the future inputs but rather a mechanism that decides which pixels represent features that are potentialy the cause of the future states.</p>
+<p>Clearly this Algorithm and its parts need to be worked out in a very simple environment. The YOLO part is all about modeling features using bounding boxes via a single pass. The GVFs are to replace yolo supervision loss with a RL compatible loss and the causal attention to reduce the overfitting and speed up learning.</p>
+<p>I decided that converting some of these simple environments to gymnasium environments would be a good way to kick start some of these ideas, more so as reviewing papers and talks by Adam and Martha White shows that most experiments in RL environments turn out to be too complicated and access to simple environments turns out to be the way to get the experiments started.</p>
 <p>In this chapter we use a simple environment called the 1000 state Random walk. I implemented this independently in Python.</p>
-<p>We also learned the MC prediction algorithm and the TD(0) algorithms for function approximation. We will use these algorithms to learn the value function of the Random Walk 1000 environment. We will also use tile coding and coarse coding to create features for the Random Walk 1000 environment.</p>
+<p>We also learned the MC prediction algorithm and the TD(0) algorithms for function approximation.</p>
+<p>We will use these algorithms to learn the value function of the Random Walk 1000 environment. We will also use tile coding and coarse coding to create features for the Random Walk 1000 environment.</p>
 </section>
 <section id="feature-construction-linear-function-approximation" class="level1">
 <h1>Feature Construction &amp; linear Function approximation</h1>
@@ -2803,10 +2816,35 @@ Learning Objectives
 </div>
 </div>
 <div class="callout-body-container callout-body">
-
+<p>In this module we consider environments that allow to consider simple state aggregationI’d like to cover the following topics:</p>
+<ol type="1">
+<li><label><input type="checkbox" checked="">create gymnasium compatible environment for the 1000 step Random Walk environment.</label>
+<ul>
+<li>This will allow to use it with many RL agents built using many libraries.</li>
+<li><label><input type="checkbox" checked="">I’d also want to extend this environment to include a neighborhood size parameter - this will set the bound how far a left or right step will move us.</label></li>
+<li><label><input type="checkbox" checked="">A dimension parameter to control dimensions of the state space. This can allow us to consider state aggregation in one two and three dimensions.</label></li>
+</ul></li>
+<li><label><input type="checkbox" checked="">Plot the trajectory of the random walk.</label></li>
+<li><label><input type="checkbox">Implement the function approximation environment for gymnasium.</label>
+<ul>
+<li><label><input type="checkbox">extend to looking at interpolation and regression problems in the context of RL. (How - using a different dataset loaded by pandas?) Time series, Tabular data, Clustering, Classification, Regression, Pricing with elasticity. Multi-dimensional data.</label></li>
+<li>This environment can be a basis for looking at how Temporal Abstraction aggregation play with function approximation in a highly simplified form.</li>
+<li>This is a fundamental issue that <a href="https://www.youtube.com/watch?v=GntIVgNKkCI">Doina Precup</a> has raised in her talks as an ongoing area of research.</li>
+<li>So such an environment might be useful in testing how different approaches can handle these issues in an environment that is very close to supervised learning.</li>
+</ul></li>
+<li>implement Gradient MC agent</li>
+<li>implement Semi Gradient TD(0) agent</li>
+<li>use these agents with and without state aggregation to learn the value function of the Random Walk 1000 environment.</li>
+<li>implement coarse coding via tile coding to create features for the Random Walk 1000 environment.</li>
+<li>implement use of <strong>polynomial features</strong> to create features for the Random Walk 1000 environment.</li>
+<li>implement use of <strong>radial basis functions</strong> to create features for the Random Walk 1000 environment.</li>
+<li>implement use of <strong>Fourier basis functions</strong> to create features for the Random Walk 1000 environment.</li>
+</ol>
 </div>
 </div>
-<p>In this lesson we use the Random Walk 1000 environment to demonstrate how to construct features for linear methods. We will use tile coding and coarse coding to create features for the Random Walk 1000 environment.</p>
+<section id="the-1000-step-random-walk-environment" class="level2">
+<h2 class="anchored" data-anchor-id="the-1000-step-random-walk-environment">The 1000 Step Random Walk Environment</h2>
+<p>In this lesson we implement the 1000 Random Walk example as an environment. This is good to demonstrate how to construct features for linear methods. We will use tile coding and coarse coding to create features for the Random Walk 1000 environment.</p>
 <div id="9dbc8e53" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> gymnasium <span class="im">as</span> gym</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> gymnasium <span class="im">import</span> spaces</span>
@@ -3027,6 +3065,7 @@ obs=1001, action=1, reward=1, terminated=True</code></pre>
 
 
 
+</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">

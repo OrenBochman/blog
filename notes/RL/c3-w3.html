@@ -116,6 +116,49 @@ div.csl-indent {
       }
 </style>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta name="twitter:title" content="Control with Approximation – Oren Bochman’s Blog">
 <meta name="twitter:description" content="Prediction and Control with Function Approximation">
@@ -2716,17 +2759,27 @@ div.csl-indent {
   <ul>
   <li><a href="#lesson-1-episodic-sarsa-with-function-approximation" id="toc-lesson-1-episodic-sarsa-with-function-approximation" class="nav-link active" data-scroll-target="#lesson-1-episodic-sarsa-with-function-approximation">Lesson 1: Episodic Sarsa with Function Approximation</a>
   <ul class="collapse">
-  <li><a href="#episodic-sarsa-with-function-approximation-video" id="toc-episodic-sarsa-with-function-approximation-video" class="nav-link" data-scroll-target="#episodic-sarsa-with-function-approximation-video">Episodic Sarsa with Function Approximation (Video)</a></li>
-  <li><a href="#episodic-sarsa-in-mountain-car-video" id="toc-episodic-sarsa-in-mountain-car-video" class="nav-link" data-scroll-target="#episodic-sarsa-in-mountain-car-video">Episodic Sarsa in Mountain Car (Video)</a></li>
-  <li><a href="#expected-sarsa-with-function-approximation-video" id="toc-expected-sarsa-with-function-approximation-video" class="nav-link" data-scroll-target="#expected-sarsa-with-function-approximation-video">Expected Sarsa with Function Approximation (Video)</a></li>
+  <li><a href="#episodic-sarsa-with-function-approximation-video" id="toc-episodic-sarsa-with-function-approximation-video" class="nav-link" data-scroll-target="#episodic-sarsa-with-function-approximation-video">Episodic SARSA with Function Approximation (Video)</a></li>
+  <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">How to Construct action Dependent Features</a></li>
+  <li><a href="#explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" id="toc-explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" class="nav-link" data-scroll-target="#explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation">Explain how to use SARSA in episodic tasks with function approximation</a></li>
+  <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">The the update for Episodic SARSA with function approximation</a></li>
+  <li><a href="#sec-l1g2" id="toc-sec-l1g2" class="nav-link" data-scroll-target="#sec-l1g2">Feature Choices in Episodic SARSA with Function Approximation</a></li>
+  <li><a href="#sec-l1g3" id="toc-sec-l1g3" class="nav-link" data-scroll-target="#sec-l1g3">Visualizing Value Function and Learning Curves</a></li>
+  <li><a href="#episodic-sarsa-in-mountain-car-video" id="toc-episodic-sarsa-in-mountain-car-video" class="nav-link" data-scroll-target="#episodic-sarsa-in-mountain-car-video">Episodic SARSA in Mountain Car (Video)</a></li>
+  <li><a href="#expected-sarsa-with-function-approximation-video" id="toc-expected-sarsa-with-function-approximation-video" class="nav-link" data-scroll-target="#expected-sarsa-with-function-approximation-video">Expected SARSA with Function Approximation (Video)</a></li>
+  <li><a href="#sec-l1g4" id="toc-sec-l1g4" class="nav-link" data-scroll-target="#sec-l1g4">How this extends to Q-learning easily, since it is a subset of Expected SARSA</a></li>
   </ul></li>
   <li><a href="#lesson-2-exploration-under-function-approximation" id="toc-lesson-2-exploration-under-function-approximation" class="nav-link" data-scroll-target="#lesson-2-exploration-under-function-approximation">Lesson 2: Exploration under Function Approximation</a>
   <ul class="collapse">
   <li><a href="#exploration-under-function-approximation-video" id="toc-exploration-under-function-approximation-video" class="nav-link" data-scroll-target="#exploration-under-function-approximation-video">Exploration under Function Approximation (Video)</a></li>
+  <li><a href="#sec-l2g1" id="toc-sec-l2g1" class="nav-link" data-scroll-target="#sec-l2g1">Optimistic Initialization as a Form of Exploration</a></li>
   </ul></li>
   <li><a href="#lesson-3-average-reward" id="toc-lesson-3-average-reward" class="nav-link" data-scroll-target="#lesson-3-average-reward">Lesson 3: Average Reward</a>
   <ul class="collapse">
   <li><a href="#average-reward-a-new-way-of-formulating-control-problems-video" id="toc-average-reward-a-new-way-of-formulating-control-problems-video" class="nav-link" data-scroll-target="#average-reward-a-new-way-of-formulating-control-problems-video">Average Reward: A New Way of Formulating Control Problems (Video)</a></li>
+  <li><a href="#sec-l3g1" id="toc-sec-l3g1" class="nav-link" data-scroll-target="#sec-l3g1">The Average Reward Setting</a></li>
+  <li><a href="#sec-l3g2" id="toc-sec-l3g2" class="nav-link" data-scroll-target="#sec-l3g2">When Average Reward Optimal Policies are Different from Discounted Solutions</a></li>
+  <li><a href="#sec-l3g3" id="toc-sec-l3g3" class="nav-link" data-scroll-target="#sec-l3g3">Differential Value Functions v.s. Discounted Value Functions</a></li>
   <li><a href="#satinder-singh-on-intrinsic-rewards-video" id="toc-satinder-singh-on-intrinsic-rewards-video" class="nav-link" data-scroll-target="#satinder-singh-on-intrinsic-rewards-video">Satinder Singh on Intrinsic Rewards (Video)</a></li>
   </ul></li>
   </ul>
@@ -2746,10 +2799,16 @@ div.csl-indent {
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/alg_selector.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="RL algorithms"><img src="img/alg_selector.png" class="img-fluid figure-img" alt="RL algorithms"></a></p>
+<p><a href="img/logo.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="RL logo"><img src="img/logo.png" class="img-fluid figure-img" alt="RL logo"></a></p>
+<figcaption>RL logo</figcaption>
+</figure>
+</div><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="img/alg_selector.png" class="lightbox" data-gallery="slides" title="RL algorithms"><img src="img/alg_selector.png" class="img-fluid figure-img" alt="RL algorithms"></a></p>
 <figcaption>RL algorithms</figcaption>
 </figure>
-</div></div><div class="callout callout-style-default callout-tip callout-titled">
+</div></div>
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -2768,7 +2827,7 @@ Readings
 </div>
 </div>
 </div>
-<section id="lesson-1-episodic-sarsa-with-function-approximation" class="level1">
+<section id="lesson-1-episodic-sarsa-with-function-approximation" class="level1 page-columns page-full">
 <h1>Lesson 1: Episodic Sarsa with Function Approximation</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -2789,13 +2848,50 @@ Learning Objectives
 </div>
 </div>
 <section id="episodic-sarsa-with-function-approximation-video" class="level2">
-<h2 class="anchored" data-anchor-id="episodic-sarsa-with-function-approximation-video">Episodic Sarsa with Function Approximation (Video)</h2>
+<h2 class="anchored" data-anchor-id="episodic-sarsa-with-function-approximation-video">Episodic SARSA with Function Approximation (Video)</h2>
+<p>In this video Adam White discusses the Episodic SARSA algorithm with function approximation. He explains how this algorithm can be used to solve reinforcement learning problems with large state spaces. He also discusses the importance of feature choices in this algorithm and how they can impact the performance of the system.</p>
+</section>
+<section id="sec-l1g1" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-l1g1">How to Construct action Dependent Features</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="nn-feature-stacking.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Stacking"><img src="nn-feature-stacking.png" class="img-fluid figure-img" alt="Stacking"></a></p>
+<figcaption>Stacking</figcaption>
+</figure>
+</div></div><p>We see two techniques for constructing action dependent features.</p>
+<p>The first is called “Stacking” and involves concatenating the state features with the action features. This is a simple and effective way to construct action dependent features.</p>
+<p>Adam White explains that this technique is used both for linear function approximation and for neural networks in much the same way. However the main issue with stacking is that it keeps the same state features used for different actions separate. This seems to be both an overparameterization (i.e.&nbsp;overfitting) and a an impediment to learning a good representation of the state.</p>
+<p>The next technique called “Passing Actions to Features” attempts to remedy this issue. In this technique, the state features are passed through a neural network that also takes the action as input. This allows the network to learn a better representation of the state that is dependent on the action. This technique is more complex but can lead to better performance.</p>
+</section>
+<section id="explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" class="level2">
+<h2 class="anchored" data-anchor-id="explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation">Explain how to use SARSA in episodic tasks with function approximation</h2>
+</section>
+<section id="sec-l1g1" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l1g1">The the update for Episodic SARSA with function approximation</h2>
+<p>So far we have been using function approximation to parametize state value function,</p>
+<p><span id="eq-parametize-state-value-function"><span class="math display">
+V_\pi(s) ≈ \hat{v}(s,w) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(S) \qquad
+\tag{1}</span></span></p>
+<p>But for SARSA we need to parametize the action value function,</p>
+<p><span id="eq-parametize-action-value-function"><span class="math display">
+q_\pi(s) ≈ \hat{q}(s,a,\mathbf{w}) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(s,a) \qquad
+\tag{2}</span></span></p>
+</section>
+<section id="sec-l1g2" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l1g2">Feature Choices in Episodic SARSA with Function Approximation</h2>
+</section>
+<section id="sec-l1g3" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l1g3">Visualizing Value Function and Learning Curves</h2>
 </section>
 <section id="episodic-sarsa-in-mountain-car-video" class="level2">
-<h2 class="anchored" data-anchor-id="episodic-sarsa-in-mountain-car-video">Episodic Sarsa in Mountain Car (Video)</h2>
+<h2 class="anchored" data-anchor-id="episodic-sarsa-in-mountain-car-video">Episodic SARSA in Mountain Car (Video)</h2>
 </section>
 <section id="expected-sarsa-with-function-approximation-video" class="level2">
-<h2 class="anchored" data-anchor-id="expected-sarsa-with-function-approximation-video">Expected Sarsa with Function Approximation (Video)</h2>
+<h2 class="anchored" data-anchor-id="expected-sarsa-with-function-approximation-video">Expected SARSA with Function Approximation (Video)</h2>
+</section>
+<section id="sec-l1g4" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l1g4">How this extends to Q-learning easily, since it is a subset of Expected SARSA</h2>
 </section>
 </section>
 <section id="lesson-2-exploration-under-function-approximation" class="level1">
@@ -2818,8 +2914,11 @@ Learning Objectives
 <section id="exploration-under-function-approximation-video" class="level2">
 <h2 class="anchored" data-anchor-id="exploration-under-function-approximation-video">Exploration under Function Approximation (Video)</h2>
 </section>
+<section id="sec-l2g1" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l2g1">Optimistic Initialization as a Form of Exploration</h2>
 </section>
-<section id="lesson-3-average-reward" class="level1">
+</section>
+<section id="lesson-3-average-reward" class="level1 page-columns page-full">
 <h1>Lesson 3: Average Reward</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -2841,7 +2940,16 @@ Learning Objectives
 <section id="average-reward-a-new-way-of-formulating-control-problems-video" class="level2">
 <h2 class="anchored" data-anchor-id="average-reward-a-new-way-of-formulating-control-problems-video">Average Reward: A New Way of Formulating Control Problems (Video)</h2>
 </section>
-<section id="satinder-singh-on-intrinsic-rewards-video" class="level2">
+<section id="sec-l3g1" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l3g1">The Average Reward Setting</h2>
+</section>
+<section id="sec-l3g2" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l3g2">When Average Reward Optimal Policies are Different from Discounted Solutions</h2>
+</section>
+<section id="sec-l3g3" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l3g3">Differential Value Functions v.s. Discounted Value Functions</h2>
+</section>
+<section id="satinder-singh-on-intrinsic-rewards-video" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="satinder-singh-on-intrinsic-rewards-video">Satinder Singh on Intrinsic Rewards (Video)</h2>
 <p>Satinder Singh is a professor at the University of Michigan. He is a leading researcher in reinforcement learning and has made significant contributions to the field. In this video, he discusses intrinsic rewards and how they can be used to improve learning in reinforcement learning systems. It’s worth noting that he is one of the reaserchers who has worked on options with Doina Precup.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -2862,6 +2970,36 @@ Discussion prompt
 </blockquote>
 </div>
 </div>
+
+<div class="no-row-height column-margin column-container"><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/L-9Pbhpk7pQ" title="From Reinforcement Learning to Artificial Intelligence ?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: This is a high level talk by Satinder Singh on AI and RL
+</figcaption>
+</figure>
+</div><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/jn1NE8uIxgw" title="Steps Towards Continual Learning" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: This talk titled ‘Steps Towards Continual Learning’ by Satinder Singh on Reinforcement Learning at DLSS &amp; RLSS 2017 - Montreal
+</figcaption>
+</figure>
+</div><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/Z7JhZx3urEY" title="Discovery in Reinforcement Learning" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Talk titled ‘Discovery in Reinforcement Learning’ at Beijing Academy of Artificial Intelligence by Satinder Singh on Two Pieces of Research on Exploration in Reinforcement Learning.
+</figcaption>
+</figure>
+</div></div>
+
 
 
 

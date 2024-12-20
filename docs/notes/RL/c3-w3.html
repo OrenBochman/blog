@@ -2763,9 +2763,9 @@ window.Quarto = {
   <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">How to Construct action Dependent Features</a></li>
   <li><a href="#explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" id="toc-explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" class="nav-link" data-scroll-target="#explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation">Explain how to use SARSA in episodic tasks with function approximation</a></li>
   <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">The the update for Episodic SARSA with function approximation</a></li>
+  <li><a href="#episodic-sarsa-in-mountain-car-video" id="toc-episodic-sarsa-in-mountain-car-video" class="nav-link" data-scroll-target="#episodic-sarsa-in-mountain-car-video">Episodic SARSA in Mountain Car (Video)</a></li>
   <li><a href="#sec-l1g2" id="toc-sec-l1g2" class="nav-link" data-scroll-target="#sec-l1g2">Feature Choices in Episodic SARSA with Function Approximation</a></li>
   <li><a href="#sec-l1g3" id="toc-sec-l1g3" class="nav-link" data-scroll-target="#sec-l1g3">Visualizing Value Function and Learning Curves</a></li>
-  <li><a href="#episodic-sarsa-in-mountain-car-video" id="toc-episodic-sarsa-in-mountain-car-video" class="nav-link" data-scroll-target="#episodic-sarsa-in-mountain-car-video">Episodic SARSA in Mountain Car (Video)</a></li>
   <li><a href="#expected-sarsa-with-function-approximation-video" id="toc-expected-sarsa-with-function-approximation-video" class="nav-link" data-scroll-target="#expected-sarsa-with-function-approximation-video">Expected SARSA with Function Approximation (Video)</a></li>
   <li><a href="#sec-l1g4" id="toc-sec-l1g4" class="nav-link" data-scroll-target="#sec-l1g4">How this extends to Q-learning easily, since it is a subset of Expected SARSA</a></li>
   </ul></li>
@@ -2827,7 +2827,7 @@ Readings
 </div>
 </div>
 </div>
-<section id="lesson-1-episodic-sarsa-with-function-approximation" class="level1">
+<section id="lesson-1-episodic-sarsa-with-function-approximation" class="level1 page-columns page-full">
 <h1>Lesson 1: Episodic Sarsa with Function Approximation</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -2851,11 +2851,30 @@ Learning Objectives
 <h2 class="anchored" data-anchor-id="episodic-sarsa-with-function-approximation-video">Episodic SARSA with Function Approximation (Video)</h2>
 <p>In this video Adam White discusses the Episodic SARSA algorithm with function approximation. He explains how this algorithm can be used to solve reinforcement learning problems with large state spaces. He also discusses the importance of feature choices in this algorithm and how they can impact the performance of the system.</p>
 </section>
-<section id="sec-l1g1" class="level2">
+<section id="sec-l1g1" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="sec-l1g1">How to Construct action Dependent Features</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="nn-feature-stacking.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Stacking"><img src="nn-feature-stacking.png" class="img-fluid figure-img" alt="Stacking"></a></p>
+<figcaption>Stacking</figcaption>
+</figure>
+</div></div><p class="page-columns page-full"><a href="nn-feature-inputs.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-4"><div class="no-row-height column-margin column-container"><img src="nn-feature-inputs.png" class="img-fluid"></div></a></p>
+<p>We see two techniques for constructing action dependent features.</p>
+<p>The first is called “Stacking” and involves concatenating the state features with the action features. This is a simple and effective way to construct action dependent features.</p>
+<p>Adam White explains that this technique is used both for linear function approximation and for neural networks in much the same way. However the main issue with stacking is that it keeps the same state features used for different actions separate. This seems to be both an overparameterization (i.e.&nbsp;overfitting) and a an impediment to learning a good representation of the state.</p>
+<p>The next technique called “Passing Actions to Features” attempts to remedy this issue. In this technique, the state features are passed through a neural network that also takes the action as input. This allows the network to learn a better representation of the state that is dependent on both the state and the action. This technique is more complex but can lead to better performance.</p>
 </section>
-<section id="explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" class="level2">
+<section id="explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation">Explain how to use SARSA in episodic tasks with function approximation</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="episodic-semi-grafient-sarsa.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Episodic SARSA with function approximation"><img src="episodic-semi-grafient-sarsa.png" class="img-fluid figure-img" alt="Episodic SARSA with function approximation"></a></p>
+<figcaption>Episodic SARSA with function approximation</figcaption>
+</figure>
+</div></div><p>Next we see how to use SARSA in episodic tasks with function approximation. The main idea is to use a similar update rule as before, but with the action value function approximated by a function approximator, i.e.&nbsp;it will be peramertized by weights <strong>w</strong>. Also we will need to add a the gradient of the to the update rule. As we will want to move the weights in the direction of the gradient of the action value function.</p>
+<p>This allows us to learn a good policy for the task. We will also need a step to update the weights.</p>
 </section>
 <section id="sec-l1g1" class="level2">
 <h2 class="anchored" data-anchor-id="sec-l1g1">The the update for Episodic SARSA with function approximation</h2>
@@ -2868,14 +2887,31 @@ V_\pi(s) ≈ \hat{v}(s,w) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(S) \qquad
 q_\pi(s) ≈ \hat{q}(s,a,\mathbf{w}) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(s,a) \qquad
 \tag{2}</span></span></p>
 </section>
-<section id="sec-l1g2" class="level2">
-<h2 class="anchored" data-anchor-id="sec-l1g2">Feature Choices in Episodic SARSA with Function Approximation</h2>
-</section>
-<section id="sec-l1g3" class="level2">
-<h2 class="anchored" data-anchor-id="sec-l1g3">Visualizing Value Function and Learning Curves</h2>
-</section>
-<section id="episodic-sarsa-in-mountain-car-video" class="level2">
+<section id="episodic-sarsa-in-mountain-car-video" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="episodic-sarsa-in-mountain-car-video">Episodic SARSA in Mountain Car (Video)</h2>
+<p class="page-columns page-full"><a href="mountain-car-environment.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-6"><div class="no-row-height column-margin column-container"><img src="mountain-car-environment.png" class="img-fluid"></div></a></p>
+</section>
+<section id="sec-l1g2" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-l1g2">Feature Choices in Episodic SARSA with Function Approximation</h2>
+<p class="page-columns page-full"><a href="mountain-car-feature-representations.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-7"><div class="no-row-height column-margin column-container"><img src="mountain-car-feature-representations.png" class="img-fluid"></div></a></p>
+<p>What features do we use for the mountain car problem?</p>
+<p>for the state:</p>
+<ul>
+<li>position</li>
+<li>velocity</li>
+</ul>
+<p>for the action:</p>
+<ul>
+<li>accelerate left</li>
+<li>accelerate right</li>
+<li>do nothing</li>
+</ul>
+</section>
+<section id="sec-l1g3" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-l1g3">Visualizing Value Function and Learning Curves</h2>
+<p class="page-columns page-full"><a href="mountain-car-learned-values.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-8"><div class="no-row-height column-margin column-container"><img src="mountain-car-learned-values.png" class="img-fluid"></div></a></p>
+<p class="page-columns page-full"><a href="mountain-car-learned-values-trajectory.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-9"><div class="no-row-height column-margin column-container"><img src="mountain-car-learned-values-trajectory.png" class="img-fluid"></div></a></p>
+<p class="page-columns page-full"><a href="mountain-car-learning-curve.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-10"><div class="no-row-height column-margin column-container"><img src="mountain-car-learning-curve.png" class="img-fluid"></div></a></p>
 </section>
 <section id="expected-sarsa-with-function-approximation-video" class="level2">
 <h2 class="anchored" data-anchor-id="expected-sarsa-with-function-approximation-video">Expected SARSA with Function Approximation (Video)</h2>

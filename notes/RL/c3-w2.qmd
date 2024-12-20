@@ -40,6 +40,10 @@ title-block-banner: /images/banner_black_3.jpg
 
 :::
 
+
+We discussed methods for representing large, an possibly continuous state spaces. Ways to construct features. A representation is an agent's internal encoding of the state, the agent constructs features to summarize the current input. Whenever we are talking about features and representation learning, we are in the land of function approximation. 
+
+
 # Lesson 1: Feature Construction for Linear Methods 
 
 ::: callout-note
@@ -278,6 +282,10 @@ A Neural network consists of a network of nodes which process and pass on inform
 Data starts at the input layer. It is passed through the connections to the hidden layer. The hidden layer is preforms some computation on the data and passes it to the output layer. This process repeats until the last layer produces the output of the network.
 
 
+## Deep Neural Networks (Video)
+
+In  this video, Martha White introduces the concept of neural networks with multiple hidden layers and activation functions.
+
 ## Neural Networks Mechanics
 
 A node in the network is a function
@@ -317,21 +325,72 @@ A feed forward architecture is a neural network where the connections between no
 
 An example of a non-feed forward architecture is a recurrent neural network where the connections between nodes form cycles.
 
+## Non-linear Approximation with Neural Networks (video)
+
+## How Neural Networks are doing feature construction {#sec-l2g4}
+
+:::{.column-margin}
+![neural feature 1](rl-activation-1.png)
+
+darker means greater activation for the feature
+:::
+
+:::{.column-margin}
+![neural feature 2](rl-activation-2.png)
+
+the one generalize differently
+:::
+
+We construct a non-linear function of the state using a neural network.
+
+recall A node takes the form 
+
+$$
+output = f[(w_1 \times input_1) + \ldots + (w_n \times input_n) + b]
+$$
 
 
+We call this output of the node a feature! We can see that these features are a non-linear function of the inputs. We repeat this process until we evaluate all the nodes of the final layer. And the output of this final layer is called the representation.
 
-## How neural networks are doing feature construction {#sec-l2g4}
+Note: This is not very different from tile coding where we pass input to a tile coder and get back a new representation of the state. 
 
-## Non-linear Approximation with Neural Networks (Video)
+In both cases we are constructing a non-linear mapping of the input of the features. And we take a nonlinear function of the representation to form the output - a nonlinear approximation of the state. 
+
+Recall that in tile coding we had to set some hyper-parameters: size shape of tiles + number of tiling. These are fixed before training.
+In a neural network we also have hyperparameters for the size of the layers, the number of layers, the activation functions.  These too are fixed before training.
+
+The difference is that Neural networks have weights that get updated during training. But tile coding does not change during training.
 
 ## How neural networks are a non-linear function of state {#sec-l2g5}
+
+:::{.column-margin}
+![neural feature 3](rl-activation-3.png)
+
+there are no hard boundaries
+:::
+
+:::{.column-margin}
+![neural feature 4](rl-activation-4.png)
+this shows how it generelises
+:::
+
+
+Neural networks are non linear functions of the because of the non-linear nature of the activation functions. These are applied recursively as we move to the final layer.
+
 
 ## Deep Neural Networks (Video)
 
 ## How deep networks are a composition of layers {#sec-l2g6}
 
+Neural networks are modular. We can add or remove layers. Each layer is a function of the previous layer. The output of the previous layer is the input to the next layer.
+
+Depth allows composition of features. Each layer can learn a different representation of the input. The final layer can learn a representation of the input that is a composition of the representations learned by the previous layers
+
+We can design the network to remove undesirable features. For example we can design a network with a bottleneck that has less features than the input. This forces the network to learn a compressed representation of the input.
+
 ## The tradeoff between learning capacity and challenges presented by deeper networks {#sec-l2g7}
 
+Depth can increase the learning capacity of the network by allowing the network to learn complex compositions and abstractions. However, deeper networks are harder to train. 
 
 # Lesson 3: Training Neural Networks 
 
@@ -354,3 +413,210 @@ An example of a non-feed forward architecture is a recurrent neural network wher
 > What properties of the representation are important for our online setting? This contrasts the offline, batch setting. 
 
 :::
+
+## Gradient Descent for Training Neural Networks (Video)
+
+:::{.column-margin}
+![](nn-notation.png){.column-margin}
+:::
+
+If we use the square error loss then 
+
+$$
+L(\hat y_k,y_k) = (\hat y_k-y_k)^2 \qquad
+$$ {#eq-loss}
+
+
+$$
+A = A −αδ^As
+$$
+
+$$
+B = B −αδ^Bx
+$$
+
+Let’s start at the output of the network and work backwards. Recall:
+$$
+x = f_A(sA)
+$$
+
+$$
+\hat{y} = f_B(xB)
+$$
+
+We start by taking the partial derivative of the loss function with respect to the first set of weights B. 
+
+We use the chain rule given the derivative of L with respect to $\hat{Y} \times \frac{∂\hat{y}}{∂B}$. The next step is again to use the chain rule for this derivative.
+
+$$
+\frac{∂L(\hat{y}_k,y_k)}{∂B_{jk}} = \frac {∂L(\hat{y}_k,y_k)}{∂\hat{y}_k} \frac{∂\hat{y}_k}{∂B_{jk}}
+$$
+
+let’s introduce a new variable, θ where θ is the output of the hidden layer times the last set of weights.
+
+$$
+θ \dot = xB
+$$
+
+Thus
+
+$$
+\hat y \dot = f_B(θ)
+$$
+
+Rewriting we have:
+
+
+$$
+\frac{∂L(\hat{y}_k,y_k)}{∂B_{jk}} = \frac {∂L(\hat{y}_k,y_k)}{∂\hat{y}_k} \frac{∂f_B(\theta_k)}{∂\theta} \frac{∂\theta_k}{∂B_{jk}}
+$$
+
+and since 
+
+$$
+\frac{∂\theta_k}{∂B_{jk}} = x_j
+$$
+
+$$
+\frac{∂L(\hat{y}_k,y_k)}{∂B_{jk}} = \frac {∂L(\hat{y}_k,y_k)}{∂\hat{y}_k} \frac{∂f_B(\theta_k)}{∂\theta} x_j
+$$
+
+
+now that we calculated the gradient for the last layer we can move to the previous layer.
+
+we use 
+
+$$
+\Psi \dot =  sA
+$$
+
+and 
+
+$$
+x \dot = f_A(\Psi)
+$$
+
+
+$$
+\begin{aligned}
+\frac{∂L(\hat{y}_k,y_k)}{∂A_{ij}} &= \delta_k^B \frac {∂\theta_k}{∂A_{ij}} \newline
+ & = \delta_k^B B_{jk} \frac {∂x_j}{∂A_{ij}} \newline
+  & = \delta_k^B B_{jk} \frac {∂f_A(\Psi_j)}{∂\Psi_j} \frac {∂\Psi_j}{∂A_{ij}} 
+\end{aligned}
+$$
+
+since 
+
+$$
+\frac {∂\Psi_j}{∂A_{ij}} = s_{ij}
+$$
+
+we have
+
+$$
+\frac{∂L(\hat{y}_k,y_k)}{∂A_{ij}} = \delta_k^B B_{jk} \frac {∂f_A(\Psi_j)}{∂\Psi_j} s_{ij}
+$$
+
+We can clean up this derivative by again, defining a term $δ_A$.
+
+$$
+δ^A_j = (B_{jk}δ^B_k ) \frac{∂f_A(ψ_j)}{∂ψ_j}
+$$
+
+The final result will be:
+
+$$
+\frac{∂L(\hat{y}_k,y_k)}{∂A_{ij}}= δ^A_j s_i
+$$
+
+Obtaining as a final result for both gradients the next expressions
+
+$$
+\frac {∂L(\hat{y}_k,y_k)}{∂B_{jk}} = δ^B_k x_j
+$$
+
+## Computing the Gradient for a Single Hidden Layer Neural Network {#sec-l3g1}
+
+Let's summerize the results:
+
+$$
+\frac {∂L(\hat{y}_k,y_k)}{∂B_{jk}} = δ^B_k x_j \qquad 
+\frac{∂L(\hat{y}_k,y_k)}{∂A_{ij}}= δ^A_j s_i
+$$
+
+where:
+
+$$
+δ^B_k = \frac {∂L(\hat{y}_k,y_k)}{∂\hat{y}_k} \frac{∂f_B(\theta_k)}{∂\theta} \qquad
+δ^A_j = (B_{jk}δ^B_k ) \frac{∂f_A(ψ_j)}{∂ψ_j}
+$$
+
+
+## Computing the Gradient for Arbitrarily Deep Networks {#sec-l3g2}
+
+![Gradient Descent Pseudo-code](img/nn-backpop.png){#fig-gradient-descent-pseudo-code  .column-margin }
+
+![Gradient Descent Pseudo-code for RELU](img/nn-backpop-relu.png){#fig-gradient-descent-RELU  .column-margin }
+
+Now that we have estimated the gradient for a hidden layer neural network.
+We can use it to learn to optimize the weights of the network by updating the weights to minimize the error in the loss function in the direction of the negative gradient.
+
+The [pseudocode in the figure](#fig-gradient-descent-pseudo-code) outlines how to  implementing the backprop algorithm with Stochastic gradient descent.
+
+For each data point s, y in our dataset, we first get our prediction $\hat{y}$ from the network. This is the forward pass. Then we can estimate the loss using the actual value $y$
+
+Next we compute the gradients starting from the output. We first compute $δ^B$ and the gradient for $B$, then we use this gradient to update the parameters $B$, with the step size $α_B$ for the last layer.
+
+Next, we update the parameters $A$. We compute $δ^A$ which reuses $δ^B$. 
+
+Notice, that by computing the gradients of the end of the network first, we avoid recomputing the same terms for A, that were already computed for $δB$. We then compute the gradient for A and update A with this gradient using step size $α_A$.
+
+----
+
+
+Next we look at how we adapt the [pseudocode](#fig-fig-gradient-descent-RELU)  to work with the ReLU activation on the hidden layer and a linear unit for the output. 
+
+First, we compute the error for the output layer, then we compute the derivative of the ReLU units with respect to $\Psi$, and finally, we use the aerial signal from the output layer along with you to compute the air signal for the hidden layer, the rest remains the same
+
+
+
+## Optimization Strategies for NNs (Video)
+
+
+## The Importance of Initialization for Neural Networks {#sec-l3g3}
+
+One simple yet effective initialization strategy for the weights, is to randomly sample the initial weights from a normal distribution with small variance Fig. 42. This way, each neuron has a different output from other neurons within its layer. This provides a more diverse set of potential features. 
+
+![Weights initialization](img/rl-feedforward-nn.png){.column-margin}
+
+By keeping the variants small, we ensure that the output of each neuron is within the same range as its neighbors. One downside to this strategy is that, as we add more inputs to a neuron, the variance of the output grows.
+
+
+## Strategies for Initializing Neural Networks {#sec-l3g4}
+
+$$
+W_{init} ~ N(0,1)
+$$
+
+
+$$
+W_{init} ~ \frac{N(0,1)}{\sqrt{n_{in}}}
+$$
+
+## Optimization Techniques for Training Neural Networks {#sec-l3g5}
+
+- momentum update AKA heavy ball method
+$$
+W_{t+1} ← W_t −α∇_wL(W_t) + λM_t
+$$
+
+$$
+M_{t+1} = λM_t −α∇_wL
+$$
+
+vector step size adaptation
+
+- separate step size for each weight
+
+![](nn-vector-step-size.png){.column-margin}
+

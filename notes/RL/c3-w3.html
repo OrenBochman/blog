@@ -2890,7 +2890,7 @@ SARSA
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<div id="alg-sarsa" class="pseudocode-container quarto-float" data-no-end="false" data-indent-size="1.2em" data-line-number-punc=":" data-line-number="true" data-comment-delimiter="#" data-pseudocode-number="1" data-caption-prefix="Algorithm">
+<div id="alg-sarsa" class="pseudocode-container quarto-float" data-no-end="false" data-caption-prefix="Algorithm" data-line-number="true" data-line-number-punc=":" data-comment-delimiter="#" data-pseudocode-number="1" data-indent-size="1.2em">
 <div class="pseudocode">
 \begin{algorithm} \caption{SARSA($\alpha,\epsilon$)}\begin{algorithmic} \State Initialize: \State $\qquad Q(s,a) \leftarrow x \in \mathbb{R} \forall s \in \mathcal{S^+}, a\in\mathcal{A}(s)\ except\ for\ Q(terminal,\cdot)=0$ \For {each episode e:} \State Initialize $S$ \State Choose A from S using policy derived from Q (e.g., $\epsilon$-greedy) \For {each step of e} \State Take action A, observe R, S' \State Choose A' from S' using policy derived from Q (e.g., $\epsilon$-greedy) \State $Q(S, A) \leftarrow Q(S, A) + \alpha [R + \gamma Q(S',A') - Q(S, A)]$ \State $S \leftarrow S'$; $A \leftarrow A'$ \EndFor \State until $S$ is terminal \EndFor \end{algorithmic} \end{algorithm}
 </div>
@@ -2929,7 +2929,7 @@ Episodic Semi-gradient SARSA
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<div id="alg-td-sarsa" class="pseudocode-container quarto-float" data-no-end="false" data-indent-size="1.2em" data-line-number-punc=":" data-line-number="true" data-comment-delimiter="#" data-pseudocode-number="2" data-caption-prefix="Algorithm">
+<div id="alg-td-sarsa" class="pseudocode-container quarto-float" data-no-end="false" data-caption-prefix="Algorithm" data-line-number="true" data-line-number-punc=":" data-comment-delimiter="#" data-pseudocode-number="2" data-indent-size="1.2em">
 <div class="pseudocode">
 \begin{algorithm} \caption{Episodic Semi-gradient SARSA for estimating ($\hat{q} \approx q_*$)}\begin{algorithmic} \State $\textbf{Input:}$ \State $\qquad \text{a differentiable action-value fn parameterization } \hat{q}: \mathcal{S} \times A \times \mathbb{R}^d \to \mathbb{R}$ \State $\textbf{Initialize:}$ \State $\qquad$ value function weights $\mathbf{w} \in \mathbb{R}^d$ arbitrarily, (e.g., $\mathbf{w} = 0$) \For {each episode e:} \State Initialize $S$ \State Choose A from S using policy derived from $\color{red}\hat{q}(S'A,\mathbf{w})$ (e.g., $\epsilon$-greedy) \For {each step of e} \State Take action A, observe R, S' \If {$S'$ is terminal} \State $\color{red}\mathbf{w} \leftarrow \mathbf{w} + \alpha \left[ R - \hat{q}(S, A, \mathbf{w}) \right] \nabla \hat{q}(S, A, \mathbf{w})$ \State Go to next episode \EndIf \State Choose A' as a function of $\color{red}\hat{q}(S'A,\mathbf{w})$ (e.g., $\epsilon$-greedy) \State $\color{red}\mathbf{w} \leftarrow \mathbf{w} + \alpha \left[ R + \gamma \hat{q}(S', A', \mathbf{w}) - \hat{q}(S, A, \mathbf{w}) \right] \nabla \hat{q}(S, A, \mathbf{w})$ \State $S \leftarrow S'$; \State $A \leftarrow A'$ \EndFor \EndFor \end{algorithmic} \end{algorithm}
 </div>
@@ -2938,20 +2938,24 @@ Episodic Semi-gradient SARSA
 </div>
 <p>This allows us to learn a good policy for the task. We will also need a step to update the weights.</p>
 
-<div class="no-row-height column-margin column-container"><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div class="no-row-height column-margin column-container"><div id="fig-projected-bellman-error" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div aria-describedby="fig-projected-bellman-error-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/nFM5kLJl34c" title="Advances in Value Estimation in Reinforcement Learning" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-projected-bellman-error-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Talk titled ‘Advances in Value Estimation in Reinforcement Learning’ at London Machine Learning Meetu by Martha White on Two Pieces of Research on Exploration in Reinforcement Learning. On work from [patterson2024generalizedprojectedbellmanerror]
 </figcaption>
 </figure>
 </div></div><section id="questions-to-consider" class="level3 callout-info">
 <h3 class="anchored" data-anchor-id="questions-to-consider">Questions to consider:</h3>
 <ol type="1">
-<li><p>Why is this a semi-gradient method? (Hint: what is the problem with the target of the update rule?)</p></li>
+<li><p>Why is this a semi-gradient method?</p>
+<p>Hint: what is the problem with the target of the update rule?</p></li>
 <li><p>Can we do better than this?</p></li>
+</ol>
+<p>Hint: using <a href="#fig-projected-bellman-error">a projected Bellman error</a>, we may get a better algorithm than SARSA with function approximation.</p>
+<ol type="1">
 <li><p>Do we have any convergence guarantees for SARSA with function approximation?</p>
 <p>For the tabular setting, <span class="citation" data-cites="singh2000convergence">(<a href="#ref-singh2000convergence" role="doc-biblioref">Singh et al. 2000</a>)</span> the authors show that the algorithm has asymptotic converges to the optimal policy provided that the policies from the policy improvement operator is “greedy in the limit with infinite exploration”</p>
 <p>For the function approximation setting, Empirical results show that the linear SARSA can chatter, i.e.&nbsp;the weight vector does not go to infinity (i.e., it does not diverge) but oscillates in a bounded region.</p></li>
@@ -2961,6 +2965,8 @@ Figure&nbsp;2: Talk titled ‘Advances in Value Estimation in Reinforcement Lear
 <li><p>When we choose the next action, are we on policy or off policy?</p></li>
 <li><p>In the non terminal rule we use two samples, but they are highly correlated. Why is this a problem</p></li>
 <li><p>How can we reduce this correlation?</p></li>
+<li><p>What is the policy improvement operator?</p></li>
+<li><p>What is the Lipschitz constant of this operator and why don’t we see this in the SARSA algorithm?</p></li>
 </ol>
 </section>
 </section>

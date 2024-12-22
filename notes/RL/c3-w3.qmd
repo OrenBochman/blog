@@ -14,8 +14,8 @@ keywords:
   - reinforcement learning
   - neural networks
   - feature construction
-  - Episodic Semi-Gradient Sarsa Algorithm
-  - Differential Semi-Gradient Sarsa Algorithm
+  - Episodic Semi-Gradient SARSA Algorithm
+  - Differential Semi-Gradient SARSA Algorithm
 image: /images/nlp-brain-wordcloud.jpg
 title-block-banner: /images/banner_black_3.jpg
 ---
@@ -23,6 +23,7 @@ title-block-banner: /images/banner_black_3.jpg
 ![RL logo](img/logo.png){.column-margin} 
 
 ![RL algorithms](img/alg_selector.png){.column-margin group="slides"}
+
 
 
 ::: {.callout-tip collapse="true"}
@@ -35,7 +36,7 @@ title-block-banner: /images/banner_black_3.jpg
 # Lesson 1: Episodic Sarsa with Function Approximation
 
 ::: callout-note
-### Learning Objectives {.unnumbered}
+### Learning objectives {.unnumbered}
 
 - [x] *Explain* the update for Episodic Sarsa with function approximation [\#](#sec-l1g1)
 - [x] *Introduce* the feature choices, including passing actions to features or stacking state features [\#](#sec-l1g2)
@@ -43,55 +44,177 @@ title-block-banner: /images/banner_black_3.jpg
 - [x] *Discuss* how this extends to Q-learning easily, since it is a subset of Expected Sarsa [\#](#sec-l1g4)
 :::
 
-## Episodic SARSA with Function Approximation (Video)
+## Episodic SARSA with function approximation (Video)
 
-In this video Adam White discusses the Episodic SARSA algorithm with function approximation. He explains how this algorithm can be used to solve reinforcement learning problems with large state spaces. He also discusses the importance of feature choices in this algorithm and how they can impact the performance of the system.
+In this video, Adam White, discusses the algorithm for "Episodic SARSA with function approximation". He explains how it can be used to solve reinforcement learning problems with large or continuous state-spaces. He also delineates the importance of feature choices in this algorithm and how they can impact the performance of the system.
 
-## How to Construct action Dependent Features {#sec-l1g1}
+## Two ways to construct action dependent features? {#sec-l1g2}
 
 ![Stacking](nn-feature-stacking.png){.column-margin}
 
-![](nn-feature-inputs.png){.column-margin}
+![Passing](nn-feature-inputs.png){.column-margin}
 
-We see two techniques for constructing action dependent features. 
+We see two techniques for constructing action dependent features. It is worthwhile noting that these two techniques are quite generally used in Machine Learning. For example Concatenating is used in CNN and with multi-head attention in Transformers.
 
-The first is called "Stacking" and involves concatenating the state features with the action features. This is a simple and effective way to construct action dependent features.
+1. **Stacking** involves concatenating the state features with the action features. This is a simple and effective way to construct action dependent features. 
 
-Adam White explains that this technique is used both for linear function approximation and for neural networks in much the same way. However the main issue with stacking is that it keeps the same state features used for different actions separate. This seems to be both an overparameterization (i.e. overfitting) and a an impediment to learning a good representation of the state.
+Stacking can used both for linear function approximation and for neural networks in much the same way. Stacking is very simple but it has  a problem, it keeps the same state features used for different actions separate. This seems to be both an over-parameterization (i.e. overfitting) and a an impediment to learning a good representation of the state. 
 
-The next technique called "Passing Actions to Features" attempts to remedy this issue. In this technique, the state features are passed through a neural network that also takes the action as input. This allows the network to learn a better representation of the state that is dependent on both the state and the action. This technique is more complex but can lead to better performance.
+2. **Passing Actions to Features** attempts to remedy this issue. In this technique, the state features are passed through a neural network that also takes the action as input. This allows the network to learn a better representation of the state that is dependent on both the state and the action. This technique is more complex but can lead to better performance.
+
+## How to use SARSA in episodic tasks with function approximation
 
 
 
-## Explain how to use SARSA in episodic tasks with function approximation
+Next we will [see](#fig-episodic-semi-grafient-sarsa) how to use SARSA in episodic tasks with function approximation. The main idea is to use a similar update rule as before, but with the action value function approximated by a function approximator, i.e. it will be parametrized by weights **w**. Also we will need to add a the gradient of the to the update rule. As we will want to move the weights in the direction of the gradient of the action value function.
 
-![Episodic SARSA with function approximation](episodic-semi-grafient-sarsa.png){.column-margin}
 
-Next we see how to use SARSA in episodic tasks with function approximation. The main idea is to use a similar update rule as before, but with the action value function approximated by a function approximator, i.e. it will be peramertized by weights **w**. Also we will need to add a the gradient of the to the update rule. As we will want to move the weights in the direction of the gradient of the action value function.
+
+
+::: callout-note
+### SARSA {#alg-sarsa}
+
+``` pseudocode
+#| label: alg-sarsa
+#| html-indent-size: "1.2em"
+#| html-comment-delimiter: "#"
+#| html-line-number: true
+#| html-line-number-punc: ":"
+#| html-no-end: false
+#| pdf-placement: "htb!"
+#| pdf-line-number: true
+
+\begin{algorithm}
+\caption{SARSA($\alpha,\epsilon$)}
+\begin{algorithmic}[1]
+\State Initialize:
+  \State $\qquad Q(s,a) \leftarrow x \in \mathbb{R} \forall s \in \mathcal{S^+}, a\in\mathcal{A}(s)\ except\ for\ Q(terminal,\cdot)=0$
+  
+\For {each episode e:}
+  \State Initialize $S$
+  \State Choose A from S using policy derived from Q (e.g., $\epsilon$-greedy)
+  \For {each step of e}
+    \State Take action A, observe R, S'
+    \State Choose A' from S' using policy derived from Q (e.g., $\epsilon$-greedy)
+    \State $Q(S, A) \leftarrow Q(S, A) + \alpha [R + \gamma Q(S',A') - Q(S, A)]$
+    \State $S \leftarrow S'$; $A \leftarrow A'$
+  \EndFor
+  \State until $S$ is terminal
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+```
+:::
+
+SARSA is a sample-based algorithm to solve the Bellman equation for action-values.
+
+- It picks an action based on the current policy and then
+- It policy evaluation by a TD updates of Q the action-value function based on the reward and the next action.
+- Then it does a policy improvement.
+
+::: {#fig-episodic-semi-grafient-sarsa .column-margin}
+![Episodic SARSA with function approximation](episodic-semi-grafient-sarsa.png)
+
+This figure shows the algorithm for Episodic semi-gradient SARSA which uses function approximation. The update rule is modified from tabular case, with an approximate action value function $\hat{q}(s,a,\mathbf{w})$ as well as the inclusion of the gradient of the action value function $\nabla \hat{q} (S_t, A_t, \mathbf{w})$ . These two modification allows us to update the weights of the function approximator The rest of the algorithm remains unchanged. 
+:::
+
+[@Rummery1994OnlineQU] introduced SARSA, but the name is due to Rich Sutton.
+
+::: callout-note
+### Episodic Semi-gradient SARSA {#alg-sg-sarsa}
+
+``` pseudocode
+#| label: alg-td-sarsa
+#| html-indent-size: "1.2em"
+#| html-comment-delimiter: "#"
+#| html-line-number: true
+#| html-line-number-punc: ":"
+#| html-no-end: false
+#| pdf-placement: "htb!"
+#| pdf-line-number: true
+
+
+\begin{algorithm}
+  \caption{Episodic Semi-gradient SARSA for estimating ($\hat{q} \approx q_*$)}
+\begin{algorithmic}[1]
+
+\State $\textbf{Input:}$
+  \State $\qquad \text{a differentiable action-value fn parameterization } \hat{q}: \mathcal{S} \times A \times \mathbb{R}^d \to \mathbb{R}$
+\State $\textbf{Initialize:}$
+  \State $\qquad$ value function weights $\mathbf{w} \in \mathbb{R}^d$ arbitrarily, (e.g., $\mathbf{w} = 0$)  
+\For {each episode e:}
+  \State Initialize $S$
+  \State Choose A from S using policy derived from $\color{red}\hat{q}(S'A,\mathbf{w})$ (e.g., $\epsilon$-greedy)
+  \For {each step of e}
+    \State Take action A, observe R, S'
+    \If {$S'$ is terminal}
+      \State $\color{red}\mathbf{w} \leftarrow \mathbf{w} + \alpha \left[ R - \hat{q}(S, A, \mathbf{w}) \right] \nabla \hat{q}(S, A, \mathbf{w})$ 
+      \State Go to next episode
+    \EndIf
+    \State Choose A' as a function of $\color{red}\hat{q}(S'A,\mathbf{w})$ (e.g., $\epsilon$-greedy)
+    \State $\color{red}\mathbf{w} \leftarrow \mathbf{w} + \alpha \left[ R + \gamma \hat{q}(S', A', \mathbf{w}) - \hat{q}(S, A, \mathbf{w}) \right] \nabla \hat{q}(S, A, \mathbf{w})$ 
+    \State $S \leftarrow S'$; 
+    \State $A \leftarrow A'$
+  \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+```
+:::
 
 This allows us to learn a good policy for the task. We will also need a step to update the weights.
 
-## The the update for Episodic SARSA with function approximation {#sec-l1g1}
+::: {.column-margin #fig-subtasks}
+{{< video https://youtu.be/nFM5kLJl34c
+    title='Advances in Value Estimation in Reinforcement Learning' >}}
 
-So far we have been using function approximation to parametize state value function,
+Talk titled 'Advances in Value Estimation in Reinforcement Learning' at 
+London Machine Learning Meetu by Martha White on Two Pieces of Research on Exploration in Reinforcement Learning. On work from [patterson2024generalizedprojectedbellmanerror]
+:::
+
+
+::: {.callout-info}
+### Questions to consider:
+
+1. Why is this a semi-gradient method? (Hint: what is the problem with the target of the update rule?)
+1. Can we do better than this?
+
+1. Do we have any convergence guarantees for SARSA with function approximation?
+   
+   For the tabular setting, [@singh2000convergence] the authors show that the algorithm has asymptotic converges to the optimal policy provided that the policies from the policy improvement operator is "greedy in the limit with infinite exploration"
+
+   For the function approximation setting, Empirical results show that the linear SARSA can chatter, i.e. the weight vector does not go to infinity (i.e., it does not diverge) but oscillates in a bounded region. 
+   
+1. Since it is semi-gradient, we are not using the true value of the next state in the update rule.
+1. Are we biased?
+1. Does this algorithm have lower variance than the TD(0) algorithm?
+1. When we choose the next action, are we on policy or off policy?
+1. In the non terminal rule we use two samples, but they are highly correlated. Why is this a problem
+1. How can we reduce this correlation?
+
+:::
+
+## The update for Episodic SARSA with function approximation {#sec-l1g1}
+
+So far we have only been using function approximation to parametrize state value function,
 
 $$
 V_\pi(s) ≈ \hat{v}(s,w) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(S) \qquad
 $$ {#eq-parametize-state-value-function}
 
-But for SARSA we need to parametize the action value function,
+For SARSA we need a parametrized approximation $\hat{q}$ for the the action value function $q_pi$,
 
 $$
-q_\pi(s) ≈ \hat{q}(s,a,\mathbf{w}) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(s,a) \qquad
-$$ {#eq-parametize-action-value-function}
+q_\pi(s,a) ≈ \hat{q}(s,a,\mathbf{w}) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(s,a) \qquad
+$$ {#eq-parametrized-action-value-function}
 
 ## Episodic SARSA in Mountain Car (Video)
 
-![](mountain-car-environment.png){.column-margin}
+![mountain car environment](mountain-car-environment.png){.column-margin}
 
-## Feature Choices in Episodic SARSA with Function Approximation {#sec-l1g2}
+## Feature Choices in Episodic SARSA with Function Approximation 
 
-![](mountain-car-feature-representations.png){.column-margin}
+![tile coding](mountain-car-feature-representations.png){.column-margin}
 
 What features do we use for the mountain car problem?
 
@@ -122,9 +245,48 @@ It worth noting that this is a very simple environment and that many more sophis
 
 ## Expected SARSA with Function Approximation (Video)
 
+Now we extend SARSA with under function approximation into Expected SARSA . 
 
+First, recall the update rule for Tabular SARSA:
+
+$$
+Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha (R_{t+1} + \gamma Q( \textcolor{red}{ S_{t+1}, A_{t+1} }) - Q(S_t,A_t)) \qquad
+$$ {#eq-tabular-sarsa-update}
+
+SARSA's update target includes the action value for the next state in action.
+
+Next, recall how Tabular Expected SARSA uses the expectation over its target policy instead.
+
+$$
+Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha (R_{t+1} + \gamma \textcolor{red}{ \sum_{a'} \pi (a' \mid S_{t+1}) Q(S_{t+1},a')} - Q(S_t,A_t)) \qquad
+$$ {#eq-tabular-expected-sarsa-update}
+
+We can compute the same expectation using function approximation. 
+
+First, recall the update for SARSA with function approximation. 
+It looks similar to the tabular setting except the action value estimates are parameterized by the weight factor, $\mathbf{w}$. i.e. $q_\pi (s, a) \approx \hat{q} (s, a, \mathbf{w})$
+
+$$
+\mathbf{w} \leftarrow \mathbf{w} + \alpha [R_{t+1} + \gamma \hat{q}(\textcolor{red} { S_{t+1} } , \textcolor{red} { A_{t+1}}, \mathbf{w}) - \hat{q}(S_t, A_t, \mathbf{w})] \nabla \hat{q} (S_t, A_t, \mathbf{w}) \qquad
+$$ {#eq-semi-gradient-sarsa-update}
+
+Expected Sarsa with function approximation follows a similar structure.
+
+$$
+\mathbf{w} \leftarrow \mathbf{w} + \alpha [R_{t+1} + \gamma   \textcolor{red}{ \sum_{a'} \pi( a' \mid S_{t+1}) \hat{q} (S_{t+1}, a' , \mathbf{w} )} - \hat{q}(S_t , A_t , \mathbf{w})] \nabla \hat{q}(S_t , A_t , \mathbf{w}) \qquad
+$$ {#eq-semi-gradient-expected-sarsa-update}
 
 ## How this extends to Q-learning easily, since it is a subset of Expected SARSA {#sec-l1g4}
+
+Finally, for Q-learning with function approximation as Q-learning is a special case of expected Sarsa in which we take the greedy. So next we replace the expectation over the target policy by argmax action to derive the Q-learning update rule. 
+
+The Q-learning update rule is:
+
+$$
+\mathbf{w} \leftarrow \mathbf{w} + \alpha [R_{t+1} + \gamma  \textcolor{red}{ \max_{a'} \hat{q}(S_{t+1},a',\mathbf{w})} −\hat{q}(S_t,A_t,\mathbf{w})] \nabla \hat{q}(S_t,A_t,\mathbf{w}) \qquad
+$$ {#eq-semi-gradient-Q-learning-update}
+
+
 
 # Lesson 2: Exploration under Function Approximation 
 
@@ -137,6 +299,22 @@ It worth noting that this is a very simple environment and that many more sophis
 ## Exploration under Function Approximation (Video)
 
 ## Optimistic Initialization as a Form of Exploration {#sec-l2g1}
+
+In the tabular setting, we saw that we could use optimistic initialization as a form of early exploration. The way this works is that we initialize the value function to be very high, this way the agent will be encouraged to try to exploit one of the states. It will discover that the value of the state is not as high as it thought and will try to exploit another and so on until it have visited all the states and learned more realistic values for them. Over time the effect of the initial values will diminish. This however assumes two things:
+
+1. the number of states is finite
+2. the values are independent of each other
+
+In the function approximation setting, we can try to do the same thing. This time we will want to initialize the weights so as to make the value function high. We face a number of issues in this setting:
+
+1. the values are not independent of each other so each weight may loose its optimistic value long before the agent has explored many of the states  within the features neighborhood in the state space.
+2. Unlike values we can't be certain that high weights will lead to high values. While this may work for linear function approximation, for a non-linear function approximation using Neural Networks with tanh activation functions, positive weights may lead to negative values.
+
+epsilon-greedy exploration is easy to implement even with non-linear function approximation. However it is not as effective in the function approximation setting. Because it relies on randomness to explore states near those followed by the current policy. This is not as systematic as the exploration due to optimistic initialization in the tabular setting.
+
+Improving exploration with function approximation is an open research question
+
+In this course we will stick to epsilon-greedy exploration. However the last video by Satinder Singh discusses using intrinsic motivation to improve exploration in reinforcement learning systems. And in it he shows a different paradigm of exploration. Rather than getting agents to explore systematic one wants to explore in a way that is interesting to the agent.
 
 # Lesson 3: Average Reward 
 
@@ -152,25 +330,44 @@ It worth noting that this is a very simple environment and that many more sophis
 
 ## The Average Reward Setting {#sec-l3g1}
 
+$$
+r(\pi) \dot = \lim _{h \to \infty} \frac{1}{h} \sum_{t=1}^{h} \mathbb{E}[R_t S_0,A_{0:t−1} ≈ \pi]  \qquad
+$$ {#eq-average-reward}
+
+We can write the average reward using the state visitation, μ. This inner term is the expected reward in a state under policy \pi. The outer sum takes the expectation over how frequently the policy is in that state. Together, we get the expected reward across states. In other words, the average reward for a policy
+
+
+$$
+r(\pi) = \sum_{s} \mu_\pi (s) \sum_{a} \pi(a \mid s) \sum_{r,s'} p(r,s' \mid s,a) r
+$$ {#eq-average-reward-visitation}
+
+In the average reward setting, returns are defined in terms of differences between rewards and the average reward $r_\pi$, which is called the differential return. The differential return represents how much more reward the agent will receive from the current state in action compared to the average reward of the policy.
+
+$$
+G_t = R_{t+1} −r_\pi + R_{t+2} −r_\pi + R_{t+2} −r_\pi \ldots \qquad
+$$ {#eq-differential-return}
+
+The differential return represents how much better it is to take an action in a state then on average under a certain policy. The differential return can only be used to compare actions if the same policy is followed on subsequent time steps. To compare policies, their average reward should be used instead
+
+
+This quantity captures how much more reward the agent will get by starting in a particular state than it would get on average over all states if it followed a fixed policy.
+$$
+q_\pi(s,a) = E_\pi[G_t|S_t = s,A_t = a] \qquad
+$$ {#eq-differential-value-function}
+
+Like in the discounted setting, differential value functions can be written as Bellman equations. They only differ in that they subtract r(\pi) from the immediate reward and there is no discounting.
+$$
+q_\pi(s,a) = \sum_{s',r} p(s',r \mid s,a)(r −r(\pi)) + \sum_{a'} \pi(a' \mid s')q_\pi(s',a') \qquad
+$$ {#eq-differential-bellman}
+
+Many algorithms from the discounted case can be rewritten to apply to the average reward case. 
+
 ## When Average Reward Optimal Policies are Different from Discounted Solutions {#sec-l3g2}
 
 ## Differential Value Functions v.s. Discounted Value Functions {#sec-l3g3}
 
 ## Satinder Singh on Intrinsic Rewards (Video)
 
-Satinder Singh is a professor at the University of Michigan. He is a leading researcher in reinforcement learning and has made significant contributions to the field. In this video, he discusses intrinsic rewards and how they can be used to improve learning in reinforcement learning systems. It's worth noting that he is one of the reaserchers who has worked on options with Doina Precup.
-
-::: callout-note
-
-### Discussion prompt {.unnumbered}
-
-> What are the issues with extending some of the exploration methods we learned about bandits and Dyna to the full RL problem? 
-  How can we do visitation counts or UCB with function approximation?
-  
-> A control agent with function approximation has to explore to find the best policy, learn a good state representation, and try to get a lot of reward, all at the same time. 
-  How might an agent balance these potentially conflicting goals?  
-
-:::
 
 
 ::: {.column-margin #fig-subtasks}
@@ -194,4 +391,19 @@ This talk  titled 'Steps Towards Continual Learning' by Satinder Singh on Reinfo
     title='Discovery in Reinforcement Learning' >}}
 
 Talk titled 'Discovery in Reinforcement Learning' at Beijing Academy of Artificial Intelligence by Satinder Singh on Two Pieces of Research on Exploration in Reinforcement Learning.
+:::
+
+
+Satinder Singh is a professor at the University of Michigan. He is a leading researcher in reinforcement learning and has made significant contributions to the field. In this video, he discusses intrinsic rewards and how they can be used to improve learning in reinforcement learning systems. It's worth noting that he is one of the reaserchers who has worked on options with Doina Precup.
+
+::: callout-note
+
+### Discussion prompt {.unnumbered}
+
+> What are the issues with extending some of the exploration methods we learned about bandits and Dyna to the full RL problem? 
+  How can we do visitation counts or UCB with function approximation?
+  
+> A control agent with function approximation has to explore to find the best policy, learn a good state representation, and try to get a lot of reward, all at the same time. 
+  How might an agent balance these potentially conflicting goals?  
+
 :::

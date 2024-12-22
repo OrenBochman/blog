@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="keywords" content="reinforcement learning, neural networks, feature construction, Episodic Semi-Gradient Sarsa Algorithm, Differential Semi-Gradient Sarsa Algorithm">
+<meta name="keywords" content="reinforcement learning, neural networks, feature construction, Episodic Semi-Gradient SARSA Algorithm, Differential Semi-Gradient SARSA Algorithm">
 
 <title>Control with Approximation – Oren Bochman’s Blog</title>
 <style>
@@ -291,7 +291,7 @@ window.Quarto = {
   <div>
     <div class="keywords">
       <div class="block-title">Keywords</div>
-      <p>reinforcement learning, neural networks, feature construction, Episodic Semi-Gradient Sarsa Algorithm, Differential Semi-Gradient Sarsa Algorithm</p>
+      <p>reinforcement learning, neural networks, feature construction, Episodic Semi-Gradient SARSA Algorithm, Differential Semi-Gradient SARSA Algorithm</p>
     </div>
   </div>
   
@@ -2759,12 +2759,15 @@ window.Quarto = {
   <ul>
   <li><a href="#lesson-1-episodic-sarsa-with-function-approximation" id="toc-lesson-1-episodic-sarsa-with-function-approximation" class="nav-link active" data-scroll-target="#lesson-1-episodic-sarsa-with-function-approximation">Lesson 1: Episodic Sarsa with Function Approximation</a>
   <ul class="collapse">
-  <li><a href="#episodic-sarsa-with-function-approximation-video" id="toc-episodic-sarsa-with-function-approximation-video" class="nav-link" data-scroll-target="#episodic-sarsa-with-function-approximation-video">Episodic SARSA with Function Approximation (Video)</a></li>
-  <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">How to Construct action Dependent Features</a></li>
-  <li><a href="#explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" id="toc-explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" class="nav-link" data-scroll-target="#explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation">Explain how to use SARSA in episodic tasks with function approximation</a></li>
-  <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">The the update for Episodic SARSA with function approximation</a></li>
+  <li><a href="#episodic-sarsa-with-function-approximation-video" id="toc-episodic-sarsa-with-function-approximation-video" class="nav-link" data-scroll-target="#episodic-sarsa-with-function-approximation-video">Episodic SARSA with function approximation (Video)</a></li>
+  <li><a href="#sec-l1g2" id="toc-sec-l1g2" class="nav-link" data-scroll-target="#sec-l1g2">Two ways to construct action dependent features?</a></li>
+  <li><a href="#how-to-use-sarsa-in-episodic-tasks-with-function-approximation" id="toc-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" class="nav-link" data-scroll-target="#how-to-use-sarsa-in-episodic-tasks-with-function-approximation">How to use SARSA in episodic tasks with function approximation</a>
+  <ul class="collapse">
+  <li><a href="#questions-to-consider" id="toc-questions-to-consider" class="nav-link" data-scroll-target="#questions-to-consider">Questions to consider:</a></li>
+  </ul></li>
+  <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">The update for Episodic SARSA with function approximation</a></li>
   <li><a href="#episodic-sarsa-in-mountain-car-video" id="toc-episodic-sarsa-in-mountain-car-video" class="nav-link" data-scroll-target="#episodic-sarsa-in-mountain-car-video">Episodic SARSA in Mountain Car (Video)</a></li>
-  <li><a href="#sec-l1g2" id="toc-sec-l1g2" class="nav-link" data-scroll-target="#sec-l1g2">Feature Choices in Episodic SARSA with Function Approximation</a></li>
+  <li><a href="#feature-choices-in-episodic-sarsa-with-function-approximation" id="toc-feature-choices-in-episodic-sarsa-with-function-approximation" class="nav-link" data-scroll-target="#feature-choices-in-episodic-sarsa-with-function-approximation">Feature Choices in Episodic SARSA with Function Approximation</a></li>
   <li><a href="#sec-l1g3" id="toc-sec-l1g3" class="nav-link" data-scroll-target="#sec-l1g3">Visualizing Value Function and Learning Curves</a></li>
   <li><a href="#expected-sarsa-with-function-approximation-video" id="toc-expected-sarsa-with-function-approximation-video" class="nav-link" data-scroll-target="#expected-sarsa-with-function-approximation-video">Expected SARSA with Function Approximation (Video)</a></li>
   <li><a href="#sec-l1g4" id="toc-sec-l1g4" class="nav-link" data-scroll-target="#sec-l1g4">How this extends to Q-learning easily, since it is a subset of Expected SARSA</a></li>
@@ -2835,7 +2838,7 @@ Readings
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Learning Objectives
+Learning objectives
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -2848,53 +2851,148 @@ Learning Objectives
 </div>
 </div>
 <section id="episodic-sarsa-with-function-approximation-video" class="level2">
-<h2 class="anchored" data-anchor-id="episodic-sarsa-with-function-approximation-video">Episodic SARSA with Function Approximation (Video)</h2>
-<p>In this video Adam White discusses the Episodic SARSA algorithm with function approximation. He explains how this algorithm can be used to solve reinforcement learning problems with large state spaces. He also discusses the importance of feature choices in this algorithm and how they can impact the performance of the system.</p>
+<h2 class="anchored" data-anchor-id="episodic-sarsa-with-function-approximation-video">Episodic SARSA with function approximation (Video)</h2>
+<p>In this video, Adam White, discusses the algorithm for “Episodic SARSA with function approximation”. He explains how it can be used to solve reinforcement learning problems with large or continuous state-spaces. He also delineates the importance of feature choices in this algorithm and how they can impact the performance of the system.</p>
 </section>
-<section id="sec-l1g1" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="sec-l1g1">How to Construct action Dependent Features</h2>
+<section id="sec-l1g2" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-l1g2">Two ways to construct action dependent features?</h2>
 
 <div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="nn-feature-stacking.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Stacking"><img src="nn-feature-stacking.png" class="img-fluid figure-img" alt="Stacking"></a></p>
 <figcaption>Stacking</figcaption>
 </figure>
-</div></div><p class="page-columns page-full"><a href="nn-feature-inputs.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-4"><div class="no-row-height column-margin column-container"><img src="nn-feature-inputs.png" class="img-fluid"></div></a></p>
-<p>We see two techniques for constructing action dependent features.</p>
-<p>The first is called “Stacking” and involves concatenating the state features with the action features. This is a simple and effective way to construct action dependent features.</p>
-<p>Adam White explains that this technique is used both for linear function approximation and for neural networks in much the same way. However the main issue with stacking is that it keeps the same state features used for different actions separate. This seems to be both an overparameterization (i.e.&nbsp;overfitting) and a an impediment to learning a good representation of the state.</p>
-<p>The next technique called “Passing Actions to Features” attempts to remedy this issue. In this technique, the state features are passed through a neural network that also takes the action as input. This allows the network to learn a better representation of the state that is dependent on both the state and the action. This technique is more complex but can lead to better performance.</p>
-</section>
-<section id="explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="explain-how-to-use-sarsa-in-episodic-tasks-with-function-approximation">Explain how to use SARSA in episodic tasks with function approximation</h2>
-
-<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+</div><div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="episodic-semi-grafient-sarsa.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Episodic SARSA with function approximation"><img src="episodic-semi-grafient-sarsa.png" class="img-fluid figure-img" alt="Episodic SARSA with function approximation"></a></p>
+<p><a href="nn-feature-inputs.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Passing"><img src="nn-feature-inputs.png" class="img-fluid figure-img" alt="Passing"></a></p>
+<figcaption>Passing</figcaption>
+</figure>
+</div></div>
+<p>We see two techniques for constructing action dependent features. It is worthwhile noting that these two techniques are quite generally used in Machine Learning. For example Concatenating is used in CNN and with multi-head attention in Transformers.</p>
+<ol type="1">
+<li><strong>Stacking</strong> involves concatenating the state features with the action features. This is a simple and effective way to construct action dependent features.</li>
+</ol>
+<p>Stacking can used both for linear function approximation and for neural networks in much the same way. Stacking is very simple but it has a problem, it keeps the same state features used for different actions separate. This seems to be both an over-parameterization (i.e.&nbsp;overfitting) and a an impediment to learning a good representation of the state.</p>
+<ol start="2" type="1">
+<li><strong>Passing Actions to Features</strong> attempts to remedy this issue. In this technique, the state features are passed through a neural network that also takes the action as input. This allows the network to learn a better representation of the state that is dependent on both the state and the action. This technique is more complex but can lead to better performance.</li>
+</ol>
+</section>
+<section id="how-to-use-sarsa-in-episodic-tasks-with-function-approximation" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="how-to-use-sarsa-in-episodic-tasks-with-function-approximation">How to use SARSA in episodic tasks with function approximation</h2>
+<p>Next we will <a href="#fig-episodic-semi-grafient-sarsa">see</a> how to use SARSA in episodic tasks with function approximation. The main idea is to use a similar update rule as before, but with the action value function approximated by a function approximator, i.e.&nbsp;it will be parametrized by weights <strong>w</strong>. Also we will need to add a the gradient of the to the update rule. As we will want to move the weights in the direction of the gradient of the action value function.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+SARSA
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="alg-sarsa" class="pseudocode-container quarto-float" data-indent-size="1.2em" data-pseudocode-number="1" data-no-end="false" data-line-number="true" data-comment-delimiter="#" data-caption-prefix="Algorithm" data-line-number-punc=":">
+<div class="pseudocode">
+\begin{algorithm} \caption{SARSA($\alpha,\epsilon$)}\begin{algorithmic} \State Initialize: \State $\qquad Q(s,a) \leftarrow x \in \mathbb{R} \forall s \in \mathcal{S^+}, a\in\mathcal{A}(s)\ except\ for\ Q(terminal,\cdot)=0$ \For {each episode e:} \State Initialize $S$ \State Choose A from S using policy derived from Q (e.g., $\epsilon$-greedy) \For {each step of e} \State Take action A, observe R, S' \State Choose A' from S' using policy derived from Q (e.g., $\epsilon$-greedy) \State $Q(S, A) \leftarrow Q(S, A) + \alpha [R + \gamma Q(S',A') - Q(S, A)]$ \State $S \leftarrow S'$; $A \leftarrow A'$ \EndFor \State until $S$ is terminal \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
+</div>
+</div>
+<p>SARSA is a sample-based algorithm to solve the Bellman equation for action-values.</p>
+<ul>
+<li>It picks an action based on the current policy and then</li>
+<li>It policy evaluation by a TD updates of Q the action-value function based on the reward and the next action.</li>
+<li>Then it does a policy improvement.</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div id="fig-episodic-semi-grafient-sarsa" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-episodic-semi-grafient-sarsa-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="episodic-semi-grafient-sarsa.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Episodic SARSA with function approximation"><img src="episodic-semi-grafient-sarsa.png" class="img-fluid figure-img"></a></p>
 <figcaption>Episodic SARSA with function approximation</figcaption>
 </figure>
-</div></div><p>Next we see how to use SARSA in episodic tasks with function approximation. The main idea is to use a similar update rule as before, but with the action value function approximated by a function approximator, i.e.&nbsp;it will be peramertized by weights <strong>w</strong>. Also we will need to add a the gradient of the to the update rule. As we will want to move the weights in the direction of the gradient of the action value function.</p>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-episodic-semi-grafient-sarsa-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: This figure shows the algorithm for Episodic semi-gradient SARSA which uses function approximation. The update rule is modified from tabular case, with an approximate action value function <span class="math inline">\hat{q}(s,a,\mathbf{w})</span> as well as the inclusion of the gradient of the action value function <span class="math inline">\nabla \hat{q} (S_t, A_t, \mathbf{w})</span> . These two modification allows us to update the weights of the function approximator The rest of the algorithm remains unchanged.
+</figcaption>
+</figure>
+</div></div><p><span class="citation" data-cites="Rummery1994OnlineQU">(<a href="#ref-Rummery1994OnlineQU" role="doc-biblioref">Rummery and Niranjan 1994</a>)</span> introduced SARSA, but the name is due to Rich Sutton.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Episodic Semi-gradient SARSA
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="alg-td-sarsa" class="pseudocode-container quarto-float" data-indent-size="1.2em" data-pseudocode-number="2" data-no-end="false" data-line-number="true" data-comment-delimiter="#" data-caption-prefix="Algorithm" data-line-number-punc=":">
+<div class="pseudocode">
+\begin{algorithm} \caption{Episodic Semi-gradient SARSA for estimating ($\hat{q} \approx q_*$)}\begin{algorithmic} \State $\textbf{Input:}$ \State $\qquad \text{a differentiable action-value fn parameterization } \hat{q}: \mathcal{S} \times A \times \mathbb{R}^d \to \mathbb{R}$ \State $\textbf{Initialize:}$ \State $\qquad$ value function weights $\mathbf{w} \in \mathbb{R}^d$ arbitrarily, (e.g., $\mathbf{w} = 0$) \For {each episode e:} \State Initialize $S$ \State Choose A from S using policy derived from $\color{red}\hat{q}(S'A,\mathbf{w})$ (e.g., $\epsilon$-greedy) \For {each step of e} \State Take action A, observe R, S' \If {$S'$ is terminal} \State $\color{red}\mathbf{w} \leftarrow \mathbf{w} + \alpha \left[ R - \hat{q}(S, A, \mathbf{w}) \right] \nabla \hat{q}(S, A, \mathbf{w})$ \State Go to next episode \EndIf \State Choose A' as a function of $\color{red}\hat{q}(S'A,\mathbf{w})$ (e.g., $\epsilon$-greedy) \State $\color{red}\mathbf{w} \leftarrow \mathbf{w} + \alpha \left[ R + \gamma \hat{q}(S', A', \mathbf{w}) - \hat{q}(S, A, \mathbf{w}) \right] \nabla \hat{q}(S, A, \mathbf{w})$ \State $S \leftarrow S'$; \State $A \leftarrow A'$ \EndFor \EndFor \end{algorithmic} \end{algorithm}
+</div>
+</div>
+</div>
+</div>
 <p>This allows us to learn a good policy for the task. We will also need a step to update the weights.</p>
+
+<div class="no-row-height column-margin column-container"><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/nFM5kLJl34c" title="Advances in Value Estimation in Reinforcement Learning" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Talk titled ‘Advances in Value Estimation in Reinforcement Learning’ at London Machine Learning Meetu by Martha White on Two Pieces of Research on Exploration in Reinforcement Learning. On work from [patterson2024generalizedprojectedbellmanerror]
+</figcaption>
+</figure>
+</div></div><section id="questions-to-consider" class="level3 callout-info">
+<h3 class="anchored" data-anchor-id="questions-to-consider">Questions to consider:</h3>
+<ol type="1">
+<li><p>Why is this a semi-gradient method? (Hint: what is the problem with the target of the update rule?)</p></li>
+<li><p>Can we do better than this?</p></li>
+<li><p>Do we have any convergence guarantees for SARSA with function approximation?</p>
+<p>For the tabular setting, <span class="citation" data-cites="singh2000convergence">(<a href="#ref-singh2000convergence" role="doc-biblioref">Singh et al. 2000</a>)</span> the authors show that the algorithm has asymptotic converges to the optimal policy provided that the policies from the policy improvement operator is “greedy in the limit with infinite exploration”</p>
+<p>For the function approximation setting, Empirical results show that the linear SARSA can chatter, i.e.&nbsp;the weight vector does not go to infinity (i.e., it does not diverge) but oscillates in a bounded region.</p></li>
+<li><p>Since it is semi-gradient, we are not using the true value of the next state in the update rule.</p></li>
+<li><p>Are we biased?</p></li>
+<li><p>Does this algorithm have lower variance than the TD(0) algorithm?</p></li>
+<li><p>When we choose the next action, are we on policy or off policy?</p></li>
+<li><p>In the non terminal rule we use two samples, but they are highly correlated. Why is this a problem</p></li>
+<li><p>How can we reduce this correlation?</p></li>
+</ol>
+</section>
 </section>
 <section id="sec-l1g1" class="level2">
-<h2 class="anchored" data-anchor-id="sec-l1g1">The the update for Episodic SARSA with function approximation</h2>
-<p>So far we have been using function approximation to parametize state value function,</p>
+<h2 class="anchored" data-anchor-id="sec-l1g1">The update for Episodic SARSA with function approximation</h2>
+<p>So far we have only been using function approximation to parametrize state value function,</p>
 <p><span id="eq-parametize-state-value-function"><span class="math display">
 V_\pi(s) ≈ \hat{v}(s,w) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(S) \qquad
 \tag{1}</span></span></p>
-<p>But for SARSA we need to parametize the action value function,</p>
-<p><span id="eq-parametize-action-value-function"><span class="math display">
-q_\pi(s) ≈ \hat{q}(s,a,\mathbf{w}) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(s,a) \qquad
+<p>For SARSA we need a parametrized approximation <span class="math inline">\hat{q}</span> for the the action value function <span class="math inline">q_pi</span>,</p>
+<p><span id="eq-parametrized-action-value-function"><span class="math display">
+q_\pi(s,a) ≈ \hat{q}(s,a,\mathbf{w}) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(s,a) \qquad
 \tag{2}</span></span></p>
 </section>
 <section id="episodic-sarsa-in-mountain-car-video" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="episodic-sarsa-in-mountain-car-video">Episodic SARSA in Mountain Car (Video)</h2>
-<p class="page-columns page-full"><a href="mountain-car-environment.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-6"><div class="no-row-height column-margin column-container"><img src="mountain-car-environment.png" class="img-fluid"></div></a></p>
-</section>
-<section id="sec-l1g2" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="sec-l1g2">Feature Choices in Episodic SARSA with Function Approximation</h2>
-<p class="page-columns page-full"><a href="mountain-car-feature-representations.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-7"><div class="no-row-height column-margin column-container"><img src="mountain-car-feature-representations.png" class="img-fluid"></div></a></p>
-<p>What features do we use for the mountain car problem?</p>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="mountain-car-environment.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="mountain car environment"><img src="mountain-car-environment.png" class="img-fluid figure-img" alt="mountain car environment"></a></p>
+<figcaption>mountain car environment</figcaption>
+</figure>
+</div></div></section>
+<section id="feature-choices-in-episodic-sarsa-with-function-approximation" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="feature-choices-in-episodic-sarsa-with-function-approximation">Feature Choices in Episodic SARSA with Function Approximation</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="mountain-car-feature-representations.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="tile coding"><img src="mountain-car-feature-representations.png" class="img-fluid figure-img" alt="tile coding"></a></p>
+<figcaption>tile coding</figcaption>
+</figure>
+</div></div><p>What features do we use for the mountain car problem?</p>
 <p>for the state:</p>
 <ul>
 <li>position</li>
@@ -2912,12 +3010,39 @@ q_\pi(s) ≈ \hat{q}(s,a,\mathbf{w}) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(s,
 <p class="page-columns page-full"><a href="mountain-car-learned-values.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-8"><div class="no-row-height column-margin column-container"><img src="mountain-car-learned-values.png" class="img-fluid"></div></a></p>
 <p class="page-columns page-full"><a href="mountain-car-learned-values-trajectory.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-9"><div class="no-row-height column-margin column-container"><img src="mountain-car-learned-values-trajectory.png" class="img-fluid"></div></a></p>
 <p class="page-columns page-full"><a href="mountain-car-learning-curve.png" class="lightbox page-columns page-full" data-gallery="quarto-lightbox-gallery-10"><div class="no-row-height column-margin column-container"><img src="mountain-car-learning-curve.png" class="img-fluid"></div></a></p>
+<p>The first two figures show the learned value function for the mountain car problem. The first figure shows the value function for each state. The second shows a possible trajectory through the state space.</p>
+<p>Then we look at the learning curve for the mountain car problem. This shows how the value function improves over time as the agent learns the optimal policy. We see the familiar exponential decay in the learning curves.</p>
+<p>It worth noting that this is a very simple environment and that many more sophisticated deep learning techniques don’t do a very good job on this problem.</p>
 </section>
 <section id="expected-sarsa-with-function-approximation-video" class="level2">
 <h2 class="anchored" data-anchor-id="expected-sarsa-with-function-approximation-video">Expected SARSA with Function Approximation (Video)</h2>
+<p>Now we extend SARSA with under function approximation into Expected SARSA .</p>
+<p>First, recall the update rule for Tabular SARSA:</p>
+<p><span id="eq-tabular-sarsa-update"><span class="math display">
+Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha (R_{t+1} + \gamma Q( \textcolor{red}{ S_{t+1}, A_{t+1} }) - Q(S_t,A_t)) \qquad
+\tag{3}</span></span></p>
+<p>SARSA’s update target includes the action value for the next state in action.</p>
+<p>Next, recall how Tabular Expected SARSA uses the expectation over its target policy instead.</p>
+<p><span id="eq-tabular-expected-sarsa-update"><span class="math display">
+Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha (R_{t+1} + \gamma \textcolor{red}{ \sum_{a'} \pi (a' \mid S_{t+1}) Q(S_{t+1},a')} - Q(S_t,A_t)) \qquad
+\tag{4}</span></span></p>
+<p>We can compute the same expectation using function approximation.</p>
+<p>First, recall the update for SARSA with function approximation. It looks similar to the tabular setting except the action value estimates are parameterized by the weight factor, <span class="math inline">\mathbf{w}</span>. i.e.&nbsp;<span class="math inline">q_\pi (s, a) \approx \hat{q} (s, a, \mathbf{w})</span></p>
+<p><span id="eq-semi-gradient-sarsa-update"><span class="math display">
+\mathbf{w} \leftarrow \mathbf{w} + \alpha [R_{t+1} + \gamma \hat{q}(\textcolor{red} { S_{t+1} } , \textcolor{red} { A_{t+1}}, \mathbf{w}) - \hat{q}(S_t, A_t, \mathbf{w})] \nabla \hat{q} (S_t, A_t, \mathbf{w}) \qquad
+\tag{5}</span></span></p>
+<p>Expected Sarsa with function approximation follows a similar structure.</p>
+<p><span id="eq-semi-gradient-expected-sarsa-update"><span class="math display">
+\mathbf{w} \leftarrow \mathbf{w} + \alpha [R_{t+1} + \gamma   \textcolor{red}{ \sum_{a'} \pi( a' \mid S_{t+1}) \hat{q} (S_{t+1}, a' , \mathbf{w} )} - \hat{q}(S_t , A_t , \mathbf{w})] \nabla \hat{q}(S_t , A_t , \mathbf{w}) \qquad
+\tag{6}</span></span></p>
 </section>
 <section id="sec-l1g4" class="level2">
 <h2 class="anchored" data-anchor-id="sec-l1g4">How this extends to Q-learning easily, since it is a subset of Expected SARSA</h2>
+<p>Finally, for Q-learning with function approximation as Q-learning is a special case of expected Sarsa in which we take the greedy. So next we replace the expectation over the target policy by argmax action to derive the Q-learning update rule.</p>
+<p>The Q-learning update rule is:</p>
+<p><span id="eq-semi-gradient-Q-learning-update"><span class="math display">
+\mathbf{w} \leftarrow \mathbf{w} + \alpha [R_{t+1} + \gamma  \textcolor{red}{ \max_{a'} \hat{q}(S_{t+1},a',\mathbf{w})} −\hat{q}(S_t,A_t,\mathbf{w})] \nabla \hat{q}(S_t,A_t,\mathbf{w}) \qquad
+\tag{7}</span></span></p>
 </section>
 </section>
 <section id="lesson-2-exploration-under-function-approximation" class="level1">
@@ -2942,6 +3067,19 @@ Learning Objectives
 </section>
 <section id="sec-l2g1" class="level2">
 <h2 class="anchored" data-anchor-id="sec-l2g1">Optimistic Initialization as a Form of Exploration</h2>
+<p>In the tabular setting, we saw that we could use optimistic initialization as a form of early exploration. The way this works is that we initialize the value function to be very high, this way the agent will be encouraged to try to exploit one of the states. It will discover that the value of the state is not as high as it thought and will try to exploit another and so on until it have visited all the states and learned more realistic values for them. Over time the effect of the initial values will diminish. This however assumes two things:</p>
+<ol type="1">
+<li>the number of states is finite</li>
+<li>the values are independent of each other</li>
+</ol>
+<p>In the function approximation setting, we can try to do the same thing. This time we will want to initialize the weights so as to make the value function high. We face a number of issues in this setting:</p>
+<ol type="1">
+<li>the values are not independent of each other so each weight may loose its optimistic value long before the agent has explored many of the states within the features neighborhood in the state space.</li>
+<li>Unlike values we can’t be certain that high weights will lead to high values. While this may work for linear function approximation, for a non-linear function approximation using Neural Networks with tanh activation functions, positive weights may lead to negative values.</li>
+</ol>
+<p>epsilon-greedy exploration is easy to implement even with non-linear function approximation. However it is not as effective in the function approximation setting. Because it relies on randomness to explore states near those followed by the current policy. This is not as systematic as the exploration due to optimistic initialization in the tabular setting.</p>
+<p>Improving exploration with function approximation is an open research question</p>
+<p>In this course we will stick to epsilon-greedy exploration. However the last video by Satinder Singh discusses using intrinsic motivation to improve exploration in reinforcement learning systems. And in it he shows a different paradigm of exploration. Rather than getting agents to explore systematic one wants to explore in a way that is interesting to the agent.</p>
 </section>
 </section>
 <section id="lesson-3-average-reward" class="level1 page-columns page-full">
@@ -2968,6 +3106,25 @@ Learning Objectives
 </section>
 <section id="sec-l3g1" class="level2">
 <h2 class="anchored" data-anchor-id="sec-l3g1">The Average Reward Setting</h2>
+<p><span id="eq-average-reward"><span class="math display">
+r(\pi) \dot = \lim _{h \to \infty} \frac{1}{h} \sum_{t=1}^{h} \mathbb{E}[R_t S_0,A_{0:t−1} ≈ \pi]  \qquad
+\tag{8}</span></span></p>
+<p>We can write the average reward using the state visitation, μ. This inner term is the expected reward in a state under policy . The outer sum takes the expectation over how frequently the policy is in that state. Together, we get the expected reward across states. In other words, the average reward for a policy</p>
+<p><span id="eq-average-reward-visitation"><span class="math display">
+r(\pi) = \sum_{s} \mu_\pi (s) \sum_{a} \pi(a \mid s) \sum_{r,s'} p(r,s' \mid s,a) r
+\tag{9}</span></span></p>
+<p>In the average reward setting, returns are defined in terms of differences between rewards and the average reward <span class="math inline">r_\pi</span>, which is called the differential return. The differential return represents how much more reward the agent will receive from the current state in action compared to the average reward of the policy.</p>
+<p><span id="eq-differential-return"><span class="math display">
+G_t = R_{t+1} −r_\pi + R_{t+2} −r_\pi + R_{t+2} −r_\pi \ldots \qquad
+\tag{10}</span></span></p>
+<p>The differential return represents how much better it is to take an action in a state then on average under a certain policy. The differential return can only be used to compare actions if the same policy is followed on subsequent time steps. To compare policies, their average reward should be used instead</p>
+<p>This quantity captures how much more reward the agent will get by starting in a particular state than it would get on average over all states if it followed a fixed policy. <span id="eq-differential-value-function"><span class="math display">
+q_\pi(s,a) = E_\pi[G_t|S_t = s,A_t = a] \qquad
+\tag{11}</span></span></p>
+<p>Like in the discounted setting, differential value functions can be written as Bellman equations. They only differ in that they subtract r() from the immediate reward and there is no discounting. <span id="eq-differential-bellman"><span class="math display">
+q_\pi(s,a) = \sum_{s',r} p(s',r \mid s,a)(r −r(\pi)) + \sum_{a'} \pi(a' \mid s')q_\pi(s',a') \qquad
+\tag{12}</span></span></p>
+<p>Many algorithms from the discounted case can be rewritten to apply to the average reward case.</p>
 </section>
 <section id="sec-l3g2" class="level2">
 <h2 class="anchored" data-anchor-id="sec-l3g2">When Average Reward Optimal Policies are Different from Discounted Solutions</h2>
@@ -2977,6 +3134,36 @@ Learning Objectives
 </section>
 <section id="satinder-singh-on-intrinsic-rewards-video" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="satinder-singh-on-intrinsic-rewards-video">Satinder Singh on Intrinsic Rewards (Video)</h2>
+
+<div class="no-row-height column-margin column-container"><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/L-9Pbhpk7pQ" title="From Reinforcement Learning to Artificial Intelligence ?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: This is a high level talk by Satinder Singh on AI and RL
+</figcaption>
+</figure>
+</div><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/jn1NE8uIxgw" title="Steps Towards Continual Learning" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: This talk titled ‘Steps Towards Continual Learning’ by Satinder Singh on Reinforcement Learning at DLSS &amp; RLSS 2017 - Montreal
+</figcaption>
+</figure>
+</div><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/Z7JhZx3urEY" title="Discovery in Reinforcement Learning" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Talk titled ‘Discovery in Reinforcement Learning’ at Beijing Academy of Artificial Intelligence by Satinder Singh on Two Pieces of Research on Exploration in Reinforcement Learning.
+</figcaption>
+</figure>
+</div></div>
+
 <p>Satinder Singh is a professor at the University of Michigan. He is a leading researcher in reinforcement learning and has made significant contributions to the field. In this video, he discusses intrinsic rewards and how they can be used to improve learning in reinforcement learning systems. It’s worth noting that he is one of the reaserchers who has worked on options with Doina Precup.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -2997,42 +3184,18 @@ Discussion prompt
 </div>
 </div>
 
-<div class="no-row-height column-margin column-container"><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/L-9Pbhpk7pQ" title="From Reinforcement Learning to Artificial Intelligence ?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: This is a high level talk by Satinder Singh on AI and RL
-</figcaption>
-</figure>
-</div><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/jn1NE8uIxgw" title="Steps Towards Continual Learning" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: This talk titled ‘Steps Towards Continual Learning’ by Satinder Singh on Reinforcement Learning at DLSS &amp; RLSS 2017 - Montreal
-</figcaption>
-</figure>
-</div><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/Z7JhZx3urEY" title="Discovery in Reinforcement Learning" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Talk titled ‘Discovery in Reinforcement Learning’ at Beijing Academy of Artificial Intelligence by Satinder Singh on Two Pieces of Research on Exploration in Reinforcement Learning.
-</figcaption>
-</figure>
-</div></div>
-
-
 
 
 </section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Rummery1994OnlineQU" class="csl-entry" role="listitem">
+Rummery, Gavin Adrian, and Mahesan Niranjan. 1994. <span>“On-Line q-Learning Using Connectionist Systems.”</span> In. <a href="https://api.semanticscholar.org/CorpusID:59872172">https://api.semanticscholar.org/CorpusID:59872172</a>.
+</div>
+<div id="ref-singh2000convergence" class="csl-entry" role="listitem">
+Singh, Satinder, Tommi Jaakkola, Michael L Littman, and Csaba Szepesvári. 2000. <span>“Convergence Results for Single-Step on-Policy Reinforcement-Learning Algorithms.”</span> <em>Machine Learning</em> 38: 287–308.
+</div>
 <div id="ref-sutton2018reinforcement" class="csl-entry" role="listitem">
 Sutton, R. S., and A. G. Barto. 2018. <em>Reinforcement Learning, Second Edition: An Introduction</em>. Adaptive Computation and Machine Learning Series. MIT Press. <a href="http://incompleteideas.net/book/RLbook2020.pdf">http://incompleteideas.net/book/RLbook2020.pdf</a>.
 </div>

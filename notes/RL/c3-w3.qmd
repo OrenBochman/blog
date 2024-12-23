@@ -22,8 +22,11 @@ title-block-banner: /images/banner_black_3.jpg
 
 ![RL logo](img/logo.png){.column-margin} 
 
-![RL algorithms](img/alg_selector.png){.column-margin group="slides"}
+::: {#fig-episodic-semi-gradient-sarsa group="slides" .column-margin}
+![RL algorithm decision tree](img/alg_selector.png)
 
+The algorithms we will be discussing in this lesson are function approximation versions of SARSA, Expected SARSA, and Q-learning. These are all sample-based algorithms that solve the Bellman equation for action-values. They differ in how they estimate the action-values and how they update them. 
+:::
 
 
 ::: {.callout-tip collapse="true"}
@@ -173,12 +176,74 @@ London Machine Learning Meetu by Martha White on Two Pieces of Research on Explo
 :::
 
 
-::: {.callout-info}
-### Questions to consider:
+::: {.callout-note}
+
+### Over Thinking Semi-gradient SARSA {.unnumbered}:
+
+So you think you understand SARSA with function approximation?
 
 1. Why is this a semi-gradient method?
 
-   Hint: what is the problem with the target of the update rule?
+   Hints: 
+   
+   - what is the MSE td error of the Q-value the next state?
+
+If we define the MSE of the Q-value of the next state as the projected Bellman error, then we can see that the update rule is a projected gradient descent on the projected Bellman error. This is a semi-gradient method because we are not using the true value of the next state in the update rule.
+
+$$
+\overline{{QE}}(w)\ \dot= \sum_{s\in \mathcal{S},a\in \mathcal{A}} \mu(s)\left[  q^*(s,a) - \hat{q}(s,a,\mathbf{w})  \right]^2
+$$
+
+since we dont know the action value function we can't compute the true value of the next state. Instead we use the value of the next state.
+
+$$
+\begin{align*}
+  \overline{{QE}}(w) &\approx \sum_{s\in \mathcal{S},a\in \mathcal{A}} \mu(s)\left[ r+\gamma \hat{q}(s',a',\mathbf{w}) - \hat{q}(s,a,\mathbf{w})  \right]^2 \\ 
+  &= \mathbb{E}_\mu \left[ (r+\gamma \hat{q}(s',a',\mathbf{w}) - \hat{q}(s,a,\mathbf{w}))^2 \right]
+\end{align*}
+$$
+
+
+then we have the following objective function:
+$$ J(w) = \mathbb{E}_\mu \left[ \sum_{t=0}^\infty \gamma^t  \left( r_t + \gamma \hat{q}(s',a',\mathbf{w}) - \hat{q}(s,a,\mathbf{w}) \right)^2 \right] 
+$$
+
+- where:
+  - $\mu$ is the state visitation distribution
+  - $\hat{q}(s,a,\mathbf{w})$ is the approximated action value function
+  - $\mathbf{w}$ is the weight vector
+  - $r_t$ is the reward at time step t
+  - $\gamma$ is the discount factor
+
+$$ 
+\begin{align*}
+\nabla_\mathbf{w} J(w) &= \mathbb{E}_\mu \left[ \sum_{t=0}^\infty \gamma^t \nabla_\mathbf{w} \left( r_t + \gamma \hat{q}(s',a',\mathbf{w}) - \hat{q}(s,a,\mathbf{w}) \right)^2 \right] \\
+&= \mathbb{E}_\mu \left[ \sum_{t=0}^\infty \gamma^t 2 \left( r_t + \gamma \hat{q}(s',a',\mathbf{w}) - \hat{q}(s,a,\mathbf{w}) \right) \nabla_\mathbf{w} \left( r_t + \gamma \hat{q}(s',a',\mathbf{w}) - \hat{q}(s,a,\mathbf{w}) \right) \right] \newline
+&= \mathbb{E}_\mu \left[ \sum_{t=0}^\infty \gamma^t 2 \delta  \left( \gamma \nabla_\mathbf{w} \hat{q}(s',a',\mathbf{w}) - \nabla_\mathbf{w} \hat{q}(s,a,\mathbf{w}) \right) \right] \\
+\end{align*}
+$$
+
+where $\delta = r_t + \gamma \hat{q}(s',a',\mathbf{w}) - \hat{q}(s,a,\mathbf{w})$ is the TD error.
+
+this is the projected gradient of the projected Bellman error.
+
+which would give us the following update rule:
+
+$$
+\mathbf{w} \leftarrow \mathbf{w} + \alpha \delta \left( \gamma \nabla_\mathbf{w} \hat{q}(s',a',\mathbf{w}) - \nabla_\mathbf{w} \hat{q}(s,a,\mathbf{w}) \right)
+$$
+
+rather than the update rule we have in the algorithm:
+
+$$
+\mathbf{w} \leftarrow \mathbf{w} + \alpha \delta \nabla_\mathbf{w} \hat{q}(s,a,\mathbf{w})
+$$
+
+$$ 
+\mathbf{w} \leftarrow \mathbf{w} + \alpha [R_{t+1} + \gamma \hat{q}(S_{t+1},A_{t+1},\mathbf{w}) - \hat{q}(S_t,A_t,\mathbf{w})] \nabla \hat{q}(S_t,A_t,\mathbf{w})
+$$
+
+
 
 1. Can we do better than this?
 
@@ -186,6 +251,9 @@ London Machine Learning Meetu by Martha White on Two Pieces of Research on Explo
 
 1. Do we have any convergence guarantees for SARSA with function approximation?
    
+  In the text book [@sutton2018reinforcement sec. 10.1] the authors state that for a constant policy ^[e.g. epsilon greedy policy without decay], this method converges in the same way that TD(0) does, with the same kind of error bound.
+  Then they go on to say that for a non-constant policy, the convergence is a matter of ongoing research.
+
    For the tabular setting, [@singh2000convergence] the authors show that the algorithm has asymptotic converges to the optimal policy provided that the policies from the policy improvement operator is "greedy in the limit with infinite exploration"
 
    For the function approximation setting, Empirical results show that the linear SARSA can chatter, i.e. the weight vector does not go to infinity (i.e., it does not diverge) but oscillates in a bounded region. 
@@ -322,7 +390,17 @@ epsilon-greedy exploration is easy to implement even with non-linear function ap
 
 Improving exploration with function approximation is an open research question
 
-In this course we will stick to epsilon-greedy exploration. However the last video by Satinder Singh discusses using intrinsic motivation to improve exploration in reinforcement learning systems. And in it he shows a different paradigm of exploration. Rather than getting agents to explore systematic one wants to explore in a way that is interesting to the agent.
+In this course we will stick to epsilon-greedy exploration.
+
+
+Q. Why is epsilon-greedy exploration ineffective in the function approximation setting? 
+
+1. like in the bandit setting, the agent keeps exploring even after it has found the optimal policy.
+2. like in environments with a changing maze multiple epsilon-greedy exploration steps may be required to explore states required by the optimal policy that are not near the current policy. The chance for such an exploration is $\mu(s)\epsilon^n$ where $mu(s)$ is importance of the nearest state and n is the number of steps required to reach the target state. This can be vanishingly small for large state spaces. Which means it can take too long to find the optimal policy using epsilon-greedy exploration. We need to think of better ways to organize exploration in the function approximation setting.
+3. Prioritizing using count based on a coarse coding may be more effective. Even better if we track the uncertainty in the value function for each if these features. This is a form of intrinsic motivation.
+
+
+ However the last video by Satinder Singh discusses using intrinsic motivation to improve exploration in reinforcement learning systems. And in it he shows a different paradigm of exploration. Rather than getting agents to explore systematic one wants to explore in a way that is interesting to the agent.
 
 # Lesson 3: Average Reward 
 
@@ -342,7 +420,7 @@ $$
 r(\pi) \dot = \lim _{h \to \infty} \frac{1}{h} \sum_{t=1}^{h} \mathbb{E}[R_t S_0,A_{0:t−1} ≈ \pi]  \qquad
 $$ {#eq-average-reward}
 
-We can write the average reward using the state visitation, μ. This inner term is the expected reward in a state under policy \pi. The outer sum takes the expectation over how frequently the policy is in that state. Together, we get the expected reward across states. In other words, the average reward for a policy
+We can write the average reward using the state visitation, $\pi$. This inner term is the expected reward in a state under policy $\pi$. The outer sum takes the expectation over how frequently the policy is in that state. Together, we get the expected reward across states. In other words, the average reward for a policy
 
 
 $$
@@ -374,6 +452,45 @@ Many algorithms from the discounted case can be rewritten to apply to the averag
 
 ## Differential Value Functions v.s. Discounted Value Functions {#sec-l3g3}
 
+::: callout-note
+### Episodic Semi-gradient SARSA {#alg-diff-sg-sarsa}
+
+``` pseudocode
+#| label: alg-differential-sg-sarsa
+#| html-indent-size: "1.2em"
+#| html-comment-delimiter: "#"
+#| html-line-number: true
+#| html-line-number-punc: ":"
+#| html-no-end: false
+#| pdf-placement: "htb!"
+#| pdf-line-number: true
+
+
+\begin{algorithm}
+  \caption{Differential Semi-gradient SARSA for estimating ($\hat{q} \approx q_*$)}
+\begin{algorithmic}[1]
+\State $\textbf{Input:}$
+  \State $\qquad \text{a differentiable action-value fn parameterization } \hat{q}: \mathcal{S} \times A \times \mathbb{R}^d \to \mathbb{R}$
+\State $\textbf{Algorithm parameters:}$
+  \State $\qquad \alpha, \beta > 0$
+\State $\textbf{Initialize:}$
+  \State $\qquad$ value function weights $\mathbf{w} \in \mathbb{R}^d$ arbitrarily, (e.g., $\mathbf{w} = 0$)  
+  \State $\bar{R} \in \mathbb{R}$ avg reward estimate
+\State Initialize $S$ and action $A$
+\For {each step}
+  \State Take action A, observe R, S'    
+  \State Choose A' as a function of $\hat{q}(S',\cdot,\mathbf{w})$ (e.g., $\epsilon$-greedy)
+  \State $\delta \leftarrow R - \bar{R} + \hat{q}(S', A', \mathbf{w}) - \hat{q}(S, A, \mathbf{w}) $
+  \State $ \bar{R}\leftarrow  \bar{R} + \beta \delta$
+  \State $\mathbf{w} \leftarrow \mathbf{w} + \alpha \delta \nabla \hat{q}(S, A, \mathbf{w})$ 
+  \State $S \leftarrow S'$; $A \leftarrow A'$  
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+```
+:::
+
+
 ## Satinder Singh on Intrinsic Rewards (Video)
 
 
@@ -403,6 +520,11 @@ Talk titled 'Discovery in Reinforcement Learning' at Beijing Academy of Artifici
 
 
 Satinder Singh is a professor at the University of Michigan. He is a leading researcher in reinforcement learning and has made significant contributions to the field. In this video, he discusses intrinsic rewards and how they can be used to improve learning in reinforcement learning systems. It's worth noting that he is one of the reaserchers who has worked on options with Doina Precup.
+
+Now Satinder Singh is a good speaker and he has lots of intereting research results to share. Unfortunately, this video is not his finest hour. I would definitely recommend watching some of his other talks linked above.
+
+
+
 
 ::: callout-note
 

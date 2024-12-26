@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="keywords" content="reinforcement learning, neural networks, feature construction, deep networks, The Policy Gradient Theorem, Policy Gradient, Actor-Critic Algorithm, Gaussian Policies">
+<meta name="keywords" content="reinforcement learning, neural networks, feature construction, deep networks, The Policy Gradient Theorem, Policy Gradient, Reinforce Algorithm, Actor-Critic Algorithm, Gaussian Policies">
 
 <title>Policy Gradient – Oren Bochman’s Blog</title>
 <style>
@@ -116,6 +116,49 @@ div.csl-indent {
       }
 </style>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta name="twitter:title" content="Policy Gradient – Oren Bochman’s Blog">
 <meta name="twitter:description" content="Prediction and Control with Function Approximation">
@@ -248,7 +291,7 @@ div.csl-indent {
   <div>
     <div class="keywords">
       <div class="block-title">Keywords</div>
-      <p>reinforcement learning, neural networks, feature construction, deep networks, The Policy Gradient Theorem, Policy Gradient, Actor-Critic Algorithm, Gaussian Policies</p>
+      <p>reinforcement learning, neural networks, feature construction, deep networks, The Policy Gradient Theorem, Policy Gradient, Reinforce Algorithm, Actor-Critic Algorithm, Gaussian Policies</p>
     </div>
   </div>
   
@@ -2714,8 +2757,22 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#lesson-1-learning-parameterized-policies" id="toc-lesson-1-learning-parameterized-policies" class="nav-link active" data-scroll-target="#lesson-1-learning-parameterized-policies">Lesson 1: Learning Parameterized Policies</a></li>
-  <li><a href="#lesson-2-policy-gradient-for-continuing-tasks" id="toc-lesson-2-policy-gradient-for-continuing-tasks" class="nav-link" data-scroll-target="#lesson-2-policy-gradient-for-continuing-tasks">Lesson 2: Policy Gradient for Continuing Tasks</a></li>
+  <li><a href="#lesson-1-learning-parameterized-policies" id="toc-lesson-1-learning-parameterized-policies" class="nav-link active" data-scroll-target="#lesson-1-learning-parameterized-policies">Lesson 1: Learning Parameterized Policies</a>
+  <ul class="collapse">
+  <li><a href="#learning-policies-directly-video" id="toc-learning-policies-directly-video" class="nav-link" data-scroll-target="#learning-policies-directly-video">Learning Policies Directly (Video)</a></li>
+  <li><a href="#sec-l1g1" id="toc-sec-l1g1" class="nav-link" data-scroll-target="#sec-l1g1">How to Define Policies as Parameterized Functions</a></li>
+  <li><a href="#sec-l1g2" id="toc-sec-l1g2" class="nav-link" data-scroll-target="#sec-l1g2">Define one class of parameterized policies based on the softmax function</a></li>
+  <li><a href="#advantages-of-policy-parameterization-video" id="toc-advantages-of-policy-parameterization-video" class="nav-link" data-scroll-target="#advantages-of-policy-parameterization-video">Advantages of Policy Parameterization (Video)</a></li>
+  <li><a href="#sec-l1g3" id="toc-sec-l1g3" class="nav-link" data-scroll-target="#sec-l1g3">Advantages of Using Parameterized Policies over Action-Value Based Methods</a></li>
+  </ul></li>
+  <li><a href="#lesson-2-policy-gradient-for-continuing-tasks" id="toc-lesson-2-policy-gradient-for-continuing-tasks" class="nav-link" data-scroll-target="#lesson-2-policy-gradient-for-continuing-tasks">Lesson 2: Policy Gradient for Continuing Tasks</a>
+  <ul class="collapse">
+  <li><a href="#the-objective-for-learning-policies-video" id="toc-the-objective-for-learning-policies-video" class="nav-link" data-scroll-target="#the-objective-for-learning-policies-video">The Objective for Learning Policies (Video)</a></li>
+  <li><a href="#sec-l2g1" id="toc-sec-l2g1" class="nav-link" data-scroll-target="#sec-l2g1">The objective for policy gradient algorithms</a></li>
+  <li><a href="#the-policy-gradient-theorem-video" id="toc-the-policy-gradient-theorem-video" class="nav-link" data-scroll-target="#the-policy-gradient-theorem-video">The Policy Gradient Theorem (Video)</a></li>
+  <li><a href="#sec-l2g2" id="toc-sec-l2g2" class="nav-link" data-scroll-target="#sec-l2g2">The results of the policy gradient theorem</a></li>
+  <li><a href="#sec-l2g3" id="toc-sec-l2g3" class="nav-link" data-scroll-target="#sec-l2g3">The importance of the policy gradient theorem</a></li>
+  </ul></li>
   <li><a href="#lesson-3-actor-critic-for-continuing-tasks" id="toc-lesson-3-actor-critic-for-continuing-tasks" class="nav-link" data-scroll-target="#lesson-3-actor-critic-for-continuing-tasks">Lesson 3: Actor-Critic for Continuing Tasks</a></li>
   <li><a href="#lesson-4-policy-parameterizations" id="toc-lesson-4-policy-parameterizations" class="nav-link" data-scroll-target="#lesson-4-policy-parameterizations">Lesson 4: Policy Parameterizations</a></li>
   </ul>
@@ -2738,10 +2795,19 @@ div.csl-indent {
 <p><a href="img/logo.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="RL logo"><img src="img/logo.png" class="img-fluid figure-img" alt="RL logo"></a></p>
 <figcaption>RL logo</figcaption>
 </figure>
-</div><div class="quarto-figure quarto-figure-center">
+</div><div id="fig-episodic-semi-gradient-sarsa" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-episodic-semi-gradient-sarsa-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="img/alg_selector.png" class="lightbox" data-gallery="slides" title="RL algorithms"><img src="img/alg_selector.png" class="img-fluid figure-img" alt="RL algorithms"></a></p>
-<figcaption>RL algorithms</figcaption>
+<p><a href="img/alg_selector.png" class="lightbox" data-gallery="slides" title="RL algorithm decision tree"><img src="img/alg_selector.png" class="img-fluid figure-img"></a></p>
+<figcaption>RL algorithm decision tree</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-episodic-semi-gradient-sarsa-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The algorithms we will be discussing in this lesson are all part of the policy gradient family.
+</figcaption>
 </figure>
 </div></div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -2757,12 +2823,48 @@ Readings
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox" checked=""><span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, sec. 13</a> pp.&nbsp;321-336)</span> <a href="http://incompleteideas.net/book/RLbook2020.pdf#page=321">book</a></label></li>
+<li><label><input type="checkbox" checked=""><span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, sec. 13</a> pp.&nbsp;321-336)</span> <a href="#fig-chapter-13-policy-gradient" class="quarto-xref">Figure&nbsp;12</a></label></li>
+</ul>
+<p>Extra recourses - may be useful to review though not required:</p>
+<ul>
+<li><a href="https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html">Intro to Policy Optimization @ Spinning Up</a></li>
+<li><a href="https://johnwlambert.github.io/policy-gradients/">Understanding Policy Gradients</a></li>
+<li><a href="https://jonathan-hui.medium.com/rl-policy-gradients-explained-9b13b688b146">Policy Gradient Explained</a></li>
 </ul>
 </div>
 </div>
 </div>
-<section id="lesson-1-learning-parameterized-policies" class="level1">
+
+<div class="no-row-height column-margin column-container"><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/PtAIh9KSnjo" title="Deep Reinforcement Learning ( OpenAI)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: This talk titled ‘SDeep Reinforcement Learning Policy Gradients and Q-Learning’ by John Schulman (who developed PPO and TRPO and Chat-GPT) on Reinforcement Learning at at the Deep Learning School on September 24/25, 2016
+</figcaption>
+</figure>
+</div><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/AKbX1Zvo7r8" title="Policy Gradients and Advantage Estimation" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Talk titled ‘Policy Gradients and Advantage Estimation’ by Pieter Abbeel. in his “Foundations of Deep RL Series”
+</figcaption>
+</figure>
+</div><div id="fig-subtasks" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/y3oqOjHilio" title="Policy-Gradient and Actor-Critic methods" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-subtasks-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Research Scientist Hado van Hasselt covers policy algorithms that can learn policies directly and actor critic algorithms that combine value predictions for more efficient learning. From DeepMind x UCL | Deep Learning Lecture Series 2021
+</figcaption>
+</figure>
+</div></div>
+
+<section id="lesson-1-learning-parameterized-policies" class="level1 page-columns page-full">
 <h1>Lesson 1: Learning Parameterized Policies</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -2775,16 +2877,161 @@ Learning Objectives
 </div>
 <div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox" checked="">Understand how to define policies as parameterized functions <a href="#l1g1">#</a></label></li>
-<li><label><input type="checkbox" checked="">Define one class of parameterized policies based on the softmax function <a href="#l1g2">#</a></label></li>
-<li><label><input type="checkbox" checked="">Understand the advantages of using parameterized policies over action-value based methods <a href="#l1g3">#</a></label></li>
+<li><label><input type="checkbox" checked="">Understand how to define policies as parameterized functions <a href="#sec-l1g1">#</a></label></li>
+<li><label><input type="checkbox" checked="">Define one class of parameterized policies based on the softmax function <a href="#sec-l1g2">#</a></label></li>
+<li><label><input type="checkbox" checked="">Understand the advantages of using parameterized policies over action-value based methods <a href="#sec-l1g3">#</a></label></li>
 </ul>
 </div>
 </div>
+<section id="learning-policies-directly-video" class="level2">
+<h2 class="anchored" data-anchor-id="learning-policies-directly-video">Learning Policies Directly (Video)</h2>
 </section>
-<section id="lesson-2-policy-gradient-for-continuing-tasks" class="level1">
+<section id="sec-l1g1" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-l1g1">How to Define Policies as Parameterized Functions</h2>
+
+<div class="no-row-height column-margin column-container"><div id="fig-policy-gradient" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-policy-gradient-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-01.png" class="lightbox" data-gallery="slides" title="policy gradient"><img src="pg-01.png" class="img-fluid figure-img"></a></p>
+<figcaption>policy gradient</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-policy-gradient-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5
+</figcaption>
+</figure>
+</div><div id="fig-policy-gradient-param" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-policy-gradient-param-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-02.png" class="lightbox" data-gallery="slides" title="policy parametrization"><img src="pg-02.png" class="img-fluid figure-img"></a></p>
+<figcaption>policy parametrization</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-policy-gradient-param-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6
+</figcaption>
+</figure>
+</div><div id="fig-policy-gradient-constraint" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-policy-gradient-constraint-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-03.png" class="lightbox" data-gallery="slides" title="policy parametrization constraints"><img src="pg-03.png" class="img-fluid figure-img"></a></p>
+<figcaption>policy parametrization constraints</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-policy-gradient-constraint-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7
+</figcaption>
+</figure>
+</div><div id="fig-policy-softmax" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-policy-softmax-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-04-softmax-policy.png" class="lightbox" data-gallery="slides" title="softmax properties"><img src="pg-04-softmax-policy.png" class="img-fluid figure-img"></a></p>
+<figcaption>softmax properties</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-policy-softmax-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8
+</figcaption>
+</figure>
+</div></div>
+
+
+<ul>
+<li>negative values of h lead to positive action probabilities.</li>
+<li>equal values of h lead to equal action probabilities.</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div id="fig-policy-action-preferences" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-policy-action-preferences-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-05-action-preferences.png" class="lightbox" data-gallery="slides" title="softmax policy v.s. epsilon-greedy"><img src="pg-05-action-preferences.png" class="img-fluid figure-img"></a></p>
+<figcaption>softmax policy v.s. epsilon-greedy</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-policy-action-preferences-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9
+</figcaption>
+</figure>
+</div></div><ul>
+<li>the softmax policy is a better option over than the <span class="math inline">\epsilon</span>-greedy policy over the action-value based methods.</li>
+</ul>
+</section>
+<section id="sec-l1g2" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l1g2">Define one class of parameterized policies based on the softmax function</h2>
+<p><span id="eq-softmax-policy"><span class="math display">
+\pi(a|s, \theta) \doteq \frac{e^{h(s, a, \theta)}}{\sum_{b\in \mathcal{A}} e^{h(s, b, \theta)}} \qquad
+\tag{1}</span></span></p>
+<ul>
+<li>the numerator is the exponential of the action preference</li>
+<li>the denominator is the sum of the exponentials of all action preferences</li>
+</ul>
+</section>
+<section id="advantages-of-policy-parameterization-video" class="level2">
+<h2 class="anchored" data-anchor-id="advantages-of-policy-parameterization-video">Advantages of Policy Parameterization (Video)</h2>
+<p>In this video we consider the advantages of using parameterized policies over action-value based methods. We will see that parameterized policies are more flexible than action-value based methods and can start off stochastic and then become deterministic.</p>
+</section>
+<section id="sec-l1g3" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l1g3">Advantages of Using Parameterized Policies over Action-Value Based Methods</h2>
+</section>
+</section>
+<section id="lesson-2-policy-gradient-for-continuing-tasks" class="level1 page-columns page-full">
 <h1>Lesson 2: Policy Gradient for Continuing Tasks</h1>
-<div class="callout callout-style-default callout-note callout-titled">
+<ul>
+<li>parameterized policies are more flexible than action-value based methods</li>
+<li>can start off stochastic and then become deterministic</li>
+</ul>
+<p>In function approximation, the optimal policy is not necessarily deterministic. Thus it is best to be able to learn stochastic policies.</p>
+<p>Example where the optimal policy is stochastic:</p>
+
+<div class="no-row-height column-margin column-container"><div id="fig-stochastic-policy" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-stochastic-policy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-06-stochastic-policy.png" class="lightbox" data-gallery="slides" title="When a deterministic policy fails"><img src="pg-06-stochastic-policy.png" class="img-fluid figure-img"></a></p>
+<figcaption>When a deterministic policy fails</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-stochastic-policy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: A minimal environment where a determinsitic policy would fail the optimal policy <span class="math inline">\pi_*</span> is stochastic.
+</figcaption>
+</figure>
+</div></div><ul>
+<li>Sometimes it is just easier to learn a stochastic policy.</li>
+<li>E.g. in mountain car, the parameterized value function is complex, but the parameterized policy is simple.</li>
+</ul>
+
+<div class="no-row-height column-margin column-container"><div id="fig-mountain-car-policy" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mountain-car-policy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-07-stochastic-simpler.png" class="lightbox" data-gallery="slides" title="mountain car environment values and policy"><img src="pg-07-stochastic-simpler.png" class="img-fluid figure-img"></a></p>
+<figcaption>mountain car environment values and policy</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mountain-car-policy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11: In mountain car, the parameterized value function is complex, but the parameterized policy is simple.
+</figcaption>
+</figure>
+</div></div><div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -2795,12 +3042,64 @@ Learning Objectives
 </div>
 <div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox" checked="">Describe the objective for policy gradient algorithms <a href="#l2g1">#</a></label></li>
-<li><label><input type="checkbox" checked="">Describe the results of the policy gradient theorem <a href="#l2g2">#</a></label></li>
-<li><label><input type="checkbox" checked="">Understand the importance of the policy gradient theorem <a href="#l2g3">#</a></label></li>
+<li><label><input type="checkbox" checked="">Describe the objective for policy gradient algorithms <a href="#sec-l2g1">#</a></label></li>
+<li><label><input type="checkbox" checked="">Describe the results of the policy gradient theorem <a href="#sec-l2g2">#</a></label></li>
+<li><label><input type="checkbox" checked="">Understand the importance of the policy gradient theorem <a href="#sec-l2g3">#</a></label></li>
 </ul>
 </div>
 </div>
+<section id="the-objective-for-learning-policies-video" class="level2">
+<h2 class="anchored" data-anchor-id="the-objective-for-learning-policies-video">The Objective for Learning Policies (Video)</h2>
+<p>In this video Martha White dive deep into the objective for policy gradient algorithms. She then contrasts this with the gradient of the value fn objectives and lists some challanges for estimating the gradient of the average reward objective. We will learn that we can use the policy gradient theorem and to overcome these challenges and derive a gradient with an neat update rule .</p>
+</section>
+<section id="sec-l2g1" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l2g1">The objective for policy gradient algorithms</h2>
+<p>Formalizing the goal as an Objective</p>
+<p><span class="math display">
+G_t = \sum_{t=0}^{T}  R_{t} \quad \text{episodic}
+</span></p>
+<p><span class="math display">
+G_t = \sum_{t=0}^{\infty} \gamma^t R_{t} \quad \text{continuing - discounted reward}
+</span></p>
+<p><span class="math display">
+G_t = \sum_{t=0}^{\infty} R_{t} - r(\pi) \quad \text{episodic - average reward}
+</span></p>
+<p>The average reward Objective for a policy is as follows: <span id="eq-average-reward-objective"><span class="math display">
+r(\pi) = \sum_{t=0}^{T} \mu(s) \sum_{a} \pi(a \mid s) \sum_{s',r} p(s',r \mid s,a) r \quad \text{avg. reward objective}
+\tag{2}</span></span></p>
+<p>What does this mean?</p>
+<ul>
+<li>the last sum is the expected reward for a state-action pair. <span class="math inline">\mathbb{E}[R_t \mid S_t = s , A_t=a]</span></li>
+<li>the last two sums together are the expected reward for a state under weighted by the policy <span class="math inline">\pi</span>. <span class="math inline">\mathbb{E}_\pi[R_t \mid S_t = s]</span></li>
+<li>full sum ads the time we spend in state <span class="math inline">s</span> under <span class="math inline">\pi</span> therefore the expected reward for a state under the policy <span class="math inline">\pi</span> and the environment dynamics <span class="math inline">p</span>. <span class="math inline">\mathbb{E}_\pi[R_t]</span></li>
+</ul>
+<p>to optimize the average reward, we need to estimate the gradient of <a href="#eq-average-reward-objective">the avg. objective</a></p>
+<p><span id="eq-average-reward-objective-gradient"><span class="math display">
+\nabla_\theta r(\pi) = \nabla_\theta \sum_{t=0}^{T} \textcolor{red}{\underbrace{\mu(s)}_{\text{Depends on }\theta}} \sum_{a} \pi(a \mid s, \theta) \sum_{s',r} p(s',r \mid s,a) r \qquad
+\tag{3}</span></span></p>
+<ol type="1">
+<li>Methods based on this are called policy gradient methods.</li>
+<li>We are trying to maximize the average reward.</li>
+</ol>
+<p>There are a few challenges with using the gradient in [#eq-average-reward-objective-gradient]:</p>
+<p>According to the lesson <span class="math inline">\mu(s)</span> depends on <span class="math inline">\theta</span>. Martha White point out that this state importance though parameterized only by s actually depends on the the policy <span class="math inline">\pi</span> which will evolve during its training based on the values of <span class="math inline">\theta</span>. Which means out notation here is a bit misleading. She then contrasts it with the value function gradient is being evaluated using a fixed policy.</p>
+<p><span class="math display">
+\begin{align*}
+\nabla_w \bar{VE} &amp;= \nabla_w \sum_{s}\textcolor{red}{\underbrace{\mu(s)}_{\text{Independent of }\mathbf{w}}}  [V_{\pi}(s)-\bar{v}(s,w)]^2 \newline
+&amp;=\sum_{s} \textcolor{red}{\mu(s)}  \nabla_w [V_{\pi}(s)-\bar{v}(s,w)]^2
+\end{align*}
+</span></p>
+<p>We can avg reward as an objective for policy optimization and the its for the stochastic gradient ascent. Next we will consider how the policy gradient theorem can help us estimate the gradient of the average reward objective despite these setbaks.</p>
+</section>
+<section id="the-policy-gradient-theorem-video" class="level2">
+<h2 class="anchored" data-anchor-id="the-policy-gradient-theorem-video">The Policy Gradient Theorem (Video)</h2>
+</section>
+<section id="sec-l2g2" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l2g2">The results of the policy gradient theorem</h2>
+</section>
+<section id="sec-l2g3" class="level2">
+<h2 class="anchored" data-anchor-id="sec-l2g3">The importance of the policy gradient theorem</h2>
+</section>
 </section>
 <section id="lesson-3-actor-critic-for-continuing-tasks" class="level1">
 <h1>Lesson 3: Actor-Critic for Continuing Tasks</h1>
@@ -2815,8 +3114,8 @@ Learning Objectives
 </div>
 <div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox" checked="">Derive a sample-based estimate for the gradient of the average reward objective <a href="#l3g1">#</a></label></li>
-<li><label><input type="checkbox" checked="">Describe the actor-critic algorithm for control with function approximation, for continuing tasks <a href="#l3g2">#</a></label></li>
+<li><label><input type="checkbox" checked="">Derive a sample-based estimate for the gradient of the average reward objective <a href="#sec-l3g1">#</a></label></li>
+<li><label><input type="checkbox" checked="">Describe the actor-critic algorithm for control with function approximation, for continuing tasks <a href="#sec-l3g2">#</a></label></li>
 </ul>
 </div>
 </div>
@@ -2834,12 +3133,12 @@ Learning Objectives
 </div>
 <div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox" checked="">Derive the actor-critic update for a softmax policy with linear action preferences <a href="#l4g1">#</a></label></li>
-<li><label><input type="checkbox" checked="">Implement this algorithm <a href="#l4g2">#</a></label></li>
-<li><label><input type="checkbox" checked="">Design concrete function approximators for an average reward actor-critic algorithm <a href="#l4g3">#</a></label></li>
-<li><label><input type="checkbox" checked="">Analyze the performance of an average reward agent <a href="#l4g4">#</a></label></li>
-<li><label><input type="checkbox" checked="">Derive the actor-critic update for a gaussian policy <a href="#l4g5">#</a></label></li>
-<li><label><input type="checkbox" checked="">Apply average reward actor-critic with a gaussian policy to a particular task with continuous actions <a href="#l4g6">#</a></label></li>
+<li><label><input type="checkbox" checked="">Derive the actor-critic update for a softmax policy with linear action preferences <a href="#sec-l4g1">#</a></label></li>
+<li><label><input type="checkbox" checked="">Implement this algorithm <a href="#sec-l4g2">#</a></label></li>
+<li><label><input type="checkbox" checked="">Design concrete function approximators for an average reward actor-critic algorithm <a href="#sec-l4g3">#</a></label></li>
+<li><label><input type="checkbox" checked="">Analyze the performance of an average reward agent <a href="#sec-l4g4">#</a></label></li>
+<li><label><input type="checkbox" checked="">Derive the actor-critic update for a gaussian policy <a href="#sec-l4g5">#</a></label></li>
+<li><label><input type="checkbox" checked="">Apply average reward actor-critic with a gaussian policy to a particular task with continuous actions <a href="#sec-l4g6">#</a></label></li>
 </ul>
 </div>
 </div>
@@ -2857,6 +3156,21 @@ Discussion prompt
 <p>Are tasks really ever continuing? Everything eventually breaks or dies. It’s clear that individual people do not learn from death, but we don’t live forever. Why might the continuing problem formulation be a reasonable model for long-lived agents?</p>
 </blockquote>
 </div>
+</div>
+<div id="fig-chapter-13-policy-gradient" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-chapter-13-policy-gradient-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="ch13-policy-gradient.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="Chapter 13"><embed src="ch13-policy-gradient.pdf" class="col-page" width="700" height="1000"></a></p>
+<figcaption>Chapter 13</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-chapter-13-policy-gradient-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12: Chapter 13 of <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018</a>)</span> covering policy gradient methods.
+</figcaption>
+</figure>
 </div>
 
 

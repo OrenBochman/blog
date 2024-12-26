@@ -20,10 +20,11 @@ image: /images/nlp-brain-wordcloud.jpg
 title-block-banner: /images/banner_black_3.jpg
 ---
 
-![RL logo](img/logo.png){.column-margin} 
+![RL logo](img/logo.png){.column-margin}
 
-::: {#fig-episodic-semi-gradient-sarsa group="slides" .column-margin}
-![RL algorithm decision tree](img/alg_selector.png)
+::: {#fig-episodic-semi-gradient-sarsa .column-margin}
+
+![RL algorithm decision tree](img/alg_selector.png){group="slides"}
 
 The algorithms we will be discussing in this lesson are function approximation versions of SARSA, Expected SARSA, and Q-learning. These are all sample-based algorithms that solve the Bellman equation for action-values. They differ in how they estimate the action-values and how they update them. 
 :::
@@ -36,15 +37,15 @@ The algorithms we will be discussing in this lesson are function approximation v
 -   [x] [@sutton2018reinforcement§10.3 pp. 249-252] [book](http://incompleteideas.net/book/RLbook2020.pdf#page=249)
 :::
 
-# Lesson 1: Episodic Sarsa with Function Approximation
+# Lesson 1: Episodic SARSA with Function Approximation
 
 ::: callout-note
 ### Learning objectives {.unnumbered}
 
-- [x] *Explain* the update for Episodic Sarsa with function approximation [\#](#sec-l1g1)
+- [x] *Explain* the update for Episodic SARSA with function approximation [\#](#sec-l1g1)
 - [x] *Introduce* the feature choices, including passing actions to features or stacking state features [\#](#sec-l1g2)
 - [x] *Visualize* value function and learning curves [\#](#sec-l1g3)
-- [x] *Discuss* how this extends to Q-learning easily, since it is a subset of Expected Sarsa [\#](#sec-l1g4)
+- [x] *Discuss* how this extends to Q-learning easily, since it is a subset of Expected SARSA [\#](#sec-l1g4)
 :::
 
 ## Episodic SARSA with function approximation (Video)
@@ -53,9 +54,20 @@ In this video, Adam White, discusses the algorithm for "Episodic SARSA with func
 
 ## Two ways to construct action dependent features? {#sec-l1g2}
 
-![Stacking](nn-feature-stacking.png){.column-margin}
 
-![Passing](nn-feature-inputs.png){.column-margin}
+
+::: {.column-margin #fig-feature-stacking}
+![Stacking](nn-feature-stacking.png){.column-margin group="slides"}
+
+Stacking involves concatenating the state features with the action features
+:::
+
+
+::: {.column-margin #fig-feature-inputs}
+![Passing](nn-feature-inputs.png){.column-margin group="slides"}
+
+Passing Actions to Features involves passing the state features through a neural network that also takes the action as input
+:::
 
 We see two techniques for constructing action dependent features. It is worthwhile noting that these two techniques are quite generally used in Machine Learning. For example Concatenating is used in CNN and with multi-head attention in Transformers.
 
@@ -69,7 +81,7 @@ Stacking can used both for linear function approximation and for neural networks
 
 
 
-Next we will [see](#fig-episodic-semi-grafient-sarsa) how to use SARSA in episodic tasks with function approximation. The main idea is to use a similar update rule as before, but with the action value function approximated by a function approximator, i.e. it will be parametrized by weights **w**. Also we will need to add a the gradient of the to the update rule. As we will want to move the weights in the direction of the gradient of the action value function.
+Next we will [see](#fig-episodic-semi-gradient-sarsa) how to use SARSA in episodic tasks with function approximation. The main idea is to use a similar update rule as before, but with the action value function approximated by a function approximator, i.e. it will be parametrized by weights **w**. Also we will need to add a the gradient of the to the update rule. As we will want to move the weights in the direction of the gradient of the action value function.
 
 
 
@@ -115,8 +127,8 @@ SARSA is a sample-based algorithm to solve the Bellman equation for action-value
 - It policy evaluation by a TD updates of Q the action-value function based on the reward and the next action.
 - Then it does a policy improvement.
 
-::: {#fig-episodic-semi-grafient-sarsa .column-margin}
-![Episodic SARSA with function approximation](episodic-semi-grafient-sarsa.png)
+::: {#fig-episodic-semi-grafient-sarsa .column-margin group="slides"}
+![Episodic SARSA with function approximation](episodic-semi-grafient-sarsa.png){group="slides"}
 
 This figure shows the algorithm for Episodic semi-gradient SARSA which uses function approximation. The update rule is modified from tabular case, with an approximate action value function $\hat{q}(s,a,\mathbf{w})$ as well as the inclusion of the gradient of the action value function $\nabla \hat{q} (S_t, A_t, \mathbf{w})$ . These two modification allows us to update the weights of the function approximator The rest of the algorithm remains unchanged. 
 :::
@@ -167,7 +179,7 @@ This figure shows the algorithm for Episodic semi-gradient SARSA which uses func
 
 This allows us to learn a good policy for the task. We will also need a step to update the weights.
 
-::: {.column-margin #fig-projected-bellman-error}
+::: {.column-margin #fig-projected-bellman-error group="slides"}
 {{< video https://youtu.be/nFM5kLJl34c
     title='Advances in Value Estimation in Reinforcement Learning' >}}
 
@@ -191,7 +203,7 @@ So you think you understand SARSA with function approximation?
 If we define the MSE of the Q-value of the next state as the projected Bellman error, then we can see that the update rule is a projected gradient descent on the projected Bellman error. This is a semi-gradient method because we are not using the true value of the next state in the update rule.
 
 $$
-\overline{{QE}}(w)\ \dot= \sum_{s\in \mathcal{S},a\in \mathcal{A}} \mu(s)\left[  q^*(s,a) - \hat{q}(s,a,\mathbf{w})  \right]^2
+\overline{{QE}}(w) \doteq \sum_{s\in \mathcal{S},a\in \mathcal{A}} \mu(s)\left[  q^*(s,a) - \hat{q}(s,a,\mathbf{w})  \right]^2
 $$
 
 since we dont know the action value function we can't compute the true value of the next state. Instead we use the value of the next state.
@@ -205,6 +217,7 @@ $$
 
 
 then we have the following objective function:
+
 $$ J(w) = \mathbb{E}_\mu \left[ \sum_{t=0}^\infty \gamma^t  \left( r_t + \gamma \hat{q}(s',a',\mathbf{w}) - \hat{q}(s,a,\mathbf{w}) \right)^2 \right] 
 $$
 
@@ -275,22 +288,34 @@ $$
 So far we have only been using function approximation to parametrize state value function,
 
 $$
-V_\pi(s) ≈ \hat{v}(s,w) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(S) \qquad
+V_\pi(s) ≈ \hat{v}(s,w) \doteq \mathbf{w}^T \cdot \mathbf{x}(S) \qquad
 $$ {#eq-parametize-state-value-function}
 
 For SARSA we need a parametrized approximation $\hat{q}$ for the the action value function $q_pi$,
 
 $$
-q_\pi(s,a) ≈ \hat{q}(s,a,\mathbf{w}) \ \dot = \ \mathbf{w}^T \cdot \mathbf{x}(s,a) \qquad
+q_\pi(s,a) ≈ \hat{q}(s,a,\mathbf{w}) \doteq \mathbf{w}^T \cdot \mathbf{x}(s,a) \qquad
 $$ {#eq-parametrized-action-value-function}
 
 ## Episodic SARSA in Mountain Car (Video)
 
-![mountain car environment](mountain-car-environment.png){.column-margin}
+
+::: {.column-margin #fig-mountain-car-environment}
+![mountain car environment](mountain-car-environment.png){.column-margin}{group="slides"}
+
+The mountain car environment
+:::
+
+
 
 ## Feature Choices in Episodic SARSA with Function Approximation 
 
-![tile coding](mountain-car-feature-representations.png){.column-margin}
+
+::: {.column-margin #fig-mountain-car-feature-representations}
+![tile coding](mountain-car-feature-representations.png){.column-margin}{group="slides"}
+
+The feature representations for the mountain car problem
+:::
 
 What features do we use for the mountain car problem?
 
@@ -307,11 +332,24 @@ for the action:
 
 ## Visualizing Value Function and Learning Curves {#sec-l1g3}
 
-![](mountain-car-learned-values.png){.column-margin}
+::: {.column-margin #fig-mountain-car-learned-values}
+![](mountain-car-learned-values.png){group="slides"}
 
-![](mountain-car-learned-values-trajectory.png){.column-margin}
+The value function for the mountain car problem
+:::
 
-![](mountain-car-learning-curve.png){.column-margin}
+::: {.column-margin #fig-mountain-car-learned-values-trajectory }
+![](mountain-car-learned-values-trajectory.png){group="slides"}
+
+The trajectory through the state space for the mountain car problem
+:::
+
+
+::: {.column-margin #fig-mountain-car-learning-curve}
+![](mountain-car-learning-curve.png){group="slides"}
+
+The learning curve for the mountain car problem
+:::
 
 The first two figures show the learned value function for the mountain car problem. The first figure shows the value function for each state. The second shows a possible trajectory through the state space.
 
@@ -354,15 +392,13 @@ $$ {#eq-semi-gradient-expected-sarsa-update}
 
 ## How this extends to Q-learning easily, since it is a subset of Expected SARSA {#sec-l1g4}
 
-Finally, for Q-learning with function approximation as Q-learning is a special case of expected Sarsa in which we take the greedy. So next we replace the expectation over the target policy by argmax action to derive the Q-learning update rule. 
+Finally, for Q-learning with function approximation as Q-learning is a special case of expected SARSA in which we take the greedy. So next we replace the expectation over the target policy by argmax action to derive the Q-learning update rule. 
 
 The Q-learning update rule is:
 
 $$
 \mathbf{w} \leftarrow \mathbf{w} + \alpha [R_{t+1} + \gamma  \textcolor{red}{ \max_{a'} \hat{q}(S_{t+1},a',\mathbf{w})} −\hat{q}(S_t,A_t,\mathbf{w})] \nabla \hat{q}(S_t,A_t,\mathbf{w}) \qquad
 $$ {#eq-semi-gradient-Q-learning-update}
-
-
 
 # Lesson 2: Exploration under Function Approximation 
 
@@ -400,7 +436,7 @@ Q. Why is epsilon-greedy exploration ineffective in the function approximation s
 3. Prioritizing using count based on a coarse coding may be more effective. Even better if we track the uncertainty in the value function for each if these features. This is a form of intrinsic motivation.
 
 
- However the last video by Satinder Singh discusses using intrinsic motivation to improve exploration in reinforcement learning systems. And in it he shows a different paradigm of exploration. Rather than getting agents to explore systematic one wants to explore in a way that is interesting to the agent.
+However the last video by Satinder Singh discusses using intrinsic motivation to improve exploration in reinforcement learning systems. And in it he shows a different paradigm of exploration. Rather than getting agents to explore systematic one wants to explore in a way that is interesting to the agent.
 
 # Lesson 3: Average Reward 
 
@@ -414,31 +450,108 @@ Q. Why is epsilon-greedy exploration ineffective in the function approximation s
 
 ## Average Reward: A New Way of Formulating Control Problems  (Video)
 
+You probably never thought about it, since discounting is familiar like a geometric series, but it can really skew the value function.
+
+:::{#fig-near-sighted-mdp .column-margin}
+
+![The near sighted MDP](near-sighted-mdp.png){group="slides"}
+
+The near sighted MDP. The lower discounting causes the agent to prefer the smaller immediate reward over the larger delayed reward.
+:::
+
+In most states, there's only one action, so there are no decisions to be made. There's only one state were a decision can be made. In this state, the agent can decide which ring to traverse. 
+
+This means there are two deterministic policies, traversing the left ring or traversing the right ring. The reward is zero everywhere except for in one transition in each ring. In the left ring, the reward is +1 immediately after state S. In the right ring, the reward is +2 immediately before state S. Intuitively, you would pick the right action because you know you will get +2 reward. But what would the value function tell us to do?
+
+**If we use discounting, what are the values of state S under these two different policies?**
+
+The policy that chooses the left action has a value of $v_l(S) = \frac{1}{1-\gamma^5}$. How do we figure this out? If you write out the infinite discounted return, you will see this is a fairly straightforward geometric series with a closed form solution. 
+
+The policy that chooses the right action has a value of $v_r(S) = \frac{2 \gamma^4}{1-\gamma^5}$. Let's think of the value of state S under these two part policies for particular values of $\gamma$. 
+
+$\gamma= 0.5 \implies V_L \approx 1 \qquad V_R \approx 0.1$ 
+
+This means the policy that takes the left action is preferable under this more myopic discount. 
+
+Let's try 
+
+$\gamma= 0.9 \implies V_L \approx 2.4 \qquad V_R \approx 3.2$
+
+So now we prefer the other policy. 
+
+In fact, we can figure out the minimum value of $\gamma$ so that the agent prefers the policy that goes right. $\gamma$ needs to be at least 0.841. So the problem here is that the discount magnitude depends on the problem. 
+
+For this example, 0.85 is sufficiently large. But if the rings had 100 states each, this discount factor would need to be over 0.99.
+
+In general, the only way to ensure that the agents actions maximize reward over time is to keep increasing the discount factor towards 1. 
+
+Depending on the problem, we might need $\gamma$ to be quite large. And we can't set it to 1 in a continuing setting as the return might be infinite. 
+
+Now, what's wrong with having larger $\gamma$? Larger values of $\gamma$ can also result in larger and more variables sums, which might be difficult to learn. So is there an alternative? 
+
 ## The Average Reward Setting {#sec-l3g1}
 
 $$
-r(\pi) \dot = \lim _{h \to \infty} \frac{1}{h} \sum_{t=1}^{h} \mathbb{E}[R_t S_0,A_{0:t−1} ≈ \pi]  \qquad
+r(\pi) \doteq \lim _{h \to \infty} \frac{1}{h} \sum_{t=1}^{h} \mathbb{E}[R_t S_0,A_{0:t−1} \sim \pi]  \qquad
 $$ {#eq-average-reward}
 
-We can write the average reward using the state visitation, $\pi$. This inner term is the expected reward in a state under policy $\pi$. The outer sum takes the expectation over how frequently the policy is in that state. Together, we get the expected reward across states. In other words, the average reward for a policy
+Let's discuss a new objective called the average reward. Imagine the agent has interacted with the world for H steps. This is the reward it has received on average across those H steps. In other words, it's rate of reward. If the agents goal is to maximize this average reward, then it cares equally about nearby and distant rewards. We denote the average reward of a policy with $R_\pi$. 
 
 
 $$
-r(\pi) = \sum_{s} \mu_\pi (s) \sum_{a} \pi(a \mid s) \sum_{r,s'} p(r,s' \mid s,a) r
+r(\pi) = \sum_{s} \mu_\pi (s) \sum_{a} \pi(a \mid s) \sum_{s',r} p(s',r \mid s,a) r
 $$ {#eq-average-reward-visitation}
 
-In the average reward setting, returns are defined in terms of differences between rewards and the average reward $r_\pi$, which is called the differential return. The differential return represents how much more reward the agent will receive from the current state in action compared to the average reward of the policy.
+
+
+More generally, we can write the average reward using the state visitation, $\mu$. This inner term is the expected reward in a state under policy $\pi$. The outer sum takes the expectation over how frequently the policy is in that state. Together, we get the expected reward across states. In other words, the average reward for a policy. 
+
+In the nearsighted example, the two deterministic possible policies visit either the left loop or the right loop indefinitely. In both cases, the five states in each loop are visited equally many times. In the left loop, the immediate expected reward is +0 for all states except one, which gets +1. This results in an average reward of 1 every 5 steps or 0.2.
+
+$r(\pi_L)=1/5=0.2 \qquad r(\pi_R)=2/5=0.4$
+
+Most states in the right loop also have +0 $\mu$ to expected reward. But this time, the last state gets +2. This gives an average reward of 2 every 5 steps or 0.4.
+
+::: {#fig-near-sighted-mdp-2 .column-margin}
+![Near sighted MDP return for Average rewards](near-sighted-mdp-2.png){group="slides"}
+
+Return for the nearsighted MDP for average rewards. The average reward for the left policy is 0.4 and for the right policy is 1.4.
+:::
+
+::: {#fig-near-sighted-mdp-3 .column-margin}
+![Near sighted MDP return for Average rewards](near-sighted-mdp-3.png){group="slides"}
+
+Return for the nearsighted MDP for average rewards. The average reward for the left policy is $G_t=-1.8$ and for the right policy is $G_t=0.8$.
+:::
+
+We can see the average reward puts preference on the policy that receives more reward in total without having to consider larger and larger discounts.
+
+The average reward definition is intuitive for saying if one policy is better than another, but **how can we decide which actions from a state are better?** 
+
+What we need are action values for this new setting. The first step is to figure out what the return is. In the average reward setting, returns are defined in terms of differences between rewards and the average reward $R_\pi$. This is called **the differential return**. 
 
 $$
 G_t = R_{t+1} −r_\pi + R_{t+2} −r_\pi + R_{t+2} −r_\pi \ldots \qquad
 $$ {#eq-differential-return}
 
+Let's look at what the **differential returns** are in our nearsighted MDP. 
+
+The differential return represents how much more reward the agent will receive from the current state in action compared to the average reward of the policy. Let's look at the differential return starting in state $s$, first choosing action L and then following $\pi$ L afterwards. 
+
+The average reward for this policy is 0.2. 
+
+The differential return is the sum of rewards into the future with the average reward subtracted from each one. This sum starts in state S with the action L. We can compute it by summing to some finite horizon H. Then taking the limit as H goes to infinity. We are simplifying things slightly with this limit notation. While notation provider works in many cases, we need to use a different technique when the environment is periodic. In this case, we compute the return using a more general limit called the [Cesàro sum](https://en.wikipedia.org/wiki/Ces%C3%A0ro_summation), but this technical detail is not critical. The main point here is the intuition. We find that the differential return is 0.4. Now, let's look at the other action. This time, we can break the differential return into two parts. First the sum for a single trajectory through the right loop. We can write the sum explicitly and it's equal to 1. Then the sum corresponding to taking the left action indefinitely. This sum is the same as the differential return we just computed, 0.4. Adding the two parts together, we find that the differential return is 1.4.
+
+We can write the average reward using the state visitation, $\pi$. This inner term is the expected reward in a state under policy $\pi$. The outer sum takes the expectation over how frequently the policy is in that state. Together, we get the expected reward across states. In other words, the average reward for a policy
+
+In the average reward setting, returns are defined in terms of differences between rewards and the average reward $r_\pi$, which is called the differential return. The differential return represents how much more reward the agent will receive from the current state in action compared to the average reward of the policy.
+
 The differential return represents how much better it is to take an action in a state then on average under a certain policy. The differential return can only be used to compare actions if the same policy is followed on subsequent time steps. To compare policies, their average reward should be used instead
 
-
 This quantity captures how much more reward the agent will get by starting in a particular state than it would get on average over all states if it followed a fixed policy.
+
 $$
-q_\pi(s,a) = E_\pi[G_t|S_t = s,A_t = a] \qquad
+q_\pi(s,a) = \mathbb{E}_\pi[G_t \mid S_t = s,A_t = a] \qquad
 $$ {#eq-differential-value-function}
 
 Like in the discounted setting, differential value functions can be written as Bellman equations. They only differ in that they subtract r(\pi) from the immediate reward and there is no discounting.
@@ -446,7 +559,7 @@ $$
 q_\pi(s,a) = \sum_{s',r} p(s',r \mid s,a)(r −r(\pi)) + \sum_{a'} \pi(a' \mid s')q_\pi(s',a') \qquad
 $$ {#eq-differential-bellman}
 
-Many algorithms from the discounted case can be rewritten to apply to the average reward case. 
+Many algorithms from the discounted settings can be rewritten to apply to the average reward case. 
 
 ## When Average Reward Optimal Policies are Different from Discounted Solutions {#sec-l3g2}
 
@@ -475,7 +588,7 @@ Many algorithms from the discounted case can be rewritten to apply to the averag
   \State $\qquad \alpha, \beta > 0$
 \State $\textbf{Initialize:}$
   \State $\qquad$ value function weights $\mathbf{w} \in \mathbb{R}^d$ arbitrarily, (e.g., $\mathbf{w} = 0$)  
-  \State $\bar{R} \in \mathbb{R}$ avg reward estimate
+  \State $\bar{R} source \in \mathbb{R}$ avg reward estimate
 \State Initialize $S$ and action $A$
 \For {each step}
   \State Take action A, observe R, S'    
@@ -493,8 +606,6 @@ Many algorithms from the discounted case can be rewritten to apply to the averag
 
 ## Satinder Singh on Intrinsic Rewards (Video)
 
-
-
 ::: {.column-margin #fig-subtasks}
 {{< video https://youtu.be/L-9Pbhpk7pQ
     title='From Reinforcement Learning to Artificial Intelligence ?' >}}
@@ -510,7 +621,6 @@ This talk  titled 'Steps Towards Continual Learning' by Satinder Singh on Reinfo
 :::
 
 
-
 ::: {.column-margin #fig-subtasks}
 {{< video https://youtu.be/Z7JhZx3urEY
     title='Discovery in Reinforcement Learning' >}}
@@ -519,12 +629,9 @@ Talk titled 'Discovery in Reinforcement Learning' at Beijing Academy of Artifici
 :::
 
 
-Satinder Singh is a professor at the University of Michigan. He is a leading researcher in reinforcement learning and has made significant contributions to the field. In this video, he discusses intrinsic rewards and how they can be used to improve learning in reinforcement learning systems. It's worth noting that he is one of the reaserchers who has worked on options with Doina Precup.
+Satinder Singh is a professor at the University of Michigan. He is a leading researcher in reinforcement learning and has made significant contributions to the field. In this video, he discusses intrinsic rewards and how they can be used to improve learning in reinforcement learning systems. It's worth noting that he is one of the researchers who has worked on options with Doina Precup.
 
-Now Satinder Singh is a good speaker and he has lots of intereting research results to share. Unfortunately, this video is not his finest hour. I would definitely recommend watching some of his other talks linked above.
-
-
-
+Now Satinder Singh is a good speaker and he has lots of interesting research results to share. Unfortunately, this video is not his finest hour. I would definitely recommend watching some of his other talks linked above.
 
 ::: callout-note
 

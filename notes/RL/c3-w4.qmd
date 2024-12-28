@@ -80,7 +80,7 @@ I found policy gradient methods to be complicated at first blush. Perhaps a bit 
 
 Here are three extra videos by experts in the field that delve deeper into this topic. Each of these instructors have published papers with some of the most groundbreaking algorithms in the field and have a lot of insights to share. 
 
-1. In [this lecture](#fig-deep-reinforcement-learning) [John Schulman](http://joschu.net/) covers Deep Reinforcement Learning Policy Gradients and Q-Learning. John Schulman is a research scientist at OpenAI and has published many papers on RL and Robotics. John Schulman who developed PPO and TRPO and Chat-GPT)
+1. In [this lecture](#fig-deep-reinforcement-learning) [John Schulman](http://joschu.net/) covers Deep Reinforcement Learning Policy Gradients and Q-Learning. John Schulman is a research scientist at OpenAI and has published many papers on RL and Robotics. John Schulman who developed PPO and TRPO and Chat-GPT
 
 
 2. In [this lecture](#fig-policy-gradients-and-advantage-estimation) [Pieter Abbeel](https://people.eecs.berkeley.edu/~pabbeel/) covers policy gradients and advantage estimation. Pieter Abbeel is a professor at UC Berkeley and has published many papers on RL and Robotics.
@@ -110,12 +110,14 @@ In the mountain car environment, the parameterized value function is complex, bu
 
 In this lesson course instructor Adam White introduces the idea of learning policies directly. He contrasts this with learning value functions and explains why learning policies directly can be more flexible and powerful. 
 
+
+
 ## How to Parametrize a Policies? {#sec-l1g1}
 
 ::: {#fig-policy-gradient-param .column-margin}
 ![policy parametrization](pg-02.png){group="slides"}
 
-When we parametrize a policy we will use the greek letter $\theta$ to denote the parameters of the policy.
+When we parametrize a policy we will use the greek letter $\theta \in \mathbb{R}^d$ to denote the parameters of the policy.
 :::
 
 ::: {#fig-policy-gradient-constraint .column-margin}
@@ -126,12 +128,32 @@ Constraints on the policy parameters can be used to ensure that the policy is va
 
 So far we have been mostly looking at learning value functions. But when it comes to function approximation, it is often simpler to learn a policy directly.
 
+
+
 In [the mountain car environment](#fig-policy-gradient) we see the power pumping policy which accelerates the car in the direction it is moving. This is a near optimal policy for this environment. The policy is simple and can be learned directly and it makes no use of value functions. This may not always be the case.
 
-A visual summary of the policy parametrization is shown in [the figure](#fig-policy-gradient-param). Recall that the policy is a function that takes in a state and outputs a probability distribution over actions. We will use the greek letter $\theta$ to denote the parameters of the policy. This way we can reference the parameters of $\hat{Q}(s,a,w)$ the action value function are denoted by $\mathbf{w}$.
+A visual summary of the policy parametrization is shown in [the figure](#fig-policy-gradient-param). Recall that the policy is a function that takes in a state and outputs a probability distribution over actions. We will use the greek letter  $\theta \in \mathbb{R}^d$  to denote the parameters of the policy. This way we can reference the parameters of $\hat{Q}(s,a,w)$ the action value function are denoted by $\mathbf{w}$. 
 
+The parametrized policy is defined as follows:
+
+$$
+\pi(a \mid s, \theta) \doteq Pr(A_t = a \mid S_t = s, \theta) \qquad \text{(parametrized policy)}
+$$ {#eq-parametrized-policy-def} 
+
+is a probability distribution over actions given a state and the policy parameters.
 
 Since we are dealing with probabilities, the policy parameters must satisfy certain constraints. For example, the probabilities must sum to one. This is shown in [the figure](#fig-policy-gradient-constraint). These policy parameters constraints will ensure that the policy is valid. 
+
+Policy Gradient use gradient ascent:
+
+$$
+\theta_{t+1} = \theta_t + \alpha \nabla_\theta J(\theta) \qquad \text{(gradient ascent)}
+$$ {#eq-gradient-ascent}
+
+where $\alpha$ is the step size and $\nabla_\theta J(\theta)$ is the gradient of the objective function $J(\theta)$ with respect to the policy parameters $\theta$.
+
+- methods that follow this update rule are called **policy gradient methods**.
+- methods that learn both a value function and a policy are called **actor-critic methods**.
 
 ## Define one class of parameterized policies based on the softmax function {#sec-l1g2}
 
@@ -140,7 +162,7 @@ Since we are dealing with probabilities, the policy parameters must satisfy cert
 
 :::
 
-The Softmax policy also called the Boltzmann distribution is a probability distribution over actions given a state. It is parameterized by a vector of action preferences $h(s, a, \theta)$. 
+The **Softmax policy** based on the Boltzmann distribution is a probability distribution over actions given a state. It is parameterized by a vector of action preferences $h(s, a, \theta)$. 
 
 $$
 \pi(a \mid s, \theta) \doteq \frac{e^{h(s, a, \theta)}}{\sum_{b\in \mathcal{A}} e^{h(s, b, \theta)}} \text{(softmax policy)} \qquad 
@@ -216,7 +238,7 @@ In mountain car, the parameterized value function is complex, but the parameteri
 
 ## The Objective for Learning Policies (Video)
 
-In this video Martha White dive deep into the objective for policy gradient algorithms. She then contrasts this with the gradient of the value fn objectives and lists some challanges for estimating the gradient of the average reward objective. We will learn that we can use the policy gradient theorem and to overcome these challenges and derive a gradient with an neat update rule .
+In this video Martha White dive deep into the objective for policy gradient algorithms. She then contrasts this with the gradient of the value fn objectives and lists some challenges for estimating the gradient of the average reward objective. We will learn that we can use the policy gradient theorem and to overcome these challenges and derive a gradient with an neat update rule .
 
 
 ## The objective for policy gradient algorithms {#sec-l2g1}
@@ -224,20 +246,16 @@ In this video Martha White dive deep into the objective for policy gradient algo
 Formalizing the goal as an Objective
 
 $$
-G_t = \sum_{t=0}^{T}  R_{t} \quad \text{episodic}
-$$
-
-$$
-G_t = \sum_{t=0}^{\infty} \gamma^t R_{t} \quad \text{continuing - discounted reward}
-$$
-
-$$
-G_t = \sum_{t=0}^{\infty} R_{t} - r(\pi) \quad \text{episodic - average reward}
-$$
+\begin{align*}
+  G_t &= \sum_{t=0}^{T}  R_{t}  \quad && \text{(episodic)} \newline
+  G_t &= \sum_{t=0}^{\infty} \gamma^t R_{t}   \quad && \text{(continuing - discounted reward)} \newline
+  G_t &= \sum_{t=0}^{\infty} R_{t} - r(\pi)  \quad && \text{(continuing - avg. reward)}
+\end{align*}
+$$ {#eq-objectives}
 
 The average reward Objective for a policy is as follows:
 $$
-r(\pi) = \sum_{t=0}^{T} \mu(s) \sum_{a} \pi(a \mid s) \sum_{s',r} p(s',r \mid s,a) r \quad \text{avg. reward objective} 
+r(\pi) = \sum_{t=0}^{T} \mu(s) \sum_{a} \pi(a \mid s, \theta)  \sum_{s',r} p(s',r \mid s,a) r \quad \text{(avg. reward objective)} 
 $$ {#eq-average-reward-objective}
 
 What does this mean?
@@ -256,42 +274,84 @@ $$ {#eq-average-reward-objective-gradient}
 1. Methods based on this are called policy gradient methods.
 2. We are trying to maximize the average reward.
 
-There are a few challenges with using the gradient in [#eq-average-reward-objective-gradient]:
+There are a few challenges with using the gradient in [the above equation](#eq-average-reward-objective-gradient):
 
 According to the lesson $\mu(s)$ depends on $\theta$. Martha White point out that this state importance though parameterized only by s actually depends on the the policy $\pi$ which will evolve during its training based on the values of $\theta$. Which means out notation here is a bit misleading.  She then contrasts it with the value function gradient is being evaluated using a fixed policy.
 
 $$
 \begin{align*}
 \nabla_w \bar{VE} &= \nabla_w \sum_{s}\textcolor{red}{\underbrace{\mu(s)}_{\text{Independent of }\mathbf{w}}}  [V_{\pi}(s)-\bar{v}(s,w)]^2 \newline
-&=\sum_{s} \textcolor{red}{\mu(s)}  \nabla_w [V_{\pi}(s)-\bar{v}(s,w)]^2 
-\end{align*}
-$$
+&=\sum_{s} \textcolor{red}{\mu(s)} \nabla_w [V_{\pi}(s)-\bar{v}(s,w)]^2 
+\end{align*} \text{(value function gradient)} \qquad
+$$ {#eq-value-function-gradient}
 
 
-We can avg reward as an objective for policy optimization and the its for the stochastic gradient ascent. Next we will consider how the policy gradient theorem can help us estimate the gradient of the average reward objective despite these setbaks.
+We can avg reward as an objective for policy optimization and the its for the stochastic gradient ascent. Next we will consider how the policy gradient theorem can help us estimate the gradient of the average reward objective despite these setbacks.
 
 ## The Policy Gradient Theorem (Video)
 
+::: {#fig-policy-gradient-theorem .column-margin}
+![Understanding the pg theorem up](pg-08-gridworld-policy.png){group="slides"}
+
+:::
+
+::: {#fig-policy-gradient-theorem .column-margin}
+![Understanding the pg theorem left](pg-09-gridworld-policy.png){group="slides"}
+
+:::
+
+::: {#fig-policy-gradient-theorem .column-margin}
+![Understanding the pg theorem all](pg-10-gridworld-policy.png){group="slides"}
+
+:::
+
+In this video course instructor Martha White explains the policy gradient theorem, a key result for optimizing policy in reinforcement learning. The goal is to maximize the average reward by adjusting policy parameters $\theta$ using gradient ascent. The challenge is estimating the gradient of the average reward, which initially involves a complex expression with the gradient of the stationary distribution over states ($\mu(s)$).
+
 ## The results of the policy gradient theorem {#sec-l2g2}
+
+
+
+The policy gradient theorem simplifies this by providing a new expression for the gradient. This expression involves summing, over all states and actions, the product of the gradient of the policy and the action-value function (Q). The gradient of the policy indicates how to adjust parameters to increase the probability of an action, while the action-value function represents the expected return from taking that action.
+
+The video illustrates this with a grid world example, showing how gradients for different actions point in different directions. By weighting these gradients with the corresponding action values, the theorem provides a direction to update the policy parameters that increases the probability of high-value actions and decreases the probability of low-value actions.
 
 The product rule
 $$
-\nabla(f(x)g(x)) = \nabla f(x)g(x) + f(x)\nabla g(x)
+\nabla(f(x)g(x)) = \nabla f(x)g(x) + f(x)\nabla g(x) \qquad \text{(product rule)}
 $$ {#eq-product-rule}
 
 therefore:
 
 $$
 \begin{align*}
-\nabla_\theta r(\pi) &= \sum_{t=0}^{T} \nabla \mu(s) \sum_{a} \pi(a \mid s,\theta) \sum_{s',r} p(s',r \mid s,a) r +  \sum_{t=0}^{T} \mu(s) \nabla \sum_{a} \pi(a \mid s, \theta) \sum_{s',r} p(s',r \mid s,a) r \\
- &= \sum_{s\in \mathcal{S}}  \mu(s) \sum_{a} \pi(a \mid s,\theta)  q(s,a) 
+\nabla_\theta r(\pi) &= \sum_{t=0}^{T} \nabla \mu(s) \sum_{a} \pi(a \mid s,\theta) \sum_{s',r} p(s',r \mid s,a) r \newline &+  \sum_{t=0}^{T} \mu(s) \nabla \sum_{a} \pi(a \mid s, \theta) \sum_{s',r} p(s',r \mid s,a) r 
+\end{align*}
+$$ {#eq-policy-gradient-naive}
+
+
+The first term is the gradient of the stationary distribution and the second term is the gradient of the policy. The policy gradient theorem simplifies this expression by eliminating the need to estimate the gradient of the stationary distribution.
+
+$$
+\begin{align*}
+\nabla_\theta r(\pi) &= \sum_{s\in \mathcal{S}} \mu(s) \textcolor{red}{ \sum_{a\in{\mathcal{A}}} \nabla \pi(a \mid s,\theta)  q_\pi(s,a) }
 \end{align*}
 $$ {#eq-policy-gradient-theorem}
 
+The policy gradient theorem provides a new expression for the gradient of the average reward objective. This expression involves summing, over all states and actions, the product of the gradient of the policy and the action-value function (Q). The gradient of the policy indicates how to adjust parameters to increase the probability of an action, while the action-value function represents the expected return from taking that action.
+
+Martha White points out that this expression is much easier to estimate. 
+Now let's try to understand this expression in more detail.
+
+
+
+
+
 ## The importance of the policy gradient theorem {#sec-l2g3}
 
+Crucially, the policy gradient theorem eliminates the need to estimate the gradient of the stationary distribution ($\mu$), making the gradient much easier to estimate from experience. This sets the stage for building incremental policy gradient algorithms, which will be discussed in the next lecture.
 
 # Lesson 3: Actor-Critic for Continuing Tasks 
+
 
 ::: callout-note
 ### Learning Objectives {.unnumbered}
@@ -300,6 +360,28 @@ $$ {#eq-policy-gradient-theorem}
 -   [x] Describe the actor-critic algorithm for control with function approximation, for continuing tasks [\#](#sec-l3g2)
 
 :::
+
+
+## Derive a sample-based estimate for the gradient of the average reward objective {#sec-l3g1}
+
+$$
+\theta_{t+1} \doteq \theta_t + \alpha \frac{ \nabla_ \pi (a_t \mid s_t, \theta)}{\pi (a_t \mid s_t, \theta)} q_\pi(s_t, a_t) \qquad \text{()}
+$$
+
+$$
+\theta_{t+1} = \theta_t + \alpha \nabla_\theta ln \pi(a_t \mid s_t, \theta) q_\pi(s_t, a_t) \qquad \text{()}
+$$ {#eq-gradient-ascent}
+
+where $\alpha$ is the step size and $\nabla_\theta J(\theta)$ is the gradient of the objective function $J(\theta)$ with respect to the policy parameters $\theta$.
+
+$$
+\nabla \ln (f(x)) = \frac{\nabla f(x)}{f(x)} \qquad \text{(log derivative)}
+$$ {#eq-log-derivative}
+
+
+## Describe the actor-critic algorithm for control with function approximation, for continuing tasks {#sec-l3g2}
+
+
 
 # Lesson 4: Policy Parameterizations 
 
@@ -314,6 +396,25 @@ $$ {#eq-policy-gradient-theorem}
 - [x] Apply average reward actor-critic with a gaussian policy to a particular task with continuous actions [\#](#sec-l4g6)
 
 :::
+
+
+## Derive the actor-critic update for a softmax policy with linear action preferences {#sec-l4g1}
+
+
+## Implement this algorithm {#sec-l4g2}
+
+
+## Design concrete function approximators for an average reward actor-critic algorithm {#sec-l4g3}
+
+
+## Analyze the performance of an average reward agent {#sec-l4g4}
+
+
+## Derive the actor-critic update for a gaussian policy {#sec-l4g5}
+
+
+## Apply average reward actor-critic with a gaussian policy to a particular task with continuous actions {#sec-l4g6}
+
 
 
 ::: callout-note

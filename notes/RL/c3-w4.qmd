@@ -22,6 +22,8 @@ keywords:
   - Gaussian Policies
 image: /images/nlp-brain-wordcloud.jpg
 title-block-banner: /images/banner_black_3.jpg
+
+
 ---
 
 ![RL logo](img/logo.png){.column-margin} 
@@ -343,6 +345,90 @@ Martha White points out that this expression is much easier to estimate.
 Now let's try to understand this expression in more detail.
 
 
+## The policy gradient theorem
+
+![proof policy gradient theorem](pg-13-pg-theorem.png){.column-margin}
+
+
+
+We need some preliminary results and definitions. First we should recall [the four part dynamics function](eq-dynamics-function):
+from the [@sutton2018reinforcement pp, 48] book:
+
+$$ 
+p(s', r \mid s, a) \doteq Pr\{S_t=s', R_t=r \mid S_{t-1} = s , A_{t-1}= a\} \qquad \text{(S.B. 3.2)}
+$$ {#eq-dynamics-function}
+
+Next we need the result from [Exercise 3.18]{#exr-3.18} in [@sutton2018reinforcement pp. 62]
+
+::: {.callout-note collapse="true"}
+## Exercise 3.18 {.unnumbered}
+
+
+> The value of a state depends on the values of the actions possible in that state and on how likely each action is to be taken under the current policy. We can think of this in terms of a small backup diagram rooted at the state and considering each possible action:
+
+![backup diagram](ex-3-18.png){ group="slides" }
+
+> Give the equation corresponding to this intuition and diagram for the value at the root node, $v_\pi(s)$, in terms of the value at the expected leaf node, $q_\pi(s, a)$, given $S_t = s$. This equation should include an expectation conditioned on following the policy, $\pi$. 
+> Then give a second equation in which the expected value is written out explicitly in terms of $\pi(a \mid s)$ such that no expected value notation appears in the equation.
+
+:::
+
+
+### Solution {.unnumbered}
+
+$$
+\begin{align}
+V_\pi(s) &= \textcolor{red}{\mathbb{E_\pi}[}\textcolor{green}{q(s_t,a) \textcolor{red}{ \mid s_t = s, a_t=a ]}} \newline &= \textcolor{red}{\sum_a \pi(a \mid s)} \textcolor{green}{q_\pi(s,a)} \newline
+\end{align}  \pi \text { is a probability distribution}
+$$ {#eq-3-18-solution}
+
+
+Next we need the result from [Exercise 3.19]{#ex-3.19} in [@sutton2018reinforcement pp. 62]
+
+::: {.callout-note collapse="true"}
+## Exercise 3.19 {.unnumbered}
+
+> The value of an action, $q_\pi(s, a)$, depends on the expected next reward and the expected sum of the remaining rewards. Again we can think of this in terms of a small backup diagram, this one rooted at an action (state—action pair) and branching to the possible next states:
+
+![backup diagram](ex-3-19.png){ group="slides" }
+
+> Give the equation corresponding to this intuition and diagram for the action value, $q_\pi(s, a)$, in terms of the expected next reward, $R_{t+1}$, and the expected next state value, $v_\pi(S_{t+1})$, given that $S_t = s$ and $A_t = a$. This equation should include an expectation but not one conditioned on following the policy. 
+> Then give a second equation, writing out the expected value explicitly in terms of $p(s_0, r \mid s, a)$ defined by [eq 3.2](#eq-dynamics-function), such that no expected value notation appears in the equation. 
+::: 
+
+
+### Solution {.unnumbered}
+
+$$
+\begin{align*}
+q_\pi(s, a) &= \mathbb{E}[R_{t+1} v_\pi(S_{t+1}) \mid S_t = s, A_t = a] \newline
+      &= \textcolor{blue}{\sum_{s', r} p(s', r \mid s, a)} \textcolor{pink}{[r + v_\pi(s')]} \newline
+\end{align*} \qquad
+$$ {#ex-3-19-solution}
+
+
+In the following $\nabla$ is with respect to $\theta$: and $\theta$ is the parameter of the policy $\pi$.
+but is omitted for brevity.
+
+$$
+\begin{align*} 
+\nabla V_\pi(s) &= \nabla \sum_a \left [ \pi(a \mid s) q_\pi(s,a) \right ] && \text{backup v to q (Ex 3.18)}
+\newline &= \sum_a \nabla \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \nabla q_\pi(s,a) && \text{product rule}
+\newline &= \sum_a \nabla \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \nabla \sum_{s'} P(s',r \mid s, a) (r + V_\pi(s')) && \text{backup q to v (Ex 3.19)} 
+\newline &= \sum_a \nabla \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \sum_{s'} P(s',r \mid s, a) \nabla V_\pi(s') && \text{Neither P nor r are } f(\theta) \newline
+=& \sum_{a \in \mathcal{A}} \Big( \nabla_\theta \pi_\theta(a \mid s)Q_\pi(s, a) + \pi_\theta(a \mid s) \sum_{s'} P(s' \mid s,a) \nabla_\theta V_\pi(s') \Big) && \text{total rule of probability on r for P } 
+\newline & \blacksquare  && \qquad
+\end{align*}
+$$ {#eq-policy-gradient-theorem-proof}
+
+$$
+\begin{align*}
+q_\pi(s, a) &= \sum_{s'} \mathbb{E}_\pi[G_{t} \mid S_{t+1}=s'] Pr\{S_{t+1} = s' \mid S_t = s, A_t = a\}
+\\ &= \sum_{s'} \mathbb{E}[R_{t+1} + \gamma G_{t+1} \mid S_t = s, A_t = a, S_{t+1} = s'] Pr\{S_{t+1} = s' \mid S_t = s, A_t = a\} \newline
+   &= \sum_{s',r} \left( r + \gamma \underbrace{\mathbb{E}[G_{t+1} \mid S_{t+1} = s']}_{v_\pi|(s')} \right) p(s', r \mid s, a)\newline\newline
+   &= \sum_{s',r} [ r + \gamma v_\pi(s')] p(s', r \mid s, a)\newline
+\end{align*}
+$$
 
 
 
@@ -411,6 +497,11 @@ $$ {#eq-log-derivative}
 
 
 ## Derive the actor-critic update for a gaussian policy {#sec-l4g5}
+
+![Actor-Critic](pg-11-actor-critic.png){group="slides"}
+
+![Actor-Critic Algorithm](pg-12-actor-critic-alg.png){group="slides"}
+
 
 
 ## Apply average reward actor-critic with a gaussian policy to a particular task with continuous actions {#sec-l4g6}

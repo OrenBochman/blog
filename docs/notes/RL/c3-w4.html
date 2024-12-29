@@ -2771,6 +2771,11 @@ window.Quarto = {
   <li><a href="#sec-l2g1" id="toc-sec-l2g1" class="nav-link" data-scroll-target="#sec-l2g1">The objective for policy gradient algorithms</a></li>
   <li><a href="#the-policy-gradient-theorem-video" id="toc-the-policy-gradient-theorem-video" class="nav-link" data-scroll-target="#the-policy-gradient-theorem-video">The Policy Gradient Theorem (Video)</a></li>
   <li><a href="#sec-l2g2" id="toc-sec-l2g2" class="nav-link" data-scroll-target="#sec-l2g2">The results of the policy gradient theorem</a></li>
+  <li><a href="#the-policy-gradient-theorem" id="toc-the-policy-gradient-theorem" class="nav-link" data-scroll-target="#the-policy-gradient-theorem">The policy gradient theorem</a>
+  <ul class="collapse">
+  <li><a href="#solution" id="toc-solution" class="nav-link" data-scroll-target="#solution">Solution</a></li>
+  <li><a href="#solution-1" id="toc-solution-1" class="nav-link" data-scroll-target="#solution-1">Solution</a></li>
+  </ul></li>
   <li><a href="#sec-l2g3" id="toc-sec-l2g3" class="nav-link" data-scroll-target="#sec-l2g3">The importance of the policy gradient theorem</a></li>
   </ul></li>
   <li><a href="#lesson-3-actor-critic-for-continuing-tasks" id="toc-lesson-3-actor-critic-for-continuing-tasks" class="nav-link" data-scroll-target="#lesson-3-actor-critic-for-continuing-tasks">Lesson 3: Actor-Critic for Continuing Tasks</a>
@@ -3236,6 +3241,111 @@ Figure&nbsp;14
 <p>The policy gradient theorem provides a new expression for the gradient of the average reward objective. This expression involves summing, over all states and actions, the product of the gradient of the policy and the action-value function (Q). The gradient of the policy indicates how to adjust parameters to increase the probability of an action, while the action-value function represents the expected return from taking that action.</p>
 <p>Martha White points out that this expression is much easier to estimate. Now let’s try to understand this expression in more detail.</p>
 </section>
+<section id="the-policy-gradient-theorem" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-policy-gradient-theorem">The policy gradient theorem</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-13-pg-theorem.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="proof policy gradient theorem"><img src="pg-13-pg-theorem.png" class="img-fluid figure-img" alt="proof policy gradient theorem"></a></p>
+<figcaption>proof policy gradient theorem</figcaption>
+</figure>
+</div></div><p>We need some preliminary results and definitions. First we should recall <a href="eq-dynamics-function">the four part dynamics function</a>: from the <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018</a> pp, 48)</span> book:</p>
+<p><span id="eq-dynamics-function"><span class="math display">
+p(s', r \mid s, a) \doteq Pr\{S_t=s', R_t=r \mid S_{t-1} = s , A_{t-1}= a\} \qquad \text{(S.B. 3.2)}
+\tag{11}</span></span></p>
+<p>Next we need the result from <span id="exr-3.18">Exercise 3.18</span> in <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, 62</a>)</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 3.18
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p>The value of a state depends on the values of the actions possible in that state and on how likely each action is to be taken under the current policy. We can think of this in terms of a small backup diagram rooted at the state and considering each possible action:</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="ex-3-18.png" class="lightbox" data-gallery="slides" title="backup diagram"><img src="ex-3-18.png" class="img-fluid figure-img" alt="backup diagram"></a></p>
+<figcaption>backup diagram</figcaption>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p>Give the equation corresponding to this intuition and diagram for the value at the root node, <span class="math inline">v_\pi(s)</span>, in terms of the value at the expected leaf node, <span class="math inline">q_\pi(s, a)</span>, given <span class="math inline">S_t = s</span>. This equation should include an expectation conditioned on following the policy, <span class="math inline">\pi</span>. Then give a second equation in which the expected value is written out explicitly in terms of <span class="math inline">\pi(a \mid s)</span> such that no expected value notation appears in the equation.</p>
+</blockquote>
+</div>
+</div>
+</div>
+<section id="solution" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="solution">Solution</h3>
+<p><span id="eq-3-18-solution"><span class="math display">
+\begin{align}
+V_\pi(s) &amp;= \textcolor{red}{\mathbb{E_\pi}[}\textcolor{green}{q(s_t,a) \textcolor{red}{ \mid s_t = s, a_t=a ]}} \newline &amp;= \textcolor{red}{\sum_a \pi(a \mid s)} \textcolor{green}{q_\pi(s,a)} \newline
+\end{align}  \pi \text { is a probability distribution}
+\tag{12}</span></span></p>
+<p>Next we need the result from <span id="ex-3.19">Exercise 3.19</span> in <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, 62</a>)</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 3.19
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<blockquote class="blockquote">
+<p>The value of an action, <span class="math inline">q_\pi(s, a)</span>, depends on the expected next reward and the expected sum of the remaining rewards. Again we can think of this in terms of a small backup diagram, this one rooted at an action (state—action pair) and branching to the possible next states:</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="ex-3-19.png" class="lightbox" data-gallery="slides" title="backup diagram"><img src="ex-3-19.png" class="img-fluid figure-img" alt="backup diagram"></a></p>
+<figcaption>backup diagram</figcaption>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p>Give the equation corresponding to this intuition and diagram for the action value, <span class="math inline">q_\pi(s, a)</span>, in terms of the expected next reward, <span class="math inline">R_{t+1}</span>, and the expected next state value, <span class="math inline">v_\pi(S_{t+1})</span>, given that <span class="math inline">S_t = s</span> and <span class="math inline">A_t = a</span>. This equation should include an expectation but not one conditioned on following the policy. Then give a second equation, writing out the expected value explicitly in terms of <span class="math inline">p(s_0, r \mid s, a)</span> defined by <a href="#eq-dynamics-function">eq 3.2</a>, such that no expected value notation appears in the equation.</p>
+</blockquote>
+</div>
+</div>
+</div>
+</section>
+<section id="solution-1" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="solution-1">Solution</h3>
+<p><span class="math display">
+\begin{align*}
+q_\pi(s, a) &amp;= \mathbb{E}[R_{t+1} v_\pi(S_{t+1}) \mid S_t = s, A_t = a] \newline
+      &amp;= \textcolor{blue}{\sum_{s', r} p(s', r \mid s, a)} \textcolor{pink}{[r + v_\pi(s')]} \newline
+\end{align*} \qquad
+</span> {#ex-3-19-solution}</p>
+<p>In the following <span class="math inline">\nabla</span> is with respect to <span class="math inline">\theta</span>: and <span class="math inline">\theta</span> is the parameter of the policy <span class="math inline">\pi</span>. but is omitted for brevity.</p>
+<p><span id="eq-policy-gradient-theorem-proof"><span class="math display">
+\begin{align*}
+\nabla V_\pi(s) &amp;= \nabla \sum_a \left [ \pi(a \mid s) q_\pi(s,a) \right ] &amp;&amp; \text{backup v to q (Ex 3.18)}
+\newline &amp;= \sum_a \nabla \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \nabla q_\pi(s,a) &amp;&amp; \text{product rule}
+\newline &amp;= \sum_a \nabla \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \nabla \sum_{s'} P(s',r \mid s, a) (r + V_\pi(s')) &amp;&amp; \text{backup q to v (Ex 3.19)}
+\newline &amp;= \sum_a \nabla \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \sum_{s'} P(s',r \mid s, a) \nabla V_\pi(s') &amp;&amp; \text{Neither P nor r are } f(\theta) \newline
+=&amp; \sum_{a \in \mathcal{A}} \Big( \nabla_\theta \pi_\theta(a \mid s)Q_\pi(s, a) + \pi_\theta(a \mid s) \sum_{s'} P(s' \mid s,a) \nabla_\theta V_\pi(s') \Big) &amp;&amp; \text{total rule of probability on r for P }
+\newline &amp; \blacksquare  &amp;&amp; \qquad
+\end{align*}
+\tag{13}</span></span></p>
+<p><span class="math display">
+\begin{align*}
+q_\pi(s, a) &amp;= \sum_{s'} \mathbb{E}_\pi[G_{t} \mid S_{t+1}=s'] Pr\{S_{t+1} = s' \mid S_t = s, A_t = a\}
+\\ &amp;= \sum_{s'} \mathbb{E}[R_{t+1} + \gamma G_{t+1} \mid S_t = s, A_t = a, S_{t+1} = s'] Pr\{S_{t+1} = s' \mid S_t = s, A_t = a\} \newline
+   &amp;= \sum_{s',r} \left( r + \gamma \underbrace{\mathbb{E}[G_{t+1} \mid S_{t+1} = s']}_{v_\pi|(s')} \right) p(s', r \mid s, a)\newline\newline
+   &amp;= \sum_{s',r} [ r + \gamma v_\pi(s')] p(s', r \mid s, a)\newline
+\end{align*}
+</span></p>
+</section>
+</section>
 <section id="sec-l2g3" class="level2">
 <h2 class="anchored" data-anchor-id="sec-l2g3">The importance of the policy gradient theorem</h2>
 <p>Crucially, the policy gradient theorem eliminates the need to estimate the gradient of the stationary distribution (<span class="math inline">\mu</span>), making the gradient much easier to estimate from experience. This sets the stage for building incremental policy gradient algorithms, which will be discussed in the next lecture.</p>
@@ -3266,11 +3376,11 @@ Learning Objectives
 </span></p>
 <p><span id="eq-gradient-ascent"><span class="math display">
 \theta_{t+1} = \theta_t + \alpha \nabla_\theta ln \pi(a_t \mid s_t, \theta) q_\pi(s_t, a_t) \qquad \text{()}
-\tag{11}</span></span></p>
+\tag{14}</span></span></p>
 <p>where <span class="math inline">\alpha</span> is the step size and <span class="math inline">\nabla_\theta J(\theta)</span> is the gradient of the objective function <span class="math inline">J(\theta)</span> with respect to the policy parameters <span class="math inline">\theta</span>.</p>
 <p><span id="eq-log-derivative"><span class="math display">
 \nabla \ln (f(x)) = \frac{\nabla f(x)}{f(x)} \qquad \text{(log derivative)}
-\tag{12}</span></span></p>
+\tag{15}</span></span></p>
 </section>
 <section id="sec-l3g2" class="level2">
 <h2 class="anchored" data-anchor-id="sec-l3g2">Describe the actor-critic algorithm for control with function approximation, for continuing tasks</h2>
@@ -3312,6 +3422,18 @@ Learning Objectives
 </section>
 <section id="sec-l4g5" class="level2">
 <h2 class="anchored" data-anchor-id="sec-l4g5">Derive the actor-critic update for a gaussian policy</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-11-actor-critic.png" class="lightbox" data-gallery="slides" title="Actor-Critic"><img src="pg-11-actor-critic.png" class="img-fluid figure-img" alt="Actor-Critic"></a></p>
+<figcaption>Actor-Critic</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-12-actor-critic-alg.png" class="lightbox" data-gallery="slides" title="Actor-Critic Algorithm"><img src="pg-12-actor-critic-alg.png" class="img-fluid figure-img" alt="Actor-Critic Algorithm"></a></p>
+<figcaption>Actor-Critic Algorithm</figcaption>
+</figure>
+</div>
 </section>
 <section id="sec-l4g6" class="level2">
 <h2 class="anchored" data-anchor-id="sec-l4g6">Apply average reward actor-critic with a gaussian policy to a particular task with continuous actions</h2>
@@ -3335,7 +3457,7 @@ Discussion prompt
 <div aria-describedby="fig-chapter-13-policy-gradient-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="ch13-policy-gradient.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="Chapter 13"><embed src="ch13-policy-gradient.pdf" class="col-page" width="700" height="1000"></a></p>
+<p><a href="ch13-policy-gradient.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-18" title="Chapter 13"><embed src="ch13-policy-gradient.pdf" class="col-page" width="700" height="1000"></a></p>
 <figcaption>Chapter 13</figcaption>
 </figure>
 </div>

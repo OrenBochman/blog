@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="keywords" content="reinforcement learning, neural networks, feature construction, deep networks, The Policy Gradient Theorem, Policy Gradient, Reinforce Algorithm, Actor-Critic Algorithm, Gaussian Policies">
+<meta name="keywords" content="reinforcement learning, neural networks, feature construction, deep networks, The policy gradient theorem, policy gradient methods, reinforce algorithm, actor-critic algorithm, gaussian policies">
 
 <title>Policy Gradient – Oren Bochman’s Blog</title>
 <style>
@@ -291,7 +291,7 @@ window.Quarto = {
   <div>
     <div class="keywords">
       <div class="block-title">Keywords</div>
-      <p>reinforcement learning, neural networks, feature construction, deep networks, The Policy Gradient Theorem, Policy Gradient, Reinforce Algorithm, Actor-Critic Algorithm, Gaussian Policies</p>
+      <p>reinforcement learning, neural networks, feature construction, deep networks, The policy gradient theorem, policy gradient methods, reinforce algorithm, actor-critic algorithm, gaussian policies</p>
     </div>
   </div>
   
@@ -2823,10 +2823,38 @@ window.Quarto = {
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-episodic-semi-gradient-sarsa-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: The algorithms we will be discussing in this lesson are all part of the policy gradient family. Sometimes the behavior codified in the policy is much simpler then the action value function. So learning a policy directly can be more efficient. In reality, learning policy is an end to end solution and to solve many real-world RL problem we will want to put to bear as much of the methods as we have learned so far. This can be done under the umbrella of these policy gradient methods. Once we cover the policy gradient theorem, we will see how we still get to use action value approximations for estimating the gradient of the average reward objective. Another way that we will make use of value functions approximations is in the actor-critic algorithm.
+Figure&nbsp;1: The algorithms discussed in this lesson are all part of the policy gradient family. Sometimes, the behavior codified in the policy is much simpler than the action value function. Thus, learning the policy directly can be more efficient. Learning policies is an end-to-end solution for solving many real-world RL problems. Coding such end-to-end solutions may be done under the umbrella of policy gradient methods. Once we cover the policy gradient theorem, we will see how we still get to use action value approximations to estimate the gradient of the average reward objective. Another way that we will make use of value function approximations is in the actor-critic algorithm.
+</figcaption>
+</figure>
+</div><div id="fig-policy-gradient-theorem-proof" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-policy-gradient-theorem-proof-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="pg-13-pg-theorem.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="the policy gradient theorem"><img src="pg-13-pg-theorem.png" class="img-fluid figure-img"></a></p>
+<figcaption>the policy gradient theorem</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-policy-gradient-theorem-proof-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: The policy gradient theorem &amp; proof from <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, 325</a>)</span> In it <span class="math inline">\nabla</span> are with respect to <span class="math inline">\theta</span> and <span class="math inline">\theta</span> is the parameter of the policy <span class="math inline">\pi</span> but is omitted for brevity.
 </figcaption>
 </figure>
 </div></div>
+
+<p>I found policy gradient methods to be rather complicated at first blush. Eventually, as the finer points sunk in, I developed some bits and pieces of intuition.</p>
+<p><strong>Parametrized policies</strong> are much easier to conceptualize than parametrized value functions. One intuition is that the parameters are weights for the action, and the policy’s actions are drawn in proportion to these weights. The <strong>softmax policy</strong> is, in fact, just this. My Bayesian-trained intuition for these weights comes from the <em>categorical distribution</em> <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. Where success is defined as an action that gets my agent closer to its goal. This intuition is just my first-order mental model.</p>
+<p>The obvious question that will arise as soon as you deal with some environment is:</p>
+<blockquote class="blockquote">
+<p>“How can I get some arbitrary feature to participate in the parametrized policy?”</p>
+</blockquote>
+<p>The immediate suspect is <em>use it to build the weights</em>. How should that work? The intuitive method for this is a (Bayesian) linear regression. If we tweak this feature, how will the policy give us better returns? Since we want to maximize returns, we should adjust the weights in the direction that provides us with the best returns.</p>
+<p>That is also the intuition for a parametrized policy’s <strong>update rule</strong>. The direction is just the gradient of the policy. The big hurdle lies in estimating this gradient.</p>
+<p>The course material is very concise and laser-focused on very specific learning goals. <strong>The policy gradient theorem</strong> is the key result that allows us to estimate policy gradients. Unfortunately, the course instructors did not cover the <a href="#fig-policy-gradient-theorem-proof">proof</a>, which is silently relegated to the readings.</p>
+<p>This proof is not as simple as represented in its preamble in the book. I saw both longer and shorter versions of proofs and felt that there is a bit of hand waving in one of the steps<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. Many people who are seriously interested in RL will be compelled to go through the proof in detail. Also, more experienced students can make greater leaps.</p>
+<p>One of my goals is to make a satisfactory proof that I properly understand and walk over with ease.</p>
+<p>Also, I was disappointed that this course does not cover more modern algorithms, such as <a href="https://arxiv.org/abs/1502.05477">TRPO</a>, <a href="https://arxiv.org/abs/1707.06347">PPO</a>, or other Deep learning algorithms. I cannot stress this point enough.</p>
+<p>In the last video in the previous lecture’s notes by <a href="https://scholar.google.com/citations?user=8RgDBoEAAAAJ&amp;hl=en">Satinder Singh</a>, all of the research on using Meta gradients to learn intrinsic rewards is also built on top of policy gradient methods - where he and his students looked at propagating these gradients through multiple the planing algorithms and later through the learning algorithm to learn a reward function and tackle the issues of exploration.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -2840,7 +2868,7 @@ Course Readings
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul class="task-list">
-<li><label><input type="checkbox" checked=""><span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, sec. 13</a> pp.&nbsp;321-336)</span> <a href="#fig-chapter-13-policy-gradient" class="quarto-xref">Figure&nbsp;15</a></label></li>
+<li><label><input type="checkbox" checked=""><span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, sec. 13</a> pp.&nbsp;321-336)</span> <a href="#fig-chapter-13-policy-gradient" class="quarto-xref">Figure&nbsp;18</a></label></li>
 </ul>
 </div>
 </div>
@@ -2862,6 +2890,8 @@ Extra Readings
 <li><a href="https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html">Intro to Policy Optimization @ Spinning Up</a></li>
 <li><a href="https://johnwlambert.github.io/policy-gradients/">Understanding Policy Gradients</a></li>
 <li><a href="https://jonathan-hui.medium.com/rl-policy-gradients-explained-9b13b688b146">Policy Gradient Explained</a></li>
+<li><a href="https://danieltakeshi.github.io/2017/03/28/going-deeper-into-reinforcement-learning-fundamentals-of-policy-gradients/">Going Deeper Into Reinforcement Learning: Fundamentals of Policy Gradients</a></li>
+<li><a href="https://danieltakeshi.github.io/2017/04/02/notes-on-the-generalized-advantage-estimation-paper/">Notes on the Generalized Advantage Estimation Paper</a></li>
 </ul>
 </div>
 </div>
@@ -2881,7 +2911,6 @@ Videos
 
 
 
-<p>I found policy gradient methods to be complicated at first blush. Perhaps a bit less so then the value function since they introduced function approximation. Also these methods are foundational for most of the algorithms in Deep RL. The course material is very concise and laser focused on very specific goals. Also I was disappointed that this course does not cover more modern algorithms like TRPO, PPO or other Deep learning algorithm. I cannot stress this point enough. In the last video in the previous lecture’s notes by Satinder Singh, all of the research on using Meta gradients to learn intrinsic rewards is also built on top of policy gradient methods - where he and his students looked at proprgating these gradients through multiple the planing algorithms and later through the learning algorithm to learn a reward function and tackle the issues of exploration.</p>
 <p>Here are three extra videos by experts in the field that delve deeper into this topic. Each of these instructors have published papers with some of the most groundbreaking algorithms in the field and have a lot of insights to share.</p>
 <ol type="1">
 <li><p>In <a href="#fig-deep-reinforcement-learning">this lecture</a> <a href="http://joschu.net/">John Schulman</a> covers Deep Reinforcement Learning Policy Gradients and Q-Learning. John Schulman is a research scientist at OpenAI and has published many papers on RL and Robotics. John Schulman who developed PPO and TRPO and Chat-GPT</p></li>
@@ -2896,7 +2925,7 @@ Videos
 <div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/PtAIh9KSnjo" title="Deep Reinforcement Learning" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-deep-reinforcement-learning-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Talk titled ‘Deep Reinforcement Learning Policy Gradients and Q-Learning’ by John Schulman on Reinforcement Learning at at the Deep Learning School on September 24/25, 2016
+Figure&nbsp;3: Talk titled ‘Deep Reinforcement Learning Policy Gradients and Q-Learning’ by John Schulman on Reinforcement Learning at at the Deep Learning School on September 24/25, 2016
 </figcaption>
 </figure>
 </div><div id="fig-policy-gradients-and-advantage-estimation" class="quarto-float quarto-figure quarto-figure-center anchored callout-3-contents callout-collapse collapse callout-margin-content">
@@ -2905,7 +2934,7 @@ Figure&nbsp;2: Talk titled ‘Deep Reinforcement Learning Policy Gradients and Q
 <div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/AKbX1Zvo7r8" title="Policy Gradients and Advantage Estimation" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-policy-gradients-and-advantage-estimation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Talk titled ‘Policy Gradients and Advantage Estimation’ by Pieter Abbeel. in his ‘Foundations of Deep RL Series’
+Figure&nbsp;4: Talk titled ‘Policy Gradients and Advantage Estimation’ by Pieter Abbeel. in his ‘Foundations of Deep RL Series’
 </figcaption>
 </figure>
 </div><div id="fig-policy-grad-limitations" class="quarto-float quarto-figure quarto-figure-center anchored callout-3-contents callout-collapse collapse callout-margin-content">
@@ -2914,7 +2943,7 @@ Figure&nbsp;3: Talk titled ‘Policy Gradients and Advantage Estimation’ by Pi
 <div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/y3oqOjHilio" title="Policy-Gradient and Actor-Critic methods" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-policy-grad-limitations-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: Research Scientist Hado van Hasselt from Deep Mind covers policy algorithms that can learn policies directly and actor critic algorithms that combine value predictions for more efficient learning. From DeepMind x UCL | Deep Learning Lecture Series 2021
+Figure&nbsp;5: Research Scientist Hado van Hasselt from Deep Mind covers policy algorithms that can learn policies directly and actor critic algorithms that combine value predictions for more efficient learning. From DeepMind x UCL | Deep Learning Lecture Series 2021
 </figcaption>
 </figure>
 </div></div>
@@ -2951,10 +2980,45 @@ Learning Objectives
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-policy-gradient-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: In the mountain car environment, the parameterized value function is complex, but the parameterized policy is simple.
+Figure&nbsp;6: In the mountain car environment, the parameterized value function is complex, but the parameterized policy is simple.
 </figcaption>
 </figure>
 </div></div><p>In this lesson course instructor Adam White introduces the idea of learning policies directly. He contrasts this with learning value functions and explains why learning policies directly can be more flexible and powerful.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Rethinking policies
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Moving on we will need to think very clearly about policies.</p>
+<p>To this end it is worth spending a minute to quickly recap the definition properties and notation of a policy from the previous lessons:</p>
+<ol type="1">
+<li><p><em>Intuitively</em> a policy <span class="math inline">\pi</span> is just decision making rule.</p></li>
+<li><p>A <em>deterministic policy</em> is just a function that maps a state to an action. <span class="math display">
+\pi : s\in \mathcal{S} \to a \in \mathcal{A} \qquad \text{(deterministic policy)}
+</span></p></li>
+<li><p>A stochastic policy is a function that maps a state to a probability distribution over actions. Stochastic policies are more general and include deterministic policies as a special case. So while we may talk of deterministic policies, we will use the mathematical form of a stochastic policy.</p></li>
+</ol>
+<p><span class="math display">
+\pi : s\in \mathcal{S} \to \mathbb{P}(\mathcal{A}) \qquad \text{(stochastic policy)}
+</span></p>
+<ol type="1">
+<li>Formally, the policy is defined probabilistically as follows:</li>
+</ol>
+<p><span id="eq-policy-def"><span class="math display">
+\pi(a \mid s) \doteq Pr(A_t = a \mid S_t = s) \qquad \text{(policy)}
+\tag{1}</span></span></p>
+<p>note that this is a shorthand for the following:</p>
+<p><span class="math display">
+\pi(a \mid s) = \mathbb{E}[A_t \mid S_t = s] \qquad \text{(policy)}
+</span></p>
+<p>Where <span class="math inline">\pi</span> is a probability distribution over actions given a state.</p>
+</div>
+</div>
 </section>
 <section id="sec-l1g1" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="sec-l1g1">How to Parametrize a Policies?</h2>
@@ -2970,7 +3034,7 @@ Figure&nbsp;5: In the mountain car environment, the parameterized value function
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-policy-gradient-param-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;6: When we parametrize a policy we will use the greek letter <span class="math inline">\theta \in \mathbb{R}^d</span> to denote the parameters of the policy.
+Figure&nbsp;7: When we parametrize a policy we will use the greek letter <span class="math inline">\theta \in \mathbb{R}^d</span> to denote the parameters of the policy.
 </figcaption>
 </figure>
 </div><div id="fig-policy-gradient-constraint" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2984,7 +3048,7 @@ Figure&nbsp;6: When we parametrize a policy we will use the greek letter <span c
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-policy-gradient-constraint-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7: Constraints on the policy parameters can be used to ensure that the policy is valid.
+Figure&nbsp;8: Constraints on the policy parameters can be used to ensure that the policy is valid.
 </figcaption>
 </figure>
 </div></div>
@@ -2994,13 +3058,13 @@ Figure&nbsp;7: Constraints on the policy parameters can be used to ensure that t
 <p>The parametrized policy is defined as follows:</p>
 <p><span id="eq-parametrized-policy-def"><span class="math display">
 \pi(a \mid s, \theta) \doteq Pr(A_t = a \mid S_t = s, \theta) \qquad \text{(parametrized policy)}
-\tag{1}</span></span></p>
+\tag{2}</span></span></p>
 <p>is a probability distribution over actions given a state and the policy parameters.</p>
 <p>Since we are dealing with probabilities, the policy parameters must satisfy certain constraints. For example, the probabilities must sum to one. This is shown in <a href="#fig-policy-gradient-constraint">the figure</a>. These policy parameters constraints will ensure that the policy is valid.</p>
 <p>Policy Gradient use gradient ascent:</p>
 <p><span id="eq-gradient-ascent"><span class="math display">
 \theta_{t+1} = \theta_t + \alpha \nabla_\theta J(\theta) \qquad \text{(gradient ascent)}
-\tag{2}</span></span></p>
+\tag{3}</span></span></p>
 <p>where <span class="math inline">\alpha</span> is the step size and <span class="math inline">\nabla_\theta J(\theta)</span> is the gradient of the objective function <span class="math inline">J(\theta)</span> with respect to the policy parameters <span class="math inline">\theta</span>.</p>
 <ul>
 <li>methods that follow this update rule are called <strong>policy gradient methods</strong>.</li>
@@ -3021,13 +3085,13 @@ Figure&nbsp;7: Constraints on the policy parameters can be used to ensure that t
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-policy-softmax-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8
+Figure&nbsp;9
 </figcaption>
 </figure>
 </div></div><p>The <strong>Softmax policy</strong> based on the Boltzmann distribution is a probability distribution over actions given a state. It is parameterized by a vector of action preferences <span class="math inline">h(s, a, \theta)</span>.</p>
 <p><span id="eq-softmax-policy"><span class="math display">
 \pi(a \mid s, \theta) \doteq \frac{e^{h(s, a, \theta)}}{\sum_{b\in \mathcal{A}} e^{h(s, b, \theta)}} \text{(softmax policy)} \qquad
-\tag{3}</span></span></p>
+\tag{4}</span></span></p>
 <ul>
 <li>the numerator is the exponential of the action preference</li>
 <li>the denominator is the sum of the exponentials of all action preferences</li>
@@ -3057,7 +3121,7 @@ Figure&nbsp;8
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-policy-action-preferences-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9: Softmax policy v.s. <span class="math inline">\epsilon</span>-greedy
+Figure&nbsp;10: Softmax policy v.s. <span class="math inline">\epsilon</span>-greedy
 </figcaption>
 </figure>
 </div><div id="fig-short-corridor-env" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -3071,15 +3135,15 @@ Figure&nbsp;9: Softmax policy v.s. <span class="math inline">\epsilon</span>-gre
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-short-corridor-env-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;10: In the Short corridor with switched action environment a deterministic policy fails to reach the goal. The only optimal policy is stochastic.
+Figure&nbsp;11: In the Short corridor with switched action environment a deterministic policy fails to reach the goal. The only optimal policy is stochastic.
 </figcaption>
 </figure>
 </div></div>
 <blockquote class="blockquote">
-<p>One advantage of parameterizing policies according to the soft-max in action preferences is <strong>that the approximate policy can approach a deterministic policy</strong>, whereas with <span class="math inline">\epsilon</span>-greedy action selection over action values there is always an <span class="math inline">\epsilon</span> probability of selecting a random action.</p>
+<p>One advantage of parameterizing policies according to the softmax in action preferences is <strong>that the approximate policy can approach a deterministic policy</strong>, whereas with <span class="math inline">\epsilon</span>-greedy action selection over action values there is always an <span class="math inline">\epsilon</span> probability of selecting a random action.</p>
 </blockquote>
 <blockquote class="blockquote">
-<p>A second advantage of parameterizing policies according to the soft-max in action preferences is that <strong>it enables the selection of actions with arbitrary probabilities</strong>. In problems with significant function approximation, the best approximate policy may be stochastic.</p>
+<p>A second advantage of parameterizing policies according to the softmax in action preferences is that <strong>it enables the selection of actions with arbitrary probabilities</strong>. In problems with significant function approximation, the best approximate policy may be stochastic.</p>
 </blockquote>
 <p>For example, in card games with imperfect information the optimal play is often a mixed strategy which means you should take two different actions each with a specific probability, such as when bluffing in Poker.</p>
 <p>Action-value methods have no natural way of finding stochastic optimal policies, whereas policy approximating methods can, as shown in <a href="#fig-short-corridor-env">The short Corridor environment</a></p>
@@ -3109,7 +3173,7 @@ Figure&nbsp;10: In the Short corridor with switched action environment a determi
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mountain-car-policy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;11: In mountain car, the parameterized value function is complex, but the parameterized policy is simple.
+Figure&nbsp;12: In mountain car, the parameterized value function is complex, but the parameterized policy is simple.
 </figcaption>
 </figure>
 </div></div><div class="callout callout-style-default callout-note callout-titled">
@@ -3138,14 +3202,14 @@ Learning Objectives
 <p>Formalizing the goal as an Objective</p>
 <p><span id="eq-objectives"><span class="math display">
 \begin{align*}
-  G_t &amp;= \sum_{t=0}^{T}  R_{t}  \quad &amp;&amp; \text{(episodic)} \newline
-  G_t &amp;= \sum_{t=0}^{\infty} \gamma^t R_{t}   \quad &amp;&amp; \text{(continuing - discounted reward)} \newline
-  G_t &amp;= \sum_{t=0}^{\infty} R_{t} - r(\pi)  \quad &amp;&amp; \text{(continuing - avg. reward)}
+G_t &amp;= \sum_{t=0}^{T}  R_{t}  \quad &amp;&amp; \text{(episodic)} \newline
+G_t &amp;= \sum_{t=0}^{\infty} \gamma^t R_{t}   \quad &amp;&amp; \text{(continuing - discounted reward)} \newline
+G_t &amp;= \sum_{t=0}^{\infty} R_{t} - r(\pi)  \quad &amp;&amp; \text{(continuing - avg. reward)}
 \end{align*}
-\tag{4}</span></span></p>
+\tag{5}</span></span></p>
 <p>The average reward Objective for a policy is as follows: <span id="eq-average-reward-objective"><span class="math display">
 r(\pi) = \sum_{t=0}^{T} \mu(s) \sum_{a} \pi(a \mid s, \theta)  \sum_{s',r} p(s',r \mid s,a) r \quad \text{(avg. reward objective)}
-\tag{5}</span></span></p>
+\tag{6}</span></span></p>
 <p>What does this mean?</p>
 <ul>
 <li>the last sum is the expected reward for a state-action pair. <span class="math inline">\mathbb{E}[R_t \mid S_t = s , A_t=a]</span></li>
@@ -3155,7 +3219,7 @@ r(\pi) = \sum_{t=0}^{T} \mu(s) \sum_{a} \pi(a \mid s, \theta)  \sum_{s',r} p(s',
 <p>to optimize the average reward, we need to estimate the gradient of <a href="#eq-average-reward-objective">the avg. objective</a></p>
 <p><span id="eq-average-reward-objective-gradient"><span class="math display">
 \nabla_\theta r(\pi) = \nabla_\theta \sum_{t=0}^{T} \textcolor{red}{\underbrace{\mu(s)}_{\text{Depends on }\theta}} \sum_{a} \pi(a \mid s, \theta) \sum_{s',r} p(s',r \mid s,a) r \qquad
-\tag{6}</span></span></p>
+\tag{7}</span></span></p>
 <ol type="1">
 <li>Methods based on this are called policy gradient methods.</li>
 <li>We are trying to maximize the average reward.</li>
@@ -3167,7 +3231,7 @@ r(\pi) = \sum_{t=0}^{T} \mu(s) \sum_{a} \pi(a \mid s, \theta)  \sum_{s',r} p(s',
 \nabla_w \bar{VE} &amp;= \nabla_w \sum_{s}\textcolor{red}{\underbrace{\mu(s)}_{\text{Independent of }\mathbf{w}}}  [V_{\pi}(s)-\bar{v}(s,w)]^2 \newline
 &amp;=\sum_{s} \textcolor{red}{\mu(s)} \nabla_w [V_{\pi}(s)-\bar{v}(s,w)]^2
 \end{align*} \text{(value function gradient)} \qquad
-\tag{7}</span></span></p>
+\tag{8}</span></span></p>
 <p>We can avg reward as an objective for policy optimization and the its for the stochastic gradient ascent. Next we will consider how the policy gradient theorem can help us estimate the gradient of the average reward objective despite these setbacks.</p>
 </section>
 <section id="the-policy-gradient-theorem-video" class="level2 page-columns page-full">
@@ -3184,7 +3248,7 @@ r(\pi) = \sum_{t=0}^{T} \mu(s) \sum_{a} \pi(a \mid s, \theta)  \sum_{s',r} p(s',
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-policy-gradient-theorem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12
+Figure&nbsp;13
 </figcaption>
 </figure>
 </div><div id="fig-policy-gradient-theorem" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -3198,7 +3262,7 @@ Figure&nbsp;12
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-policy-gradient-theorem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13
+Figure&nbsp;14
 </figcaption>
 </figure>
 </div><div id="fig-policy-gradient-theorem" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -3212,7 +3276,7 @@ Figure&nbsp;13
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-policy-gradient-theorem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;14
+Figure&nbsp;15
 </figcaption>
 </figure>
 </div></div>
@@ -3225,37 +3289,35 @@ Figure&nbsp;14
 <p>The video illustrates this with a grid world example, showing how gradients for different actions point in different directions. By weighting these gradients with the corresponding action values, the theorem provides a direction to update the policy parameters that increases the probability of high-value actions and decreases the probability of low-value actions.</p>
 <p>The product rule <span id="eq-product-rule"><span class="math display">
 \nabla(f(x)g(x)) = \nabla f(x)g(x) + f(x)\nabla g(x) \qquad \text{(product rule)}
-\tag{8}</span></span></p>
+\tag{9}</span></span></p>
 <p>therefore:</p>
 <p><span id="eq-policy-gradient-naive"><span class="math display">
 \begin{align*}
 \nabla_\theta r(\pi) &amp;= \sum_{t=0}^{T} \nabla \mu(s) \sum_{a} \pi(a \mid s,\theta) \sum_{s',r} p(s',r \mid s,a) r \newline &amp;+  \sum_{t=0}^{T} \mu(s) \nabla \sum_{a} \pi(a \mid s, \theta) \sum_{s',r} p(s',r \mid s,a) r
 \end{align*}
-\tag{9}</span></span></p>
+\tag{10}</span></span></p>
 <p>The first term is the gradient of the stationary distribution and the second term is the gradient of the policy. The policy gradient theorem simplifies this expression by eliminating the need to estimate the gradient of the stationary distribution.</p>
 <p><span id="eq-policy-gradient-theorem"><span class="math display">
 \begin{align*}
 \nabla_\theta r(\pi) &amp;= \sum_{s\in \mathcal{S}} \mu(s) \textcolor{red}{ \sum_{a\in{\mathcal{A}}} \nabla \pi(a \mid s,\theta)  q_\pi(s,a) }
 \end{align*}
-\tag{10}</span></span></p>
+\tag{11}</span></span></p>
 <p>The policy gradient theorem provides a new expression for the gradient of the average reward objective. This expression involves summing, over all states and actions, the product of the gradient of the policy and the action-value function (Q). The gradient of the policy indicates how to adjust parameters to increase the probability of an action, while the action-value function represents the expected return from taking that action.</p>
 <p>Martha White points out that this expression is much easier to estimate. Now let’s try to understand this expression in more detail.</p>
 </section>
 <section id="the-policy-gradient-theorem" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="the-policy-gradient-theorem">The policy gradient theorem</h2>
-
-<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="pg-13-pg-theorem.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="proof policy gradient theorem"><img src="pg-13-pg-theorem.png" class="img-fluid figure-img" alt="proof policy gradient theorem"></a></p>
-<figcaption>proof policy gradient theorem</figcaption>
-</figure>
-</div></div><p>We need some preliminary results and definitions. First we should recall <a href="eq-dynamics-function">the four part dynamics function</a>: from the <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018</a> pp, 48)</span> book:</p>
+<p>We need some preliminary results and definitions.</p>
+<ol type="1">
+<li><a href="#eq-dynamics-function">The four part dynamics function</a> from the <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, 48</a>)</span> book:</li>
+<li>Next we need the result from <a href="#note-318">Exercise 3.18</a> in <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, 62</a>)</span></li>
+<li>Next we need the result from <a href="#note-319">Exercise 3.19</a> in <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, 62</a>)</span></li>
+</ol>
 <p><span id="eq-dynamics-function"><span class="math display">
 p(s', r \mid s, a) \doteq Pr\{S_t=s', R_t=r \mid S_{t-1} = s , A_{t-1}= a\} \qquad \text{(S.B. 3.2)}
-\tag{11}</span></span></p>
-<p>Next we need the result from <span id="exr-3.18">Exercise 3.18</span> in <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, 62</a>)</span></p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+\tag{12}</span></span></p>
+<div id="note-318" class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -3264,33 +3326,43 @@ Exercise 3.18
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-7" class="callout-7-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <blockquote class="blockquote">
 <p>The value of a state depends on the values of the actions possible in that state and on how likely each action is to be taken under the current policy. We can think of this in terms of a small backup diagram rooted at the state and considering each possible action:</p>
 </blockquote>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="ex-3-18.png" class="lightbox" data-gallery="slides" title="backup diagram"><img src="ex-3-18.png" class="img-fluid figure-img" alt="backup diagram"></a></p>
-<figcaption>backup diagram</figcaption>
-</figure>
-</div>
+
 <blockquote class="blockquote">
 <p>Give the equation corresponding to this intuition and diagram for the value at the root node, <span class="math inline">v_\pi(s)</span>, in terms of the value at the expected leaf node, <span class="math inline">q_\pi(s, a)</span>, given <span class="math inline">S_t = s</span>. This equation should include an expectation conditioned on following the policy, <span class="math inline">\pi</span>. Then give a second equation in which the expected value is written out explicitly in terms of <span class="math inline">\pi(a \mid s)</span> such that no expected value notation appears in the equation.</p>
 </blockquote>
 </div>
 </div>
 </div>
-<section id="solution" class="level3 unnumbered">
+<div class="no-row-height column-margin column-container"><div id="fig-ex-3-18" class="quarto-float quarto-figure quarto-figure-center anchored callout-7-contents callout-collapse collapse show callout-margin-content">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ex-3-18-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="ex-3-18.png" class="lightbox" data-gallery="slides" title="backup diagram from v() to q()"><img src="ex-3-18.png" class="img-fluid figure-img"></a></p>
+<figcaption>backup diagram from v() to q()</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ex-3-18-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16: backup diagram from <span class="math inline">v_\pi(s)</span> to <span class="math inline">q_\pi(s,a)</span>
+</figcaption>
+</figure>
+</div></div><section id="solution" class="level3 unnumbered page-columns page-full">
 <h3 class="unnumbered anchored" data-anchor-id="solution">Solution</h3>
 <p><span id="eq-3-18-solution"><span class="math display">
 \begin{align}
-V_\pi(s) &amp;= \textcolor{red}{\mathbb{E_\pi}[}\textcolor{green}{q(s_t,a) \textcolor{red}{ \mid s_t = s, a_t=a ]}} \newline &amp;= \textcolor{red}{\sum_a \pi(a \mid s)} \textcolor{green}{q_\pi(s,a)} \newline
-\end{align}  \pi \text { is a probability distribution}
-\tag{12}</span></span></p>
-<p>Next we need the result from <span id="ex-3.19">Exercise 3.19</span> in <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018, 62</a>)</span></p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+V_\pi(s) &amp;= \mathbb{E_\pi}[q(s_t,a)  \mid s_t = s, a_t=a ] &amp;&amp; \text{(def. of Value)} \newline
+&amp;= \sum_a Pr(a \mid s) q_\pi(s,a) &amp;&amp; \text{(def. of Expectation)} \newline
+&amp;= \textcolor{red}{\sum_a \pi(a \mid s)} \textcolor{green}{q_\pi(s,a)} &amp;&amp; \text {(def. of policy)}
+\end{align}
+\tag{13}</span></span></p>
+<div id="note-319" class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="true" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -3299,51 +3371,60 @@ Exercise 3.19
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-8" class="callout-8-contents callout-collapse collapse show">
 <div class="callout-body-container callout-body">
 <blockquote class="blockquote">
 <p>The value of an action, <span class="math inline">q_\pi(s, a)</span>, depends on the expected next reward and the expected sum of the remaining rewards. Again we can think of this in terms of a small backup diagram, this one rooted at an action (state—action pair) and branching to the possible next states:</p>
 </blockquote>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="ex-3-19.png" class="lightbox" data-gallery="slides" title="backup diagram"><img src="ex-3-19.png" class="img-fluid figure-img" alt="backup diagram"></a></p>
-<figcaption>backup diagram</figcaption>
-</figure>
-</div>
+
 <blockquote class="blockquote">
 <p>Give the equation corresponding to this intuition and diagram for the action value, <span class="math inline">q_\pi(s, a)</span>, in terms of the expected next reward, <span class="math inline">R_{t+1}</span>, and the expected next state value, <span class="math inline">v_\pi(S_{t+1})</span>, given that <span class="math inline">S_t = s</span> and <span class="math inline">A_t = a</span>. This equation should include an expectation but not one conditioned on following the policy. Then give a second equation, writing out the expected value explicitly in terms of <span class="math inline">p(s_0, r \mid s, a)</span> defined by <a href="#eq-dynamics-function">eq 3.2</a>, such that no expected value notation appears in the equation.</p>
 </blockquote>
 </div>
 </div>
 </div>
-</section>
+<div class="no-row-height column-margin column-container"><div id="fig-ex-3-19" class="quarto-float quarto-figure quarto-figure-center anchored callout-8-contents callout-collapse collapse show callout-margin-content">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ex-3-19-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="ex-3-19.png" class="lightbox" data-gallery="slides" title="backup diagram from q() to v()"><img src="ex-3-19.png" class="img-fluid figure-img"></a></p>
+<figcaption>backup diagram from q() to v()</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ex-3-19-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;17: backup diagram from <span class="math inline">q_\pi(s,a)</span> to <span class="math inline">v_\pi(s')</span>
+</figcaption>
+</figure>
+</div></div></section>
 <section id="solution-1" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="solution-1">Solution</h3>
 <p><span class="math display">
 \begin{align*}
-q_\pi(s, a) &amp;= \mathbb{E}[R_{t+1} v_\pi(S_{t+1}) \mid S_t = s, A_t = a] \newline
-      &amp;= \textcolor{blue}{\sum_{s', r} p(s', r \mid s, a)} \textcolor{pink}{[r + v_\pi(s')]} \newline
+q_\pi(s, a) &amp;= \mathbb{E}[R_{t+1} v_\pi (s_{t+1}) \mid s_t = s, a_t = a] \newline
+&amp;= \textcolor{blue}{\sum_{s', r} p(s', r \mid s, a)} \textcolor{pink}{[r + v_\pi(s')]}
 \end{align*} \qquad
-</span> {#ex-3-19-solution}</p>
-<p>In the following <span class="math inline">\nabla</span> is with respect to <span class="math inline">\theta</span>: and <span class="math inline">\theta</span> is the parameter of the policy <span class="math inline">\pi</span>. but is omitted for brevity.</p>
-<p><span id="eq-policy-gradient-theorem-proof"><span class="math display">
-\begin{align*}
-\nabla V_\pi(s) &amp;= \nabla \sum_a \left [ \pi(a \mid s) q_\pi(s,a) \right ] &amp;&amp; \text{backup v to q (Ex 3.18)}
-\newline &amp;= \sum_a \nabla \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \nabla q_\pi(s,a) &amp;&amp; \text{product rule}
-\newline &amp;= \sum_a \nabla \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \nabla \sum_{s'} P(s',r \mid s, a) (r + V_\pi(s')) &amp;&amp; \text{backup q to v (Ex 3.19)}
-\newline &amp;= \sum_a \nabla \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \sum_{s'} P(s',r \mid s, a) \nabla V_\pi(s') &amp;&amp; \text{Neither P nor r are } f(\theta) \newline
-=&amp; \sum_{a \in \mathcal{A}} \Big( \nabla_\theta \pi_\theta(a \mid s)Q_\pi(s, a) + \pi_\theta(a \mid s) \sum_{s'} P(s' \mid s,a) \nabla_\theta V_\pi(s') \Big) &amp;&amp; \text{total rule of probability on r for P }
-\newline &amp; \blacksquare  &amp;&amp; \qquad
-\end{align*}
-\tag{13}</span></span></p>
+</span> {#ex-319-solution}</p>
 <p><span class="math display">
 \begin{align*}
 q_\pi(s, a) &amp;= \sum_{s'} \mathbb{E}_\pi[G_{t} \mid S_{t+1}=s'] Pr\{S_{t+1} = s' \mid S_t = s, A_t = a\}
-\\ &amp;= \sum_{s'} \mathbb{E}[R_{t+1} + \gamma G_{t+1} \mid S_t = s, A_t = a, S_{t+1} = s'] Pr\{S_{t+1} = s' \mid S_t = s, A_t = a\} \newline
-   &amp;= \sum_{s',r} \left( r + \gamma \underbrace{\mathbb{E}[G_{t+1} \mid S_{t+1} = s']}_{v_\pi|(s')} \right) p(s', r \mid s, a)\newline\newline
-   &amp;= \sum_{s',r} [ r + \gamma v_\pi(s')] p(s', r \mid s, a)\newline
+\newline &amp;= \sum_{s'} \mathbb{E}[R_{t+1} + \gamma G_{t+1} \mid S_t = s, A_t = a, S_{t+1} = s'] Pr\{S_{t+1} = s' \mid S_t = s, A_t = a\}
+\newline &amp;= \sum_{s',r} \left( r + \gamma \underbrace{\mathbb{E}[G_{t+1} \mid S_{t+1} = s']}_{v_\pi|(s')} \right) p(s', r \mid s, a)
+\newline &amp;= \sum_{s',r} [ r + \gamma v_\pi(s')] p(s', r \mid s, a)
 \end{align*}
 </span></p>
+<p>Here is my version of the proof:</p>
+<p><span id="eq-policy-gradient-theorem-proof"><span class="math display">
+\begin{align*}
+\textcolor{cyan}{\nabla_\theta V_\pi(s)} &amp;= \nabla_\theta \sum_a \textcolor{red}{\pi(a \mid s)} \textcolor{green}{ q_\pi(s,a) } &amp;&amp; \text{backup } v_\pi \to q_\pi \text{ (Ex 3.18)}
+\newline &amp;= \sum_a \nabla_\theta \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \nabla_\theta q_\pi(s,a) &amp;&amp; \text{product rule}
+\newline &amp;= \sum_a \nabla_\theta \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \nabla_\theta \sum_{s'} \textcolor{blue}{P(s',r \mid s, a)} \textcolor{pink}{[r + V_\pi(s')]} &amp;&amp; \text{backup } q_\pi \to v_\pi \text{ (Ex 3.19)}
+\newline &amp;= \sum_a \nabla_\theta \pi(a \mid s) q_\pi(s,a) + \pi(a \mid s) \sum_{s'} P(s',r \mid s, a) \nabla_\theta V_\pi(s') &amp;&amp; P, r \text{ are const w.r.t. } \theta \newline
+=&amp; \sum_{a \in \mathcal{A}} \Big( \nabla_\theta \pi(a \mid s)Q_\pi(s, a) + \pi(a \mid s) \sum_{s'} P(s' \mid s,a)  \textcolor{cyan}{\nabla_\theta V_\pi(s')} \Big) &amp;&amp; \text{total rule of probability on r for P }
+\newline &amp; \blacksquare &amp;&amp; \qquad
+\end{align*}
+\tag{14}</span></span></p>
 </section>
 </section>
 <section id="sec-l2g3" class="level2">
@@ -3376,11 +3457,11 @@ Learning Objectives
 </span></p>
 <p><span id="eq-gradient-ascent"><span class="math display">
 \theta_{t+1} = \theta_t + \alpha \nabla_\theta ln \pi(a_t \mid s_t, \theta) q_\pi(s_t, a_t) \qquad \text{()}
-\tag{14}</span></span></p>
+\tag{15}</span></span></p>
 <p>where <span class="math inline">\alpha</span> is the step size and <span class="math inline">\nabla_\theta J(\theta)</span> is the gradient of the objective function <span class="math inline">J(\theta)</span> with respect to the policy parameters <span class="math inline">\theta</span>.</p>
 <p><span id="eq-log-derivative"><span class="math display">
 \nabla \ln (f(x)) = \frac{\nabla f(x)}{f(x)} \qquad \text{(log derivative)}
-\tag{15}</span></span></p>
+\tag{16}</span></span></p>
 </section>
 <section id="sec-l3g2" class="level2">
 <h2 class="anchored" data-anchor-id="sec-l3g2">Describe the actor-critic algorithm for control with function approximation, for continuing tasks</h2>
@@ -3463,7 +3544,7 @@ Discussion prompt
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-chapter-13-policy-gradient-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;15: Chapter 13 of <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018</a>)</span> covering policy gradient methods.
+Figure&nbsp;18: Chapter 13 of <span class="citation" data-cites="sutton2018reinforcement">(<a href="#ref-sutton2018reinforcement" role="doc-biblioref">Sutton and Barto 2018</a>)</span> covering policy gradient methods.
 </figcaption>
 </figure>
 </div>
@@ -3473,11 +3554,18 @@ Figure&nbsp;15: Chapter 13 of <span class="citation" data-cites="sutton2018reinf
 </section>
 </section>
 
+
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-sutton2018reinforcement" class="csl-entry" role="listitem">
 Sutton, R. S., and A. G. Barto. 2018. <em>Reinforcement Learning, Second Edition: An Introduction</em>. Adaptive Computation and Machine Learning Series. MIT Press. <a href="http://incompleteideas.net/book/RLbook2020.pdf">http://incompleteideas.net/book/RLbook2020.pdf</a>.
 </div>
-</div></section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>which models an K-sided die based on its historic performance<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>A step that does not logically follow from the previous one<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div>CC SA BY-NC-ND</div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
   author = {Bochman, Oren},
   title = {Policy {Gradient}},
   date = {2024-04-04},

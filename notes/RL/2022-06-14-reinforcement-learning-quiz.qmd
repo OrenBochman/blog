@@ -141,14 +141,85 @@ What is the weighting on each prior reward for the general case, analogous to (2
 sequence of step-size parameters? 
 
 
-> Exercise 2.5 (programming) Design and conduct an experiment to demonstrate the
-difficulties that sample-average methods have for non-stationary problems. Use a modified
-version of the 10-armed testbed in which all the $q_{*}(a)$ start out equal and then take
-independent random walks (say by adding a normally distributed increment with mean
-zero and standard deviation 0.01 to all the $q(a)$ on each step). Prepare plots like
-Figure 2.2 for an action-value method using sample averages, incrementally computed,
-and another action-value method using a constant step-size parameter, $\alpha = 0.1$. Use
-$\epsilon= 0.1$ and longer runs, say of 10,000 steps.
+> Exercise 2.5 (programming) Design and conduct an experiment to demonstrate the difficulties that sample-average methods have for non-stationary problems. Use a modified version of the 10-armed testbed in which all the $q_{*}(a)$ start out equal and then take
+independent random walks (say by adding a normally distributed increment with mean zero and standard deviation 0.01 to all the $q(a)$ on each step). Prepare plots like Figure 2.2 for an action-value method using sample averages, incrementally computed,
+and another action-value method using a constant step-size parameter, $\alpha = 0.1$. Use $\epsilon= 0.1$ and longer runs, say of 10,000 steps.
+
+
+
+For pole balancing we had
+
+> Episodic: The reward in this case could be +1 for every time step on which failure did not occur, so that the return at each time would be the number of steps until failure. In this case, successful balancing forever would mean a return of infinity.
+
+> Continuing: Alternatively, we could treat pole-balancing as a continuing task, using discounting. In this case the reward would be -1 on each failure and zero at all other times. The return at each time would then be related to -\gamma^{K-1}, where K is 
+the number of time steps before failure (as well as to the times of later failures)
+
+
+> Exercise 3.6 Suppose you treated pole-balancing as an episodic task but also used discounting, with all rewards zero except for -1 upon failure. What then would the return be at each time? How does this return differ from that in the discounted, continuing
+formulation of this task?
+
+
+In the episodic task the return would be -1 at the end of the episode and 0 at all other times. In the continuing task the return would be -1 at the end of the episode and 0 at all other times. The difference is that in the episodic task the return is zero at all other times.
+
+> Exercise 3.7 Imagine that you are designing a robot to run a maze. You decide to give it a reward of +1 for escaping from the maze and a reward of zero at all other times. The task seems to break down naturally into episodes—the successive runs through the maze—so you decide to treat it as an episodic task, where the goal is to maximize expected total reward (3.7). After running the learning agent for a while, you find that it is showing
+no improvement in escaping from the maze. What is going wrong? Have you effectively communicated to the agent what you want it to achieve? 
+
+### Solution
+
+perhaps not - as running around the maze carries no penalty and the escape signal is very sparse. 
+
+We may want to give the agent some penalty for running around the maze aimlessly. 
+
+Perhaps we might give it a better signal by using penalty for visting the any states more than once so we don't discourage exploration.
+
+
+> Exercise 3.8 Suppose $\gamma = 0.5$ and the following sequence of rewards is received $R_1 = -1, R_2 = 2, R_3 = 6, R_4 = 3, and R_5 = 2, with $T=5$. What are $G_0, G_1 , . . . , G_5$ ? 
+> Hint:
+Work backwards. 
+
+> Exercise 3.9 Suppose   = 0 . 9 and the reward sequence is R 1 = 2 followed by an infinite sequence of 7s. 
+> What are G 1 and G 0 ?
+
+> Exercise 3.10 Prove the second equality in (3.10).
+
+
+this is the sum of the geometric series
+$$
+\sum_{k=0}^{\infty} \gamma^k = \frac{1}{1-\gamma}
+$$
+
+proof:
+
+$$
+\begin{align*}
+  S_n &= ar^0 + ar^1 + \cdots + ar^{n},\\
+ rS_n &= ar^1 + ar^2 + \cdots + ar^{n+1},\\
+  S_n - rS_n &= ar^0 - ar^{n+1},\\
+  S_n\left(1-r\right) &= a\left(1-r^{n+1}\right),\\
+  S_n &= a\left(\frac{1-r^{n+1}}{1-r}\right),
+\end{align*}
+$$
+
+$$
+\begin{align*}
+S &= a+ar+ar^2+ar^3+ar^4+\cdots\\
+  &= \lim_{n \rightarrow \infty} S_n\\
+  &= \lim_{n \rightarrow \infty} \frac{a(1-r^{n+1})}{1-r} \\
+  &= \frac{a}{1-r} - \frac{a}{1-r} \lim_{n \rightarrow \infty} r^{n+1} \\
+  &= \frac{a}{1-r},
+\end{align*}
+$$
+
+> Exercise 3.11 If the current state is $S_t$ , and actions are selected according to a stochastic  policy $\pi$ , then what is the expectation of $R_{t+1}$ in terms of $\pi$ and the four-argument
+function p (3.2)?
+
+$$
+ \mathbb{E}[R_{t+1} \mid S_t, A_t, \pi] = \sum_{r} r \sum_{s'} p(s', r \mid S_t, A_t, \pi)
+$$
+
+
+
+
 
 # Reinforcement Learning Q&A
 

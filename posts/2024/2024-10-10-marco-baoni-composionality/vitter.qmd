@@ -1,0 +1,157 @@
+---
+title: "Vitter Algorithm"
+subtitle: "Paper Review"
+date: 2025-01-01
+categories: [review,compositionality,neural networks,signaling systems,language evolution]
+keywords: 
+    compositionality
+    naive compositionality
+    language emergence
+    deep learning
+    neural networks
+    signaling systems 
+    emergent languages
+    topographic similarity
+    positional disentanglement
+    bag-of-symbols disentanglement
+    information gap disentanglement    
+bibliography: ./bibliography.bib
+---
+
+
+
+```{python}
+import heapq
+
+class Node:
+    def __init__(self, char, freq):
+        self.char = char
+        self.freq = freq
+        self.left = None
+        self.right = None
+
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+def build_huffman_tree(chars_freq):
+    """
+    Builds the Huffman tree for given character frequencies.
+
+    Args:
+        chars_freq: A dictionary of characters and their frequencies.
+
+    Returns:
+        The root of the Huffman tree.
+    """
+    nodes = []
+    for char, freq in chars_freq.items():
+        heapq.heappush(nodes, Node(char, freq))
+
+    while len(nodes) > 1:
+        left = heapq.heappop(nodes)
+        right = heapq.heappop(nodes)
+        parent = Node(None, left.freq + right.freq)
+        parent.left = left
+        parent.right = right
+        heapq.heappush(nodes, parent)
+
+    return nodes[0]
+
+def encode_char(root, char, code=''):
+    """
+    Encodes a character using Huffman codes.
+
+    Args:
+        root: The root of the Huffman tree.
+        char: The character to encode.
+        code: The current code (initially empty).
+
+    Returns:
+        The Huffman code for the character.
+    """
+    if root is None:
+        return ''
+
+    if root.char == char:
+        return code
+
+    left_code = encode_char(root.left, char, code + '0')
+    if left_code != '':
+        return left_code
+
+    right_code = encode_char(root.right, char, code + '1')
+    return right_code
+
+def decode_char(root, code):
+    """
+    Decodes a Huffman code to get the character.
+
+    Args:
+        root: The root of the Huffman tree.
+        code: The Huffman code to decode.
+
+    Returns:
+        The decoded character.
+    """
+    current = root
+    for bit in code:
+        if bit == '0':
+            current = current.left
+        else:
+            current = current.right
+
+    if current.char is not None:
+        return current.char
+
+def encode_message(root, message):
+    """
+    Encodes a message using Huffman codes.
+
+    Args:
+        root: The root of the Huffman tree.
+        message: The message to encode.
+
+    Returns:
+        The encoded message.
+    """
+    encoded_message = ''
+    for char in message:
+        encoded_message += encode_char(root, char)
+    return encoded_message
+
+def decode_message(root, encoded_message):
+    """
+    Decodes a Huffman-encoded message.
+
+    Args:
+        root: The root of the Huffman tree.
+        encoded_message: The encoded message.
+
+    Returns:
+        The decoded message.
+    """
+    decoded_message = ''
+    current = root
+    for bit in encoded_message:
+        if bit == '0':
+            current = current.left
+        else:
+            current = current.right
+
+        if current.char is not None:
+            decoded_message += current.char
+            current = root
+
+    return decoded_message
+
+# Example usage
+chars_freq = {'a': 45, 'b': 13, 'c': 12, 'd': 16, 'e': 9, 'f': 5}
+root = build_huffman_tree(chars_freq)
+
+message = "abcdef"
+encoded_message = encode_message(root, message)
+print("Encoded message:", encoded_message)
+
+decoded_message = decode_message(root, encoded_message)
+print("Decoded message:", decoded_message)
+```

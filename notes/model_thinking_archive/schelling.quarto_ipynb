@@ -1,0 +1,171 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "draft: true\n",
+        "title: mesa tests\n",
+        "---\n",
+        "\n",
+        "\n",
+        "So this is supposed to become a python Shiney app for the schelling model\n",
+        "using mesa modeling environment.\n",
+        "\n",
+        "\n",
+        "\n",
+        "But I soon decided to just try to get the demo notebook from [here](https://github.com/projectmesa/mesa-examples/blob/main/examples/schelling/analysis.ipynb) running!\n",
+        "\n",
+        "\n",
+        "## Schelling Segregation Model\n",
+        "\n",
+        "### Background\n",
+        "\n",
+        "The Schelling (1971) segregation model is a classic of agent-based modeling, demonstrating how agents following simple rules lead to the emergence of qualitatively different macro-level outcomes. Agents are randomly placed on a grid. There are two types of agents, one constituting the majority and the other the minority. All agents want a certain number (generally, 3) of their 8 surrounding neighbors to be of the same type in order for them to be happy. Unhappy agents will move to a random available grid space. While individual agents do not have a preference for a segregated outcome (e.g. they would be happy with 3 similar neighbors and 5 different ones), the aggregate outcome is nevertheless heavily segregated.\n",
+        "\n",
+        "## Implementation\n",
+        "\n",
+        "This is a demonstration of running a Mesa model in an IPython Notebook. The actual model and agent code are implemented in `model.py`, in the same directory as this notebook. \n",
+        "\n",
+        "Below, we will import the model class, instantiate it, run it, and plot the time series of the number of happy agents.\n",
+        "\n",
+        "```\n",
+        "$ # This will install the \"mesa_models\" package\n",
+        "!pip install --quiet --upgrade mesa \n",
+        "!pip install -U -e git+https://github.com/projectmesa/mesa-examples#egg=mesa-models\n",
+        "```\n"
+      ],
+      "id": "e0d1f50c"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import seaborn as sns\n",
+        "\n",
+        "import matplotlib.pyplot as plt\n",
+        "import mesa_models \n",
+        "from mesa_models.schelling.model import Schelling   \n",
+        "\n",
+        "%matplotlib inline"
+      ],
+      "id": "5e4362f6",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Now we instantiate a model instance: a 10x10 grid, with an 80% change of an agent being placed in each cell, approximately 20% of agents set as minorities, and agents wanting at least 3 similar neighbors.\n"
+      ],
+      "id": "9bb6e551"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#model = Schelling(height=10, width=10, homophily=0.8, radius=0.2, density=3, minority_pc=0.2, seed=None)\n",
+        "\n",
+        "# this model crashes\n",
+        "#model = Schelling(10, 10, 0.8, 0.2, 3)\n",
+        "\n",
+        "# this should fix the bug from a change in the order of the variables\n",
+        "model = Schelling(height=10, width=10,homophily=3,density=0.8,minority_pc=0.2)\n",
+        "\n",
+        "while model.running and model.schedule.steps < 100:\n",
+        "    model.step()\n",
+        "\n",
+        "print(model.schedule.steps)  # Show how many steps have actually run"
+      ],
+      "id": "7017a4ab",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The model has a DataCollector object, which checks and stores how many agents are happy at the end of each step. It can also generate a pandas DataFrame of the data it has collected:\n"
+      ],
+      "id": "6898b925"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "model_out = model.datacollector.get_model_vars_dataframe()"
+      ],
+      "id": "9944a12b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "model_out.head()"
+      ],
+      "id": "2a018bb2",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Finally, we can plot the 'happy' series:\n"
+      ],
+      "id": "af8162ad"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "model_out.happy.plot()"
+      ],
+      "id": "c29333ab",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "For testing purposes, here is a table giving each agent's x and y values at each step.\n",
+        "\n",
+        "\n",
+        "\n",
+        "```python\n",
+        "#| eval: False\n",
+        "## the agent does not seem to have any tracking for x and y!?\n",
+        "## so this fails\n",
+        "x_positions = model.datacollector.get_agent_vars_dataframe()\n",
+        "```\n",
+        "\n",
+        "```python\n",
+        "x_positions.head()\n",
+        "```\n",
+        "\n",
+        "\n",
+        "## Effect of Homophily on segregation\n",
+        "\n",
+        "Now, we can do a parameter sweep to see how segregation changes with homophily.\n",
+        "\n",
+        "First, we create a function which takes a model instance and returns what fraction of agents are segregated -- that is, have no neighbors of the opposite type.\n"
+      ],
+      "id": "c66215d2"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/home/oren/.local/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

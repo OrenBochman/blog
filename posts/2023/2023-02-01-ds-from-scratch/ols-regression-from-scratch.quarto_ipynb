@@ -1,0 +1,142 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: OLS regression From Scratch\n",
+        "date: 2023-02-01\n",
+        "categories:\n",
+        "    - data science\n",
+        "    - ml\n",
+        "    - algorithms\n",
+        "---\n",
+        "\n",
+        "\n",
+        "# OLS regression\n",
+        "\n",
+        "OLS regression is a method for estimating the parameters of a linear regression model. The goal is to find the line that best fits a set of data points. The line is represented by an equation of the form\n",
+        "$$\n",
+        "y = mx + b\n",
+        "$$\n",
+        "\n",
+        "where :\n",
+        "\n",
+        "- $y$ is the **dependent variable**, \n",
+        "- $x$ is the **independent variable**, \n",
+        "- $m$ is the **slope** of the line, and \n",
+        "- $b$ is the **y-intercept**.\n",
+        "\n",
+        "## Generate random data\n"
+      ],
+      "id": "4c601192"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Import the necessary libraries\n",
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "\n",
+        "# Generate random data\n",
+        "n = 100\n",
+        "x = np.random.rand(n)\n",
+        "y = 2*x + np.random.normal(size=n)\n",
+        "\n",
+        "# Create a DataFrame and save to CSV\n",
+        "df = pd.DataFrame({'x': x, 'y': y})\n",
+        "df.to_csv('your_dataset.csv', index=False)"
+      ],
+      "id": "8bded99f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## "
+      ],
+      "id": "d6a8f116"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import numpy as np\n",
+        "from numpy import ndarray\n",
+        "import pandas as pd\n",
+        "import xarray as xr\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "# Step 1: Load the data and split into independent and dependent variables\n",
+        "data = pd.read_csv('your_dataset.csv')\n",
+        "X = data.iloc[:, :-1].values\n",
+        "y = data.iloc[:, -1].values\n",
+        "\n",
+        "# add a column of 1s to the X matrix for the intercept term\n",
+        "X = np.append(arr=np.ones((len(X), 1)), values=X, axis=1)\n",
+        "\n",
+        "# calculate the coefficients using the OLS formula\n",
+        "beta = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(y)\n",
+        "\n",
+        "y_pred = X.dot(beta)"
+      ],
+      "id": "7923ffcb",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def mean_squared_error(y_true:ndarray, y_pred:ndarray):\n",
+        "    n = len(y_true)\n",
+        "    mse = sum([(y_true[i] - y_pred[i])**2 for i in range(n)]) / n\n",
+        "    return mse\n",
+        "\n",
+        "def r2_score(y_true:ndarray, y_pred:ndarray):\n",
+        "    ssr = sum([(y_true[i] - y_pred[i])**2 for i in range(len(y_true))])\n",
+        "    sst = sum([(y_true[i] - np.mean(y_true))**2 for i in range(len(y_true))])\n",
+        "    r2 = 1 - (ssr / sst)\n",
+        "    return r2\n",
+        "\n",
+        "rmse = np.sqrt(mean_squared_error(y, y_pred))\n",
+        "r2 = r2_score(y, y_pred)\n",
+        "\n",
+        "print(\"RMSE: \", rmse)\n",
+        "print(\"R-squared: \", r2)"
+      ],
+      "id": "490a2071",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "plt.scatter(X[:, 1], y, color='blue')\n",
+        "plt.plot(X[:, 1], y_pred, color='red')\n",
+        "plt.title('OLS Regression')\n",
+        "plt.xlabel('Independent variable')\n",
+        "plt.ylabel('Dependent variable')\n",
+        "plt.show()"
+      ],
+      "id": "07f51b50",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/home/oren/.local/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

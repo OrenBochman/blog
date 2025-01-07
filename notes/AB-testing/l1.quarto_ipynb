@@ -1,0 +1,192 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: Lesson 1 - Overview of A/B Testing\n",
+        "description: Notes from Udacity A/B Testing course\n",
+        "date: 2023-01-01\n",
+        "image: AB-Test-Sparrows.jpg\n",
+        "categories: [a/b-testing,notes]\n",
+        "title-block-banner: banner_blue_1.jpg\n",
+        "---\n",
+        "\n",
+        "\n",
+        "![udacity](/images/logos/udacity.png){.column-margin}\n",
+        "\n",
+        "Notes from Udacity A/B Testing course, I took this course around the time it first launched.\n",
+        "The course is about planning and analyzing A/B tests - not about implementing A/B testing using a specific framework.\n",
+        "\n",
+        "## Instructors:\n",
+        "\n",
+        " - [Carrie Grimes Bostock](https://www.linkedin.com/in/carrie-grimes-bostock-4b61138/) Googler,\n",
+        " - [Caroline Buckey Polaris](https://www.linkedin.com/in/cbuckey/) Googler,  \n",
+        " - [Diane Tang](https://www.linkedin.com/in/diane-tang-2a2477/)  Googler.\n",
+        "\n",
+        "\n",
+        "## Lesson 1: Overview of A/B Testing\n",
+        "\n",
+        "The Instructors gave the following examples of A/B testing from the industry:\n",
+        "\n",
+        "- Google tested [41 different shades of blue](http://www.nytimes.com/2009/03/01/business/01marissa.html?pagewanted=3).\n",
+        "- Amazon initially decided to launch their first personalized product recommendations based on an [A/B test showing a huge revenue increase by adding that feature](http://www.exp-platform.com/Documents/GuideControlledExperiments.pdf). (See the second paragraph in the introduction.)\n",
+        "- LinkedIn tested [whether to use the top slot on a user's stream for top news articles or an encouragement to add more contacts](http://engineering.linkedin.com/mobile/mobile-ab-testing-linkedin-how-members-shape-our-apps). (See the first paragraph in \"A/B testing with view based JSON\" section.)\n",
+        "- Amazon determined that [every 100ms increase in page load time decreased sales by 1%](http://www.exp-platform.com/Documents/IEEEComputer2007OnlineExperiments.pdf). (In \"Secondary metrics\" section on the last page)\n",
+        "Google’s [latenc resultsy](http://googleresearch.blogspot.com/2009/06/speed-matters.html)  showed a similar impact for a 100ms delay.\n",
+        "- Kayak [tested whether notifying users that their payment was encrypted would make users more or less likely to complete the payment](http://apptimize.com/blog/2014/03/kayaks-most-interesting-ab-test/).\n",
+        "- Khan Academy tests [changes like letting students know how many other students are working on the exercise with them, or making it easier for students to fast-forward past skills they already have](http://apptimize.com/blog/2014/07/how-khan-academy-uses-ab-testing-to-improve-student-learning/). (See the question \"What is the most interesting A/B test you've seen so far?\")\n",
+        "\n",
+        "1. **Metrics** Difference between click-through rate and click-through probability?\n",
+        "    - **CTR** is used to measure usability e.g. how easy to find the button,  $\\frac{ \\text { click}}{\\text{ page views}}$. \n",
+        "    - **CTP** is used to measure the impact $\\frac{ \\text {unique visitors click}}{\\text{ unique visitors view the page}}$.\n",
+        "2.  Statistical significance and practical significance\n",
+        "    - **Statistical significance** is about ensuring observed effects are not due to chance.\n",
+        "    - **Practical significance** depends on the industry e.g. medicine vs. internet.\n",
+        "    - **Statistical significance** \n",
+        "        - $\\alpha$: the probability you happen to observe the effect in your sample if $H_0$ is true.\n",
+        "        - **Small sample**: $\\alpha$ low, $\\beta$ high. \n",
+        "        - **Larger sample**, $\\alpha$ same, $\\beta$ lower \n",
+        "        - any larger change than your practical significant boundary will have a lower $\\beta$, so it will be easier to detect the significant difference. \n",
+        "        - $1-\\beta$ also called **sensitivity**\n",
+        "3. How to calculate sample size?\n",
+        "    - Use this [calculator](https://www.evanmiller.org/ab-testing/sample-size.html), input baseline conversion rate, minimum detectable effect (the smallest effect that will be detected $(1-\\beta)%$ of the time), alpha, and beta.\n",
+        "    \n",
+        "## Python Modelling\n",
+        "\n",
+        "### Binomeal Distribution\n"
+      ],
+      "id": "75710b17"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import numpy as np\n",
+        "import matplotlib.pyplot\n",
+        "import seaborn as sns\n",
+        "from collections  import Counter\n",
+        "n_trials = 10\n",
+        "p=3/4\n",
+        "size=1000\n",
+        "x= np.random.binomial(n=n_trials, p=p, size=size)\n",
+        "freqs = Counter(x)\n",
+        "##probs = freqs/size\n",
+        "##print(probs)\n",
+        "##sns.distplot(x, kde=True)\n",
+        "sns.histplot(x, kde=False, stat='density',binwidth=1.0,fill=False)"
+      ],
+      "id": "3b51c350",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### Estimate mean and standard deviation\n"
+      ],
+      "id": "9a90821b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "np.set_printoptions(formatter={'float':\"{0:0.2f}\".format})\n",
+        "np.set_printoptions(precision=2)\n",
+        "mean =  np.round(x.mean(),2)\n",
+        "mean_theoretical =  np.round(n_trials* p,2)\n",
+        "width=6\n",
+        "print(f'mean {mean: <{width}} mean_theoretical  {mean_theoretical}')\n",
+        "variance =  np.round(x.var(),2)\n",
+        "variance_theoretrical =  np.round(n_trials* p * (1-p),2)\n",
+        "print(f'var  {variance: <{width}} var_theoretrical  {variance_theoretrical}')\n",
+        "sd =  np.round(x.std(),2)\n",
+        "sd_theoretical = np.round(np.sqrt(variance_theoretrical),2)\n",
+        "print(f'sd   {sd: <{width}} sd_theoretical    {sd_theoretical}')\n",
+        "##TODO can we do it with PYMC, in a tab"
+      ],
+      "id": "8277021a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### Estimating p from data\n"
+      ],
+      "id": "0f57888b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "size = 10\n",
+        "n_trials=10\n",
+        "p= np.random.uniform(low=0.0, high=1.0)\n",
+        "x= np.random.binomial(n=n_trials, p=p, size=size)\n",
+        "p=round(p,3)\n",
+        "p_est=np.round(x.mean()/n_trials,3)\n",
+        "p_b_est=np.round((x.mean()+1)/(n_trials+2),3) ## baysian estimator\n",
+        "print(f'{p=} {p_est=} {p_b_est=}')\n",
+        "print(f'\\t {np.round(np.abs(p-p_est),3)} {np.round(np.abs(p-p_b_est),3)}')"
+      ],
+      "id": "354c1150",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### Estimating Confidece Intervals\n"
+      ],
+      "id": "b621423e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "n=n_trials\n",
+        "confidence = 95/100\n",
+        "alpha=1-confidence\n",
+        "z=1-(1/2)*alpha\n",
+        "ci=np.round(z+np.sqrt(p_est*(1-p_est)/n_trials),2)\n",
+        "print(f'{alpha=},{z=}')\n",
+        "print(f'[-{ci},{ci}] wald ci')\n",
+        "z_lb=1-(1/2)*alpha\n",
+        "z_ub=1-(1/2)*(1-alpha)\n",
+        "print(f'{alpha=},{z_lb=},{z_ub=}')\n",
+        "lb_wilson=(p_est+z_lb*z_lb/(2*n)+z_lb*np.sqrt(p_est*(1-p_est)/n + z_lb*z_lb/(4*n)))/(1+z_lb*z_lb/n)\n",
+        "ub_wilson=(p_est+z_ub*z_ub/(2*n)+z_ub*np.sqrt(p_est*(1-p_est)/n + z_ub*z_ub/(4*n)))/(1+z_ub*z_ub/n)\n",
+        "print(f'[-{lb_wilson},{ub_wilson}] wilson ci')"
+      ],
+      "id": "49f20f40",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Resources\n",
+        "\n",
+        "- [A/B testing](https://en.wikipedia.org/wiki/A/B_testing##A.2FB_testing_tools_comparison) article on Wikipedia.\n",
+        "-  These notes were influenced by [Joanna](https://medium.com/@jchen001) "
+      ],
+      "id": "b13d7fd4"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/home/oren/.local/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

@@ -1,28 +1,117 @@
 ---
 date: 2024-01-04
 title: "Understanding Emergent Languages"
+categories:
+    - nlp
+    - language evolution
+    - emergent languages
 keywords: 
-    compositionality
-    naive compositionality
-    language emergence
-    deep learning
-    neural networks
-    signaling systems 
-    emergent languages
-    topographic similarity
-    positional disentanglement
-    bag-of-symbols disentanglement
-    information gap disentanglement    
+    - compositionality
+    - naive compositionality
+    - language emergence
+    - deep learning
+    - neural networks
+    - signaling systems 
+    - emergent languages
+    - topographic similarity
+    - positional disentanglement
+    - bag-of-symbols disentanglement
+    - information gap disentanglement    
 bibliography: ./bibliography.bib
 ---
 
-Okay, today I've been rethinking Complex signaling systems and thier Lewis Signaling Game. As I make slow progress on this I can say that I am considering a number of research questions that seem trivial for a simple two-state two-signal Lewis signaling game but become important as we delve deeper. 
+
+Okay after taking a break, today I've been rethinking Complex Lewis signaling systems and the equilibria.  I slow make progress in this area byc considering a number of research questions that seem trivial for a simple two-state two-signal Lewis signaling game but become important as we delve deeper into extensions in which complex systems emerge.
+
+I've made a bit of study of the original Lewis signaling game and built some intuition by reproducing some key results. I've developed urn based RL algorithms that are fast and Bayesian RL algorithms that are versatile for this tasks. I've spent a long time trying to figure out the complex games from a mathematical perspective. 
+
+There is a big hurdle between the original lewis signaling game and one that can generate a complex signaling system that is a first approximation of a natural langague, or even a good representation of a formal languae like first order logic. It certainly possible to design some variants that lead to specific complex signaling systems. But a more general solution seems elusive. In this article I've made another step towards finding this more general solution.
+
+Recently I also reviewed a number of talks on emergent languages. Considered the challenges they put forth and reviewed the main papers they were based on and read many others. 
+
+::: {.callout-note}
+## TL-DR
+
+![Emergent Languages In a Nutshell](/images/in_the_nut_shell_coach_retouched.jpg)
+
+This article is my first take on figuring out what modifications to the Lewis signaling game used 
+in a number of research papers resulted in a emergent languages. By emergent languages we mean an
+equilibria of the modified Lewis signaling game that has been learned by the agents through reinforcement learning.
+
+Why are these equilibria called emregent languages ?
+
+We can start with **language**. Unmodifed lewis games result in learning a shared lexicon which allows the agents to successfully communicate every time. Emergent language can be imperfect with an expected communication less than 1. Emergent languages may also develop more structure than just a lexicon snd this is the main themes of this and upcoming article. Next is the **emergence** part.
+In [@de2011self] the authors discuss emergence in languages in terms of a self-organizing systems that operate through selection pressure, exploration, feedback, preferential attachment etc. 
+Though as I pointed out with the lewis signaling game and decent RL algorithms a perfect signaling system is inevitable. So that calling such a system emergent needs to be justified and one should perhaps talk about emergent properties like compositionality.
+
+This article takes a step back and reconsiders the what one should expect from a game modified to create a complex signaling system. With enough insight the process may look less like emergence and more like design or engineering. 
+
+At this point I am trying to find better research questions which slowly have been collecting in the next section. 
+
+I then go over the main terminology and main ideas that are being discussed in the context of emergent languages. This helps clear up the intellectual landscape and will help us touch base for the rest of this article.
+
+Next I try to puzzle out how emergent languages have been generated through trial and error. And what is thier secret sauce. This is primarily an exercise in hypothesis generation.
+
+It isn't really easy to figure out complex systems like the complex lewis signaling game in general. I've made some progress that way and noticed that some challenges from the simple game become advantages in the complex game. So at this point though I will consider some examples and try to take them apart to see if I can get at some general principles.
+
+Some of these are rathe long and will be broken up into smaller articles that cover experiments to check the hypothesis.
+
+Finally I think I can make a couple of hypothesis that go beyond understanding the mechanisms needed to make emergent languages. These are more in line with the design and engineering approach.
+
+:::
+
+
+
 Within the complex games we are dealing with sequences of signals based on some alphabet. Here are a few of the research questions that raise their heads as we consider the complexity of the signaling systems:
 
 
 ## Research questions {#sec-research-questions}
 
-1. How do semantics arise for sequences?^[this is a natural question for anyone who has stated learning a new language that is from a different language family, and in this case we may be better equipped to answer it]
+
+### Semantics 
+
+In the simple game semantics (meaning) of signals are not easy to define. But the gist of it is that each symbols encodes an action that corresponds uniquely to some state. In nature the actions are real action and in the game they correspond to simply recognizing the original states. So the semantics of the simple games are captured by the lexicon. But how do they arrise ? There can be many ways (which I am exploring in a working paper) But let's consider the answer presented by David Lewis that semantics arbitrarily emerges though spontaneous symmetry breaking.
+
+Let's explain a bit. In a mathematical sense a signaling system with N states and symbols is one of any permutation permutation from stated to symbols and it inverse. These are premuations as a set from the symmetric group. Picking one is a form of symmetry breaking. But in the game we do this in steps. THis also figures with the fact that one can decompose a permutation into a product of transpositions. Each time we fix a transposition we are breaking a smaller symmetry. Eventually ending up with a fixed system.
+
+In one sense we do the same for complex systems. But if are interested in a self organizing signaling system to emerge we only go so far with trial and error that arbitrary system breaking 
+follows.  Why is this tricky. Whatever system that will emerge even is highly organized and structured may have numerous degenerate systems that are isomorphic to it. In this sense nothing is different - we will still go though a series of symmetry breaking steps whose order is dictated by nature. But it seems there is a greater role for planning step by the sender to select a set of symbols using a mapping that preserves the structure of the states. This type of signaling system is a group homomorphism.
+
+So we have three paradigms in mind for the creation of semantics in the complex signaling system. 
+
+1. Spontaneous symmetry breaking - that learns a system that is just a lexicon.
+2. Self-organizing - a blind watch maker that can pick a structure that is a group homomorphism.
+3. Planning - a sender that can plan a signaling system that is a Normality-Preserving Homomorphism homomorphism.
+
+
+I.e. IF the semantics arise via self-organization using RL we may end up with systems that are do not correspond to different stages in the sequence of normal subgroups. And with a good algorithms we likely get the smallest symmetries most frequently and fastest and the largest symmetries least frequently and slowest. With planning the sender should be able to plan a signaling system that is a normality preserving homomorphism i.e. leads to a system that captures the structure of the states. 
+
+One point about self organization. 
+
+I envision this in few ways.
+
+The first is that sender may decide to swap the signal between states and jump closer to a homomorphic equilibrium. This can happen using epsilon greedy exploration and may be reinfoced over time if the outcome is better.
+A second is some sort of preferential attachment or rich get richer situation where the states are.
+Unevenly distributed and we use the initial bias to learn a system that has not just symmetry but a semantics to the symbols. 
+Other ways for a system to self organize is to replicate structures though templates. These might arise from using priors in a hierarchial bayesian learning system.
+
+Another way the system may self orgenize if there is a bias in the states that is reflected in the rewards. This bias may be reflected in the distribution of the states or in the rewards. If the states are distributed unevenly the system may self orgenize if rewards encourge shorter messages or messages built from shorter symbols (think morse code).
+One way I envision this is that the signaling system is at first a 2x2 system. One system might arise spontaneously. Next each of these states becomes two states with a new symmetry. If learning is a hierarchial and bayesian the bias learned intially can be used to predispose learning to learn one systems with a symmetry (perhaps even if there isn't one) 
+Another ideas is if the states are dirtibuted unevenly, the system may self orgenize if rewards encourge shorter messages or messages built from shorter symbols (think morse code).
+The sender sees this he might use the old system as a template for additional states via a template or some prior. This is a could be planning but it could also be though some contraint. A prior may be just a bias for listing the more comon substates first reusing the existing symbols in a sequence. This may lead to a systems thar leands itseslf
+
+4. Using templates - reusing existing structures and teaching/learning through analogy or using an established bias.
+
+All these approaches can be incorporated into planning. Just that a planning agent may be able to simulate many states drawn from the distribution of states and seek out a signaling system that is a optimal for some criteria - faster learning though homomorphisms, better generalization, safer communication, error correction etc.
+
+Given all that there could be further structures in the states that are not even captured by normal subgroups (i.e. not symmetries perhaps order and hierarchy) To capture these we may need better planning or to design rewards strucures that allow these to emerge naturally though self-orgenization
+
+
+Here are some more questions pn semantics?
+
+
+1. How do semantics arise for sequences?^[this is a natural question for anyone who has stated learning a new language that is from a different language family, and in this case we may be better equipped to answer it. I've outlined three mechanism there may be more and there may be additional subtleties.]
+
     - Does **Simple lexicon^[semantics for atomic symbols, it kind of does in propositional calculus]** suffice ? 
     - Is an aggregation rule sufficient to create semantics? Does a simple lexicon help?
     - What aggregation types lead to compositionality, entanglement and disentanglement of meaning?
@@ -37,8 +126,8 @@ Within the complex games we are dealing with sequences of signals based on some 
     - More able to generalize to new or unseen states (moran process for the alphabet)
     - a better match to represent the states.^[can we leverage representation theory to handle symmetries within the states?] 
     - easier to interpret/translate/transfer    
-1. Emergent languages may be subject to selection pressure when the Lewis game is composed with some external framing game. What choices are more conducive for agents to lean quickly and communicate effectively using **robust** learning . I.e. algorithms that lead to more stable language whose lecion, grammar and semantic persist over time?
-    - Do we need to tinker with rewards structure to realign the incentives of the agents?^[can agents that are at odds evolve a signaling system or will deception lead to the collapse of the signaling system to prefectly pooling equilibria?]
+1. Emergent languages may be subject to selection pressure when the Lewis game is composed with some external framing game. What choices are more conducive for agents to lean quickly and communicate effectively using **robust** learning . I.r. algorithms that lead to more stable language whose lexicon, grammar and semantic persist over time?
+    - Do we need to tinker with rewards structure to realign the incentives of the agents?^[can agents that are at odds evolve a signaling system or will deception lead to the collapse of the signaling system to perfectly pooling equilibria?]
     - Can these be grounded within the external framing game? ^[will we get the full benefits of signaling systems in our framing game to re-shape the over-all equilibria]
     - resilience to distributional shifts in the states distribution. (e.g. changes in the framing game)
     - resilience to co-adaptation between agents. (persistence of the lexicon, grammar, and semantics).
@@ -46,12 +135,19 @@ Within the complex games we are dealing with sequences of signals based on some 
 1. Can we impose additional structure on the sequences (e.g. a formal grammar that decides a sequence is well formed) Does this imbue the signaling system with additional desiderata?
 1.  Natural Languages develop between many agent and evolve over long time frames. (Hebrew students in primary school read the bible written in Hebrew thousands of years ago using just thier knowledge of modern hebrew.) What about having many senders and receivers speeds things up. I.e. what choices can we make as designers to leverage this.
 1. Can the the sender plan all this machinery in advance and hide it in the the sequences allowing the receiver to learn in the same way as the simple game. Can the receiver infer the machinery from the data? Are there other paths to learning. What if they need to make revisions can they handle those too?
+1. Can we locate set of states with symmetries where we have more more equilibria that preserve the structure of the states. 
+   - Is subgroups enough or is there benefits to having normal subgroups?
+   - How can we quantify the amount of learning needed to learn a signaling system for a given set of states?
+   - How can we quantify the likelihood of reinforcement given set of states for signal/action action/signal pairs?
+   - Can we use s-vector semantics to aid in quantifying this.
+1. What can we say about basins of attraction and stability for equilibria in a lattice from maximally symmetric to minimally symmetric equilibria?
+1. Are there some some collections of states for whcih we can expect radicaly different equilibria to exist in the complex signaling system?
 
 So I ended up with more questions then I bargained for. These are questions within question. These questions suggest new and intriguing desiderata for (complex) signaling systems as some novel  path for signaling and possibly new settings for learning them.
 
-## Are Complex siganling games hard to visulaize
+## Are Complex signaling games hard to visualize?
 
-In reality I have no idea about almost all of these questions yet here they are. Somewhat similar to how I felt at the end of my BA in mathematics. In reality I've made lots of progress with the lewis game and so I do believe I can make more progress. The reality is that to make progress you need to ask the right questions. **I have been lucky to be able to look at the work of many  others, criticize but later ask different questions than they did and so I was able to crack the issues related to the simple game**. I also developed good intuitions on the simple lewis game and over and over I realize that the complex game is in many aspects just the simple game in most respects.
+In reality as I progress writing this article adding more examples. I keep finding more questions and I have little in the way of answers. Some what similar to how I felt at the end of my BA in mathematics. In reality I've made lots of progress with the lewis game and so I do believe I can make more progress. The reality is that to make progress you need to ask the right questions. **I have been lucky to be able to look at the work of many  others, criticize but later ask different questions than they did and so I was able to crack the issues related to the simple game**. I also developed good intuitions on the simple lewis game and over and over I realize that the complex game is in many aspects just the simple game in most respects.
 
 ![ultimate tic tac toe](ultimate-tic-tac-toe.webp){.column-margin}
 
@@ -97,7 +193,7 @@ Let's start with these concepts that come up quite a bit in the literature and m
 It not simple to explain how these differ differences from simple signaling systems except to say that while simple signaling systems are just a lexicon complex ones may be able to capture some or possibly all of the nonces of a natural language.
 
 One way is that perhaps some the symbols comprising the alphabet might be included in the lexicon as length one sequences, and when they are used in a sequence their semantics may be assumed to be the same as when they are used alone, unless there is an explicit entry in the lexicon that says otherwise. This would mean that the lexicon now has potential to express
-What is different from simple signaling systems is that should the states have a sub-states with some structure. In such a case if agents are able to coordinate a signaling system that respects this structure they may be able to learn to communicate much faster. Also if the system gain evloves and new states are intorduced with this structure the agents may be able to learn to communicate about these states much faster then if the structure is ignored.
+What is different from simple signaling systems is that should the states have a sub-states with some structure. In such a case if agents are able to coordinate a signaling system that respects this structure they may be able to learn to communicate much faster. Also if the system gain evolves and new states are intorduced with this structure the agents may be able to learn to communicate about these states much faster then if the structure is ignored.
 
 It worthwhile to recall that these three definitions
 
@@ -130,7 +226,7 @@ My mental model for a formal grammar in the lewis game is propositional logic on
 The main takeaways is that if we generate the lexicon without using an unambiguous formal grammar we are putting the syntax of the language at risk. And if we don't have a a lexicon for the alphabet we may be putting the semantics of the language at risk. 
 
 
-An intersting issue is that we can have differently likelihoods of having different constructs depending on what we include in out lewis game extention....
+An interesting issue is that we can have differently likelihoods of having different constructs depending on what we include in out Lewis game extention....
 
 We might want to find a metric that measures the use of categories in a signaling system.
 
@@ -138,7 +234,7 @@ Another couple of ideas.
 
 We can have examples of complex signaling systems that are on a spectrum from being fully  compositional to being fully entangled. 
 
-Another thing we can unse is a complex compositional language for pre-linguistic objects that don't have a simple disentangled structure and don't fit with the positivistic view of an objective orthogonal and disentangled dimensions that can be measured with full certainty. Ie we can use a easy to learn compositional complex signaling system to encode the pre-linguistic objects that are not easy to interpret like arrays of raw pixels. But also we might be less likely to learn such a language if this is our only input. We would have to come up with it by change.
+Another thing we can use is a complex compositional language for pre-linguistic objects that don't have a simple disentangled structure and don't fit with the positivistic view of an objective orthogonal and disentangled dimensions that can be measured with full certainty. Ie we can use a easy to learn compositional complex signaling system to encode the pre-linguistic objects that are not easy to interpret like arrays of raw pixels. But also we might be less likely to learn such a language if this is our only input. We would have to come up with it by change.
 
 One way this might happen is that we could learn a grammar (classifier) that 
 

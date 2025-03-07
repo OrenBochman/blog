@@ -25,22 +25,21 @@ Okay after taking a break, today I've been rethinking Complex Lewis signaling sy
 
 I've made a bit of study of the original Lewis signaling game and built some intuition by reproducing some key results. I've developed urn based RL algorithms that are fast and Bayesian RL algorithms that are versatile for this tasks. I've spent a long time trying to figure out the complex games from a mathematical perspective. 
 
-There is a big hurdle between the original lewis signaling game and one that can generate a complex signaling system that is a first approximation of a natural langague, or even a good representation of a formal languae like first order logic. It certainly possible to design some variants that lead to specific complex signaling systems. But a more general solution seems elusive. In this article I've made another step towards finding this more general solution.
+There is a big hurdle between the original lewis signaling game and one that can generate a complex signaling system that is a first approximation of a natural language, or even a good representation of a formal language like first order logic. It certainly possible to design some variants that lead to specific complex signaling systems. But a more general solution seems elusive. In this article I've made another step towards finding this more general solution.
 
 Recently I also reviewed a number of talks on emergent languages. Considered the challenges they put forth and reviewed the main papers they were based on and read many others. 
 
 ::: {.callout-note}
-## TL-DR
+## TL-DR Emergent Languages In a Nutshell
 
 ![Emergent Languages In a Nutshell](/images/in_the_nut_shell_coach_retouched.jpg)
 
-This article is my first take on figuring out what modifications to the Lewis signaling game used 
-in a number of research papers resulted in a emergent languages. By emergent languages we mean an
-equilibria of the modified Lewis signaling game that has been learned by the agents through reinforcement learning.
+This article is my first take on figuring out what modifications to the Lewis signaling game used in a number of research papers resulted in a emergent languages. By emergent languages we mean an equilibria of the modified Lewis signaling game that has been learned by the agents through reinforcement learning.
 
-Why are these equilibria called emregent languages ?
+Why are these equilibria called **emergent languages** ?
 
-We can start with **language**. Unmodifed lewis games result in learning a shared lexicon which allows the agents to successfully communicate every time. Emergent language can be imperfect with an expected communication less than 1. Emergent languages may also develop more structure than just a lexicon snd this is the main themes of this and upcoming article. Next is the **emergence** part.
+Let's start with **language**. Agent with a suitable RL algorithm [@cn] that play a Lewis signaling games will learning a Convention that is they will have shared lexicon which maps states to symbols and symbols to actions. This then allows the agents to interact by communicating successfully at every turn. In complex games though agent learn **a language** which  can be imperfect in the sense that one might not expected communication to succeed 100% of the time. Emergent languages may also develop more structure than just a lexicon snd this is the main themes of this and upcoming article. Next is the **emergence** part.
+
 In [@de2011self] the authors discuss emergence in languages in terms of a self-organizing systems that operate through selection pressure, exploration, feedback, preferential attachment etc. 
 Though as I pointed out with the lewis signaling game and decent RL algorithms a perfect signaling system is inevitable. So that calling such a system emergent needs to be justified and one should perhaps talk about emergent properties like compositionality.
 
@@ -1700,4 +1699,160 @@ Sorry to bore you with this long chain of thought -- Lewis games are ofthen cons
 
 ## Planning in the Lewis Game {#sec-planning}
 
-How can the sender use planing in the lewis signaling game to build a signaling system
+How can the sender use planing in the lewis signaling game to build a signaling system? 
+
+- in a simple game there is a single action, the sender sends a message.
+- in more complex games there is an alphabet and the sender needs to construct a message from the alphabet. 
+- we can abstract it as sending one letter at a time but that is problematic because we wont get feedback till it is all sent. And we may have to wait a very long time untill recievers learns to decode.
+- we need the sender to map the message to a sequence and send that sequence.
+- he could then invert it (cheating) and get the reward of 1.
+- he could then repeat untill there is a signaling system. 
+- then he can play real games untill everything is coordinated with the reciever.
+
+- The only problem is that the sender isn't doing anything to make the system homomorphic. Since rewards are perfect there is no loss or signal to
+indicate that some system is better.
+- We might intorduce noise. If there are errors that might help. But then again we will probably learn to ignore the noise not to plan.
+- We might use some loss fuction to test the full signaling system.
+
+Another question is how would an agent learn to encode the state in a way
+that is east to decode, and that is homomorphic?
+
+Another point of view is to consider this in terms of learning loss.
+CAn we repersent the complex signaling systems in terms of learning complexity? This then might allow us to plan for a system that is least complex to learn.
+
+Learning complexity seems to be recursive. We have the alphabet and its
+semantics (or lack of). Then we want to represnt the siganling system as 
+functions we can compose recursively. This is a decompostion into a lexicon and a grammar. The functions should be homomorphisms of the normal subgroups of the pre-linguistic object.
+
+e.g. PL
+
+variables = {A,B,C}
+functions = {AND, OR, NOT}
+
+to learn a linear parametrised representation 
+for a boolean function we need to learn the weights of the functions.
+
+$b + w_1 \times A + w_2 \times B = f(A,B)$
+
+Note: functions like XOR and NAND are not linearly separable this means
+we can't use the following representation which I learned in the RL specialisation on Coursera.
+
+$b + w_1 \times A + w_2 \times B = f(A,B)$
+
+beacuse 
+
+$b + w_1 \times A = XOR(A)$
+
+One way to learn a suitable approximation is to use a two layer feed forward neural network with a non-linear activation function. However I want to avoid using neural networks and stick to a model that is more like a regression.
+
+
+$b + w_1 \times A = NOT(A)$
+
+if $A = 0$
+$b + w_1 0 = 1$ so  $b = 1$
+so the function is $NOT(A) = 1 -1 \times A$
+
+for Boolean fuction f 
+
+$b + w_1 \times A + w_2 \times B + w_3 \times A \times B = f(A,B)$
+ 
+For AND OR and XOR we can learn the weights.
+
+| A | B | AND | OR | XOR |
+|---|---|-----|----|-----|
+| 0 | 0 |  0  |  0 |  0  |
+| 0 | 1 |  0  |  1 |  1  |
+| 1 | 0 |  0  |  1 |  1  |
+| 1 | 1 |  1  |  1 |  0  |
+
+
+b + w_1 \times A + w_2 \times B + w_3 \times A \times B = f(A,B)
+
+for AND using the first row:
+
+$b + w_1 \times 0 + w_2 \times 0 + w_3 \times 0 \times 0 = 0$ so $b = 0$
+
+using the second row:
+
+$0 + w_1 \times 0 + w_2 \times 1 + w_3 \times 0 \times 1 = 1$ so $w_2 = 1$
+
+using the third row:
+
+$0 + w_1 \times 1 + w_2 \times 0 + w_3 \times 1 \times 0 = 1$ so $w_1 = 1$
+
+using the fourth row:
+
+$0 + w_1 \times 1 + w_2 \times 1 + w_3 \times 1 \times 1 = 1$ so $w_3 = -1$
+
+so $AND (A,B) = 1 \times A + 1 \times B - 1 \times A \times B$
+
+for OR using the first row:
+
+$b + w_1 \times 0 + w_2 \times 0 + w_3 \times 0 \times 0 = 0$ so $b = 0$
+
+using the second row:
+
+$0 + w_1 \times 0 + w_2 \times 1 + w_3 \times 0 \times 1 = 1$ so $w_2 = 1$
+
+using the third row:
+
+$0 + w_1 \times 1 + 1 \times 0 + w_3 \times 1 \times 0 = 1$ so $w_1 = 1$
+
+using the fourth row:
+
+$0 + 1 \times 1 + 1 \times 1 + w_3 \times 1 \times 1 = 1$ so $w_3 = -1$
+
+so we we have $OR (A,B) = 1 \times A + 1 \times B - 1 \times A \times B $
+
+
+Now for XOR using the first row:
+
+$b + w_1 \times 0 + w_2 \times 0 + w_3 \times 0 \times 0 = 0$ so $b = 0$
+
+using the second row:
+
+$0 + w_1 \times 0 + w_2 \times 1 + w_3 \times 0 \times 1 = 1$ so $w_2 = 1$
+
+using the third row:
+
+$0 + w_1 \times 1 + 1 \times 0 + w_3 \times 1 \times 0 = 1$ so $w_1 = 1$
+
+using the fourth row:
+
+$0 + 1 \times 1 + 1 \times 1 + w_3 \times 1 \times 1 = 0$ so $w_3 = -2$
+
+so we we have $XOR (A,B) = 1 \times A + 1 \times B - 2 \times A \times B$
+
+So it appears that by adding a term for the interaction of the variables we can learn the weights for the functions. I used algebra to solve them but we could use a regression or stochastic gradient descent to learn the weights.
+
+How do we approximate the weights for a more complex function?
+
+The natural way is to extend our model to include more terms. 
+
+$$
+F(A,B,C) = b + w_1 \times A + w_2 \times B + w_3 \times C + w_4 \times A \times B + w_5 \times A \times C + w_6 \times B \times C + w_7 \times A \times B \times C
+$$
+
+With this model we need to learn eight weights and we can use the eight  rows of data to learn from so should be fine.
+
+But perhaps we can do better. If we think about it learning these function is more like learning a grammar than a lexicon. And our grammar may be powerful enough to express $F(A,B,C)$ using what we have learned so far. But we now need to learn a rule that lets us express an arbitrary function of $A,B,C$ in terms of functions over pairs of variables. 
+
+If I was stumped^[sure I know about seq2seq, rnns and transformers, and markovian models.] about how to create sequence models from states now there seems to be a first hint.
+
+
+
+Some thoguht about regression:
+
+**Logistic regression** has binary output and a non linearity built into it. So we might be able to learn a simpler model using logistic regression.
+
+
+**Bayesian regression** can
+
+1. Be used for logistic regression by introducing a link function.
+2. Let us learn both weights and their uncertainty. This might be useful for estimating regrets i.e. the cost of learning in our algorithm for learning the weights of the functions. This can help to understand how much we need to learn for different  equilibria.
+3. More interesting is that we may be able to find a prior that speed up learning by using a prior. e.g. one that is the postretior of some   function close to the one we want to approximate. This is a way to implement templates in the learning algorithm.
+4. Let us compose functions hierarchically. We can learn the weights of the functions and then use them as inputs to another regression.
+
+
+
+

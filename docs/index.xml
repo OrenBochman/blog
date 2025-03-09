@@ -37,10 +37,12 @@ TL;DR: A desiderata For Emergent Languages
 <figcaption>Emergent Languages in a Nutshell</figcaption>
 </figure>
 </div>
-<p>In this space I want to collect a desiderata for emergent languages. Following <span class="citation" data-cites="Skyrms2010signals">(<strong>Skyrms2010signals?</strong>)</span> and others my view of emergent languages is through the lens of minimal extensions to the Lewis Signaling game. The lewis game particularly is not well understood when we extend it to compound signals. Thus my desiderata for emergent languages remains minimal and shaped in part by my intuition of the simple and compound variants. I also do not see the need for deep RL in this space.</p>
+<p>In this space I want to collect a desiderata for emergent languages. Following <span class="citation" data-cites="Skyrms2010signals">(Skyrms 2010)</span> and others my view of emergent languages is through the lens of minimal extensions to the Lewis Signaling game. The lewis game particularly is not well understood when we extend it to compound signals. Thus my desiderata for emergent languages remains minimal and shaped in part by my intuition of the simple and compound variants. I also do not see the need for deep RL in this space.</p>
 </div>
 </div>
-<p><span class="citation" data-cites="Skyrms2010signals">(<strong>Skyrms2010signals?</strong>)</span> and others have shown that we can also add a lot of structure to the signaling system. In his book he considers, learning to reason, learning to form efficient communication networks, learning to use better communication protocols. Others have considers inducting communication protocols from a meta protocol. [] And this has been coupled with the idea of learning to represent the structure of the state space.</p>
+<div class="no-row-height column-margin column-container"><div id="ref-Skyrms2010signals" class="csl-entry">
+Skyrms, Brian. 2010. <span>“<span class="nocase">14512 Complex Signals and Compositionality</span>.”</span> In <em><span class="nocase">Signals: Evolution, Learning, and Information</span></em>. Oxford University Press. <a href="https://doi.org/10.1093/acprof:oso/9780199580828.003.0013">https://doi.org/10.1093/acprof:oso/9780199580828.003.0013</a>.
+</div></div><p><span class="citation" data-cites="Skyrms2010signals">(Skyrms 2010)</span> and others have shown that we can also add a lot of structure to the signaling system. In his book he considers, learning to reason, learning to form efficient communication networks, learning to use better communication protocols. Others have considers inducting communication protocols from a meta protocol. [] And this has been coupled with the idea of learning to represent the structure of the state space.</p>
 <p>I think that <strong>the coordination problem is the easy part</strong> and I have devoted some time to solve it in a number of settings. I think that the next challenge is to learn a reductionist concept for signal aggregation. Something that allows bags of words, ordered sequences and recursive structures to be learned in much the same way. I think this we have not been asking the right questions to find it yet since aggregation is a hard problem. However I think that at this point a starting point exists and the next problem is to learn the structure of the state space. I think that here we can apply some existing algorithms that may be a good fit for Lewis signaling games but it is quite important because the structure of the state space is what will determine the optimality of the language to a particular domain. A second facet is that we should think of a minimal state space that captures the essence of the real world. This should be a model that we can consider sufficiently powerful for real world agents. But in terms of the emergent signaling system I don’t think it will be qualitative or quantitatively all that different from other systems other than this it could act as a good <a href="">interlingua</a> for transferring between natural languages as well as between tasks in RL. This is therefore the holy grail of emergent languages at this point.</p>
 <p>Regarding deep learning - I think that the best work in deep learning is done by researcher who have a clear view of the problem and use the DNN to approximate the function they cannot extend or scale beyond thier simple model. In the case of Emergent Langauges people have built kits and adapted other architectures to that is overkill instead of focusing on the real problem at hand. So I think that most of the work in that space if flawed even if some the results are interesting.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
@@ -257,6 +259,170 @@ January 14, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-01-14-D
   <category>information theory</category>
   <category>linguistics</category>
   <guid>https://orenbochman.github.io/posts/2025/2025-01-14-Desiderata-For-Emergent-Languages/desiderata-for-emerent-languges.html</guid>
+  <pubDate>Mon, 13 Jan 2025 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Planning in the Complex Lewis Game</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/2025-03-09-planning-in-complex-lewis-game/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Today I want to consider a couple of weak assumption about planning in the Complex Lewis game. It seems that before I do I ought to revisit the basic form of the Lewis Signaling game and the referential version of the game and the complex version of the game, and how these are formalized in Game Theory and in Reinforcement Learning. This is perhaps an onerous detour but it might be useful to help make progress that the weak assumptions I want to consider.</p>
+<p>To avoid confusion lets state these assumptions up front. Lets code the function that maps the states to singals as <img src="https://latex.codecogs.com/png.latex?e"> for endoing and the function that maps the signals to states as <img src="https://latex.codecogs.com/png.latex?d"> for decoding.</p>
+<ul>
+<li>In the simple game the sender may pick from an combinatorial large set of lexicons if there are N states and N signals there are N! lexicons. The receiver in this case has to learn the full lexicon by trial and error.</li>
+<li>In the referential game the same is true about the lexicon, only now the receiver picks from a restricted set of states, though these are not know in advance if they are remebered learning can proceed much faster as each trial eliminates most lexicons.</li>
+<li>In the complex game the sender has N states by <img src="https://latex.codecogs.com/png.latex?M%3CN"> signals, but can send a sequence of signals. If we convert the signals to digits the sender is sending a base M number or a string of base M digits. While there are an infinite number of possible numbers the sender can send, only the first N of these are need to encode the N states… If the sender picks the first N numbers there are again N! different lexicons and we can use the same algorithm to solve the game.<br>
+</li>
+<li>If the channel is noisy the sender might want to use the first contiguous N numbers but pick the first N numbers that are each at a hamming distance of K from each other. This suggest that the receiver cannot assume the first bane M numbers are the signals but rather that there are N distinct signals. If the channel is known to be noisy then there may be many more corrupted signals that should be considered.</li>
+<li>If there is a inherent structure in the states, the sender might select an encoding <img src="https://latex.codecogs.com/png.latex?e(s)"> should preserve this structure. For example if S has a group structure the sender might use an encoding that is a group homomorphism. If there is are partial orders in the states the sender might use an encoding that if monotonic with respect to the partial order.
+<ul>
+<li>We may call a minimal set of states as a base lexicon if knowledge of the base lexicon and the encoding function is sufficient to recover the rest of the lexicon automatically. In terms of linguistics we might call these the parts of the lexicon that is not in the base as the derived lexicon as it contains inflections, declensions, and derivations of the base forms.</li>
+<li>In such a case though the sender might not want to pick the first N numbers but might want to pick a different set of numbers that are more suited to the structure of the states! The receiver who decodes some example might use analogies to infer additional states and eventually learn the decoder and the base lexicon.</li>
+<li>If the receiver is like a child it may see many analogies and learn the decoder. If the reciever is less bright it could still learn the decoder the hardway (i.e.&nbsp;by trial and error over the full lexicon)</li>
+</ul></li>
+</ul>
+<p>In the Lewis signaling game, the sender and receiver have to coordinate their actions to maximize their reward. The sender has to choose a signal that will help the receiver identify the correct state. The receiver has to interpret the signal and choose the correct state. This requires planning and coordination between the two agents.</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Bayesian view of the Lewis game
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What do the agents know pre-ante?</p>
+<ol type="1">
+<li>do they know the full state space?</li>
+<li>do they know the distribution of states?</li>
+<li>do they know all possible signaling systems?</li>
+<li>do they know the other possible equilibria?</li>
+</ol>
+<p>The receiver in game theory needs a strategy and in that strategy is a response to all possible actions by the sender. If there are sufficient rounds the receiver has a strategy for solving the full coordination problem before the game starts.</p>
+<p>If there are N states and signals, there are N! ways to map the states to signals we can consider that these are the different possible lexicons. While the sender might pick a signal at random for each new state, in terms of game theory she too must have a strategy, i.e.&nbsp;a choice of signal for each contingent state. And we can follow the convention of Bayesian games and that this choice is made before the game starts by nature picking a type for the sender from the N! possible types. We may also assume that nature has picked a vector of states to be presented to the sender and receiver but this is not necessary as once the strategies are pre-determined we can use bayesian game theory to work out the actions of the agents that will lead to the equilibria with the highest payoffs. Since this is a bayesian game the solution concept is a bayesian Nash equilibrium.</p>
+<p>Each time the sender solves on of the senders signals she can eliminate all the incompatible types until only one type remains and the receiver has inferred the mapping that decodes the sender’s signals for all but one state and thus knows the senders type.</p>
+<p>In reality this changes very little in terms of the game, it’s just a more precise way of thinking about the game in terms of what Game theory formalism requires.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Reinforcement Learning view of the Lewis game
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that when we think about the same game in reinforcement learning we may not require the agents to decide on a full strategy before the game starts. In RL settings they are in a PMDP a partially observed Markov Decision Process.</p>
+</div>
+</div>
+<p>We could consider these as different lexicons. In a bayesian settings we might go further and consider that there are N! senders each with a different lexicon and that the receiver must infer type of sender rather than the the correct signal for the current state.</p>
+<p>If the sender picks a lexicon for n</p>
+<p>:::</p>
+<p>The state space can be simple or structured and anything in between. If the state space is simple the sender will use the original Lewis game to create a lexicon. If the state space is structured the sender and receiver may do better - particularly if the number of simple signals is smaller than the number of states and sequences of signals must be used.</p>
+<p>If the state space is a list of binary fields then the sender can use a fixed template of length n and two signals encodeing on or off. If the Planning in the Lewis game is a complex problem</p>
+<p>It seems a daunting task to plan the whole language when presented with say the first state or perhaps a million states. We can assume from the game theoretic nature of the Lewis Game that the sender and receivers know the full states space even if not the distribution of states. I say this because how could the receiver know from what options to respond to the sender if it did not know the full state space.</p>
+<p>In the referential game the receiver only seed a few states and must infer the right one from the signal. In this case we may relax the previous assumption and say that the sender and receiver may have a partial view of the state space.</p>
+<section id="section" class="level2">
+<h2 class="anchored" data-anchor-id="section"></h2>
+<p>More so what if the sender must start without even being exposed to the full state space or it</p>
+<ol type="1">
+<li>morphology</li>
+</ol>
+</section>
+<section id="analogies" class="level2">
+<h2 class="anchored" data-anchor-id="analogies">Analogies</h2>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {Planning in the {Complex} {Lewis} {Game}},
+  date = {2025-01-14},
+  url = {https://orenbochman.github.io/posts/2025/2025-03-09-planning-in-complex-lewis-game/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2025. <span>“Planning in the Complex Lewis Game.”</span>
+January 14, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-03-09-planning-in-complex-lewis-game/">https://orenbochman.github.io/posts/2025/2025-03-09-planning-in-complex-lewis-game/</a>.
+</div></div></section></div> ]]></description>
+  <category>compositionality</category>
+  <category>emergent languages</category>
+  <category>reinforcement learning</category>
+  <category>transfer learning</category>
+  <category>information theory</category>
+  <category>linguistics</category>
+  <guid>https://orenbochman.github.io/posts/2025/2025-03-09-planning-in-complex-lewis-game/</guid>
+  <pubDate>Mon, 13 Jan 2025 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>The Referential Lewis Signaling Game</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/2025-03-09-referential-lewis-game/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>When I read a few papers using the referential Lewis signaling game I thought, this should be much faster for complex signaling games I use in my research. But when I got to thinking about coding a Bayesian agent with belief propagation I realized that the referential game is actually not a little easier but essentially trivial to solve even if coding the belief propagation algorithm is not.</p>
+<p>Now that I wrote this up I realize I can code a much simpler algorithm without belief propagation that will solve the referential game in (sub)-linear time complexity.</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+TL;DR
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In many experiments that RL agents are use the Referential Lewis signaling game, rather than the simple Lewis signaling game (AKA the Lewis Reconstruction Game). <mark>But a powerful RL agent can and should learn to exploit this difference and solve the coordination problem in sub-linear time complexity</mark> . I therefore recommend that researchers avoid the methodological trap of using the referential Lewis signaling game as a stand in for the simple Lewis signaling game!</p>
+</div>
+</div>
+<p>In the referential Lewis signaling game, the sender has to choose a signal that will help the receiver identify the correct state. The receiver has to interpret the signal and choose the correct state. This requires planning and coordination between the two agents.</p>
+<p>The main difference between the referential Lewis signaling game and the simple Lewis signaling game is that in the referential game, the receiver picks from a restricted set of states, rather than the full set of states. For researchers used to supervised learning this seems like a small change - the task looks like the familiar k-way classification task. This seems fine particularly as modern RL agents have neural networks that are built using pretrained classifiers like Clip or Cnns that are trained on ImageNet.</p>
+<p>Using a pretrained model can let agent completely avoid the coordination problem inherent in the Lewis signaling game and is not the focus of this post. One the other hand the referential Lewis signaling game is also problematic and in a way that RL agents should learn to exploit rather quickly.</p>
+<p>Lets consider the basic lewis game with 100 states and 100 signals.</p>
+<p>In the first round the receiver has a 1/100 chance of decoding the signal correctly. It seed <img src="https://latex.codecogs.com/png.latex?E_1"> Say it picks <img src="https://latex.codecogs.com/png.latex?S_1"> Now If the state has changed the receiver sees a new signal <img src="https://latex.codecogs.com/png.latex?E_2">. If it picks a signal at random it has again a 1/100 chance of decoding the signal correctly again. Though if it picks <img src="https://latex.codecogs.com/png.latex?S_1"> again it has a 1/99 chance of decoding the signal correctly, because for it has excluded <img src="https://latex.codecogs.com/png.latex?S_1"> for <img src="https://latex.codecogs.com/png.latex?E_1">. As the state keeps changing the sender should keep sticking to the same signal as each mistake the receiver makes gives it more information about the meaning of the signal. Boring and slow after 50 round on average the receiver will have decoded the first signal and got its first payoff. It now start from scratch with the second signal and 1/99 chance of decoding it. We can estimate the complexity of the game as <img src="https://latex.codecogs.com/png.latex?O(N%5E2)"></p>
+<p>Now consider the referential game with 100 states and 100 signals and a challenge set of k=4 states.</p>
+<ol type="1">
+<li>In the first round it sees <img src="https://latex.codecogs.com/png.latex?e_1"> the receiver has options <img src="https://latex.codecogs.com/png.latex?%7Bs_1,%20s_2%20,s_3%20,s_4%7D"> It has a 1/4 chance of decoding the signal correctly. Again it picks <img src="https://latex.codecogs.com/png.latex?S_1"> and looses out. But now it knows</li>
+<li>the next time it sees <img src="https://latex.codecogs.com/png.latex?e_1"> it should pick one of the other three states it has seen before. If all three appear it has a 1/3 chance of decoding the signal correctly by ignoring the state it has not seen before.</li>
+<li>Is the K states are a random sample of the 100 states there is a very small chance that the receiver will see the any of <img src="https://latex.codecogs.com/png.latex?%7Bs_1,%20s_2%20,s_3%20,s_4%7D"> again for <img src="https://latex.codecogs.com/png.latex?e_1"> unless it is the correct state! Lets calculate its likelihood if the next such round is the next round.
+<ol type="1">
+<li>The worst case of sees all three candidates <img src="https://latex.codecogs.com/png.latex?%7Bx,%20s_2%20,s_3%20,s_4%7D"> with 3/4 chance of decoding the signal correctly. There are 100-3=97 it can get such a combination.</li>
+<li>next worst case of sees a combination with two unknown candidates <img src="https://latex.codecogs.com/png.latex?%7Bx,%20y%20,s_3%20,s_4%7D"> with 1/2 chance of decoding the signal correctly. There are (99-3)<em>(99-4) </em> 3 such a combinations.</li>
+<li>next worst case of sees a combination with one unknown candidates <img src="https://latex.codecogs.com/png.latex?%7Bx,%20y%20,z%20,s_4%7D"> with 1/1 chance of decoding the signal correctly. There are (99-3)<em>(99-4)</em>(99-5)*3 ways it can get such a combination.</li>
+<li>to sum up it has <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7B(99-3)*(99-4)*(99-5)*3%20+%20(99-3)*(99-4)/2%20+%2097*3/4%20%7D%7B(99-3)*(99-4)*(99-5)*3%20+%20(99-3)*(99-4)%20+%2097%7D%20=%20.998"> chances of decoding the signal correctly on the next such round. So for the referential game the receiver has a 1/4 chance of decoding the signal correctly in the first round and a 1/998 chance of decoding the signal correctly in the second round for <img src="https://latex.codecogs.com/png.latex?e_1"> We can estimate the complexity of the game as <img src="https://latex.codecogs.com/png.latex?O(N)"></li>
+</ol></li>
+</ol>
+<p>So by restricting the the options to the receiver the referential game is reduced from square to linear complexity. This is a huge difference also in the worst case the agent need to store N*K-1 states to solve the referential game this way. And in practice it can be solved even faster since after going through every state once the receiver has solved 1/K of the states and can eliminate those from the states it has in it’s buffer.</p>
+<p>If you are working with RL agents and more so if you are using deep RL avoid the methodological trap of using the referential Lewis signaling game as a stand in for the simple Lewis signaling game as you are using Deep RL or Dynamic Programming to solve an O(N) coordination problem rather which is overkill and not a particularly impressive result.</p>
+
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {The {Referential} {Lewis} {Signaling} {Game}},
+  date = {2025-01-14},
+  url = {https://orenbochman.github.io/posts/2025/2025-03-09-referential-lewis-game/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2025. <span>“The Referential Lewis Signaling
+Game.”</span> January 14, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-03-09-referential-lewis-game/">https://orenbochman.github.io/posts/2025/2025-03-09-referential-lewis-game/</a>.
+</div></div></section></div> ]]></description>
+  <category>reinforcement learning</category>
+  <guid>https://orenbochman.github.io/posts/2025/2025-03-09-referential-lewis-game/</guid>
   <pubDate>Mon, 13 Jan 2025 22:00:00 GMT</pubDate>
 </item>
 <item>
@@ -7600,136 +7766,6 @@ Financial Prices 1-4.”</span> November 30, 2024. <a href="https://orenbochman.
   <guid>https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/</guid>
   <pubDate>Sat, 30 Nov 2024 02:12:11 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/cover.webp" medium="image" type="image/webp"/>
-</item>
-<item>
-  <title>lewis game</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games.html</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="tikz-lewis-signaling-games_files/figure-html/complete-pooling-1.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Extensive form 3 x 3 Lewis signaling game"><img src="https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games_files/figure-html/complete-pooling-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%" alt="Extensive form 3 x 3 Lewis signaling game"></a></p>
-</figure>
-</div>
-<figcaption>Extensive form 3 x 3 Lewis signaling game</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="tikz-lewis-signaling-games_files/figure-html/tree-lewis-game-1.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Extensive form 2x2 Lewis signaling game"><img src="https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games_files/figure-html/tree-lewis-game-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%" alt="Extensive form 2x2 Lewis signaling game"></a></p>
-</figure>
-</div>
-<figcaption>Extensive form 2x2 Lewis signaling game</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>Here the two information sets linking s_1 instances and s_2 instances indicate that the receiver cannot distinguish between the two states.</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="tikz-lewis-signaling-games_files/figure-html/tree-lewis-game-take2-1.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Extensive form 2x2 Lewis signaling game"><img src="https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games_files/figure-html/tree-lewis-game-take2-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%" alt="Extensive form 2x2 Lewis signaling game"></a></p>
-</figure>
-</div>
-<figcaption>Extensive form 2x2 Lewis signaling game</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="tikz-lewis-signaling-games_files/figure-html/tree-lewis-game-3by3-1.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Extensive form 3x3 Lewis signaling game"><img src="https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games_files/figure-html/tree-lewis-game-3by3-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%" alt="Extensive form 3x3 Lewis signaling game"></a></p>
-</figure>
-</div>
-<figcaption>Extensive form 3x3 Lewis signaling game</figcaption>
-</figure>
-</div>
-</div>
-</div>
-
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
-  author = {Bochman, Oren},
-  title = {Lewis Game},
-  date = {2024-10-21},
-  url = {https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games.html},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2024. <span>“Lewis Game.”</span> October 21, 2024. <a href="https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games.html">https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games.html</a>.
-</div></div></section></div> ]]></description>
-  <category>tikz</category>
-  <category>game theory</category>
-  <category>signaling games</category>
-  <guid>https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games.html</guid>
-  <pubDate>Mon, 21 Oct 2024 14:55:02 GMT</pubDate>
-</item>
-<item>
-  <title>Complete pooling</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-complete-pooling.html</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="tikz-complete-pooling_files/figure-html/complete-pooling-1.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Complete pooling"><img src="https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-complete-pooling_files/figure-html/complete-pooling-1.svg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%" alt="Complete pooling"></a></p>
-</figure>
-</div>
-<figcaption>Complete pooling</figcaption>
-</figure>
-</div>
-</div>
-</div>
-
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
-  author = {Bochman, Oren},
-  title = {Complete Pooling},
-  date = {2024-10-21},
-  url = {https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-complete-pooling.html},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2024. <span>“Complete Pooling.”</span> October 21, 2024.
-<a href="https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-complete-pooling.html">https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-complete-pooling.html</a>.
-</div></div></section></div> ]]></description>
-  <category>tikz</category>
-  <category>game theory</category>
-  <category>signaling games</category>
-  <guid>https://orenbochman.github.io/posts/2024/2024-05-02-signaling-games-tikz/tikz-complete-pooling.html</guid>
-  <pubDate>Mon, 21 Oct 2024 14:53:43 GMT</pubDate>
 </item>
 </channel>
 </rss>

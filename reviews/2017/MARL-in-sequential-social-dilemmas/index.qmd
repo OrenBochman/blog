@@ -1,0 +1,81 @@
+---
+title: "Multi-agent Reinforcement Learning in Sequential Social Dilemmas"
+subtitle: "paper review"
+date: 2024-06-10
+categories: ["paper review", "multi-agent reinforcement learning", "sequential social dilemmas","sequential social dilemmas", "cooperation", "Markov games", "agent-based social simulation", "non-cooperative games"]
+bibliography: "./bibliography.bib"
+---
+
+> Matrix games like Prisoner’s Dilemma have guided research on social dilemmas for decades. However, they necessarily treat the choice to cooperate or defect as an atomic action. In real-world social dilemmas these choices are temporally extended. Cooperativeness is a property that applies to policies, not elementary actions. We introduce sequential social dilemmas that share the mixed incentive structure of matrix game social dilemmas but also require agents to learn policies that implement their strategic intentions. We analyze the dynamics of policies learned by multiple self-interested independent learning agents, each using its own deep Qnetwork, on two Markov games we introduce here: 1. a fruit Gathering game and 2. a Wolfpack hunting game. We characterize how learned behavior in each domain changes as a function of environmental factors including resource abundance. Our experiments show how conflict can emerge from competition over shared resources and shed light on how the sequential nature of real world social dilemmas affects cooperation." -- [@leibo2017multi] abstract
+
+::: callout-warning
+Initially at least it seems to me that the "sequential social dilemma" is just an analog of an iterated prisoner's dilemma game. This game considered the basis of all other social dilemmas has been treated at great length in [@axelrod2009evolution] and [@axelrod1997complexity] with the famous Axelrod tournaments. Some interesting results include the fact that the best strategy in the tournament was the simplest. Population dynamics are such that in population of agents with one strategy, the introduction of new agents with a different strategy can gain a foothold and cause the dominant strategy in the population to switch to the new strategy. This is known as the "evolution of cooperation".
+
+This work led to a growing interest in the study of cooperation in non-cooperative games with about 300 new papers published on the topic in the 10 years following the publication.
+
+Later work looked at the robustness of the winning strategies in the Axelrod tournaments, see [@nowak2004emergence].
+:::
+
+## Outline
+
+1.  Introduction
+    -   Discusses the tension in social dilemmas between individual rationality and collective rationality.
+
+    -   Presents three canonical examples of matrix game social dilemmas: Prisoner's Dilemma, Chicken, and Stag Hunt.
+
+    -   Discusses limitations of the matrix game social dilemma (MGSD) formalism.
+
+    -   Proposes a Sequential Social Dilemma (SSD) model.
+2.  Definitions and Notation
+    -   Defines SSDs as general-sum Markov games where policies, rather than actions, are classified as cooperation or defection.
+
+    -   Presents formal definitions of Markov games and SSDs, including the concept of empirical payoff matrices.
+
+<!-- -->
+
+3.  Learning Algorithms
+    3.  Discusses previous work on multi-agent learning in Markov games, taking a descriptive rather than a prescriptive view.
+    4.  Describes the use of deep Q-networks (DQN) for learning in SSDs, assuming independent learners that treat each other as part of the environment.
+4.  Simulation Methods
+    -   Describes the implementation of Gathering and Wolfpack games in a 2D grid-world environment.
+
+    -   Specifies state representation, observation function, action space, reward structure, episode length, and DQN architecture.
+
+<!-- -->
+
+5.  Results
+
+    -   Presents three experiments exploring the effects of environmental and agent parameters on emergent social outcomes.
+
+    1.  Experiment 1: Gathering
+        -   Describes the Gathering game, where players collect apples and can tag each other with a beam.
+
+        -   Discusses the influence of apple abundance (Napple) and conflict cost (Ntagged) on the emergence of aggressive (beam-use) behavior.
+
+        -   Shows that empirical game-theoretic analysis reveals Prisoner's Dilemma-type payoffs in most cases where social dilemma conditions are met.
+    2.  Experiment 2: Wolfpack
+        -   Describes the Wolfpack game, where two wolves cooperate to hunt prey and receive higher rewards for joint captures.
+
+        -   Investigates the impact of group capture bonus (rteam/rlone) and capture radius on the level of cooperation (wolves per capture).
+
+        -   Demonstrates that empirical payoff matrices in Wolfpack can exhibit Chicken, Stag Hunt, and Prisoner’s Dilemma characteristics.
+    3.  Experiment 3: Agent Parameters Influencing the Emergence of Defection
+        -   Explores the effects of agent parameters (discount factor, batch size, and network size) on the emergence of defection in Gathering and Wolfpack.
+
+        -   Shows that agents with higher discount factors are more likely to defect, while larger batch sizes promote cooperation.
+
+        -   Highlights the opposite effects of network size on defection: increasing in Gathering and decreasing in Wolfpack, explained by the complexity of learning different policies.
+
+6.  Discussion
+
+    -   Discusses the differences in learning complexity for cooperative and defecting policies in Gathering and Wolfpack.
+
+    -   Argues that SSD models provide a richer framework for understanding social dilemmas compared to MGSDs.
+
+    -   Proposes several important learning-related phenomena that are not captured by MGSD models.
+
+    -   Suggests broader applications of SSDs to study real-world social dilemmas, including policy interventions and resource sustainability.
+
+# Introduction
+
+In [@leibo2017multi], the authors introduce a new class of social dilemmas, called sequential social dilemmas, which are inspired by the classic matrix game social dilemmas like the Prisoner's Dilemma.

@@ -1107,6 +1107,492 @@ Overfitting Isn’t Always Bad/</a>.
   <pubDate>Mon, 10 Jun 2024 21:00:00 GMT</pubDate>
 </item>
 <item>
+  <title>Multi-agent Reinforcement Learning in Sequential Social Dilemmas</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/reviews/2017/MARL-in-sequential-social-dilemmas/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<div class="page-columns page-full"><blockquote class="blockquote">
+<p>Matrix games like Prisoner’s Dilemma have guided research on social dilemmas for decades. However, they necessarily treat the choice to cooperate or defect as an atomic action. In real-world social dilemmas these choices are temporally extended. Cooperativeness is a property that applies to policies, not elementary actions. We introduce sequential social dilemmas that share the mixed incentive structure of matrix game social dilemmas but also require agents to learn policies that implement their strategic intentions. We analyze the dynamics of policies learned by multiple self-interested independent learning agents, each using its own deep Qnetwork, on two Markov games we introduce here: 1. a fruit Gathering game and 2. a Wolfpack hunting game. We characterize how learned behavior in each domain changes as a function of environmental factors including resource abundance. Our experiments show how conflict can emerge from competition over shared resources and shed light on how the sequential nature of real world social dilemmas affects cooperation.” – <span class="citation" data-cites="leibo2017multi">(Leibo et al. 2017)</span> abstract</p>
+</blockquote><div class="no-row-height column-margin column-container"></div></div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Initially at least it seems to me that the “sequential social dilemma” is just an analog of an iterated prisoner’s dilemma game. This game considered the basis of all other social dilemmas has been treated at great length in <span class="citation" data-cites="axelrod2009evolution">(Axelrod 2009)</span> and <span class="citation" data-cites="axelrod1997complexity">(Axelrod 1997)</span> with the famous Axelrod tournaments. Some interesting results include the fact that the best strategy in the tournament was the simplest. Population dynamics are such that in population of agents with one strategy, the introduction of new agents with a different strategy can gain a foothold and cause the dominant strategy in the population to switch to the new strategy. This is known as the “evolution of cooperation”.</p>
+<p>This work led to a growing interest in the study of cooperation in non-cooperative games with about 300 new papers published on the topic in the 10 years following the publication.</p>
+<p>Later work looked at the robustness of the winning strategies in the Axelrod tournaments, see <span class="citation" data-cites="nowak2004emergence">(Nowak et al. 2004)</span>.</p>
+</div>
+</div>
+<div class="no-row-height column-margin column-container"><div id="ref-nowak2004emergence" class="csl-entry">
+Nowak, Martin A, Akira Sasaki, Christine Taylor, and Drew Fudenberg. 2004. <span>“Emergence of Cooperation and Evolutionary Stability in Finite Populations.”</span> <em>Nature</em> 428 (6983): 646–50.
+</div></div><div class="no-row-height column-margin column-container"><div id="ref-axelrod1997complexity" class="csl-entry">
+Axelrod, R. 1997. <em>The Complexity of Cooperation: Agent-Based Models of Competition and Collaboration</em>. Princeton Studies in Complexity. Princeton University Press. <a href="https://books.google.co.il/books?id=J0dgRGMdjmQC">https://books.google.co.il/books?id=J0dgRGMdjmQC</a>.
+</div></div><div class="no-row-height column-margin column-container"><div id="ref-axelrod2009evolution" class="csl-entry">
+———. 2009. <em>The Evolution of Cooperation: Revised Edition</em>. Basic Books. <a href="https://books.google.co.il/books?id=SwU4DgAAQBAJ">https://books.google.co.il/books?id=SwU4DgAAQBAJ</a>.
+</div></div><section id="outline" class="level2">
+<h2 class="anchored" data-anchor-id="outline">Outline</h2>
+<ol type="1">
+<li>Introduction
+<ul>
+<li><p>Discusses the tension in social dilemmas between individual rationality and collective rationality.</p></li>
+<li><p>Presents three canonical examples of matrix game social dilemmas: Prisoner’s Dilemma, Chicken, and Stag Hunt.</p></li>
+<li><p>Discusses limitations of the matrix game social dilemma (MGSD) formalism.</p></li>
+<li><p>Proposes a Sequential Social Dilemma (SSD) model.</p></li>
+</ul></li>
+<li>Definitions and Notation
+<ul>
+<li><p>Defines SSDs as general-sum Markov games where policies, rather than actions, are classified as cooperation or defection.</p></li>
+<li><p>Presents formal definitions of Markov games and SSDs, including the concept of empirical payoff matrices.</p></li>
+</ul></li>
+</ol>
+<!-- -->
+<ol start="3" type="1">
+<li>Learning Algorithms
+<ol start="3" type="1">
+<li>Discusses previous work on multi-agent learning in Markov games, taking a descriptive rather than a prescriptive view.</li>
+<li>Describes the use of deep Q-networks (DQN) for learning in SSDs, assuming independent learners that treat each other as part of the environment.</li>
+</ol></li>
+<li>Simulation Methods
+<ul>
+<li><p>Describes the implementation of Gathering and Wolfpack games in a 2D grid-world environment.</p></li>
+<li><p>Specifies state representation, observation function, action space, reward structure, episode length, and DQN architecture.</p></li>
+</ul></li>
+</ol>
+<!-- -->
+<ol start="5" type="1">
+<li><p>Results</p>
+<ul>
+<li>Presents three experiments exploring the effects of environmental and agent parameters on emergent social outcomes.</li>
+</ul>
+<ol type="1">
+<li>Experiment 1: Gathering
+<ul>
+<li><p>Describes the Gathering game, where players collect apples and can tag each other with a beam.</p></li>
+<li><p>Discusses the influence of apple abundance (Napple) and conflict cost (Ntagged) on the emergence of aggressive (beam-use) behavior.</p></li>
+<li><p>Shows that empirical game-theoretic analysis reveals Prisoner’s Dilemma-type payoffs in most cases where social dilemma conditions are met.</p></li>
+</ul></li>
+<li>Experiment 2: Wolfpack
+<ul>
+<li><p>Describes the Wolfpack game, where two wolves cooperate to hunt prey and receive higher rewards for joint captures.</p></li>
+<li><p>Investigates the impact of group capture bonus (rteam/rlone) and capture radius on the level of cooperation (wolves per capture).</p></li>
+<li><p>Demonstrates that empirical payoff matrices in Wolfpack can exhibit Chicken, Stag Hunt, and Prisoner’s Dilemma characteristics.</p></li>
+</ul></li>
+<li>Experiment 3: Agent Parameters Influencing the Emergence of Defection
+<ul>
+<li><p>Explores the effects of agent parameters (discount factor, batch size, and network size) on the emergence of defection in Gathering and Wolfpack.</p></li>
+<li><p>Shows that agents with higher discount factors are more likely to defect, while larger batch sizes promote cooperation.</p></li>
+<li><p>Highlights the opposite effects of network size on defection: increasing in Gathering and decreasing in Wolfpack, explained by the complexity of learning different policies.</p></li>
+</ul></li>
+</ol></li>
+<li><p>Discussion</p>
+<ul>
+<li><p>Discusses the differences in learning complexity for cooperative and defecting policies in Gathering and Wolfpack.</p></li>
+<li><p>Argues that SSD models provide a richer framework for understanding social dilemmas compared to MGSDs.</p></li>
+<li><p>Proposes several important learning-related phenomena that are not captured by MGSD models.</p></li>
+<li><p>Suggests broader applications of SSDs to study real-world social dilemmas, including policy interventions and resource sustainability.</p></li>
+</ul></li>
+</ol>
+</section>
+<section id="introduction" class="level1 page-columns page-full">
+<h1>Introduction</h1>
+<p>In <span class="citation" data-cites="leibo2017multi">(Leibo et al. 2017)</span>, the authors introduce a new class of social dilemmas, called sequential social dilemmas, which are inspired by the classic matrix game social dilemmas like the Prisoner’s Dilemma.</p>
+
+
+<div class="no-row-height column-margin column-container"><div id="ref-leibo2017multi" class="csl-entry">
+Leibo, Joel Z, Vinicius Zambaldi, Marc Lanctot, Janusz Marecki, and Thore Graepel. 2017. <span>“Multi-Agent Reinforcement Learning in Sequential Social Dilemmas.”</span> <em>arXiv Preprint arXiv:1702.03037</em>.
+</div></div>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Multi-Agent {Reinforcement} {Learning} in {Sequential}
+    {Social} {Dilemmas}},
+  date = {2024-06-10},
+  url = {https://orenbochman.github.io/reviews/2017/MARL-in-sequential-social-dilemmas/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2024. <span>“Multi-Agent Reinforcement Learning in
+Sequential Social Dilemmas.”</span> June 10, 2024. <a href="https://orenbochman.github.io/reviews/2017/MARL-in-sequential-social-dilemmas/">https://orenbochman.github.io/reviews/2017/MARL-in-sequential-social-dilemmas/</a>.
+</div></div></section></div> ]]></description>
+  <category>paper review</category>
+  <category>multi-agent reinforcement learning</category>
+  <category>sequential social dilemmas</category>
+  <category>sequential social dilemmas</category>
+  <category>cooperation</category>
+  <category>Markov games</category>
+  <category>agent-based social simulation</category>
+  <category>non-cooperative games</category>
+  <guid>https://orenbochman.github.io/reviews/2017/MARL-in-sequential-social-dilemmas/</guid>
+  <pubDate>Sun, 09 Jun 2024 21:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Generally Capable Agents Emerge from Open-Ended Play</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/reviews/2021/generally-capable-agents-emerge-from-open-ended-play/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="first-impressions" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="first-impressions">First impressions</h2>
+<p>The paper does not present a breakthrough like alpha go zero etc. But it shows very high level of creativity and innovation. I am still a new comer to RL and this paper has opened my eyes to how little of the field I have seen. There are lots of buzz words, references to other papers and concepts that I am not familiar with. Also this paper is visually stunning. The authors have put a lot of energy into creating an aesthetically pleasing project and they have gone to some length to explain what would otherwise might be a very challenging evaluation process.</p>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/1yVoNAMLIy0" title="Max Jaderberg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<ol type="1">
+<li>to what extent can agents learn to solve certain types of problems like solving a maze. I might call these learning tactical solutions</li>
+<li>to what extent can agents compress this tactical knowledge into a heuristic that might end up as much more general.</li>
+<li>to what extent can RL agents learn representations of the environment that allow them to reuse tactics and heuristics across different problems instead of having to discover them anew each time.</li>
+<li>when sparse rewards or no rewards are given can agents learn use their capabilities to model the environment</li>
+<li>generally capable agents should be able to handle the many different RL problem settings that are out there:</li>
+</ol>
+<ul>
+<li>single state, multi-state, continuous state,</li>
+<li>tabular, continuous,</li>
+<li>finite state space, infinite state space,</li>
+<li>episodic, continuing, i.e.&nbsp;finite horizon, infinite horizon,</li>
+<li>single agent, multi-agent,</li>
+<li>online, offline,</li>
+<li>model based, model free,</li>
+<li>known dynamics, unknown dynamics,</li>
+<li>sparse rewards, dense rewards,</li>
+<li>on-policy, off-policy,</li>
+<li>discounted, undiscounted rewards,</li>
+<li>single goal, multi-goal,</li>
+<li>deterministic, stochastic,</li>
+<li>stationary, non-stationary,</li>
+<li>specific constraints, in reality there are also variations of these settings not all of these are dichotomies.</li>
+</ul>
+<ol start="6" type="1">
+<li>The paper mentions priors work on social dilemmas - another dimension that seems to be related is how well can agents learn to solve simple game theoretic scenarios like the prisoner’s dilemma or colonel Blotto and then to transfer the knowledge to more complex games. The same idea might be applied to problems based in economic models.</li>
+</ol>
+<p>here are some of the concepts that I am not familiar with:</p>
+<ul>
+<li><a href="https://deepmind.google/discover/blog/population-based-training-of-neural-networks/">Population based training</a> a technique used to optimize a series of NN at the same time.
+<ul>
+<li>can this be useful in RL where an agent might need to learn multiple NNs to solve a problem.
+<ul>
+<li>the transition model P(s’ | s, a) model</li>
+<li>the reward model R(r | s, a) model</li>
+<li>for representing the model (this is the four part dynamic function for <img src="https://latex.codecogs.com/png.latex?f(s',r%7Cs,a)"></li>
+<li>value functions
+<ul>
+<li>the value function, <img src="https://latex.codecogs.com/png.latex?v_%7B%5Cpi_%7B%5Cstar%7D%20%7D%20(s)"></li>
+<li>the action value function <img src="https://latex.codecogs.com/png.latex?q_%7B%5Cpi_%7B%5Cstar%7D%20%7D(s,a)"></li>
+</ul></li>
+<li>the advantage function <img src="https://latex.codecogs.com/png.latex?A_%7B%5Cpi_%7B%5Cstar%7D%20%7D(s,a)=%20Q_%7B%5Cpi_%7B%5Cstar%7D%20%7D(s,a)%20-%20V_%7B%5Cpi_%7B%5Cstar%7D%20%7D(s)"></li>
+<li>the the policy <img src="https://latex.codecogs.com/png.latex?pi_%5Cstar%20(s)"></li>
+</ul></li>
+</ul></li>
+</ul>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 29%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 6%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 11%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Algorithm</th>
+<th>Abr</th>
+<th>Q-Fn<br>
+<img src="https://latex.codecogs.com/png.latex?Q(s,a)"></th>
+<th>V-Fn<br>
+<img src="https://latex.codecogs.com/png.latex?V(s)"></th>
+<th>Policy<br>
+<img src="https://latex.codecogs.com/png.latex?%CF%80(a%E2%88%A3s)"></th>
+<th>Advantage<br>
+<img src="https://latex.codecogs.com/png.latex?A(s,a)"></th>
+<th>Transitions<br>
+<img src="https://latex.codecogs.com/png.latex?P(s%E2%80%B2%E2%88%A3s,a)"></th>
+<th>Reward <img src="https://latex.codecogs.com/png.latex?R(s,a)"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Deep Q-Network<br>
+<span class="citation" data-cites="Mnih2015HumanlevelCT">(Mnih et al. 2015)</span></td>
+<td>(DQN)</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><p>Double DQN</p>
+<p><span class="citation" data-cites="Hasselt2015DeepRL">(Hasselt, Guez, and Silver 2015)</span></p></td>
+<td>(DDQN)</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="odd">
+<td>Dueling DQN<br>
+<span class="citation" data-cites="Wang2015DuelingNA">(Wang et al. 2015)</span></td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td>Deep Deterministic Policy Gradients<br>
+<span class="citation" data-cites="Lillicrap2015ContinuousCW">(Lillicrap et al. 2015)</span></td>
+<td>(DDPG)</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="odd">
+<td><p>Twin Delayed DDPG</p>
+<p><span class="citation" data-cites="Fujimoto2018AddressingFA">(Fujimoto, Hoof, and Meger 2018)</span></p></td>
+<td>(TD3)</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><p>Soft Actor-Critic</p>
+<p><span class="citation" data-cites="Haarnoja2018SoftAO">(Haarnoja et al. 2018)</span></p></td>
+<td>(SAC)</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="odd">
+<td><p>Proximal Policy Optimization</p>
+<p><span class="citation" data-cites="Schulman2017ProximalPO">(Schulman et al. 2017)</span></p></td>
+<td>(PPO)</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td><p>Trust Region Policy Optimization</p>
+<p><span class="citation" data-cites="Schulman2015TrustRP">(Schulman et al. 2015)</span></p></td>
+<td>(TRPO)</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="odd">
+<td>Advantage Actor-Critic<br>
+<span class="citation" data-cites="Mnih2016AsynchronousMF">(Mnih et al. 2016)</span></td>
+<td>(A2C/A3C)</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td>Model-Based DQN<br>
+<span class="citation" data-cites="Feinberg2018ModelBasedVE">(Feinberg et al. 2018)</span></td>
+<td>(M-DQN)</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr class="odd">
+<td>Model-Based PPO<br>
+<span class="citation" data-cites="Clavera2018ModelBasedRL">(Clavera et al. 2018)</span></td>
+<td>(M-PPO)</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr class="even">
+<td><p>AlphaGo</p>
+<p><span class="citation" data-cites="Silver2016MasteringTG">(Silver et al. 2016)</span></p></td>
+<td></td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="odd">
+<td><p>AlphaGo Zero</p>
+<p><span class="citation" data-cites="Silver2017MasteringTG">(Silver et al. 2017)</span></p></td>
+<td></td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr class="even">
+<td><p>AlphaZero</p>
+<p><span class="citation" data-cites="Silver2018AGR">(Silver et al. 2018)</span></p></td>
+<td></td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<div class="no-row-height column-margin column-container"><div id="ref-Mnih2015HumanlevelCT" class="csl-entry">
+Mnih, Volodymyr, K. Kavukcuoglu, David Silver, Andrei A. Rusu, J. Veness, Marc G. Bellemare, Alex Graves, et al. 2015. <span>“Human-Level Control Through Deep Reinforcement Learning.”</span> <em>Nature</em> 518: 529–33.
+</div><div id="ref-Hasselt2015DeepRL" class="csl-entry">
+Hasselt, H. V., A. Guez, and David Silver. 2015. <span>“Deep Reinforcement Learning with Double q-Learning,”</span> 2094–2100.
+</div><div id="ref-Wang2015DuelingNA" class="csl-entry">
+Wang, Ziyun, T. Schaul, Matteo Hessel, H. V. Hasselt, Marc Lanctot, and Nando de Freitas. 2015. <span>“Dueling Network Architectures for Deep Reinforcement Learning,”</span> 1995–2003.
+</div><div id="ref-Lillicrap2015ContinuousCW" class="csl-entry">
+Lillicrap, T., Jonathan J. Hunt, A. Pritzel, N. Heess, Tom Erez, Yuval Tassa, David Silver, and Daan Wierstra. 2015. <span>“Continuous Control with Deep Reinforcement Learning.”</span> <em>CoRR</em> abs/1509.02971.
+</div><div id="ref-Fujimoto2018AddressingFA" class="csl-entry">
+Fujimoto, Scott, H. V. Hoof, and D. Meger. 2018. <span>“Addressing Function Approximation Error in Actor-Critic Methods,”</span> 1582–91.
+</div><div id="ref-Haarnoja2018SoftAO" class="csl-entry">
+Haarnoja, Tuomas, Aurick Zhou, P. Abbeel, and S. Levine. 2018. <span>“Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor.”</span> <em>ArXiv</em> abs/1801.01290.
+</div><div id="ref-Schulman2017ProximalPO" class="csl-entry">
+Schulman, John, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. <span>“Proximal Policy Optimization Algorithms.”</span> <em>ArXiv</em> abs/1707.06347.
+</div><div id="ref-Schulman2015TrustRP" class="csl-entry">
+Schulman, John, S. Levine, P. Abbeel, Michael I. Jordan, and Philipp Moritz. 2015. <span>“Trust Region Policy Optimization.”</span> <em>ArXiv</em> abs/1502.05477.
+</div><div id="ref-Mnih2016AsynchronousMF" class="csl-entry">
+Mnih, Volodymyr, Adrià Puigdomènech Badia, Mehdi Mirza, Alex Graves, T. Lillicrap, Tim Harley, David Silver, and K. Kavukcuoglu. 2016. <span>“Asynchronous Methods for Deep Reinforcement Learning,”</span> 1928–37.
+</div><div id="ref-Feinberg2018ModelBasedVE" class="csl-entry">
+Feinberg, Vladimir, Alvin Wan, I. Stoica, Michael I. Jordan, Joseph E. Gonzalez, and S. Levine. 2018. <span>“Model-Based Value Estimation for Efficient Model-Free Reinforcement Learning.”</span> <em>ArXiv</em> abs/1803.00101.
+</div><div id="ref-Clavera2018ModelBasedRL" class="csl-entry">
+Clavera, I., Jonas Rothfuss, John Schulman, Yasuhiro Fujita, T. Asfour, and P. Abbeel. 2018. <span>“Model-Based Reinforcement Learning via Meta-Policy Optimization,”</span> 617–29.
+</div><div id="ref-Silver2016MasteringTG" class="csl-entry">
+Silver, David, Aja Huang, Chris J. Maddison, A. Guez, L. Sifre, George van den Driessche, Julian Schrittwieser, et al. 2016. <span>“Mastering the Game of Go with Deep Neural Networks and Tree Search.”</span> <em>Nature</em> 529: 484–89.
+</div><div id="ref-Silver2017MasteringTG" class="csl-entry">
+Silver, David, Julian Schrittwieser, K. Simonyan, Ioannis Antonoglou, Aja Huang, A. Guez, T. Hubert, et al. 2017. <span>“Mastering the Game of Go Without Human Knowledge.”</span> <em>Nature</em> 550: 354–59.
+</div><div id="ref-Silver2018AGR" class="csl-entry">
+Silver, David, T. Hubert, Julian Schrittwieser, Ioannis Antonoglou, Matthew Lai, A. Guez, Marc Lanctot, et al. 2018. <span>“A General Reinforcement Learning Algorithm That Masters Chess, Shogi, and Go Through Self-Play.”</span> <em>Science</em> 362: 1140–44.
+</div></div></section>
+<section id="summary" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>The paper <span class="citation" data-cites="Team2021OpenEndedLL">(Team et al. 2021)</span> explores the idea that generally capable agents can emerge from open-ended play, similar to how human children learn and develop through play. The goal is to create agents that exhibit broad competencies and adaptability without being explicitly trained for specific tasks. In other words in the typical RL settings agents are trained to perform specific tasks and can learn solution to general problems. However they are very poor at generalizing these solutions to slightly different versions of the same problem. The authors seek to develop agents that can not only learn to solve a wide range of tasks but can also generalize and transfer their solutions to new problems.</p>
+<div class="no-row-height column-margin column-container"><div id="ref-Team2021OpenEndedLL" class="csl-entry">
+Team, Open-Ended Learning, Adam Stooke, Anuj Mahajan, C. Barros, Charlie Deck, Jakob Bauer, Jakub Sygnowski, et al. 2021. <span>“Open-Ended Learning Leads to Generally Capable Agents.”</span> <em>ArXiv</em> abs/2107.12808.
+</div><div id="ref-impala2018" class="csl-entry">
+Espeholt, Lasse, Hubert Soyer, Remi Munos, Karen Simonyan, Volodymir Mnih, Tom Ward, Yotam Doron, et al. 2018. <span>“IMPALA: Scalable Distributed Deep-RL with Importance Weighted Actor-Learner Architectures.”</span> In <em>Proceedings of the International Conference on Machine Learning (ICML)</em>.
+</div><div id="ref-Hessel2018MultitaskDR" class="csl-entry">
+Hessel, Matteo, Hubert Soyer, L. Espeholt, Wojciech M. Czarnecki, Simon Schmitt, and H. V. Hasselt. 2018. <span>“Multi-Task Deep Reinforcement Learning with PopArt.”</span> <em>ArXiv</em> abs/1809.04474.
+</div></div><p>This is not the first time that this idea has been explored. Prior work includes the development of agents that can learn to play a variety of video games without explicit training on each game. Other work like <span class="citation" data-cites="impala2018">(Espeholt et al. 2018)</span> and <span class="citation" data-cites="Hessel2018MultitaskDR">(Hessel et al. 2018)</span> at deep mind have already shown how this can be done. However, the authors of this paper take this idea further by developing agents that can learn to solve a wider range of tasks.</p>
+<p>In this paper they develop environments that co-evolve with the agents. The environment increase in difficulty as the agents learn to solve them. The agents are equipped with intrinsic motivation mechanisms, such as curiosity and novelty-seeking behaviors, to drive exploration. A variety of tasks and challenges are presented dynamically, promoting continuous learning and adaptation.</p>
+<p>But the real question is to what degree does this approach create agents that can learn to solve a wide range of tasks and can generalize their solutions to new problems. There seems to be three parts</p>
+</section>
+<section id="open-ended-learning" class="level2">
+<h2 class="anchored" data-anchor-id="open-ended-learning">Open-Ended Learning:</h2>
+<dl>
+<dt>Open-Ended Learning</dt>
+<dd>
+<p>Open-ended learning refers to an unsupervised, exploratory process where agents interact with their environment without predefined goals. This approach contrasts with traditional reinforcement learning, which focuses on optimizing performance for specific tasks.</p>
+</dd>
+</dl>
+<p>Have the the authors really provided environment with not predefined goals or just many many goals. There are games in game theory where the player</p>
+<p>is given incomplete information - you don’t get told the reward or the rules and need to figure out an optimal strategy without them.</p>
+</section>
+<section id="methodology" class="level2">
+<h2 class="anchored" data-anchor-id="methodology">Methodology:</h2>
+<p>The authors design an environment that encourages diverse interactions and challenges. Agents are equipped with intrinsic motivation mechanisms, such as curiosity and novelty-seeking behaviors, to drive exploration. A variety of tasks and challenges are presented dynamically, promoting continuous learning and adaptation.</p>
+<p>As the authors point out - making a maze larger don’t necessarily make it more difficult once the agents have learned to solved a few mazes. The authors have to carefully design the environment to ensure that the agents are always challenged but not overwhelmed.</p>
+<p>I have three criticism of the methodology:</p>
+<ol type="1">
+<li>Although this paper is about RL there is more than a fair share of evolutionary algorithms. It isn’t clear to what extent the agents are learning through RL and to what extent they are evolving through evolutionary algorithms. I don’t dislike this idea but it seems to muddy the waters regarding how well this research might be applied to create generally capable RL agents in the real world.</li>
+<li>Some of the environment used in testing are hand crafted while the bulk of the environments are procedurally generated.</li>
+<li>The claim about these these hand crafted test environments being unlike other environments that are procedurally generated is not very convincing.</li>
+</ol>
+<p>How is skill acquisition tracked?</p>
+<p>Intrinsic Motivations are based on curiosity and novelty seeking behaviors. However I think that for some environment/problems intrinsic (motivation) could emerge from a dynamic of the environment itself. In some way this intrinsic motivation reflects the agents ability to model the environment and to predict the consequences of its actions.</p>
+<p>For example in an agent can reproduce under some selection pressure it should acquire a relevant fitness intrinsic (expected progeny). If it needs to solve different mazes it should need an exploration intrinsic. If it needs to maximize harvesting of resources it should learn some utility function intrinsic. For a social dilemma it might learn some social utility function intrinsic. However in this case this is an intrinsic that need to be learned by all agents Even if all the agents learn it there is are possibility that the agents will not cooperate. We might look to game theory, mechanism design to see if agents can learn self encouraging mechanisms to cooperate and so on. Can they learn to signal or coordinate behavior to activate the social utility function intrinsic. Can they plan to change roles in sequential games with memory and without.</p>
+<p>a environment itself. For example in the case of the maze the agent might be intrinsically motivated to explore the maze because it is the only way to find the reward. In this case the environment itself is providing the intrinsic motivation.</p>
+<p>A more interesting approach would be to track the agents ability to solve a wide range of tasks and to generalize their solutions to new problems. This would be a more direct measure of the agents general capabilities.</p>
+<p>The paper and website show how the internal state of the agent is visualized over the course of play. This seems to be a hearmap with different possible goals.</p>
+</section>
+<section id="results-and-findings" class="level2">
+<h2 class="anchored" data-anchor-id="results-and-findings">Results and Findings:</h2>
+<p>Agents developed through open-ended play demonstrate a wide range of capabilities, such as problem-solving, tool use, and social interaction. These agents outperform those trained with traditional task-specific reinforcement learning in terms of adaptability and generalization. Emergent behaviors and skills are observed, highlighting the potential of open-ended play in fostering general intelligence.</p>
+</section>
+<section id="implications-for-ai-development" class="level2">
+<h2 class="anchored" data-anchor-id="implications-for-ai-development">Implications for AI Development:</h2>
+<p>The findings suggest that fostering environments that encourage open-ended play can lead to the development of more robust and versatile AI agents. This approach could be pivotal in advancing AI towards general intelligence, where agents can perform well across a wide range of tasks without explicit training for each.</p>
+</section>
+<section id="future-directions" class="level2">
+<h2 class="anchored" data-anchor-id="future-directions">Future Directions:</h2>
+<p>Further research is needed to understand the mechanisms underlying the success of open-ended play. Scaling up the complexity of environments and intrinsic motivation systems could lead to even more capable agents. Exploring the integration of open-ended play with other AI paradigms might enhance the development of general AI.</p>
+<!-- ![paper](https://arxiv.org/pdf/2107.12808){.col-page width="800px" height="1000px"} -->
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Generally {Capable} {Agents} {Emerge} from {Open-Ended}
+    {Play}},
+  date = {2024-06-10},
+  url = {https://orenbochman.github.io/reviews/2021/generally-capable-agents-emerge-from-open-ended-play/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2024. <span>“Generally Capable Agents Emerge from
+Open-Ended Play.”</span> June 10, 2024. <a href="https://orenbochman.github.io/reviews/2021/generally-capable-agents-emerge-from-open-ended-play/">https://orenbochman.github.io/reviews/2021/generally-capable-agents-emerge-from-open-ended-play/</a>.
+</div></div></section></div> ]]></description>
+  <category>paper review</category>
+  <category>multi-agent reinforcement learning</category>
+  <category>sequential social dilemmas</category>
+  <category>sequential social dilemmas</category>
+  <category>cooperation</category>
+  <category>Markov games</category>
+  <category>agent-based social simulation</category>
+  <category>non-cooperative games</category>
+  <guid>https://orenbochman.github.io/reviews/2021/generally-capable-agents-emerge-from-open-ended-play/</guid>
+  <pubDate>Sun, 09 Jun 2024 21:00:00 GMT</pubDate>
+</item>
+<item>
   <title>sense2vec - A Fast and Accurate Method for Word Sense Disambiguation In Neural Word Embeddings</title>
   <dc:creator>Oren Bochman</dc:creator>
   <link>https://orenbochman.github.io/reviews/2015/sense2vec/</link>
@@ -2102,7 +2588,7 @@ Games.”</span> <a href="https://orenbochman.github.io/reviews/2007/evolution_o
   <category>reinforcement learning</category>
   <category>signaling games</category>
   <guid>https://orenbochman.github.io/reviews/2007/evolution_of_coding/</guid>
-  <pubDate>Wed, 12 Mar 2025 10:56:50 GMT</pubDate>
+  <pubDate>Wed, 12 Mar 2025 12:01:47 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/reviews/2007/evolution_of_coding/cover.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
@@ -2188,7 +2674,7 @@ Classification.”</span> <a href="https://orenbochman.github.io/reviews/2012/Mu
 deep neural networks for image classi cation/</a>.
 </div></div></section></div> ]]></description>
   <guid>https://orenbochman.github.io/reviews/2012/Multi-column deep neural networks for image classi cation/</guid>
-  <pubDate>Wed, 12 Mar 2025 10:56:50 GMT</pubDate>
+  <pubDate>Wed, 12 Mar 2025 12:01:47 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/reviews/2012/Multi-column deep neural networks for image classi cation/cover.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
@@ -2272,7 +2758,7 @@ Bochman, Oren. n.d. <span>“Improving Neural Networks by Preventing
 Co-Adaptation of Feature Detectors.”</span> <a href="https://orenbochman.github.io/reviews/2012/dropout/">https://orenbochman.github.io/reviews/2012/dropout/</a>.
 </div></div></section></div> ]]></description>
   <guid>https://orenbochman.github.io/reviews/2012/dropout/</guid>
-  <pubDate>Wed, 12 Mar 2025 10:56:50 GMT</pubDate>
+  <pubDate>Wed, 12 Mar 2025 12:01:47 GMT</pubDate>
 </item>
 <item>
   <title>ImageNet Classification with Deep Convolutional Neural Networks</title>
@@ -2341,7 +2827,7 @@ Bochman, Oren. n.d. <span>“ImageNet Classification with Deep
 Convolutional Neural Networks.”</span> <a href="https://orenbochman.github.io/reviews/2012/imagenet/">https://orenbochman.github.io/reviews/2012/imagenet/</a>.
 </div></div></section></div> ]]></description>
   <guid>https://orenbochman.github.io/reviews/2012/imagenet/</guid>
-  <pubDate>Wed, 12 Mar 2025 10:56:50 GMT</pubDate>
+  <pubDate>Wed, 12 Mar 2025 12:01:47 GMT</pubDate>
 </item>
 <item>
   <title>Handwriting beautification using token means</title>
@@ -2521,7 +3007,7 @@ Bochman, Oren. n.d. <span>“Handwriting Beautification Using Token
 Means.”</span> <a href="https://orenbochman.github.io/reviews/2013/HandwritingBeautification/">https://orenbochman.github.io/reviews/2013/HandwritingBeautification/</a>.
 </div></div></section></div> ]]></description>
   <guid>https://orenbochman.github.io/reviews/2013/HandwritingBeautification/</guid>
-  <pubDate>Wed, 12 Mar 2025 10:56:50 GMT</pubDate>
+  <pubDate>Wed, 12 Mar 2025 12:01:47 GMT</pubDate>
 </item>
 <item>
   <title>NIN — Network in Network</title>
@@ -2620,225 +3106,7 @@ Lin, Min, Qiang Chen, and Shuicheng Yan. 2014. <span>“Network in Network.”</
 Bochman, Oren. n.d. <span>“NIN --- Network in Network.”</span> <a href="https://orenbochman.github.io/reviews/2013/NIN/">https://orenbochman.github.io/reviews/2013/NIN/</a>.
 </div></div></section></div> ]]></description>
   <guid>https://orenbochman.github.io/reviews/2013/NIN/</guid>
-  <pubDate>Wed, 12 Mar 2025 10:56:50 GMT</pubDate>
-</item>
-<item>
-  <title>Dropout: A Simple Way to Prevent Neural Networks from Overfitting</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2014/Dropout/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<section id="tldr" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="tldr">TL;DR</h2>
-<p>In <span class="citation" data-cites="JMLR:v15:srivastava14a">(Srivastava et al. 2014)</span> the authors, present a novel regularization technique for deep neural networks called “dropout.” The key idea behind dropout is to randomly drop units (along with their connections) from the neural network during training. This prevents units from co-adapting too much and significantly reduces overfitting. The authors show that dropout improves the performance of neural networks on supervised learning tasks in vision, speech recognition, document classification, and computational biology, obtaining state-of-the-art results on many benchmark data sets.</p>
-<div class="no-row-height column-margin column-container"></div><p>The technique had been in use in some earlier works, but this paper popularized it and showed its effectiveness on a wide range of tasks. The idea behind drop out is pretty simple and people have since come up with many variations of it. It has become a standard technique in the deep learning toolbox.</p>
-</section>
-<section id="abstract" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
-<div class="page-columns page-full"><blockquote class="blockquote">
-<p>Deep neural nets with a large number of parameters are very powerful machine learning systems. However, overfitting is a serious problem in such networks. Large networks are also slow to use, making it difficult to deal with overfitting by combining the predictions of many different large neural nets at test time. Dropout is a technique for addressing this problem. The key idea is to randomly drop units (along with their connections) from the neural network during training. This prevents units from co-adapting too much. During training, dropout samples from an exponential number of different thinned networks. At test time, it is easy to approximate the effect of averaging the predictions of all these thinned networks by simply using a single unthinned network that has smaller weights. This significantly reduces overfitting and gives major improvements over other regularization methods. We show that dropout improves the performance of neural networks on supervised learning tasks in vision, speech recognition, document classification and computational biology, obtaining state-of-the-art results on many benchmark data sets.</p>
-<p>– <span class="citation" data-cites="JMLR:v15:srivastava14a">(Srivastava et al. 2014)</span></p>
-</blockquote><div class="no-row-height column-margin column-container"></div></div>
-</section>
-<section id="review" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="review">Review</h2>
-<p>In <span class="citation" data-cites="JMLR:v15:srivastava14a">(Srivastava et al. 2014)</span> the authors presents a regularization technique called Dropout, aimed at addressing the critical problem of overfitting in deep neural networks (DNNs). Dropout randomly drops units (neurons) during training to prevent co-adaptation of units, which can lead to overfitting. This novel technique is demonstrated to significantly improve the performance of neural networks across a wide range of tasks, including computer vision, speech recognition, and natural language processing.</p>
-<div class="no-row-height column-margin column-container"><div id="ref-JMLR:v15:srivastava14a" class="csl-entry">
-Srivastava, Nitish, Geoffrey Hinton, Alex Krizhevsky, Ilya Sutskever, and Ruslan Salakhutdinov. 2014. <span>“Dropout: A Simple Way to Prevent Neural Networks from Overfitting.”</span> <em>Journal of Machine Learning Research</em> 15 (56): 1929–58. <a href="http://jmlr.org/papers/v15/srivastava14a.html">http://jmlr.org/papers/v15/srivastava14a.html</a>.
-</div></div></section>
-<section id="core-idea" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="core-idea">Core Idea</h2>
-
-<div class="no-row-height column-margin column-container"><div class="">
-<div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig1.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;1: the effect of dropout"><img src="https://orenbochman.github.io/reviews/2014/Dropout/fig1.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: the effect of dropout
-</figcaption>
-</figure>
-</div>
-</div></div><p>Dropout works by randomly removing units from the network during each training iteration. This prevents the network from becoming overly reliant on specific units, thus reducing overfitting. During testing, all units are used, but their weights are scaled to account for the dropout during training. This approximates the averaging of an exponential number of thinned networks that would otherwise be computationally infeasible.</p>
-
-<div class="no-row-height column-margin column-container"><div class="">
-<div id="fig-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig2.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;2: Training vs Test"><img src="https://orenbochman.github.io/reviews/2014/Dropout/fig2.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Training vs Test
-</figcaption>
-</figure>
-</div>
-</div></div></section>
-<section id="methodology-and-theoretical-motivation" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="methodology-and-theoretical-motivation">Methodology and Theoretical Motivation</h2>
-<p>Dropout’s theoretical foundation stems from biological principles, specifically the idea of genetic robustness in sexual reproduction. In the analogy, a network’s hidden units act like genes that must learn to function independently of one another, preventing complex co-adaptations that may not generalize well to unseen data. The stochastic nature of dropout introduces noise during training, which acts as a form of model averaging and regularization.</p>
-
-<div class="no-row-height column-margin column-container"><div class="">
-<div id="fig-3" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig3.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;3: figure 3"><img src="https://orenbochman.github.io/reviews/2014/Dropout/fig3.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: figure 3
-</figcaption>
-</figure>
-</div>
-</div></div></section>
-<section id="key-contributions" class="level2">
-<h2 class="anchored" data-anchor-id="key-contributions">Key Contributions</h2>
-<ul>
-<li>Model Averaging: Dropout enables the training of many subnetworks (thinned networks) simultaneously, which leads to a more robust model.</li>
-<li>Regularization Effect: Dropout reduces overfitting more effectively than other methods such as L1/L2 regularization or early stopping.</li>
-<li>Efficiency: Dropout provides a computationally feasible approximation of model averaging by scaling weights at test time, as opposed to maintaining an ensemble of networks.</li>
-</ul>
-</section>
-<section id="experimental-results" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="experimental-results">Experimental Results</h2>
-<p>The authors demonstrate the efficacy of dropout across several benchmark datasets:</p>
-
-<div class="no-row-height column-margin column-container"><div class="">
-<div id="fig-3" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig4.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;4: figure 4"><img src="https://orenbochman.github.io/reviews/2014/Dropout/fig4.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: figure 4
-</figcaption>
-</figure>
-</div>
-</div></div><ul>
-<li>MNIST: Error rates are reduced from 1.60% (standard neural network) to 0.95% using dropout with additional max-norm regularization.</li>
-<li>CIFAR-10 and CIFAR-100: Dropout networks outperform previous methods, with an error reduction to 12.6% on CIFAR-10 and 37.2% on CIFAR-100.</li>
-<li>TIMIT (Speech Data): Dropout reduces the phone error rate from 23.4% to 21.8%, showing significant improvements over non-dropout models.</li>
-<li>ImageNet: Dropout helps achieve state-of-the-art results in image classification tasks, significantly lowering the top-5 error rate.</li>
-</ul>
-
-<div class="no-row-height column-margin column-container"><div class="">
-<div id="fig-3" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig5.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;5: image samples"><img src="https://orenbochman.github.io/reviews/2014/Dropout/fig5.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: image samples
-</figcaption>
-</figure>
-</div>
-</div></div></section>
-<section id="advantages-of-dropout" class="level2">
-<h2 class="anchored" data-anchor-id="advantages-of-dropout">Advantages of Dropout</h2>
-<ul>
-<li>Generality: Dropout works across a variety of architectures, including fully connected, convolutional, and recurrent neural networks.</li>
-<li>Ease of Use: Dropout is simple to implement, requiring only one additional hyperparameter (the dropout rate, typically 0.5 for hidden layers).</li>
-<li>Compatibility with Other Methods: Dropout can be combined with techniques like unsupervised pretraining, max-norm regularization, and momentum, further improving model performance.</li>
-</ul>
-</section>
-<section id="limitations" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
-<ul>
-<li>Increased Training Time: Dropout can significantly slow down training, typically requiring 2-3 times more iterations to converge.</li>
-<li>Tuning of Hyperparameters: While simple, the dropout rate must be carefully selected, and higher learning rates and momentum are generally required for optimal performance.</li>
-<li>Application-Specific Benefits: Although dropout improves performance in vision and speech recognition tasks, the improvements in certain domains like text classification (e.g., Reuters RCV1 dataset) are less pronounced. <sup>1</sup></li>
-</ul>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;I think this is because if we drop a few words from a sentence a reader can often guess them from the context and redundancy in natural languages.</p></div></div></section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>The paper introduces dropout as a powerful and simple regularization technique that significantly reduces overfitting in deep neural networks. Dropout provides a computationally efficient method to approximate model averaging and works across a range of architectures and tasks, achieving state-of-the-art results on several benchmarks. However, it comes at the cost of increased training time, and some tuning is required for optimal performance.</p>
-<p>Dropout represents a substantial advancement in neural network training, and its adoption has since become widespread in the deep learning community.</p>
-</section>
-<section id="the-paper" class="level2">
-<h2 class="anchored" data-anchor-id="the-paper">The Paper</h2>
-<p><a href="https://jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf">link to the paper</a></p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="https://jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="embeded paper"><embed src="https://jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" class="col-page" style="width:8.5in;height:11in"></a></p>
-<figcaption>embeded paper</figcaption>
-</figure>
-</div>
-
-
-
-</section>
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman,
-  author = {Bochman, Oren},
-  title = {Dropout: {A} {Simple} {Way} to {Prevent} {Neural} {Networks}
-    from {Overfitting}},
-  url = {https://orenbochman.github.io/reviews/2014/Dropout/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. n.d. <span>“Dropout: A Simple Way to Prevent Neural
-Networks from Overfitting.”</span> <a href="https://orenbochman.github.io/reviews/2014/Dropout/">https://orenbochman.github.io/reviews/2014/Dropout/</a>.
-</div></div></section></div> ]]></description>
-  <guid>https://orenbochman.github.io/reviews/2014/Dropout/</guid>
-  <pubDate>Wed, 12 Mar 2025 10:56:50 GMT</pubDate>
-</item>
-<item>
-  <title>ViT — An Image is worth 16x16 words: Transformers for Image Recognition at scale</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2020/ViT/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<section id="abstract" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
-<div class="page-columns page-full"><blockquote class="blockquote">
-<p>While the Transformer architecture has become the de-facto standard for natural language processing tasks, its applications to computer vision remain limited. In vision, attention is either applied in conjunction with convolutional networks, or used to replace certain components of convolutional networks while keeping their overall structure in place. We show that this reliance on CNNs is not necessary and a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks. When pre-trained on large amounts of data and transferred to multiple mid-sized or small image recognition benchmarks (ImageNet, CIFAR-100, VTAB, etc.), Vision Transformer (ViT) attains excellent results compared to state-of-the-art convolutional networks while requiring substantially fewer computational resources to train.</p>
-<p>— <span class="citation" data-cites="DBLP:journals/corr/abs-2010-11929">(Dosovitskiy et al. 2020)</span></p>
-</blockquote><div class="no-row-height column-margin column-container"><div id="ref-DBLP:journals/corr/abs-2010-11929" class="csl-entry">
-Dosovitskiy, Alexey, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, et al. 2020. <span>“An Image Is Worth 16x16 Words: Transformers for Image Recognition at Scale.”</span> <em>CoRR</em> abs/2010.11929. <a href="https://arxiv.org/abs/2010.11929">https://arxiv.org/abs/2010.11929</a>.
-</div></div></div>
-</section>
-<section id="see-also" class="level2">
-<h2 class="anchored" data-anchor-id="see-also">See also</h2>
-<ul>
-<li><a href="https://arxiv.org/abs/2010.11929">Paper</a></li>
-<li><a href="https://github.com/google-research/vision_transformer">Code - Vision Transformer and MLP-Mixer Architectures</a></li>
-<li><a href="https://iclr.cc/virtual/2021/oral/3458">ICLR - Video &amp; Slides</a></li>
-<li><a href="https://research.google/pubs/an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale/">Blog post</a></li>
-<li>Third-party reviews:
-<ul>
-<li><a href="https://www.youtube.com/@YannicKilcher">Review by Yannic Kilcher</a></li>
-<li><a href="https://www.youtube.com/watch?v=aD-D8-D-ZyY">Sahil Khose</a></li>
-<li><a href="https://www.youtube.com/watch?v=DVoHvmww2lQ">AI Coffee Break with Letitia</a></li>
-<li><a href="https://medium.com/@ManishChablani/vision-transformer-vit-an-image-is-worth-16x16-words-transformers-for-image-recognition-at-a4bd5c6f17a7">Manish Chablani — Review</a></li>
-</ul></li>
-</ul>
-
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman,
-  author = {Bochman, Oren},
-  title = {ViT -\/-\/- {An} {Image} Is Worth 16x16 Words: {Transformers}
-    for {Image} {Recognition} at Scale},
-  url = {https://orenbochman.github.io/reviews/2020/ViT/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. n.d. <span>“ViT --- An Image Is Worth 16x16 Words:
-Transformers for Image Recognition at Scale.”</span> <a href="https://orenbochman.github.io/reviews/2020/ViT/">https://orenbochman.github.io/reviews/2020/ViT/</a>.
-</div></div></section></div> ]]></description>
-  <guid>https://orenbochman.github.io/reviews/2020/ViT/</guid>
-  <pubDate>Wed, 12 Mar 2025 10:56:50 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/reviews/2020/ViT/cover.jpg" medium="image" type="image/jpeg"/>
+  <pubDate>Wed, 12 Mar 2025 12:01:47 GMT</pubDate>
 </item>
 </channel>
 </rss>

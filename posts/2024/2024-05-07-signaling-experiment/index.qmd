@@ -1,0 +1,294 @@
+---
+date: 2024-05-07
+title: "Signals Experiment"
+subtitle: "Leaning language games"
+keywords: [game theory, signaling games, partial pooling, evolution, reinforcement learning, signaling systems, evolution of language]
+#draft: True
+---
+
+
+
+```{python}
+from mesa import Agent, Model
+from mesa.time import RandomActivation
+
+
+class Urn:
+    def __init__(self, options, balls=None):
+        self.options = options
+        if balls is not None:
+            self.balls = balls
+        else:
+            self.balls = {option: 1.0 for option in self.options}
+    
+    def get_filtered_urn(self, filter):
+        '''Filters urn's options by prefix and normalizes the weights.'''
+        filtered_options = [k for k in self.balls.keys() if k.startswith(filter)]
+        assert len(filtered_options) > 0, f"no options found for filter={filter} on {self.balls}"
+        filtered_balls = {opt: self.balls[opt] for opt in filtered_options}
+        total_balls = sum(filtered_balls.values())
+        assert total_balls > 0.0, f"total weights is {total_balls} after filter={filter} on {self.balls}"
+        filtered_probs = {opt: self.balls[opt]/total_balls for opt in filtered_options}
+        return filtered_probs
+
+
+    def choose_option(self, filter, model):
+          
+        '''Filters the urn based on a option prefix (state for sender, signal for reciever).
+        
+          In the litrature agents have multiple urns to support learning conditional probabilites for differnt context.
+            - sender need one urns per state, and 
+            - recievers need one urn per signal.
+          I choose a simpler representation by implemented multiple urns as a single matrix
+          To get the wieghts coresponding to a for a given prefix we filter the urn based on the prefix.
+          allow updating the conditional probabilities for each signal given a state.
+          We have one urn and estimate the conditional probabilities by filtering the urn based on the prefix.
+        '''
+        
+        
+        if self.verbose:
+            print(f'choose_option({filter=})')
+        urn = self.get_filtered_urn(filter)
+        return model.random.choices(list(urn.keys()), list(urn.values()))
+
+    def update_weights(self, option, reward):
+        old_balls = self.balls[option]
+        self.balls[option] += reward 
+        if self.verbose:
+            print(f"Updated weight for option {option}: {old_balls} -> {self.balls[option]}")
+
+
+
+class HerrnsteinRL(Urn):
+    ''' Herrnstein matching law with learning rate.'''
+    def __init__(self, options, learning_rate=1.0, verbose=False, name='Herrnstein matching law'):
+        #add docstring
+        '''
+        Herrnstein matching law with learning rate.
+        
+        Parameters:
+          options: list of options
+          learning_rate: float, default 1.0 should behave like the parent urn model
+          verbose: bool, default False
+          name: str, the rule name 'Herrnstein matching law'
+        '''
+        super().__init__(options)
+        self.verbose = verbose
+        self.name = name
+        self.learning_rate = learning_rate
+        self.options = options
+        if self.verbose:
+            print(f'LearningRule.__init__(Options: {options})')
+
+    def update_weights(self, option, reward):
+        ''' this adds the learning rate to the update'''
+        old_balls = self.balls[option]
+        self.balls[option] += self.learning_rate * reward 
+        if self.verbose:
+            print(f"Updated weight for option {option}: {old_balls} -> {self.balls[option]}")
+
+
+class LewisAgent(Agent):
+    def __init__(self, unique_id, model, game, role, verbose=False):
+        '''Agent for Lewis signaling game.
+        
+        Parameters:
+          unique_id: int, unique identifier
+          model: SignalingGame, the model
+          game: int, the game number
+          role: str, the role of the agent
+          verbose: bool, default False
+        '''
+        
+          
+        super().__init__(unique_id, model)
+        self.role = role
+        self.verbose = verbose
+        self.message = None
+        self.action = None
+        self.game = game
+        self.current_state = None
+        if role == "sender":
+            self.urn = HerrnsteinRL(model.states_signals, learning_rate=1.0, verbose=verbose, name='state_signal_weights')
+        elif role == "receiver":
+            self.urn = HerrnsteinRL(model.signals_actions, learning_rate=1.0, verbose=verbose, name='signal_action_weights')
+        else:
+            # consider adding an urn for nature to use for choosing states
+            # this way one could use simple modifcation of the urn class to to support some basic distribution via their urn model.
+            # and we could also visualize the urns and their weights using a simple schematic
+            self.urn = HerrnsteinRL(model.states, learning_rate=0.0, verbose=verbose, name='state_weights')
+        self.messages = []
+        self.actions = []
+        self.reward = 0
+        
+    def step(self):
+        self.messages = []
+        self.actions = []
+
+    def gen_state(self):
+        if self.role == "nature":
+            #self.current_state = self.model.random.choice(self.model.states)
+            #use the urn to choose the state
+            self.current_state = self.urn.choose_option(filter='', model=self.model)[0]
+            if self.verbose:
+                print(f"Nature {self.unique_id} set state {self.current_state}")
+
+    @property
+    def state(self):
+        if self.role == "nature":
+            return self.current_state
+
+    def choose_signal(self, state):
+        if self.role == "sender":
+            self.option = self.urn.choose_option(filter=state, model=self.model)
+            self.signal = self.option[0].split('_')[1]
+            
+            if True:#self.verbose:
+                print(f"Sender {self.unique_id} sends signal: {self.signal}")
+            return self.signal
+
+    def send_signal(self, state, receiver):
+        if self.role == "sender":
+            assert type(state) == str, f"state must be a string"
+            assert len(state) > 0, f"state must be a non-empty string"
+            assert receiver is not None, f"receiver must be a valid agent"
+            assert state in self.model.states, f"{state=} must be in {self.model.states}"
+            signal = self.choose_signal(state)
+            receiver.messages.append(signal)
+            if self.verbose:
+                print(f"Sender {self.unique_id} sends signal: {signal}")
+
+    def fuse_actions(self, actions):
+        self.action = 0
+        if self.role == "receiver":
+            if len(actions) == 1:
+                self.action = actions[0]
+            else:
+                for i in range(len(actions)):
+                    self.action += int(actions[i]) * (2 ** i)
+        return self.action
+
+    def decode_message(self, signal):
+        if self.role == "receiver":
+            message = self.urn.choose_option(filter=signal, model=self.model)
+            if self.verbose:
+                print(f"Receiver {self.unique_id} received signal: {self.message}")
+            return message
+
+    def set_action(self):
+        '''Receiver decodes each message then 
+           then fuses them into one action'''
+           
+        if self.role == "receiver":
+            for signal in self.messages:
+                assert type(signal) == str, f"{signal=} must be a string"
+                self.actions.append(self.decode_message(signal))
+            action = self.fuse_actions(self.actions)
+            if self.verbose:
+                print(f"Receiver {self.unique_id} decided on action: {action}")
+
+    def set_reward(self,reward):
+      if self.role != "nature":
+          self.reward = reward
+          if self.verbose:
+              print(f"agent {self.unique_id} received reward: {self.reward}")
+
+    def calc_reward(self,state):
+        ''' only reveiver calculates reward'''
+        if self.role == "receiver":
+            action = self.action
+            reward = 1.0 if action == state else 0.0
+            self.model.reward = reward
+
+
+
+
+class SignalingGame(Model):
+  
+  
+    def __init__(self, game_count=2, senders_count=1, receivers_count=1, state_count=3,verbose=False):
+        super().__init__()
+        self.verbose = verbose
+        self.schedule = RandomActivation(self)
+        # states, signals, and actions
+        self.states = [f'{i}' for i in range(state_count)]
+        self.signals = [chr(65 + i) for i in range(state_count)]
+        self.actions = [f'{i}' for i in range(state_count)]
+        # urn options for sender and receiver
+        self.states_signals = [f'{state}_{signal}' for state in self.states for signal in self.signals]
+        self.signals_actions = [f'{signal}_{action}' for signal in self.signals for action in self.actions]
+        
+        
+        self.current_state = None
+        self.games = []
+        self.uid = 0
+        self.senders_count = senders_count
+        self.receivers_count = receivers_count
+        
+        for i in range(game_count):
+            game = {'senders': [], 'receivers': [], 'nature': None}
+            nature = LewisAgent(self.uid, self, game=i, role="nature")
+            game['nature'] = nature
+            self.schedule.add(nature)
+            self.uid += 1
+            for j in range(senders_count):
+                sender = LewisAgent(self.uid, self, game=i, role="sender")
+                game['senders'].append(sender)
+                self.schedule.add(sender)
+                self.uid += 1
+            for j in range(receivers_count):
+                receiver = LewisAgent(self.uid, self, game=i, role="receiver")
+                game['receivers'].append(receiver)
+                self.schedule.add(receiver)
+                self.uid += 1
+            self.games.append(game)
+    
+    def step(self):
+        for agent in self.schedule.agents:
+          agent.step()
+          if agent.role == 'nature':
+                agent.gen_state()
+        
+        for agent in self.schedule.agents:
+          if agent.role == 'sender':
+                state = self.games[agent.game]['nature'].current_state
+                for receiver in self.games[agent.game]['receivers']:
+                    agent.send_signal(state, receiver)
+        
+        for agent in self.schedule.agents:
+          if agent.role == 'receiver':
+                agent.set_action()
+                state = self.games[agent.game]['nature'].current_state
+                agent.calc_reward(state=state)
+                agent.calc_reward(state)
+                
+        for agent in self.schedule.agents:
+          reward = self.games[agent.game]['receivers'][0].reward
+          agent.set_reward(reward)
+        
+        for i, game in enumerate(self.games):
+            print(f'Game {i}, expected_rewards={self.expected_rewards(game)}')
+
+    def expected_rewards(self, game):
+        return 0.25
+
+
+# Running the model
+state_count = 2  # Number of states, signals, and actions
+steps = 10
+model = SignalingGame(senders_count=1, receivers_count=1, state_count=state_count, game_count=3,verbose=True)
+for i in range(steps):
+    print(f"--- Step {i+1} ---")
+    model.step()
+ 
+```
+
+some refactoring ideas:
+
+- in the urn class add support a matrix based representation of the weights
+
+lets fix bugs
+- remove unused items from the agent
+- replace the expected_rewards for a game with a code that calculates the expected rewards
+  as follows:
+  

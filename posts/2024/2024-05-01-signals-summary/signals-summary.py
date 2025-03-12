@@ -43,7 +43,7 @@ class HerrnsteinRL():
     
     1. nature picks a state 
     2. sender  gets the state, chooses a signal by picking a ball in choose_option() from the stat'es urn
-    3. reciver gets the action, chooses an actuion by picking a ball in choose_option()
+    3. receiver gets the action, chooses an action by picking a ball in choose_option()
     4. the balls in the urns are incremented if action == state
     5. repeat
     
@@ -180,9 +180,9 @@ class LewisAgent(Agent):
         ''' 
             # Message fusion logic:
             1. single message:  if there is only one signal then the action is the action associated with the signal
-            2. ordered messages: if there are multiple signals then the action is the number from the string assocciated with the concatenated signal
+            2. ordered messages: if there are multiple signals then the action is the number from the string associated with the concatenated signal
                if there are two signals possible per message we concat and covert binary string to number
-            3. is the messages are sets we could perform a intersetion and take the action associated with the intersection 
+            3. is the messages are sets we could perform a intersection and take the action associated with the intersection 
                currently this is not implemented
             4. support for recursive signals is currently under research .
         ''' 
@@ -378,6 +378,7 @@ class SignalingGame(Model):
 
 
 # Running the model
+k = 2
 state_count= 3  # Number of states, signals, and actions
 signal_count= 3
 steps = 1000

@@ -1,0 +1,209 @@
+---
+title: "Vitter's Algorithm"
+date: "2024-10-11"
+categories: 
+    review
+    compositionality
+    neural networks
+    signaling systems
+    language evolution
+keywords: 
+    compositionality
+    naive compositionality
+    language emergence
+    deep learning
+    neural networks
+    signaling systems 
+    emergent languages
+    topographic similarity
+    positional disentanglement
+    bag-of-symbols disentanglement
+    information gap disentanglement    
+bibliography: ./bibliography.bib
+image: thumbnail.png
+---
+
+This is the Vitter algorithm - an algorithm for encoding and decoding messages based on using Huffman prefix codes.
+
+But it is a an adaptive version of the Huffman coding algorithm, which means that it can update the codebook as it processes the message. 
+
+This is useful when the frequency distribution of characters in the message changes over time.
+
+Why and when does this confer a significant advantage?
+
+For complex lewis signaling games we need some way to convert the state of the world chosen by nature into a message that the sender can send to the receiver.
+
+Some options that came to mind are:
+
+1. Enumeration base $|L|$, same as in the regular game but adjusted to the limitation of the alphabet - unfortunately this fails to capture any structure of the states.
+2. Huffman coding using base 2. Many advantages but requires access to the entire message and the frequency distribution of the states. This generally not available in the Lewis signaling games where the states are chosen by nature and the distribution emerges over time from the interaction of the agents.
+3. N-ary Huffman coding - this time we use base $|L|$ for greater efficiency.
+4. Adaptive Huffman coding - this is the Vitter algorithm.
+5. Learn an encoder decoder using a neural network with LSTM or a transformer.
+6. Learn an denoising autoencoder to correct for the noise in the message.
+
+My idea is that this can stand in as a default protocol for encoding and decoding messages in lewis signaling games with complex signals.
+
+The protocol gets updated as the agents play the game and distribution of states drifts over time.
+
+This algorithm support both encoding compositional codes by encoding just atomic symbols or if we **encode multiple symbols at a time it can be produce entangled codes**.
+
+
+A way to make this idea more concrete is if we designate certain sequences as an idiom i.e. we wish to encode the idiom as a single symbol since together they have a different meaning than thier literal meaning as atomic symbols. This may sound like 
+an awkward idea but consider that there are many cases where such a sequence is dramatically more likely then any other sequence featuring it's constituents. 
+
+Given  the higher frequency we might encode them as a single symbol. 
+This way we can encode compositional codes and idioms in the same message. 
+But you also avoid collisions between idioms and their atomic counter parts
+
+- "keep the wolf from the door" idiomatic version - in a 1 block of  6 symbols.
+- "keep the wolf from the door" atomic symbols - as a 6 symbols
+
+## Future work:
+
+1. add an algorithm for adaptive arithmetic coding - which is more efficient than huffman coding.
+2. add support for blocking - this is where we encode 4 or more characters at a time. This is useful when the message is very long and we want to reduce the overhead of encoding and decoding. 
+    - Blocking seems to be counter productive for language evolution making semantics depend on the length and order of the block.  
+    - However both agents and Natural language can use entangled codes so we may want to support this. 
+    - With the caveat that we may pad the block to avoid blocking beyond the end of the message or a semantic unit.
+3. Integrate into an agent in the lewis petting zoo environment.
+
+```{python}
+import heapq
+
+class Node:
+    def __init__(self, char, freq):
+        self.char = char
+        self.freq = freq
+        self.left = None
+        self.right = None
+
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+def build_huffman_tree(chars_freq):
+    """
+    Builds the Huffman tree for given character frequencies.
+
+    Args:
+        chars_freq: A dictionary of characters and their frequencies.
+
+    Returns:
+        The root of the Huffman tree.
+    """
+    nodes = []
+    for char, freq in chars_freq.items():
+        heapq.heappush(nodes, Node(char, freq))
+
+    while len(nodes) > 1:
+        left = heapq.heappop(nodes)
+        right = heapq.heappop(nodes)
+        parent = Node(None, left.freq + right.freq)
+        parent.left = left
+        parent.right = right
+        heapq.heappush(nodes, parent)
+
+    return nodes[0]
+
+def encode_char(root, char, code=''):
+    """
+    Encodes a character using Huffman codes.
+
+    Args:
+        root: The root of the Huffman tree.
+        char: The character to encode.
+        code: The current code (initially empty).
+
+    Returns:
+        The Huffman code for the character.
+    """
+    if root is None:
+        return ''
+
+    if root.char == char:
+        return code
+
+    left_code = encode_char(root.left, char, code + '0')
+    if left_code != '':
+        return left_code
+
+    right_code = encode_char(root.right, char, code + '1')
+    return right_code
+
+def decode_char(root, code):
+    """
+    Decodes a Huffman code to get the character.
+
+    Args:
+        root: The root of the Huffman tree.
+        code: The Huffman code to decode.
+
+    Returns:
+        The decoded character.
+    """
+    current = root
+    for bit in code:
+        if bit == '0':
+            current = current.left
+        else:
+            current = current.right
+
+    if current.char is not None:
+        return current.char
+
+def encode_message(root, message):
+    """
+    Encodes a message using Huffman codes.
+
+    Args:
+        root: The root of the Huffman tree.
+        message: The message to encode.
+
+    Returns:
+        The encoded message.
+    """
+    encoded_message = ''
+    for char in message:
+        encoded_message += encode_char(root, char)
+    return encoded_message
+
+def decode_message(root, encoded_message):
+    """
+    Decodes a Huffman-encoded message.
+
+    Args:
+        root: The root of the Huffman tree.
+        encoded_message: The encoded message.
+
+    Returns:
+        The decoded message.
+    """
+    decoded_message = ''
+    current = root
+    for bit in encoded_message:
+        if bit == '0':
+            current = current.left
+        else:
+            current = current.right
+
+        if current.char is not None:
+            decoded_message += current.char
+            current = root
+
+    return decoded_message
+
+# Example usage
+chars_freq = {'a': 45, 'b': 13, 'c': 12, 'd': 16, 'e': 9, 'f': 5}
+root = build_huffman_tree(chars_freq)
+
+message = "abcdef"
+encoded_message = encode_message(root, message)
+print("Encoded message:", encoded_message)
+
+decoded_message = decode_message(root, encoded_message)
+print("Decoded message:", decoded_message)
+```
+
+
+
+

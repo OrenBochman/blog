@@ -1,0 +1,58 @@
+---
+title: "The Referential Lewis Signaling Game"
+subtitle: "Back of the napkin complexity calculations"
+date: "2025-01-14"
+categories: [reinforcement learning, complex signaling system]
+keywords: [methodology, reinforcement learning]
+bibliography: ./bibliography.bib
+image: /images/cover.png
+---
+
+When I read a few papers using the referential Lewis signaling game I thought, this should be much faster for complex signaling games I use in my research. But when I got to thinking about coding a Bayesian agent with belief propagation I realized that the referential game is actually not a little easier but essentially trivial to solve even if coding the belief propagation algorithm is not. 
+
+Now that I wrote this up I realize I can code a much simpler algorithm without belief propagation that will solve the referential game in (sub)-linear time complexity.
+
+
+::: {.callout-caution}
+
+## TL;DR
+
+In many experiments that RL agents are use the Referential Lewis signaling game, rather than the simple Lewis signaling game (AKA the Lewis Reconstruction Game). [But a powerful RL agent can and should learn to exploit this difference and solve the coordination problem in sub-linear time complexity]{.mark} . I therefore recommend that researchers avoid the methodological trap of using the referential Lewis signaling game as a stand in for the simple Lewis signaling game!
+:::
+
+In the referential Lewis signaling game, the sender has to choose a signal that will help the receiver identify the correct state. The receiver has to interpret the signal and choose the correct state. This requires planning and coordination between the two agents.
+
+The main difference between the referential Lewis signaling game and the simple Lewis signaling game is that in the referential game, the receiver picks from a restricted set of states, rather than the full set of states. For researchers used to supervised learning this seems like a small change - the task looks like the familiar k-way classification task.  This seems fine particularly as modern RL agents have neural networks that are built using pretrained classifiers like Clip or Cnns that are trained on ImageNet.
+
+Using a pretrained model can let agent completely avoid the coordination problem inherent in the Lewis signaling game and is not the focus of this post. One the other hand the referential Lewis signaling game is also problematic and in a way that RL agents should learn to exploit rather quickly.
+
+
+
+
+Lets consider the basic lewis game with 100 states and 100 signals. 
+
+In the first round the receiver has a 1/100 chance of decoding the signal correctly. It seed $E_1$ Say it picks $S_1$
+Now If the state has changed the receiver sees a new signal $E_2$. If it picks a signal at random it has again a 1/100 chance of decoding the signal correctly again. Though if it picks $S_1$ again it has a 1/99 chance of decoding the signal correctly, because for it has excluded $S_1$ for $E_1$. 
+As the state keeps changing the sender should keep sticking to the same signal as each mistake the receiver makes gives it more information about the meaning of the signal. Boring and slow after 50 round on average the receiver will have decoded the first signal and got its first payoff.
+It now start from scratch with the second signal and 1/99 chance of decoding it.
+We can estimate the complexity of the game as $O(N^2)$
+
+Now consider the referential game with 100 states and 100 signals and a challenge set of k=4 states.
+
+1. In the first round it sees $e_1$ the receiver has options ${s_1, s_2 ,s_3 ,s_4}$ It has a 1/4 chance of decoding the signal correctly. 
+Again it picks $S_1$ and looses out. But now it knows
+1. the next time it sees $e_1$ it should pick one of the other three states it has seen before. If all three appear it has a 1/3 chance of decoding the signal correctly by ignoring the state it has not seen before.
+1. Is the K states are a random sample of the 100 states there is a very small chance that the receiver will see the any of ${s_1, s_2 ,s_3 ,s_4}$ again for $e_1$ unless it is the correct state! Lets calculate its likelihood if the next such round is the next round.
+    1. The worst case of sees all three candidates ${x, s_2 ,s_3 ,s_4}$ with 3/4 chance of decoding the signal correctly. There are 100-3=97 it can get such a combination.
+    2. next worst case of sees a combination with two unknown candidates ${x, y ,s_3 ,s_4}$ with 1/2 chance of decoding the signal correctly. There are (99-3)*(99-4) * 3 such a combinations.
+    3. next worst case of sees a combination with one unknown candidates ${x, y ,z ,s_4}$ with 1/1 chance of decoding the signal correctly. There are (99-3)*(99-4)*(99-5)*3 ways it can get such a combination.
+    4. to sum up it has $\frac{(99-3)*(99-4)*(99-5)*3 + (99-3)*(99-4)/2 + 97*3/4 }{(99-3)*(99-4)*(99-5)*3 + (99-3)*(99-4) + 97} = .998$ 
+    chances of decoding the signal correctly on the next such round.
+So for the referential game the receiver has a 1/4 chance of decoding the signal correctly in the first round and a 1/998 chance of decoding the signal correctly in the second round for $e_1$ We can estimate the complexity of the game as $O(N)$
+
+
+So by restricting the the options to the receiver the referential game is reduced from square to linear complexity. This is a huge difference also in the worst case the agent need to store N*K-1 states to solve the referential game this way. And in practice it can be solved even faster since after going through every state once the receiver has solved 1/K of the states and can eliminate those from the states it has in it's buffer. 
+
+If you are working with RL agents and more so if you are using deep RL avoid the methodological trap of using the referential Lewis signaling game as a stand in for the simple Lewis signaling game as you are using Deep RL or Dynamic Programming to solve an O(N) coordination problem rather which is overkill and not a particularly impressive result.
+
+

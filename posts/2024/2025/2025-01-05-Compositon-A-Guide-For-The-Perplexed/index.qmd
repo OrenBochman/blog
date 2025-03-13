@@ -1,0 +1,250 @@
+---
+title: Compositionality in Lewis signaling games and MARL transfer learning.
+date: 2024-10-14
+categories: [compositionality, emergent languages, reinforcement learning, transfer learning, information theory, linguistics, complex signaling system]
+keywords: [compositionality, emergent languages, reinforcement learning, transfer learning]
+bibliography: ./bibliography.bib
+image: compositionality.jpg
+---
+
+
+::: {.callout-note}
+## TL;DR: Compositionality - A guide to the perplexed
+
+![Compositionality in a nutshell](/images/in_the_nut_shell_coach_retouched.jpg)
+
+[**Compositionality** means different things to different people in different contexts, which is irksome to the student, renders researches prone to vagaries and foist unexpected complications onto practitioners]{.mark}. Although I'm no Maimonides, I will assay to identify the different meanings; delineate thier contextual boundaries; and to establish a hierarchy relating such different facets of Compositionality. 
+
+In this research note I'm trying to formalize the notion of compositionality within the context of Lewis signaling games. Though I'm hopeful to try to extend this to Multi Objective Multi Agent Reinforcement Learning (MO-MARL) with applications to transfer learning. I will also try to abstract these into a formalize mathematical form.
+
+Ideally, though I'd like to express these using commutative diagrams and functors. This is because compositionality is a property of functions and functors are the abstraction of functions.
+:::
+
+
+## Motivation 1 - Synthetic and Emergent languages
+
+When dealing with emergent languages, I believe that complex signaling systems that are more faithful representations of real world states are superior to ones that just map them arbitrarily. I say complex because the simple signaling systems are highly symmetrical but when we use aggregate signals we immediately get systems that are have different levels of desirable properties. The signaling systems one ends up with may be path dependent, and may not be the most optimal for the task at hand.
+
+But what does it mean to be faithful? ^[this is not related to the mathematical notion of a group action discussed below, It just means that the signal is a good representation of the state.]
+
+We can most easily understand it using an example. If the state contain some space time description, a signaling system that has a rule about describing space and similar rule about time will require learning two rules and a much smaller lexicon rather than leaning no rules and a massive lexicon for each of the space time combinations deemed pertinent to communication. We also see how compositionality is intimately tied to learnability and faithfulness. In a language that is compositional we can allocate more of the lexicon to atomic and semantically orthogonal concepts and use the rules to create a whole space of possible meaning.
+
+Why is this a challenge? In the real world states are complex and there are many facets to being faithful. For example, the state might be a picture of a cat. The signaling system might have to learn to describe the color of the cat, the shape of the cat, the size of the cat, the position of the cat, the orientation of the cat, the texture of the cat, the breed of the cat, the mood of the cat, the age of the cat, the health. The list goes on and on. So as a language grows we shift from a simple rules to capture parts of the state into more abstract system that can capture all the many facets of the state with the added constraint that this abstract system must be easy to learn via this same idea of composition. ^[One would imagine that given a flexible template for a complex signaling game the constraint on learnability would select for more compositional languages. In reality there are many impediments to learning such a systems so there are no guarantees that using various constraints will lead to a paragon of complex signaling to emerge - we will more likely see something odd and obscure that is very hard to interpret. I'd like to point out that natural languages are rather hard for machines to learn and for most humans even more so.]
+
+### Desiderata fulfilled by the original Lewis signaling game
+
+Natural language temper a using faithful one to one mapping with of state to signals with abstraction that are easier to learn by being general.
+
+- When learning using a Lewis signaling game, agents begin with a very simple semantic setup 
+- there is a list of states and we want to be able to name them. 
+- Agents learn a mapping not unlike a **lexicon** which list the different meaning of a token.
+- A good lexicon also lists things like prefixes, suffixes and collocations which are compositional elements of language. 
+- A **thesaurus** list synonyms which are also compositional elements of language. Lewis games can also capture synonymy by having multiple signals for the same state we can call these partial pooling states equilibria - separating equilibria as they do not require receiver to guess the state from the signal.
+While synonyms are clearly inefficient in a a signaling system, when adding a time dimensions synonyms for common ideas can diverge into more nuanced states as we learn more facets of the partial state they correspond. We can think of this also as $X+w_1 a, X+w_2 b ... X+n$ where X is the common state and a, b, ... n are the different semantics atoms but the weights w_i start as 0 and  slowly increase thus diverging into more meaningful versions.
+- Lewis games can also capture homonymy by having multiple states for the same signal this is called a partial pooling equilibrium. These are useful if we consider them as the most informative partial signals that can be sent. (This may sound a bit of a stretch but it is best way I found to think about it.)
+
+We can see how Lewis game can capture at least three structural properties of language. In the literature the focus has been on signaling systems which are one to one mappings between states and signals this corresponds to a large part of language which is unambiguous and has a list like structure I discussed above. However we can now see that algorithms that could be designed to target a broader set of equilibria that facilitate use of synonyms and homonyms. This is a more complex signaling system that is more like a thesaurus and a dictionary combined.
+
+## Motivation 2 - Transfer learning in RL
+
+Some modern RL algorithms are fantastic for finding optimal or superhuman level policies for a single task. However, when we want to learn a new task we often have to start from scratch. This is because the policy is a complex function that is hard to decompose into simpler functions that can be reused. This is a problem of compositionality. If we could decompose the policy into simpler functions we could reuse the simpler functions and learn the new task faster. This is the idea behind transfer learning.
+
+Recent research into using LLMs with RL agents indicates that with an expressive enough language and the kind of common sense knowledge captured in such a language agents may have enough structure to represent thier task in terms of an abstraction that is sufficiently amenable to transfer skills between task and may significantly reduce the amount of learning required to learn a new task. 
+So if a language is a compositional representation of the world and the rewards can also be expressed as compositional functions of the state components then agents may be able to leverage these structures.
+
+Also learning language in the microcosm of other games framing the lewis signaling might be key to exploring this duality of RL algorithms that learn abstract representations along with transferable RL skills.
+
+
+## Games and constraints
+
+Besides the lewis signaling game there are:
+
+1. the **Lewis reconstruction game** - where the receiver needs to reconstruct the state (an image) using the signal and there is a reconstruction loss. The agents get a shared reward but it is not 0 or 1 but a continuous value. (Deep learning practitioners likes continuous rewards since they can be differentiated and plugged into the backpropagation algorithm.)
+2. the **Lewis referential game** AKA **the classification game**. The receiver needs to pick the correct state from a set of distractions and one or more good image. This is easier than the original game as there are fewer states to choose from. However selecting the state requires learning an image classifier or even a clip classifier and this is a harder task then just learning a mapping from states to signals. (It requires more steps to train if we start from scratch and learn one example at a time as we do in the lewis game. In this game i think if the distractions come from a GAN there would be better opportunities for compositionality to emerge.)
+3. The set reference game [@mu2022emergentcommunicationgeneralizations] in which states are sets of images that need a rule
+3. The concept game [@mu2022emergentcommunicationgeneralizations]
+
+Note: in both these task there are usually two modalities. Perception with multiple modalities may be key to developing the discriminative ability to learn to ignore distractions and focus on the most salient parts of the state. Each modality has its own distractions and noise. This places the actors language expressive enough to be general purpose. On the other hand the real world is four dimensional. A large parts of languages like tenses and part of the case systems are about capturing these. Anyhow if we can get an adversarial setup ideally the adversary can learn to generate distraction in all modalities.
+
+A four dimensional world is a world where the state is a sequence of three dimensional attributes that evolve. Some are salient to one task others to another and most are distractions and should be ignored. Also in this kind of a game agents can more readily learn to distinguish between cheap talk and informative signals. This is because distractions are not just random noise but are generated by a model that is trying to fool the receiver.
+
+## Constraints
+
+I am kind of biased that by adding constraints, preferably encoded as incentives some undesirable outcomes can be avoided.
+
+1. **Laziness** the loss of a complex lewis game should penalize agents for long messages and reward them for short ones. see also [@rita2020lazimpa] where this is called lazy communication.
+1. **Impulsivity** the loss of a complex lewis game should reward early actions i.e. impulsiveness if it results in a correct action. see also [@rita2020lazimpa] where this is called a impulsiveness.
+1. I think that these could happen in a frame game of predation which mutiplies the Lewis game outcomes with a bonus and a malleus or in which each atomic signal sent carries a risk of sudden death.
+1. **Communication bottleneck** see [@kirby2001spontaneous] - complex signals would need to arise if agents have to use a restricted communication channel. I think of this as a shannon noisy channel and can only send a short sequence of drawn from a limited set of symbols. ^[This together with the previous constraints should encourage agents to learn to do source coding on the signals.]
+1. **Errors Correction** if there are errors then agents will benefit from being able to correct them. Injecting errors into the signals should incentivize agents to learn redundent a more complex signaling system that can detect and correct errors. This together with the previous item forms the notion shannon game, operating as a frame game for the lewis game.
+1. **under-parametrization** [@kottur2017natural], [@galke2022emergent]
+1. **population dynamics** [@chaabouni2022emergent], [@rita2022role]
+1. **memory restriction** [@cogswell2019emergence], [@cornish2017sequence] 
+1. **partial observability** agents only see a fraction of the states at training time perhaps one or two combinations of each partial state. They need to be able to use language to coordiante the full state by pooling thier partial observations. This is what we generally mean about generalization.^[The greater the signaling systems the more challanging to learn from a few examples as agents are trying to learn a grammar a lexicon and many distributions to more effectively decode messages.]
+
+## Functors abstractions of function composition
+
+In mathematics composition of function is one of their most fundamental and useful properties. When we think about compositionality in natural language and in machine learning we are really trying to impose some version of this idea into the problem and this is a point we almost always forget. But since mathematics is where this ideas are formalized, mathematics is where the some of the best ideas are likely to be found.
+
+
+In mathematics one is often more interested in functions that preserve a structure which are called morphisms.  and the abstraction of this idea is [functor](https://en.wikipedia.org/wiki/Functor) in [category theory](https://en.wikipedia.org/wiki/Category_theory))
+
+
+![functor](Commutative_diagram_for_morphism.svg){.column-margin}
+
+
+However lewis games do not require us to only use simple symbols. Agents can play the game with more complex signals and states. This is where the notion of compositionality becomes more interstsing. We can think of the lewis game as a function from states to signals
+
+- [formal languages](https://en.wikipedia.org/wiki/Formal_language) deal with transformation of one set of symbols to another set of symbols. This lets us rewrite a message from basic symbols into one with more complex symbols and allows us to use numbers to represent the different languages in the [chomsky hierarchy](https://en.wikipedia.org/wiki/Chomsky_hierarchy).  This is probably not the first thing that people in this field consider. However work starting with the simple formalism of Lewis game quickly raises the questions of how can we get language in which subsequent signals can used to break the symmetry leading to ambiguities associated with partial pooling equilibria. This is it worth noting as it might be the necessary abstraction to properly state the  the problem.
+
+![The Chomsky hierarchy expresses greater expressivity.](Chomsky-hierarchy.svg){.column-margin}
+
+
+- games have a tree representation called [extensive form](https://en.wikipedia.org/wiki/Extensive-form_game).
+    - We can graft to the lewis game tree additional trees states before and after and thus get game with equilibria that are more in line with various notions of compositionality and other properties of natural languages.
+    - If this seems extreme it is worth noting most of the time we are not interested in a coordination task but some other framing task in which coordination is a means to an end. If this task can be learned by MARL
+    then we already have this kind of extended tree with an embedded lewis game tree. It is essential that some kind of harmony is maintained between the parts or the equilibira may not be part of the biggger game.
+    e.g. lewis games are cooperative games where the agents are trying to coordinate on a single equilibrium. If the framing game is a zero sum game it then it may eliminate the incentive to coordinate encoded into the payoffs
+    of the lewis game. I don't mean to say you cant have a game with incentives to
+    cooperate and to compete but that when you do its a subtle ballance to maintain both without breaking either.
+    - 
+
+![syntax tree](Syntax_tree.svg){.column-margin}
+
+- signals can be aggregated using different ways and it is hard to generelize from conjunction, to recursive structures.
+
+> The syntax of English, for example, is clearly compositional—that is, the meaning of a sentence is some function of the meanings of the parts of that sentence. --- [@kirby2001spontaneous] 
+
+
+- 
+
+<style>
+.gold { color: gold; }
+.red { color: red; }
+.green { color: green; }
+.blue { color: blue; }
+.purple { color: purple; }
+</style>
+
+| Root (Gold)        | Tense (Red)                        | Person & Number (Green)          | Group Action                                                                                                                                                   |
+|--------------------|------------------------------------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <span class="gold">áll</span>  | <span class="red">Present</span>                 | <span class="green">1st person singular</span>  | <span class="gold">áll</span><span class="green">ok</span>                                                                                                     |
+| <span class="gold">áll</span>  | <span class="red">Present</span>                 | <span class="green">1st person plural</span>    | <span class="gold">áll</span><span class="green">unk</span>                                                                                                    |
+| <span class="gold">áll</span>  | <span class="red">Present</span>                 | <span class="green">2nd person singular</span>  | <span class="gold">áll</span><span class="green">sz</span>                                                                                                     |
+| <span class="gold">áll</span>  | <span class="red">Present</span>                 | <span class="green">2nd person plural</span>    | <span class="gold">áll</span><span class="green">tok</span>                                                                                                    |
+| <span class="gold">áll</span>  | <span class="red">Present</span>                 | <span class="green">3rd person singular</span>  | <span class="gold">áll</span>                                                                                                                                  |
+| <span class="gold">áll</span>  | <span class="red">Present</span>                 | <span class="green">3rd person plural</span>    | <span class="gold">áll</span><span class="green">nak</span>                                                                                                    |
+| <span class="gold">áll</span>  | <span class="red">Past</span>                    | <span class="green">1st person singular</span>  | <span class="gold">áll</span><span class="red">t</span><span class="green">am</span>                                                                                                      |
+| <span class="gold">áll</span>  | <span class="red">Past</span>                    | <span class="green">1st person plural</span>    | <span class="gold">áll</span><span class="red">t</span><span class="green">unk</span>                                                                                                     |
+| <span class="gold">áll</span>  | <span class="red">Past</span>                    | <span class="green">3rd person singular</span>  | <span class="gold">áll</span><span class="red">t</span>                                                                                                        |
+| <span class="gold">áll</span>  | <span class="red">Past</span>                    | <span class="green">3rd person plural</span>    | <span class="gold">áll</span><span class="red">t</span><span class="green">ak</span>                                                                                                      |
+| <span class="gold">áll</span>  | <span class="red">Future</span>                  | <span class="green">1st person singular</span>  | <span class="red">fog</span><span class="green">ok</span> <span class="gold">áll</span><span class="green">ni</span>                                                                             |
+| <span class="gold">áll</span>  | <span class="red">Future</span>                  | <span class="green">1st person plural</span>    | <span class="red">fog</span><span class="green">unk</span> <span class="gold">áll</span><span class="green">ni</span>                                                                          |
+| <span class="gold">áll</span>  | <span class="red">Future</span>                  | <span class="green">2nd person singular</span>  | <span class="red">fog</span><span class="green">sz</span> <span class="gold">áll</span><span class="green">ni</span>                                                                            |
+| <span class="gold">áll</span>  | <span class="red">Future</span>                  | <span class="green">2nd person plural</span>    | <span class="red">fog</span><span class="green">tok</span> <span class="gold">áll</span><span class="green">ni</span>                                                                         |
+| <span class="gold">áll</span>  | <span class="red">Future</span>                  | <span class="green">3rd person singular</span>  | <span class="red">fog</span> <span class="gold">áll</span><span class="green">ni</span>                                                                                                    |
+| <span class="gold">áll</span>  | <span class="red">Future</span>                  | <span class="green">3rd person plural</span>    | <span class="red">fog</span><span class="green">nak</span> <span class="gold">áll</span><span class="green">ni</span>                                                                        |
+
+- this is considered  a regular verb in hungarian
+- i have ommitted many of the forms of the verb for simplicity
+- we can ser that person and number have an entangled representation.
+- present tense is unmarked
+- past tense is is an infix
+- future tense has its own template with a auxilary verb and a infinitive 
+
+
+- there is another point I'd like to make and  it has to do with making agent able to communicate with humans.
+- if the agent's language has the same group actions (homomorphism) to express structural semantics of nouns, verbs, pronouns etc. It should be much easier to then learn to converse in the homomorphic human language. The task boils down to learning functors that map agentic-roots to natural roots and agentic rules to natural rules. The agentic language might be highly regular with a single verb template and to use hungarian it might need to learn 60+ verb templates. But this is much easier I think then learning hungarian from scratch.
+- in reality learning a few extra rules might faccilitate (e.g. phonemic adjustments and vowel harmony) being able to communicae with hungarian verbs.
+
+Note though that we are no longer talking about learning hungarian but some underlying structure that is shared between hungarian and the agents language. 
+
+This idea of learning a underlying structure and a surface structure is one that can be further abstracted. We can have a morphological level a syntactical level and a logical level all disentandled and seperatable or we can have them all sitting in one level and possibly entagled.
+
+Entaglement can arrise from ... cancatenation, from coding the most  common segements into shorter segments, erosion, and swapping to help with difficult phone sequences. 
+
+THis suggests that we might have a sequence-bag or soft-sequence agregator - a conventino that has a prefered order but is indifferent to change in the order so long as semantics are preserved. 
+
+also 
+word order 
+
+şehirlileştiremediklerimizdensiniz mean "you are one of those that we could not make into a city dweller" in archaic turkish. The word order is the opposite of English or Hebrew, this is because Turkish is a VO and English is an OV language. The word order is a surface structure that is not important to the meaning of the sentence. [@deutscher2006unfolding]
+
+
+## An evolving desiderata of Emergent Languages
+
+1. mappings between states and signals
+    1. morphosyntax mappings preserve partial states (Homomorphism of normal subgroups) 
+    2. mappings preserve semantic topologies (if a is close to b then f(a) should be close to f(b))    
+1. Stability
+    1. Regualrity is stable (mappings used in syntax and morphology are stable over time)
+    2. Irregularity is stable (mappings used in irregular verbs and nouns are also stable over time) In english we maintain many irregular borrowings from other languages and thus preserve thier regularity - making such exceptions easier to learn too.
+1. Compositionality
+1. Brevity (source coding)
+1. Self correcting (channel coding to detect errors and correction them through redundancies like agreement, vowel harmony, etc.)
+1. Learnability - how many things need to be coordinated; the complexity of the strucures, the [Hoffding bound](https://en.wikipedia.org/wiki/Hoeffding%27s_inequality) on rates of learning distribution when there are errors. The [Bonferroni correction](https://en.wikipedia.org/wiki/Bonferroni_correction) for  multiple learners.^[multiple learners has similar logic as a multiple hypothesis testing problem, for each learner postulating different signaling system with each failure or success in a Lewis game. More so when learners get to observe each other's actions and rewards.]
+
+1. Stable irregularities 
+1. zipfian distributions - the most common signals should be the shortest and the least common the longest. This is a form of source coding and would arrise naturally from huffman coding, except that this isn't practical for several reasons. It could also arise out of laziness in the sender
+1. Faithfulness 
+1. Distributional stability
+1. Decidebility - easy to disambiguate ambiguous signals from thier context
+1. Expressivity - the ability to express a wide range of concepts
+1. Generalization - learning the language is possible from just a few signal state pairs.
+
+Some metrics
+
+1. Compositionality
+    1. Topographic similarity c.f. [][@mu2022emergentcommunicationgeneralizations]
+    1. 
+2. Source coding 
+    1. Compression ratio
+    1. Entropy
+    1. Mutual information
+3. Error detection and correction
+    1. Error rate
+    1. Hamming distance
+4. Learnability
+    1. Number of examples to learn a new word
+    1. Number of examples to learn a new rule
+
+
+Another random thoguht or two:
+
+
+### VO and OV via symmetry breaking 
+
+
+If we use Huffman coding like process to organize the order of the morphological and syntactical elements (effectively making the fixing the on avarge most surprising partial signals before the next on average most surprising ones) we should have emergent languages that are rather similar and fairly easy to learn 
+Like Turkish and Japanese. However there is at the start the question of how to apply aggregations. If action is first we get V O languages if it is second we get OV languages. I think that V carries more entropy in Predation and Resource gathering games so that VO should be more pravelent. However once this decision is made most partical algorithms will not be able to reverse it.
+
+### Vowel Harmony
+
+if agents backprogogate with topographic similarity in mind and the 
+basic signals (phonemes) are endowed with a similarity they may end up with
+systems with vowel harmony and alternation of consonants to capture sets normal subgroups with greater similarity.
+
+if these regular configuration also lead to better channel coding the benefits should persist. 
+
+
+## Compositionality in Lewis signaling games
+
+So here is a sketch idea for an algorithm for learning a compositional language in a lewis game.
+
+
+We need a language designer. This is can be the sender, the receiver or implicit. Without loss of generality we can assume that the sender is the language designer.
+
+THe language designer needs 
+1. to a 'semantic' metric to decide when two state are close or distant.
+2. a  way to deconstruct states into atomic orthogonal/independent parts. I am thinking of normal subgroups.
+
+Note that we can define the metric on the parts and aggregate them to get the metric on the whole. This is a form of compositionality.
+
+More abstractly we can just say that the state is an algebraic topological group. 
+
+So the language designer can use a template with n part (on for each of the subgroups) Ideally ordered with by the decreasing size to prefix code the sub-states. If they there are duplicate sizes this will yield multiple equilibria to be selected via spontaneous symmetry breaking.
+
+The designer now can allocate the states to one of the points in the topology. By picking the system with lowest overall distances we get a regular compositional language. 
+
+Since there are many ways to do this the designer needs to coordinate with the receiver. 
+However since there is greater regularity they only need to coordinate a minimal set with each atomic  sub-state appearing once.

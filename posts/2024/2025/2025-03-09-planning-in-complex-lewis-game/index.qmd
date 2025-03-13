@@ -1,0 +1,159 @@
+---
+title: "Planning in the Complex Lewis Game"
+date: "2025-01-14"
+categories: [compositionality, emergent languages, reinforcement learning, transfer learning, information theory, linguistics]
+keywords: [compositionality, emergent languages, reinforcement learning, transfer learning]
+bibliography: ./bibliography.bib
+image: /images/cover.png
+---
+
+Today I want to consider a couple of weak assumption about planning in the Complex Lewis game. Yet  before I do I ought to revisit the basic form of the Lewis Signaling game and the referential version of the game^ and the complex version of the game, and how these are formalized in Game Theory and in Reinforcement Learning. This is perhaps an onerous detour but it might be useful to help make progress that the weak assumptions I want to consider.
+
+::: {.callout-note}
+## The referential Lewis Game
+
+In the referential game the sender has un unrestricted lexicon. The receiver gets to picks from a restricted set of states. Since it can remember them learning can proceed much faster. if there are 4 options the trial adds clues about 4 slots in the state/signal matrix but it also excludes all the other signals  for that states. 
+
+When I went over the referential Lewis game I was able to realize a fascinating distinction between this version and the original formulation which is described in greater detail in the [next research note](../2025-03-09-referential-lewis-game/index.html). What it suggests is that by restricting the options of the receiver to a subset of the states the game becomes much easier to solve. The details are less important but I can say it changes from $O(N^2)$ to $O(N)$ in terms of the number of trials required to solve the game and the memory requirements are also reduced.
+
+On the other hand as described below the complex version which seems to be equivalent to the basic formulation with the restriction of the symbols can be exactly as hard as the basic formulation or much harder problem depending on the senders choice of either a contiguous and thus finite set of signals or a sparse in what can be potentially infinite set of signals. 
+
+:::
+
+::: {.callout-note}
+## Tables v.s. Rules - Motivating function approximation
+
+I learned about the formal definition of a functions in a course on set theory by [Yaacov Choueka](https://en.wikipedia.org/wiki/Yaacov_Choueka) who headed the [Bar Ilan Responsa Project](https://www.responsa.org.il/) and played a leadership role in the [Rav-Milim project](https://www.ravmilim.co.il/naerr.asp) which was is run by [Melingo](https://melingo.com/) for which I worked for. Now one of the many insight I gained in that course is that a function which I alway thought of a a rule is nothing more then a table of values. There are some columns for the inputs and one column for the output. (Perhaps more if it is a multi-valued function). Another fascinating point made in this class and echoes later throughout many mathematics courses is that even absent a rule we can posit that a choice function exists that maps the inputs to the outputs. This seems to be a basic and unassailable assumption in mathematics called the axiom of choice and I even read a couple of fascinating books Titled Equivalents of the Axiom of Choice, I & II, c.f. [@rubin1963equivalents], and [@rubin1985equivalents] which demonstrate that this notion of a choice function is actually quite pervasive in mathematics and often less intuitive then the axiom of choice itself. Also it is used in the proof of the existence of many mathematical objects that are not easily constructed. One example that comes to mind is the existence of an equilibrium in the Lewis signaling game with some arbitrary structure!
+
+Now the point of this nostalgic digression is that although in my mind for many years the distinction between the table (albeit with a continua of entries) and a rule had been erased. When I learned a about RL a fine distinction was made which made me realize that the two are not one and the same. After learning about tabular methods we are told that the problem with a table is that it does not generalize. What you learn about an entry any number of $x$ and $f(x)$ does not help you predict the value of any other $x$. Because the choice function can spit out any pair of $x$ and $f(x)$ it wants.
+But if we use a rule e.g. a linear function approximator or a Neural Net then the parameter learn a rule, perhaps also the importance of the different inputs and can generalize to new inputs. And there is also a very neat result - linear function approximation cant be used to represent any table, though at the cost of having a potentially one parameter for each input in the table. (E.g. I didn't say it wan't a trivial result).
+
+Now I told this little story because as I survey the literature I see that many authors like I did fail to make this simple distinction, they are discussing experiments in Tabular setting but then talking about results concerning rules.
+
+In terms of RL these are distinct algorithms. Function approximators require features and parameters. Tabular methods do not. So while discussion about rules in the context of Lewis signaling games may be interesting they cannot be complete when omit the features and algorithms that can learn such rules and it seems that no less significant is the importance function used to evaluate the loss on different examples. It also follows that the features are drawn directly from the pre-linguistic objects that we associate with the states!
+
+So to sum up: [RL agents don't say that agents learn rules in the Lewis signaling game. While rules and generalization are very powerful elements in language modeling, they don't typically arise from the Lewis signaling game. None of the algorithms in the book signals are suitable to learn rules - they are generally tabular algorithms. So without suitable structures being explicitly included in the state space as appropriate prelinguistic objects, features and algorithms we may be at a loss as to explain how agents learn such rules. 
+
+
+:::
+
+Also now that this is clarified it seems quite interesting to fill in the details about how we may acquire such features and develop an algorithm.
+
+To avoid confusion lets state these assumptions up front. 
+
+Before we consider how a sophisticated language evolves in the  complex signaling system might evolve that is like a language we should consider the trivial case. By this I mean how can the agents overcome the limitation of having a large set of states $\mathbb{S}=\{s_i\}$ and a much smaller set of signals $\mathbb{L}=\{l_i\}$. Clearly, they will need to send sequences of signals or they will be stuck in a partial pooling equilibria and with a very low success rate, corresponding to the number of signals divided by the number of states. We can reference this language as $L^*$. where the star symbol is the Kleene star and indicates that the language is a set of strings of signals.
+
+::: {.callout-important}
+
+### Trivial Complex Signaling Systems
+
+The trivial formulation and its as follows:
+
+1. The Sender enumerates the states. $1,\ldots,|S|$. 
+    As there are $|S|!$ ways to enumerate the states. This enumeration may seem like a choice that sender can defer to when each state appears but the Lords of Entropy will not allow this - he must decide ahead of time on a strategy and that means a signal for each state must be chosen.    
+    In the bayesian view The enumeration is predetermined by Nature. We might further imagine that the sender is assigned a lexicon of states to signals, but perhaps there is just a barcode reader that scans a state and returns a number.
+2. The sender converts the enumeration to base in $[2,\ldots,|L|]$, we could assume he picks the largest.
+3. The sender transliterates each digit to a signal in L* by converting each digit to a signal in the alphabet $\mathbb{L}$. He again as a L! ways to do this but again the Gods of entropy, require that he must pick them ahead of time. In the bayesian view he might be provided by a decoder ring to do this... ex-ante. But if he subscribes to the frequentest orthodoxy he might toss aside the decoder and pick the mapping at random the first time he transliterates each digit.
+4. He then sends the resulting sequence to the receiver.
+5. In the bayesian view the receiver has a pile of decoder rings and state-enumeration lexicons all he needs is to figure out the type the sender is using and so he can choose the ones that reverse the original process. Or if he subscribes to the frequentest orthodoxy he can just try states by trial and error and keep tabs of what he has tried and what the sender has sent.
+
+To sum this up the sender is assigned a type from S!*L! possible types. He encodes the states using base L enumeration and sends it to the receiver. 
+
+The receiver can use any algorithm it used in the simple Lewis game.
+
+Note: if we make the assumption that the agents can both count and share the digits.
+Then we can also assume that the sender will have picker the first $|S|$ numbers in base $|L|$. Under this assumption the receiver can test each $|S|^2$ possible options, string out any signals,state combo that has already been eliminated, giving a total of $|S|(|S|-1)/2$ tests in the worst case... which is exactly the same as the simple lewis game.
+:::
+
+The trivial game is tabular in nature - the encoding is a table assigned by nature. The decoding is by necessity the inverse table as they must compose to the identity. 
+
+Now I get to ask and answer what I never asked my teachers: "Why bother with this trivial case?"
+
+1. Because it is the simplest case and it is a good starting point to consider the more complex cases.
+2. Also the RL agent generally smuggle without a some solution no matter how bad before they can learn to find the optimal policy. In other words the trivial solution is the greater half of the battle. 
+3. Moving forward in RL is usually based on making steps with minimal improvements. I already have many ideas on making minimal improvement based on ideas listed in the article on the [desiderata of emergent communication](../../2025/2025-01-14-Desiderata-For-Emergent-Languages/index.qmd)
+
+We can now think about adapting this problem to existing tabular RL methods or for developing new ones.
+
+Naturally we may wonder if the agents can do better than the trivial solution? Can we do any better without adding more structure to the state space?
+
+
+::: {.callout-important}
+
+### Non-trivial Complex Signaling Systems - Noisy channel
+
+If the channel is perfect, the sender might want to use the first contiguous N numbers. But if there is a noisy channel it could do better by pick the first N numbers that are each at a (hamming) distance of K from each other. This would alow  the receiver to recover messages with k errors.
+
+This suggest that the receiver cannot assume the sender is using the first $|S|_{|L|}$ numbers. In this case it cannot  even be sure that there are $|S|$ signals as they can be corrupted to many more signals. 
+
+What should the reciever do in this case ? If it can figure out the (hamming) distance between codes it can use that to recover the original message. But it also needs to figure out what the correct message means. 
+
+So adding an error correction might help agents in the long term but it might increase the search space for the receiver by a orders of magnitude
+
+So this is a challenge. For a large state space this will be a show stopper. However if the agent is learning functions rather then tables it might be ok. This is because it could learn the function on a small state space and then use this to generalize to the larger state space. This combines function approximation with curriculum learning. We may revisit this scenario later on.
+
+:::
+ 
+- If there is a inherent structure in the states, the sender might select an encoding $e(s)$ should preserve this structure. For example if S has a group structure the sender might use an encoding that is a group homomorphism. If there is are partial orders in the states the sender might use an encoding that if monotonic with respect to the partial order. 
+    - We may call a minimal set of states as a base lexicon if knowledge of the base lexicon and the encoding function is sufficient to recover the rest of the lexicon automatically. In terms of linguistics we might call these the parts of the lexicon that is not in the base as the derived lexicon as it contains inflections, declensions, and derivations of the base forms.
+    - In such a case though the sender might not want to pick the first N numbers but might want to pick a different set of numbers that are more suited to the structure of the states! The receiver who decodes some example might use analogies to infer additional states and eventually learn the decoder and the base lexicon. 
+    - If the receiver is like a child it may see many analogies and learn the decoder. If the receiver is less bright it could still learn the decoder the hard way (i.e. by trial and error over the full lexicon)
+
+
+
+
+
+In the Lewis signaling game, the sender and receiver have to coordinate their actions to maximize their reward. The sender has to choose a signal that will help the receiver identify the correct state. The receiver has to interpret the signal and choose the correct state. This requires planning and coordination between the two agents.
+
+::: {.callout-caution}
+
+## Bayesian view of the Lewis game
+
+What do the agents know pre-ante?
+
+1. do they know the full state space?
+1. do they know the distribution of states?
+1. do they know all possible signaling systems?
+1. do they know the other possible equilibria?
+
+The receiver in game theory needs a strategy and in that strategy is a response to all possible actions by the sender. If there are sufficient rounds the receiver has a strategy for solving the full coordination problem before the game starts.
+
+If there are N states and signals, there are N! ways to map the states to signals we can consider that these are the different possible lexicons. While the sender might pick a signal at random for each new state, in terms of game theory she too must have a strategy, i.e. a choice of signal for each contingent state. And we can follow the convention of Bayesian games and that this choice is made before the game starts by nature picking a type for the sender from the N! possible types. We may also assume that nature has picked a vector of states to be presented to the sender and receiver but this is not necessary as once the strategies are pre-determined we can use bayesian game theory to work out the actions of the agents that will lead to the equilibria with the highest payoffs. Since this is a bayesian game the solution concept is a bayesian Nash equilibrium.
+
+Each time the sender solves on of the senders signals she can eliminate all the incompatible types until only one type remains and the receiver has inferred the mapping that decodes the sender's signals for all but one state and thus knows the senders type.
+
+In reality this changes very little in terms of the game, it's just a more precise way of thinking about the game in terms of what Game theory formalism requires.
+
+:::
+
+::: {.callout-caution}
+
+## Reinforcement Learning view of the Lewis game
+Note that when we think about the same game in reinforcement learning we may not require the agents to decide on a full strategy before the game starts. In RL settings they are in a PMDP a partially observed Markov Decision Process.
+
+:::
+
+
+We could consider these as different lexicons. In a bayesian settings we might go further and consider that there are N! senders each with a different lexicon and that the receiver must infer type of sender rather than the the correct signal for the current state. 
+
+The state space can be simple or structured and anything in between. If the state space is simple the sender will use the original Lewis game to create a lexicon. If the state space is structured the sender and receiver may do better - particularly if the number of simple signals is smaller than the number of states and sequences of signals must be used.
+
+
+
+If the state space is a list of binary fields then the sender can use a fixed template of length n and two signals encoding on or off.
+If the 
+Planning in the Lewis game is a complex problem 
+
+It seems a daunting task to plan the whole language when presented with say the first state or perhaps a million states.
+We can assume from the game theoretic nature of the Lewis Game that the sender and receivers know the full states space even if not the distribution of states. I say this because how could the receiver know from what options to respond to the sender if it did not know the full state space. 
+
+In the referential game the receiver only seed a few states and must infer the right one from the signal. In this case we may relax the previous assumption and say that the sender and receiver may have a partial view of the state space.
+
+
+
+More so what if the sender must start without even being exposed to the full state space or it 
+
+1. morphology
+
+## Analogies
+

@@ -689,5 +689,65 @@ https://www.tandfonline.com/doi/epdf/10.1080/09540091.2014.885303?needAccess=tru
 - win-stay/lose-randomise
 - win-stay/lose-inaction
 
-
 :::
+
+
+## Learning approximate complex signaling systems
+
+Here is a little paradox. While in the simple signaling game the goal of the agents is to find an equilibrium that is perfectly separating. In most  complex signaling game there are seems to be many partially pooling equilibria that are arbitrary close to such a perfectly separating equilibrium. 
+In many MDPs a subset of states are more important than others, e.g. bottle necks in a maze, central square in chess. This is often formalised in terms of the avarage time an agent is likely to spend in each state. and so on and in language with a Ziphian property most words have a low frequency of use. This means that learn an approximate signaling system that gives arbitrary close to the optimal signaling system with much higher probability than learning the optimal signaling system. This makes more sense if the langauge makes infinite use of finite resource. This may be the case if the languge has a recursive grammar.
+
+Now it is worthwhile to set down a few definitions.
+
+1. Complex State - a structured state that might be described by a sentence or a paragraph. Since we can rephrase any paragraph as a single sentence can assume that the state can be captured by an arbitrarily long sentence. In many cases though there will be a data structure or an image. It is worth noting that if the states have a rich structure we may be able to replicate this within the language. 
+    - A simple example is if we want to represent a tree and trees we might have use a prefix code to repsient singular and another the plural form. We might reuse this prefix to represent plural in both nouns and verbs.
+    - A related example is that we might learn a prefix for two trees. We could generelise this to any number of trees.
+    - We could make use of recursion to represent a number system for all number of trees using a few symbols.
+    - This recursive rule would expand our signaling system to capture an infinite number of states using a finite number of signals. And what is more interesting we would be able to learn it from a small set of examples.
+    - The point here is that if the states have such rich structures the language that preserves these can potentially be orgenised to in such a way that it can be learned more efficiently then in the tabular case. The idea is that instead of a table we could use a rule perhaps recursive to encode this part of the state. But only if it has such a structure.    
+    - Finally note that even if there are many such functions we could be able to compose them in a way that the become a single function. This is the idea of compositionality in language and it likely the key for learning to represent arbitrary complex signaling systems.
+2. Signal - In the complex signaling game the signal can be viewed as 
+    - as a string of arbitrary length made using a limited alphabet of size |L|
+    - as a number N in base |L| i.e. *N_L*
+3. Prelinguistic object
+    - I noticed that people use this term as a synonym for the state. I want to use it a little differently. I want it to correspond to a sub-state that may be interpreted as a unit of meaning. There may be multiple prelinguistic objects in a state. We may consider these as parts of a picture for example and each part may need servral words to describe it. Or we may refernce a bit in a binary vector.
+    - as noted above the states may have a rich structure, e.g. nouns, verb, inflection, a recursively defined number system. Or a recursively defined system of clauses. The last might even generlise the number system.    
+    - The prelinguitic objects may be in a list, a tree, a grid a graph or some other data structure. However it seems that we might gravitate towards trees as they are the most common representation for parsing natural languages and more importantly they can be defined using a simple recursive rule.
+4. Encoder - a function that the agent learns to convert the state into signals
+    it needs to
+    1. serialize the prelinguistic state into a sequence
+    2. convert each prelinguistic object into a sequence in the alphabet L.
+    3. Possibly use some kind of symbol as a delimiter. (Prefix code precludes the need for this)
+5. Decoder - a function that the agent learns to convert the signals into actions. It the inverse fuction of the encoder. And has the same steps but inverse order.
+6. Tabular Language - when we learn a tabular representation of the signaling system we can assume that the encoder and decoder are perfect and that the signals are perfectly separating. However in this case the language is unlikely to generalize. I.e. we need to learn all the signals to be alble to understand what states they refer to. Since the best case we need to learn |S| signals for |S| states we need to to test |S|^2/s signals in the worst case. This is the main shortcomming of the tabular approach. Note that the endocde and decoder are function but in this case they are acting as a lookup table in step 2. of the encoder.
+7. Functional language - This is a language that is learned fitting parameters in a model that approximates the tabular language. Since linear function approximation can exactly replicate the language we can without much trouble approximate any language with a linear function. With one paprmeter per-state we can preferctly replicate the tabular language. The advantage of the functional language is that it can generalize to new states. 
+This means that we might learn the grammar, and morphology using a very smaller subset |MS| and then we would need to learn a fraction of the lexicon consiting of the base forms of the words  |MS| + |BL|. The learning time would be (|MS| + |BL|)^2/s. And it would cover all the states. The more infelction and dervied forms we have the greater the speaker's ability to generelise. Also the syntax would then allow to combine these words into sentences. The language might be suitable to handle potentialy infinite number of states with a finite learning time stated above. However as I pointed out just now the replicating a tabular language will not endow it with this generalization ability, not unless by some lucky coincidence the encoder is able to capture and preserve the full structure of the state space. 
+
+Now it is worth making a couple of observation.
+
+1. we can learn a large table of states and thier associated signals by enumerating them using base |L| numbers. This is one baseline. IT has a lexicon |S|.
+2. We may use train an encoder to encode some natural language say English sentences into binary signals. Then we could use english to encode any state. This is a second baseline. It has an alphabet of size 27 and a lexicon of size - the number of words in the english language. |E| + |S|. English is a very general purpose language. The down side is that the language will be large and require lots of resources for each new agent to learn it. About (|E|+|S|)^2/s steps in the worst case of an optimal algorithm. Note though that using English would also require learning rules of grammar and syntax and so on. We might also need to be sure to avoid ambiguity in the sentences our encoder uses, we might just use english and specifiy the details that let the receiver resolve any ambiguity. However the size of the lexicon is impractical.
+3. We could do better by giving each word a previously unused prefix to indicate things like the word sense, the part of speech, or an clues as to what it is referencing. This would only make the lexicon a little larger but would possibly elliminate all ambiguity.
+4. English has a complicated grammar. We might also simplify it. This would be easier if we made libberal use of prefixes in item #3. This would convert the language to a more morphologically rich language and allow us to radically simplify the grammar. For example we could use the bases of words and the prefixes to get a highly predictable morphology and drastically reduce the lexicon. 
+5. With all the pos-orgenised as regular and unambigous we might just also be able to discard things like agreements and our grammar could become much simpler. We would have a single recursive rule that lets us parse the sentence into a tree. 
+6. If |S| are structured and not particularly complicated. We might even require a rather small subset of english to encode the states. (|ME|+|S|)^2/s
+ This minimalist english should be much easier to learn and use but expresive enough to encode the states. This is the third baseline. It has an alphabet of size 27 and a lexicon of size - the number of words in the minimalist english language. |ME| + |S|.
+7. We might also consider that in most cases we don't even need that much expressive ability in the language. In this case we are looking at a domain specific version of minimalist english i.e. |DME| + |S|. This is the fourth baseline. It has an alphabet of size 27 and a lexicon of size - the number of words in the domain specific minimalist english language. |DME| + |S|.
+
+
+
+
+
+
+
+If we use function approximation with 
+Todays signaling systems is tommorows partial pooling equilibrium. 
+As new states and thier associated prelinguistic objects manifest, agents will need to extend thier state space and action space to handle these new states and objects.
+
+Complex signaling systems have three main facets that are different than simple signaling systems.
+
+1. Limited signals but a longer message length.
+2. Complex states spaces
+3. 
+
+In terms of signaling systems here is my best idea:

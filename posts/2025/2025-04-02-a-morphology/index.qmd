@@ -1,0 +1,283 @@
+---
+date: 2025-04-02
+title: "Base line Morphology Model" 
+categories: ['code']
+---
+
+So in this note I'd like to create a vanilla implementation of a morphology and syntax that might be used as a inductive bias for the emergent language.
+
+Morphological states are based on primitives. More genrally we also need a syntax to combine many morphological states into a larger state.
+
+grounding means at the bare minimum mapping state-features to morphological-features. If we have complex structure we would need trees of morphological states. 
+a feature 
+
+## Morphology
+
+Let's:
+
+1. [x] code a regular morphology for the emergent language.
+1. [ ] look at using it as a part of the inductive bias for the emergent language.
+1. [x] add inputs:
+    - part of speech
+        - open
+        - closed
+    - nouns
+    - cases
+    - tenses
+    - aspects
+    - moods  
+1. [x] export lexicon to CSV
+1. [ ] make features like a data-frame or at least a dict.
+1. [ ] export for use with [egg] ?
+1. [ ] an algorithm for an agent to associate the morphology with the states (for senders perhaps) what is the minimal steps to identify the morphology to the states. (a form of grounding)
+1. [ ] add support for closed categories like pronouns and articles
+1. create an option for replacing phonology with a base-n numbers. 
+1. add a mapping back and forth from IPA to phonemes to Base-n numbers.
+1. test on Prisoners Dillema
+1. create a linear function approximator from the features for morphological states
+
+
+### A baseline generative model for morphology
+
+```{python}
+import random
+import csv
+
+
+random.seed(45)
+# start with a simple morphology and then add more complexity.
+
+## TODO: check we don't over flow the phoneme space
+
+class base_morphology:
+
+    def __init__(self,
+                    vowels=None, 
+                    consonants=None,
+                    parts_of_speech_closed=None,
+                    parts_of_speech_open=None,
+                    declensions=None, 
+                    nouns=None,
+                    ):
+
+        # define the phonemes
+        if not vowels:
+            self.vowels = ['a','e', 'i','o', 'u', 'aa','ee', 'ii','oo', 'uu','ai','au','ei','ou','ia','ua']
+        else:
+            self.vowels = vowels
+        if not consonants:
+            self.consonants = ['b', 'c','cs','ch', 'd','dh', 'dzh','f', 'g','gh', 'h','hw','ny', 'j', 'k','kw' 'l','ld','lh', 'm','mb', 'n','nc', 'nd','ng','ngw','nqu','nqt','nt', 'p', 'q', 'r','rd','rh', 's', 'sh', 't','tsh' 'v', 'w', 'x', 'y', 'z']
+        else:
+            self.consonants = consonants
+
+        # define the parts of speech
+        if not parts_of_speech_closed:
+            self.parts_of_speech_closed = ['pronoun','article','preposition','conjunction','numeral']
+        else:
+            self.parts_of_speech_closed = parts_of_speech_closed
+        
+        if not parts_of_speech_open:
+            self.parts_of_speech_open = ['noun','verb','adjective','adverb']
+        else:
+            self.parts_of_speech_open = parts_of_speech_open
+
+        if not declensions:
+            self.declensions = [
+                'nominative',  # subject
+                'accusative',  # direct object
+                'dative',      # indirect object
+                'instrumental',# with, by means of
+                'causal',      # for, for the purpose of
+                'translative', # into
+                'terminative', # as far as, up to
+                'essive',      # as 
+                'inessive',    # in
+                'superessive', # on  
+                'adessive',    # by, at
+                'illative',    # into
+                'sublative',   # onto
+                'allative',    # to
+                'elative',     # out of
+                'delative',    # off, about
+                'ablative',    # from, away from
+                'genitive',    # of, 's 
+                'locative',    # location
+                'vocative',    # object being addressed 
+                'partitive',   # partialness
+                'abessive',   # without
+                'comitative', # with
+            ]
+        else:
+            self.declensions = declensions
+
+        # define the nouns
+        if not nouns:
+            self.nouns = ['monkey','falcon','puma','conda','tilapia','banana','kiwi','coconut','pear','river','mountain','ocean','lake','forest','clearing','valley','one','two','many',]
+        else:
+            self.nouns = nouns
+        
+        self.gen_parts_of_speech_dict()
+        self.gen_dec_dict()
+        self.gen_noun_dict()
+        self.gen_plurals_dict()
+        self.gen_inf_markers_dict()
+        self.gen_tense_dict()
+        self.gen_mood_dict()
+        self.gen_aspect_dict()
+
+    def generate_rnd_phone(self):   
+        # generate a random phoneme
+        return random.choice(self.consonants) + random.choice(self.vowels)
+
+    def generate_num_phoneme(self,consonant, vowel):
+        # pick a consonants cons from consonants
+        c = self.consonants[consonant % len(self.consonants)]
+        # pick a vowel from vowels
+        v = self.vowels[vowel % len(self.vowels)]
+        return c + v 
+
+    def generate_rnd_stem(self,k=3):
+        # generate a random word with k phonemes
+        word = ''
+        for i in range(k):
+            word += self.generate_rnd_phone()
+        return word 
+
+    def gen_parts_of_speech_dict(self):
+        # generate a dictionary of parts of speech        
+        pos_markers = [""]+ [self.generate_num_phoneme(i, 0) for i in range(len(self.parts_of_speech_open)-1)]
+        self.pos_dict = {pos_markers[i]:self.parts_of_speech_open[i] for i in range(len(self.parts_of_speech_open))}
+        # currently the closed pos are ignored
+
+    # The criterion for an ending to be a case (according to today's generative linguistic grammars of Hungarian) is that a word with that ending can be a compulsory argument of a verb. This difference is usually unimportant for average learners of the language.
+
+    def gen_dec_dict(self):
+        # generate a dictionary of declensions        
+        markers = [""]+ [self.generate_num_phoneme(i, 0) for i in range(len(self.declensions)-1)]
+        self.declenations_dict = {markers[i]:self.declensions[i] for i in range(len(self.declensions))}
+
+    def gen_plurals_dict(self):
+        # generate a dictionary for plurals affixes
+        ## TODO make a parameter
+        self.numbers = ['singular','plural']    
+        markers = [""]+ [self.generate_num_phoneme(i, 0) for i in range(len(self.numbers)-1)]
+        self.plu_markers_dict = {markers[i]:self.numbers[i] for i in range(len(self.numbers))}
+
+    def gen_inf_markers_dict(self):
+        # generate a dictionary for plurals affixes
+        ## TODO make a parameter
+        self.inflections = ['1ps','2ps','3ps','1pp','2pp','3pp'] 
+        markers = [""]+ [self.generate_num_phoneme(i, 0) for i in range(len(self.inflections)-1)]
+        self.inf_markers_dict = {markers[i] : self.inflections[i] for i in range(len(self.inflections))}
+
+    def gen_tense_dict(self):
+        # generate a dictionary for tenses affixes
+        ## TODO make a parameter
+        self.tenses = ['past','present','future']
+        markers = [""]+ [self.generate_num_phoneme(i, 0) for i in range(len(self.tenses)-1)]
+        self.tense_markers_dict = {markers[i] : self.tenses[i] for i in range(len(self.tenses))}
+
+    def gen_mood_dict(self):
+        # generate a dictionary for tenses affixes
+        ## TODO make a parameter
+        self.moods = ['indicative','subjunctive','imperative','conditional','optative','jussive','interrogative','exclamatory']
+        markers = [""]+ [self.generate_num_phoneme(i, 0) for i in range(len(self.moods)-1)]
+        self.mood_markers_dict = {markers[i] : self.moods[i] for i in range(len(self.moods))}
+
+    def gen_aspect_dict(self):
+        # generate a dictionary for tenses affixes
+        ## TODO make a parameter
+        self.aspects = ['perfective','imperfective','progressive','habitual','frequentative','iterative']        
+        markers = [""]+ [self.generate_num_phoneme(i, 0) for i in range(len(self.aspects)-1)]
+        self.aspects_dict = {markers[i] : self.aspects[i] for i in range(len(self.aspects))}
+
+
+    def gen_noun_dict(self):
+
+        self.nouns = ['monkey','falcon','puma','conda','tilapia','banana','kiwi','coconut','pear','river','mountain','ocean','lake','forest','clearing','valley','one','two','many',]
+
+        ## 1. generate a stem for each noun
+        stems = [self.generate_rnd_stem(3) for i in range(len(self.nouns))]
+
+        ## 2. a dictionary of nouns
+
+        self.nouns_dict = {stems[i]:self.nouns[i] for i in range(len(self.nouns))}
+
+
+    def gen_lexicon(self):
+
+        self.lexicon = {}
+
+        for stem in (self.nouns_dict):
+            print(f'\n\nlemma: {stem} = {self.nouns_dict[stem]}')
+            for pos in self.pos_dict: 
+                #print(pos)
+                if self.pos_dict[pos] == 'noun': 
+                    for declension in self.declenations_dict: 
+                        for plural in self.plu_markers_dict: 
+                            lexeme = f'{stem}\'{pos}{declension}{plural}'
+                            features =  f'{self.nouns_dict[stem]},{self.pos_dict[pos]},{self.declenations_dict[declension]},{self.plu_markers_dict[plural]}'
+                            self.lexicon[lexeme] = features
+                            print(f'{lexeme} = {features}')
+                elif self.pos_dict[pos] == 'verb':
+                    for mood in self.mood_markers_dict:
+                        for aspect in self.aspects_dict:
+                            for tense in self.tense_markers_dict:
+                                for inflection in self.inf_markers_dict:
+                                    lexeme = f'{stem}\'{pos}{mood}{aspect}{tense}{inflection}'
+                                    features = f'{self.nouns_dict[stem]},{self.pos_dict[pos]},{self.mood_markers_dict[mood]},{self.aspects_dict[aspect]},{self.tense_markers_dict[tense]},{self.inf_markers_dict[inflection]}'
+                                    self.lexicon[lexeme] = features
+                                    print(f'{lexeme} = {features}')
+                else:
+                    lexeme= f'{stem}\'{pos}'
+                    features = f'{self.nouns_dict[stem]},{self.pos_dict[pos]}'
+                    self.lexicon[lexeme] = features
+                    print(f'{lexeme} = {features}')
+        
+    def export_lemmas(self,filename='lexicon.csv'):
+        # export the lexicon to a csv file
+        with open(filename, 'w') as f:
+            writer = csv.writer(f)
+            writer.writerow(['lemma', 'features'])
+            for lemma, features in self.lexicon.items():
+                writer.writerow([lemma, features])       
+
+base = base_morphology(
+    vowels=['a','e', 'i','o', 'u',],
+    consonants=['b', 'c', 'd','f', 'g','h', 'j', 'k', 'l','m','n', 'p', 'q'],
+    parts_of_speech_closed=['pronoun','article','preposition'],
+    parts_of_speech_open=['noun','verb'],
+    declensions=['nominative'],
+    nouns=['monkey','falcon'],
+)
+
+print(f'{base.generate_rnd_phone()=}')
+print(f'{base.generate_num_phoneme(3, 2)}')
+print(f'{base.generate_rnd_stem(3)}')
+print (f'{base.pos_dict=}')
+print (f'{base.declenations_dict=}')
+print (f'{base.nouns_dict=}')
+print (f'{base.plu_markers_dict=}')
+print (f'{base.inf_markers_dict=}')
+print (f'{base.tense_markers_dict=}')
+print (f'{base.mood_markers_dict=}')
+print (f'{base.aspects_dict=}')
+print (f'{base.gen_lexicon()=}')
+base.export_lemmas()
+
+#export_lemmas(lexicon)
+# f = open('dict.csv','wb')
+# w = csv.DictWriter(f,mydict.keys())
+# w.writerow(mydict)
+# f.close()
+
+```
+
+## Syntax
+
+a fixed template syntax to go with the morphology that can be generalized to a rule based grammar.
+
+children start with one word sentence then learn two sentences and then three word sentences and so on.
+
+
+

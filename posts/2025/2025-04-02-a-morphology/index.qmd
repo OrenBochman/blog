@@ -273,6 +273,236 @@ base.export_lemmas()
 
 ```
 
+## Morphology and States
+
+Morphology refers to morphemes. 
+These are the smallest packages of semantic meaning.
+Although not particularly clear cases, inflection and derivations extend the 
+semantics of the root in many systematic ways that can be viewed as part of a
+powerful ontology. Adjectives and Adverbs are also ways to extend the semantics of the root.
+
+What struck me as I developed this baseline morphology is that while it is derived as a sum of products of related morphemes from a list or factor (product of lists) of features.
+
+While these features are defined in terms of linguistic properties of natrural languages, we do not neccessarily need to derive the morphemes from these specific features. We could look at this in a more abstract form as construct from sums of products of feature factors. I think the baseline overgenerates the verbs. 
+
+One For example
+
+```{python}
+from itertools import product
+
+def constrained_product(feature_sets, constraint_fn):
+    """
+    Generates product combinations satisfying constraint_fn.
+    """
+    return [combo for combo in product(*feature_sets) if constraint_fn(combo)]
+
+# Example
+colors = ['red', 'blue']
+sizes = ['S', 'M', 'L']
+styles = ['casual', 'formal']
+
+def constraint(c):
+# This yields only combinations where red ≠ formal
+    color, size, style = c
+    return not (color == 'red' and style == 'formal')  # example constraint
+
+valid = constrained_product([colors, sizes, styles], constraint)
+for item in valid : 
+    print(item)
+
+```
+
+So if we wanted to generalize we might add a spec that defines sums of products of factors with constraints. This can be useful for phonotactics and other features.
+
+- e.g. 
+    1. declensions go with pos = noun 
+    1. inflections tense mood aspect go with pos = verb
+
+
+adjectives
+
+- hope
+    - hopeful 
+    - hopeless 
+- care
+    - careful (-ful)
+    - careless (-less)
+- fast
+    - fastness (-ness)    
+    - fastlike (-like)
+    - fasted (-ed)
+    - faster / fastest (comparative/superlative suffixes)    
+    - fasten (-en)
+    - fasting (-ing)
+- base
+    - basic (-ic)
+    - baseless (-less)
+    - baser / basest (comparative/superlative suffixes)
+    - baselike (-like)
+    - basial (rare/technical, -ial)
+    - based (-ed)
+    - baser / basest (comparative/superlative suffixes)
+- race
+    - racial (-al)
+    - raceless (-less)
+    - raced (-ed)
+    - racer / raciest (comparative/superlative suffixes)
+    - racelike (-like)
+    - racial (-al)
+    - racism (-ism)
+    - racist (-ist)
+
+
+nouns should be:
+<stem> +  <plural>+ <possessor> + <posession-person> + <posession-plural>
+<declension> + 
+
+in your houses
+
+## Bayesian Morphology ?
+
+```{python}
+from itertools import product
+
+def constrained_dict_product(dicts, value_constraint):
+    """
+    Given a list of dicts, returns (key_tuple, value_tuple)
+    for each product, filtering on values.
+    """
+    key_sets = [d.keys() for d in dicts]
+    val_maps = [d for d in dicts]
+
+    results = []
+    for key_combo in product(*key_sets):
+        val_combo = tuple(d[k] for d, k in zip(val_maps, key_combo))
+        if value_constraint(val_combo):
+            results.append((key_combo, val_combo))
+    return results
+
+# Example dicts
+size = {1: 'S', 2: 'M'}
+color = {10: 'red', 20: 'blue'}
+style = {100: 'casual', 200: 'formal'}
+
+# Constraint on values only
+def constraint(vals):
+    c, s, t = vals
+    return not (c == 'red' and t == 'formal')
+
+output = constrained_dict_product([color, size, style], constraint)
+print(f'{output}')
+```
+
+
+A more general version ...
+
+design:
+
+1. we generate using features. using a generator.
+1. we generate a dataframe or a dict with all the features.
+1. we apply a constraint function to filter the features.
+1. we use a dictionary or a function to map features to morphemes.
+
+```{python}
+from itertools import product
+import pandas as pd
+#import numpy as np
+import random
+import string
+import csv
+
+
+# class abstract_morphology:
+
+#     # init takes a dict of factors and a constraint
+#     def __init__(self,
+#                     factors = None,
+#                     constraint_fn = None,
+#                     ):
+#         if not factors:
+#             self.factors = {
+                            
+#                  'pos' : ['noun','verb','adjective','adverb'],
+#                  'tense' : ['past','present','future'],
+#                  'mood' : ['indicative','subjunctive','imperative'],
+#                  'aspect' : ['perfective','imperfective','progressive'],
+#                  'inflection' : ['1ps','2ps','3ps','1pp','2pp','3pp'],
+#                  'declension' : ['nominative','accusative','dative','instrumental','causal','translative','terminative','essive','inessive','superessive','adessive','illative','sublative','allative','elative','delative','ablative','genitive','locative','vocative']
+#             }                                    
+#         else:
+#             self.factors = factors
+
+#         if not constraints:
+#             self.constraints = return (pos == 'noun' and declension not None)
+#         else:
+#             self.constraint_fn = constraint_fn
+
+
+
+#         self.lexicon = self.gen_lexicon()
+
+#     def gen_lexicon(self):
+
+#         return [combo for combo in product(*feature_sets) if constraint_fn(combo)]
+
+
+from itertools import product
+
+def constrained_product(feature_sets, constraint_fn):
+    """
+    Generates product combinations satisfying constraint_fn.
+    """
+    return [combo for combo in product(*feature_sets) if constraint_fn(combo)]
+
+def morph_constraint(c):
+    """
+    Enforces different slot requirements depending on `pos` value.
+    """
+    stem = c[0]
+    pos = c[1]
+
+    if pos == 'noun':
+        # Expected: (pos, stem, decl, possessor, possessed, number)
+        return stem is not None and all(f is not None for f in c[2:6]) and all(f is None for f in c[6:])
+    elif pos == 'verb':
+        # Expected: (pos, stem, inflection, mood, aspect, tense)
+        return stem is not None and all(f is not None for f in c[6:10]) and all(f is None for f in c[2:6])
+    elif pos not in {'noun', 'verb'}:
+        # Expected: (pos, stem, None, None, None, None)
+        return stem is not None and all(f is None for f in c[2:])
+    return False
+
+pos = ['noun', 'verb', 'adjective']
+stem = ['falcon', 'cat']
+decl = ['I', 'II']
+possessor = ['1PS', '2PS', '3PS', '1PP', '2PP', '3PP']
+possessed = ['0', '1']
+number = ['sg', 'pl']
+inflection = ['1PS', '2PS', '3PS', '1PP', '2PP', '3PP']
+tense = ['past', 'present', 'future']
+mood = ['indicative', 'subjunctive', 'imperative']
+aspect = ['perfective', 'imperfective', 'progressive']
+
+# Same arity for all: (pos, stem, slot3, slot4, slot5, slot6)
+features = [stem, 
+            pos, 
+            decl + [None], 
+            possessed + [None],
+            number + [None],
+            possessor + [None], 
+            inflection + [None],
+            aspect + [None],
+            mood + [None], 
+            tense + [None],
+            ]
+
+valid = constrained_product(features, morph_constraint)
+
+for item in valid:
+    print(item)
+```
+    
+
 ## Syntax
 
 a fixed template syntax to go with the morphology that can be generalized to a rule based grammar.

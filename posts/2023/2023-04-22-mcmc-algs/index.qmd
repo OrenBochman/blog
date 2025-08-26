@@ -1,0 +1,169 @@
+---
+date: 2023-04-22
+title: "MCMC algorithms"
+revealjs: 
+    html-math-method: katex
+    chalkboard: 
+      buttons: false
+    preview-links: auto
+    css: styles.css
+---
+
+# MCMC Algorithms
+
+## Metropolis-Hastings
+
+```pseudocode
+#| html-indent-size: "1.2em"
+#| html-comment-delimiter: "//"
+#| html-line-number: true
+#| html-line-number-punc: ":"
+#| html-no-end: false
+#| pdf-placement: "htb!"
+#| pdf-line-number: true
+\begin{algorithm}
+\caption{Metropolis-Hastings algorithm}
+\begin{algorithmic}
+\Procedure{MetropolisHastings}{$p(x), q(x,y), x_0, N$}
+\State Initialize $x_0$ and set $t=0$.
+\While{$t<N$}
+\State Generate a proposal $y \sim q(x_t, \cdot)$.
+\State Calculate the acceptance ratio $r = \frac{p(y)q(x_t|y)}{p(x_t)q(y|x_t)}$.
+\State Generate a random number $u \sim U(0,1)$.
+\If{$u < r$}
+\State Accept the proposal: $x_{t+1} = y$.
+\Else
+\State Reject the proposal: $x_{t+1} = x_t$.
+\EndIf
+\State Increment $t$: $t \leftarrow t+1$.
+\EndWhile
+\State \textbf{return} $(x_0, x_1, \ldots, x_N)$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
+
+The procedure `MetropolisHastings` takes as input :
+- the target distribution $p(x)$, 
+- the proposal distribution $q(x,y)$, 
+- the initial sample $x_0$, and
+- the total number of samples to generate $N$. 
+The procedure returns:
+- the sequence of samples $(x_0, x_1, \ldots, x_N)$.
+
+# Gibbs Sampling
+
+#| label: alg-gibbs-sampling
+
+```pseudocode
+#| html-indent-size: "1.2em"
+#| html-comment-delimiter: "//"
+#| html-line-number: true
+#| html-line-number-punc: ":"
+#| html-no-end: false
+#| pdf-placement: "htb!"
+#| pdf-line-number: true
+
+\begin{algorithm}[h]
+\caption{Gibbs Sampling algorithm}
+\begin{algorithmic}[1]
+\Procedure{GibbsSampling}{$p(x,y), x^{(0)}, y^{(0)}, N$}
+\State Initialize $x_0 = x^{(0)}$ and $y_0 = y^{(0)}$.
+\For{$t=1$ to $N$}
+\State Sample $x_t \sim p(x|y_{t-1})$.
+\State Sample $y_t \sim p(y|x_t)$.
+\EndFor
+\State \textbf{return} $(x_1, \ldots, x_N), (y_1, \ldots, y_N)$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+The procedure `GibbsSampling` takes as input :
+- the joint distribution $p(x,y)$, 
+- the initial values for $x$ and $y$
+-  ($x^{(0)}$ and $y^{(0)}$), and 
+- the total number of samples to generate $N$. 
+The procedure returns:
+-  the sequences of samples for $x$ and $y$, $(x_1, \ldots, x_N)$ and $(y_1, \ldots, y_N)$, respectively
+
+#| label: alg-invsamp
+
+```pseudocode
+#| html-indent-size: "1.2em"
+#| html-comment-delimiter: "//"
+#| html-line-number: true
+#| html-line-number-punc: ":"
+#| html-no-end: false
+#| pdf-placement: "htb!"
+#| pdf-line-number: true
+\begin{algorithm}
+\caption{Inverse Sampling algorithm}
+\begin{algorithmic}
+\Procedure{InverseSampling}{$F^{-1}(u), U_1, \ldots, U_N$}
+    \For{$i=1$ to $N$}
+        \State Generate a uniform random number $u_i \sim U(0,1)$.
+        \State Compute $x_i = F^{-1}(u_i)$.
+    \EndFor
+    \State \textbf{return} $(x_1, \ldots, x_N)$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
+The procedure `InverseSampling` takes as input :
+- the inverse cumulative distribution function $F^{-1}(u)$ and 
+- the number of samples to generate $N$.
+ The procedure generates $N$ uniform random numbers $u_1, \ldots, u_N$ and computes the corresponding samples $x_1, \ldots, x_N$ using the inverse cumulative distribution function $F^{-1}(u)$.
+ 
+  The procedure returns:
+  - the sequence of samples $(x_1, \ldots, x_N)$.
+Note: that in this algorithm, we assume that the inverse cumulative distribution function $F^{-1}(u)$ is available, and can be used to generate samples from a distribution with cumulative distribution function $F(x)$.
+
+#| label: alg-hmc
+
+```pseudocode
+#| html-indent-size: "1.2em"
+#| html-comment-delimiter: "//"
+#| html-line-number: true
+#| html-line-number-punc: ":"
+#| html-no-end: false
+#| pdf-placement: "htb!"
+#| pdf-line-number: true
+\begin{algorithm}[h]
+\caption{Hamiltonian Monte Carlo algorithm}
+\begin{algorithmic}[1]
+\Procedure{HamiltonianMC}{$\pi(x), \nabla \log \pi(x), L, \epsilon, M$}
+\State Initialize $x_0$.
+\For{$m=1$ to $M$}
+\State Sample momentum $p_m \sim \mathcal{N}(0, I)$.
+\State Set $x = x_{m-1}$ and $p = p_m$.
+\State Simulate Hamiltonian dynamics for $L$ steps with step size $\epsilon$:
+\For{$l=1$ to $L$}
+\State Update momentum: $p \leftarrow p - \frac{\epsilon}{2} \nabla \log \pi(x)$.
+\State Update position: $x \leftarrow x + \epsilon p$.
+\EndFor
+\State Flip the momentum: $p \leftarrow -p$.
+\State Compute the Metropolis-Hastings acceptance probability:
+\State $\alpha = \min \left(1, \frac{\pi(x')}{\pi(x)} \frac{p(x|x')}{p(x'|x)} \right)$, where $x' = x$ and $p' = p$ after the simulation.
+\State Accept or reject the proposal:
+\State With probability $\alpha$, set $x_m = x'$.
+\State With probability $1-\alpha$, set $x_m = x_{m-1}$.
+\EndFor
+\State \textbf{return} $(x_1, \ldots, x_M)$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
+In this algorithm statement, the Hamiltonian Monte Carlo algorithm is encapsulated in a procedure called \textsc{HamiltonianMC}. 
+The procedure `HamiltonianMC` takes as input:
+-  the target distribution $\pi(x)$, 
+- its gradient $\nabla \log \pi(x)$,
+-  the number of steps to simulate Hamiltonian dynamics $L$, 
+- the step size $\epsilon$, and
+-  the total number of samples to generate $M$. 
+The procedure returns:
+-  the sequence of samples $(x_1, \ldots, x_M)$.
+Note: that in this algorithm, we first sample a momentum variable $p$ from a normal distribution, then simulate Hamiltonian dynamics for $L$ steps using the leapfrog method. We then compute the Metropolis-Hastings acceptance probability based on the updated proposal, and accept or reject the proposal according to this probability. We repeat this process for $M$ iterations to generate the desired samples.
+-->

@@ -1,0 +1,99 @@
+---
+date: 2025-09-25
+title: "Vibe coding GPT5 Edition"
+subtitle: "A Wikipedian considers prompting strategies in the age of GPT 5"
+---
+
+A few days back, a friend discussed on FB his attempt at a mathematical puzzle and the outcomes of using a commercial LLM and a self-hosted LLM to solve it, and he then raised a couple of questions as to why the LLM was able to get the result so much faster and better than he could.
+
+My response was too long and is best published here.
+
+
+## Why are the LLMs so good at coding and reasoning about code?
+
+1. LLMs are trained on lots of code and problems. More so to boost their overall reasoning benchmarks. Some LLMs may have seen a substantial percentage of all code written in history.
+2. The deeper reasons for this are that [code is much easier to do next token prediction than natural language]{.mark}. Intuitively, the number of **legit next token** by class is minimal. Additionally, the number of variables that need to be kept in context is usually tiny for most algorithms, even if complete programs have many variables. Even so, the full number of free variables in a regular program is many orders of magnitude smaller than the words in a natural language text of similar length.
+3. Also, there are some areas where LLMs are not so good at coding. When a library or API undergoes breaking changes, it becomes asymptotically more likely that the LLM will make mistakes.
+4. LLMs are generalists, and there is substantial knowledge on making LLMs that are much better specialists. If you use LLMs through APIs, you may have seen how many coding specialists are out there already.
+
+::: {.callout-tip}
+
+### overthinking bugs
+
+Reinforcement Learning (RL) is one area where a language model can utilize a tool to learn in a closed-loop environment, ensuring its code compiles, passes tests, is well-documented, and adheres to a set of conventions.
+
+So, I won't be surprised to see this area continue to improve over time. However, for now, if relevant, requesting a single page of code with no APIs can yield fantastic results. 
+:::
+
+
+## Vibe coding and Tough problems
+
+Around the time $GPT_5$ was launched.
+More recently, I've made an effort to solve a large number of graduate-level questions from graduate or PhD-level textbooks in statistics, price theory, and RL. 
+These were recommended in the five specializations I took (NLP, RL, Bayesian statistics, Kalman filters, and Microeconomics), as well as in some real-world data science problems from my work that require these skills. Anyhow, $GPT_5$ can ~~solve~~ *supply answers that are not obviously wrong* for many of these problems where its predecessors failed dismally. 
+
+In fact, my early strategy for vibe coding, combined with improvements in memory across sessions, suggests that repeated failures on complex problems, followed by simpler cases, often elicit an MVP solution for the full problem.
+
+For example, $GPT_5$ failed to provide LaTeX derivations of advanced Bayesian statistics with Rationals summarized in under five words on the right-hand side. 
+However, after a week of failures, it began to offer derivations on its own. Unexpectedly, each step has an explanation. 
+Thorny quantities that the professor didn't name in the code or the course are being given their correct technical terms.
+I don't know how this happens, but I think it can recall the few sessions where I pasted the derivations I had stitched together and cleaned up, plus the code sessions I bug-fixed,
+
+To get back on point, both $GPT_{3:4}$ were able to reason much better in code, YAML, and now in Markdown than in natural languages. 
+$GPT_5$ still has tokenizer issues, but if I implement some workarounds in the prompt, the time savings can be dramatic.
+
+## New & Old prompting strategies 
+
+### Peeking at the Sources 
+
+Growing ire with $GPT_3$ pridilications for BS and my background with Wikipedia led me to add to my preferences a request for reputable sources for any significant claim. I also requested that it provide the consensus view to mitigate its tendency, as seen in $GPT_3:4$, to pander to its users at the expense of factual correctness.
+
+
+This was largely ignored at the time, but later on, $GPT_3:4$ would undermine my credibility by furnishing its replies with fake sources that included time-wasting or potentially malicious URLs^[I do believe it picked this habit from Wikipedia-based spammers].
+
+At some point, I started to hear about the consensus view from sources X, Y, and Z; then $GPT_5$ began to provide excellent sources in a sidebar.
+Looking at these, though, many are totally irrelevant. Asking suggests that $GPT_5$ didn't consult the sources except perhaps the top three sources.
+
+::: {.callout-tip}
+
+### Overthinking reputable sources
+
+> What is happening here? What it is ain't exactly clear...
+
+I have thought about and even designed systems that store and utilize sources. There are many possible solutions, but one idea I had is citation embeddings. Create special tokens that embed the citation in the text (within each context window). 
+
+Learning about citations is an emergent ability for language models, but this is usually superficial. Particularly if we consider that Wikidata has several million citations on record as linked data, and the web likely has many more.
+
+What makes search engines work well is an inverse index. AFAIK, LLMs are not trying to mimic this feature, but they are definitely trying to improve information retrieval across the deep network
+
+It appears that $GPT_5$ can respond to the request in my prompt regarding consensus views, as it keeps referencing an older textbook I never read. 
+Is this for real? Like everything else with LLMs, it is hard to say. But the sources may contain URLs that have been accessed via training or search. Either way, [we should verify]{.marked}^[evey time you verify you delay LLM related brain rot], that it actually knows where the full text of the books we are discussing is available online. Or that there is an earlier, more accessible copy on one of the author's web pages.
+
+One last point, I gave notebook LM my website URL as a source, and it became a top source. This quelled my blind trust in the sources once again.
+::: 
+
+
+### Reasoning summary
+
+1. Almost all of my prompts lead to long reasoning chains. I started peeking at these messages. I was skeptical of these, as in many cases, these were made-up outputs with mostly coincidental relation to the actual chat session.
+2. I don't really know at this point if there is any better relevance to these notes or not. In the back of my mind, I suspect that this is primarily a trick to slow down queries or to make users wait for a much slower GPU allocation.   
+3. What is clear from reading just a few plans:
+    1. $GPT_5$ consistently claims it can't access the pages I give it (but only in the plan in the chat session, this failure is not mentioned, leading to a *zero support hallucination*. The reasoning summary can bridge the gap before wasting time on iterating on a hallucination.
+    2. $GPT_5$ states its assumptions about my prompt. These are often not what I had in mind in two ways. Correcting a misconception or adding a missing fact is good practice - one of the advantages of a $GPT_?$ is to get you to train to think more precisely.
+    3. Frequently, the plan expands my initial prompt with ambitious sub-goals to do more than requested (e.g., *provide extra metrics I had to look up*), but in practice, the actual response doesn't enact any of these planned extras or even much of the request. (This is evidence that the plans are fake or that they don't really correlate with how the LLM is actually reasoning.)
+
+### Becoming a master of your own domain and reading between the lines
+
+>  'Teutch who directed the intricacies of a private infinity'-- Rhialto the Marvelous by Jack Vance
+
+$GPT_{[3:5]}$ often hints that you know you are making mistakes. But it also has few, if any, qualms in humoring you if you insist you are correct. Ignore these hints, and you will quickly become the master of your own infinity. I.E., you will interact with the $GPT_?$ in a domain of knowledge that is essentially your own creation, and after you do a reality check, you will have to go back to the point where $GPT_?$ suggested it knew better and start over from there.
+
+## Conclusion
+
+Since you made it this far, here are some conclusions.
+
+We need to be even more skeptical of GPT outputs than before. Research is conclusive that as you feel smarter by asking GPT about black holes and Crypto, [you are actually getting dumber]{.mark}. Try to engage more in conversations with actual intelligent people as much as you do with the GPT.
+
+[Language models were invented to correct spelling mistakes. We scaled them up and found they could do many things, but anything else they do that isn't correcting typos is suspect.]{.mark}
+
+Ultimately, GPT can either waste your time or boost your productivity, and the choice is yours. I've provided you with some tips here, but you'd be best served by considering them as such, rather than wasting time with $GPT_5$ .

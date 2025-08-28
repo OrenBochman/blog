@@ -1,56 +1,72 @@
 ---
-title: Loss engineering and uncertainty
-slug: reinforcement-learning-quiz
-description: Robust Regression
-author: oren bochman
-date: 2022-09-12T16:03:06.877Z
-lastmod: 2022-09-12T16:13:54.042Z
-draft: true
-tags:
-  - machine learning
-  - ml engineering
-  - negative transfer
-  - multi task learning
-categories:
-  - data science
-  - robust regression
----
-Credit: I used Leo F. Isikdogan's [Multi-Task Learning Explained in 5 Minutes](https://www.isikdogan.com/blog/multi-task-learning-explained-in-5-minutes.html) as my starting point - as it mentioned the paper that kept coming up
+date: 2022-09-12
+title: Loss engineering and uncertainty for multi-task learning
 
-# Loss engineering TLDR
+subtitle: Robust Regression
+description: Understanding the challenges and strategies in multi-task learning
+categories: [data science]
+keywords: [machine learning, ml engineering, negative transfer, multi task learning, robust regression]
+---
+
+::: {.callout-note}
+## Loss engineering TLDR
+
 Our assignment today is model some related scientific phenomena (aka tasks) using a single model. Hoping perhaps that multiple tasks will let create a synergy by helping the model generalize by providing multiple signals to better reinforce the difference of signal from noise and capture more of the hidden structure in the problem. Since each tasks has it loss function (a metric of how well it performs evaluated on unseen data) we just need to combine them and we are done.
+
 The reason why not all models are multitask learning models is that in reality there are any number of forces that may act to frustrate the synergy we are hoping to create. Losses may be in different scales, time frames. They tasks may learn better when cooperating or competing. Finally the underlying processes may be causally related in subtle ways.
+
 Two ideas are used in multi-goal learning - enforcing sparsity across tasks through norm regularization and modelling the relationships between tasks.
 Casual inference in the bayesian modeling frameworks seems to be a method of resolve some of these issues. It can certainly help by pointing out when the underlying mechanism governing the processes generating each effects/task are at odds. I recommend McElereth's "Statistical Rethinking" for learning about that. But even if we have not been able to do a casual analysis or it seems fine, we still need to engineer a loss that works for the particular collection of tasks.
-And it is worth mentioning that whole the loss sits at the top of the model and is the source of all gradients different. Using different loss function may require engineering a suitable architecture. 
 
-# Multitask loss function
+And it is worth mentioning that whole the loss sits at the top of the model and is the source of all gradients different. Using different loss function may require engineering a suitable architecture. 
+:::
+
+## Multitask loss function
 The `naive` solution is Linear combination.
-$$ L = \sum {\alpha_!L_i} $$
-where: 
+$$
+L = \sum {\alpha_!L_i} 
+$$
+
+- where: 
  - $L_i$ are the individual losses 
  - $\alpha_i$ are the importance of each task. 
+
 I suppose it worth checking out what people use in multitask learning. I recall that multitask learning is common in large language model papers
 
 - [An Overview of Multi-Task Learning in Deep Neural Networks](https://ruder.io/multi-task/index.html)
 - [Multi-Task Learning Explained in 5 Minutes](https://www.isikdogan.com/blog/multi-task-learning-explained-in-5-minutes.html)
 - [SemifreddoNets: Partially Frozen Neural Networks for Efficient Computer Vision Systems](href="http://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123720188.pdf) / [Video Summary](https://youtu.be/hZWQ2RsF7Fo")
-- [Cross-stitch Networks for Multi-task Learning](https://openaccess.thecvf.com/content_cvpr_2016/papers/Misra_Cross-Stitch_Networks_for_CVPR_2016_paper.pdf)>
+- [Cross-stitch Networks for Multi-task Learning](https://openaccess.thecvf.com/content_cvpr_2016/papers/Misra_Cross-Stitch_Networks_for_CVPR_2016_paper.pdf)
 - [Which Tasks Should Be Learned Together in Multi-task Learning?](http://taskgrouping.stanford.edu/)
 - [Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and Semantics](https://arxiv.org/pdf/1705.07115.pdf)
 - [GradNorm: Gradient Normalization for Adaptive Loss Balancing in Deep Multitask Networks](https://arxiv.org/pdf/1711.02257.pdf)
 an aside:
 [setting adaptive per weight learning rates](https://www.youtube.com/watch?v=76lj_cKBvmg&list=PLiPvV5TNogxKKwvKb1RKwkq2hm7ZvpHz0&index=44) - implement this this in jax/pytorch etc 
 due to :
-$$\Delta w_{ij}=\epsilon g_{ij} \frac {\partial E}{\partial w_{ij}}$$
-with 
-- $g_{ij}$ is the gain 
-- if $$ \frac {\partial E}{\partial w_{ij}}(t) \cdot \frac {\partial E}{\partial w_{ij}}(t-1) >0 $$
-then
-$$g_{ij}(t)=g_{ij}(t-1)+0.5 $$
+$$
+\Delta w_{ij}=\epsilon g_{ij} \frac {\partial E}{\partial w_{ij}}
+$$
+
+- with 
+  - $g_{ij}$ is the gain 
+  - if $$ \frac {\partial E}{\partial w_{ij}}(t) \cdot \frac {\partial E}{\partial w_{ij}}(t-1) >0 $$
+- then
+$$
+g_{ij}(t)=g_{ij}(t-1)+0.5 
+$$
+
 else:
-$$g_{ij}(t)=g_{ij}(t-1)*.95 $$
-Ways to make this work better:
-- limit gains to avoid instabilities
-- better with large batches - since designed for bull bach learning
-- combine with momentum
+$$
+g_{ij}(t)=g_{ij}(t-1)*.95 
+$$
+
+- Ways to make this work better:
+  - limit gains to avoid instabilities
+  - better with large batches - since designed for bull bach learning
+  - combine with momentum
+
+
+::: {.callout-important}
+### Credit 
+I used Leo F. Isikdogan's [Multi-Task Learning Explained in 5 Minutes](https://www.isikdogan.com/blog/multi-task-learning-explained-in-5-minutes.html) as my starting point - as it mentioned the paper that kept coming up
+:::

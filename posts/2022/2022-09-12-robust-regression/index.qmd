@@ -1,0 +1,143 @@
+---
+date: 2022-09-12
+title: Robust Regression
+subtitle: Robust Regression
+description: Robust Regression Techniques
+categories:
+  - Data science
+  - Robust regression
+Keywords:
+  - Robust regression
+  - Bayesian data analysis
+  - Drift detection
+  - Regime change
+  - Kolmogorov-Smirnov test
+  - Two sample test
+  - Outliers
+  - Anomalies
+  - Quantile-regression
+  - Student-t prior
+  - Horse-shoe prior
+  - Slab and spike prior
+  - Concept drift
+  - Distribution drift
+  - Covariant drift
+---
+
+::: {.callout-note}
+## Robust regression TL;DR
+
+![Robust regression](/images/in_the_nut_shell_coach_retouched.jpg)
+
+Robust regressions are extensions to Bayesian and OLS regression that are less impacted by the presence of outliers. 
+
+High leverage points can disproportionately influence the model's parameters, leading to biased estimates. Robust regression techniques aim to mitigate this issue by down-weighting the impact of these influential observations.
+
+:::
+
+## Background #1 Advertising Data
+
+I have been interested in advertising though my work in digital marketing Agency as head of Analytics. When I did a specialization on Bayesian statistics I decided to revisit the problem of advertising spend from different channels and its impact on sales. I chose the advertising dataset from ISL
+
+I used robust regression in my project on advertising spend and its impact on sales. By incorporating robust regression techniques, I was able to account for outliers and better understand the underlying relationships in the data. 
+
+More importantly non robust regression on the advertising dataset would give contradictory assessments of the co-variate level test (e.g. t-test) and overall regression validity (e.g. F-test). This made model comparison a challenge.
+
+In this project I used a couple of different implementation `statsmodels` learn for my base line model, when OLS issued complaint.
+
+Diving deeper, into the data showed that the EDA step was misleading.
+
+I had created some hierarchical models using BAMBI and found that I had the same issues as before but without recourse to the standardized output of `statsmodels`.
+
+I then changed my prior to a student-T distribution and found that the model was more robust. I then wanted to try a few other priors including the horseshoe prior and the slab and spike prior. However these were not supported in BAMBI.
+
+## Background #2 Elasticity Data
+
+I also worked on estimating elasticity at scale. In this situation there were many cases where the data set was sparse, samples too small,  noisy, contained outliers, inflated zeros, and anomalies due to sampling errors.
+
+I decided to mitigate these to the best of my ability. In this case I turned to quantile regression. 
+
+One idea was to include an inverse gamma to mitigate the impact zero inflation. In retrospect a mixture model would have been a better choice as it would allow using a more robust prior like the horseshoe prior or the slab and spike prior to handle the outliers. 
+
+I also used hyper priors to handle the small sample in many of the cases.
+
+One way that I found that using robust regression techniques helped to improve the accuracy of the elasticity estimates and provided more reliable insights for decision-making. 
+
+However, I still faced challenges due to the inherent limitations of the data.
+Although I had some good ideas it seems one could do better. 
+
+However, we had many discussion at the time and I was asked by colleagues if I knew some approach would work. I realize now that even the best models from academia are not able to give results that are without micro-economic contradiction. And that in practice the data we get is not the data we need.
+
+Consider three cases:
+
+1. aggregation - if we don't account for seasonality the demand curve can become inverted. But how should we account for seasonality. Does price determine demand? Wont low demand result in a reduction in price ? Perhaps the season here acts as a moderating variable.
+2. there are lots of promotion in retail but while some can be stated as an effective price others like points that can be redeemed for future purchases are much harder to quantify. 
+3. Some transaction get canceled and recorded on days with zero sales, giving negative demand. And this may be all the data we have for a certain prices.
+
+I plan to revisit this area as I have had many ideas on how to do much better.
+Based on mixtures, NDLMs, and hierarchical models and TVARs. However this models needs a two pronged approach - theoretical validations (sensitivity analysis, robustness) and testing on real data.
+
+
+### Some notes on robust regression.
+
+- One useful way to think about your data/model duality is using robustness :
+  - initial model - model trained on a narrow data set.
+  - robust model - model trained on a  wide data set.
+  - stale model - model whose data set has drifted.
+
+### The initial dataset and model
+
+A narrow dataset is one which is just about sufficient to train the model and pass its diagnostics. For regression there are diagnostics per each of its many assumptions but in this case I am thinking about primarily the degrees of freedom, and uncorrelated features. What makes the dataset narrow is that it does not capture the full domain of the data producing process and thus is a sample of a much larger distribution.
+
+### Robust model
+
+To become more robust the dataset on which the model is trained needs to capture more of the domain of the generating process. 
+How much is data is required for a model to achieve robustness? 
+This is hard to say. **Intuitively what we want is that if some outlier appears in the dataset, the regression line won't move much.** For this to happen the model must have seen enough data that the outlier isn't particularly unexpected. For example a spike in sales in Christmas may present as an outlier the first time. But even a strong Christmas wont be as shocking after two lackluster years.
+A more abstract way of considering this is to look at leave one out cross validation impact of each point. If it is sufficiently small we are robust.
+If we don't have a way of getting lots of data we need to bake in robustness statistically.
+
+## Small samples
+
+For small samples we replace the *Normal distribution* with the *Student-T distribution* and add the degree of freedom to our model. The reason that the normal distribution is less robust is that it has less mass in its tail so that any new point in $\mu +\sigma_3$ is going to move $\mu$ a lot. Student T and other heavy tailed distributions are less impacted by this behavior.
+**For a small sample size we should use a student-T as a drop in replacement for the Normal**
+
+## Resistance to outliers
+
+However once our degree of freedom reach about 40 there is almost no difference between *Normal distribution* with the *Student-T distribution*. A second statistical tool is *quantile regression* which uses the median rather than the mean as a centrality indicator. And since mode is far less affected by outliers the model is naturally more robust.
+**Once the sample is no longer small we may want to move to use quantile regression**
+The passage of time is generally not enough to guarantee robustness. 
+We need for the data generating process to have sampled a sufficient part of its domain. 
+Once way to visualize this is using a galactic quadrant map familiar to trekkie's. Since In reality high dimensional data sets only fill a small region of space. One could try to imagine the full data set like a spherical galaxy. Initially we sample a few neighboring quadrants which correspond to some small angle slice in a few dimensions.
+Changing conditions will teleport our sample to a distant new quadrant. Once we try to make prediction for points in this quadrant we will suffer epic failures since we never trained on this part of space and conditions here are quite different. 
+
+## Drift detection
+
+The first rule of model drift is detecting the drift!
+In many domains e.g. online advertising data becomes stale quite quickly. (People buy their heart's desire or change their preferences and two month old data is worth next to nothing).
+If we made our models fairly robust we may not so easily notice that the data had drifted.
+
+1. **concept drift** in a marginal distribution, say price, which is like moving from one edge of the quadrant to the other.
+2. **covariate drift** e.g. inflation would increase price, reduce income and decrease demand. This is a more complex pattern and corresponds to jumping to a strange new quadrant.
+3. **label shift** - this is where someone renamed a product or a category. Worse they may have completely replaced one web site with another - all product pages have changed and need to be remapped.
+The solutions are fairly simple - retain the model adding more recent data. Remap old labels to new schema.
+
+### Accuracy
+
+Also if accuracy isn't impacted by the drift we may not be as worried. Chip Hugen suggests in [@huyen2022designing] to monitor production accuracy metrics like: *F1 score*, *recall*, *AUC-ROC*, etc. When these are negatively impacted, it is worth noting there are a number of drift we would want to monitor.
+
+### Summary statistics
+
+*min*, *max*, *mean*, *median*, *variance*, various quantiles(such as 5th, 25th, 75th, or 95th quantile),
+
+### Two sample tests
+
+- Two-sample hypothesis tests, shortened as *Two sample test*. Unfortunately a statistical significance in a two sample test doesn't immediately translate to a practical significance.
+Some tests are:
+  - *Kolmogorov–Smirnov* 
+  - *Maximum minimum discrepency*
+  - *Least kernal MMD*
+
+see [Alibi Detect](https://docs.seldon.io/projects/alibi-detect/en/stable/) for implementations.
+
+A second aspect of drift detection is the time window used to compute the statistics.

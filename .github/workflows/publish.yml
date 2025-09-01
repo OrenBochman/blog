@@ -22,6 +22,24 @@ jobs:
         with:
           r-version: '4.5.1'
 
+      # Install system deps needed by R packages (curl in particular)
+      - name: Install system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcurl4-openssl-dev \   # needed by R curl/httr2
+            libssl-dev \             # needed by openssl/httr2
+            libxml2-dev \            # needed by xml2
+            libicu-dev \             # needed by stringi
+            zlib1g-dev \             # compressors used by xml2/readr/vroom
+            pkg-config \             # helps find libs during configure
+            build-essential \        # g++, make for C/C++ packages
+            gfortran \               # some CRAN packages still use Fortran
+            cmake                    # useful for cmdstan toolchain
+
+
+
+
       - name: Install R Dependencies
         uses: r-lib/actions/setup-renv@v2
         with:

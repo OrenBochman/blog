@@ -1,0 +1,12 @@
+{
+  "hash": "fc072b5ea3f72ce6cee38d741405bff9",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: conversion util\n---\n\n::: {#c0d239cf .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\nimport pyarrow.parquet as pq\n\n# Read the TXT file into a Pandas DataFrame\n# Adjust 'sep' based on your TXT file's delimiter (e.g., ',', '\\t', ' ')\ncolumn_names = ['customer_id', 'date', 'quantity', 'price']\ndf = pd.read_csv('CDNOW_master.txt', sep='\\s+' , header=None, names=column_names)\n\n# Convert 'date' column using the correct function and format\n# Assuming the date is in 'YYYYMMDD' format\ndf['date'] = pd.to_datetime(df['date'], format='%Y%m%d')\n\n# Downcast numerical columns to a smaller, efficient data type\n# We use 'int16' instead of 'int8' for safety against overflow\ndf['customer_id'] = pd.to_numeric(df['customer_id'], downcast='integer')\ndf['quantity'] = pd.to_numeric(df['quantity'], downcast='integer')\ndf['price'] = pd.to_numeric(df['price'], downcast='float')\n\n# Write the DataFrame to a Parquet file\ndf.to_parquet('CDNOW_master.parquet', engine='pyarrow',compression='brotli') \n```\n:::\n\n\n",
+    "supporting": [
+      "convert_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

@@ -1,0 +1,44 @@
+---
+title: cdnow conversion to parquet
+---
+
+
+```python
+import pandas as pd
+import pyarrow.parquet as pq
+
+# Read the TXT file into a Pandas DataFrame
+# Adjust 'sep' based on your TXT file's delimiter (e.g., ',', '\t', ' ')
+column_names = ['customer_id', 'date', 'quantity', 'price']
+df = pd.read_csv('CDNOW_master.txt', sep='\s+' , header=None, names=column_names)
+
+# Convert 'date' column using the correct function and format
+# Assuming the date is in 'YYYYMMDD' format
+df['date'] = pd.to_datetime(df['date'], format='%Y%m%d')
+
+# Downcast numerical columns to a smaller, efficient data type
+# We use 'int16' instead of 'int8' for safety against overflow
+df['customer_id'] = pd.to_numeric(df['customer_id'], downcast='integer')
+df['quantity'] = pd.to_numeric(df['quantity'], downcast='integer')
+df['price'] = pd.to_numeric(df['price'], downcast='float')
+
+# Write the DataFrame to a Parquet file
+df.to_parquet('CDNOW_master.parquet', engine='pyarrow',compression='brotli') 
+
+```
+
+
+
+```{python}
+import pandas as pd
+
+# Load the Parquet file into a DataFrame
+df = pd.read_parquet('CDNOW_master.parquet')
+
+# Display the first few rows to confirm it loaded correctly
+print(df.head())
+
+# Print information about the DataFrame, including data types
+print(df.info())
+
+```

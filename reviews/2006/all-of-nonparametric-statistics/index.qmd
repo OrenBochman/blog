@@ -1,12 +1,13 @@
 ---
-title: "title"
+date: 2025-06-10
+title: "All of nonparametric statistics"
 subtitle: "book review"
-description: "teaser for reading this paper"
-categories: [draft,review]
-keywords: [review,paper,book]
+description: "A brief review of nonparametric statistical methods."
+categories: [review]
+keywords: [nonparametric statistics, book review]
 image: /images/lit-review-cover.jpg
 bibliography: "./bibliography.bib"
-#draft: true
+draft: false
 ---
 
 ![cover](cover.webp){.column-margin .nolightbox width="250px"}
@@ -29,16 +30,19 @@ Talk at Waterloo.AI by Martha White on Developing Reinforcement Learning Agents 
 -->
 
 
-This is the follow up book to All of Statistics by Wasserman. This one covers non-parametric methods.
-Though the first book also covered a number of non-parametric methods like wavelets, this book goes into more detail on the subject. It too is a bit dated as it was written before the deep learning revolution which falls under the non-parametric methods. However, it is still a good reference for the basics of non-parametric statistics. 
 
+This book is Wasserman's follow up to "All of Statistics". This one covers non-parametric methods. Though the first book also covered a number of non-parametric methods like wavelets, this one goes into greater detail and covers a number of additional topics.
 
 ::: {.callout-note}
-## TL;DR - Too Long; Didn't Read about XXX <!-- Short Catchy title -->
+## TL;DR - Too Long; Didn't Read about Nonparametrics Stats 
 
-![XXX in a nutshell](/images/in_the_nut_shell_coach_retouched.jpg)
+![Nonparametrics in a nutshell](/images/in_the_nut_shell_coach_retouched.jpg)
 
-{{< lipsum 1 >}} <!-- SHORT & OPINIONATED-->
+Nonparametric statistics are a bit of a misnomer as they not only make use of parameters but that the number of parameters isn't fixed but can grow as needed. Say we are dealing with a problems like classification of species where we are likely to always gave to come up with new classes as we collect more data.
+
+
+
+ <!-- SHORT & OPINIONATED-->
 
 <!-- 1. What are the research questions? -->
 <!-- 2. What are the main findings? -->
@@ -53,15 +57,32 @@ Here is a light hearted Deep Dive into the book:
   </source>
 </audio>
 
+
+
 ## Glossary
 
-This book uses lots of big terms so let's break them down so we can understand them better
+This book uses lots of big terms so let us try to unpack them so we can understand the presentation more easily. 
+This glossary is still a little tricky in places sorry about that while I try to simplify it.
+
+### Probability theory
+
+These definitions are from probability theory and should be quite familiar to most readers.
 
 $\sigma$-field
-: A class of events $A$ such that (i) $\emptyset \in A$, (ii) $A \in A$ implies that $A^c \in A$ and (iii) $A_1, A_2, \ldots \in A$ implies that $\bigcup_{i=1}^\infty A_i \in A$.
+: A collection $A$ of events with properties suitable as a support of a probability measure. More formally:
+: A class of events $A$ such that:
+
+$$
+\begin{aligned}
+\emptyset &\in A && \text{(a null event)} \\
+A &\in A \implies A^c \in A && \text{(events have complements)} \\
+A_1, A_2, \ldots &\in A \implies \bigcup_{i=1}^\infty A_i \in A && \text{(closure under countable unions)}
+\end{aligned}
+$$
 
 Probability measure
-: A function $P$ defined on a $\sigma$-field $A$ such that $P(A) \geq 0$ for all $A \in A$, $P(\Omega) = 1$ and if $A_1, A_2, \ldots \in A$ are disjoint then $P\left(\bigcup_{i=1}^\infty A_i\right) = \sum_{i=1}^\infty P(A_i)$.
+: A measurable function that assigns probabilities to events in a $\sigma$-field in a way that is consistent with the axioms of probability. More formally:
+: A function $P$ defined on a $\sigma$-field $A$ such that $P(A) \geq 0 \forall A \in A$, $P(\Omega) = 1$ and if $A_1, A_2, \ldots \in A$ are disjoint then $P\left(\bigcup_{i=1}^\infty A_i\right) = \sum_{i=1}^\infty P(A_i)$.
 
 Probability space
 : The triple $(\Omega, A, P)$ where $\Omega$ is the sample space, $A$ is a $\sigma$-field of events, and $P$ is a probability measure.
@@ -69,35 +90,55 @@ Probability space
 Random variable
 : A map $X : \Omega \to \mathbb{R}$ such that, for every real $x$, $\{\omega \in \Omega : X(\omega) \leq x\} \in A$.
 
-Mean (of a function $a$)
-: $E(a(X)) = \int a(x) dF(x) \equiv \left\{ \int a(x) f(x) dx \text{ in the continuous case, } \sum_j a(x_j) f(x_j) \text{ in the discrete case} \right\}$.
+Mean of a function $a$
+: Depending on if it is continuos or discrete we have
 
-Variance (of a random variable $X$)
-: $V(X) = E((X - E(X))^2)$.
+$$
+\begin{aligned}
+    \mathbb{E} (a(X)) &= \int a(x) dF(x) &\stackrel{\cdot}{\equiv} 
+\left \{ 
+    \int a(x) 
+    f(x) dx \text{ continuous case } 
+\right \} \\
+&= \int a(x) dF(x) &\stackrel{\cdot}{\equiv} 
+\left\{ \sum_j a(x_j) f(x_j) \text{  discrete case} \right\}
+\end{aligned}
+$$
 
-Mean squared error (mse)
-: $\text{mse} = \text{bias}^2(\hat{\theta}_n) + V(\hat{\theta}_n)$. Also defined as $R(f(x), \hat{f}_n(x)) = E ( L(f(x), \hat{f}_n(x)) )$.
+Variance of a random variable $X$
+: A measure of the spread of a distribution defined as:
 
-Confidence set
-: A set $C_n$ of possible values of a quantity of interest $\theta$, which depends on the data $X_1, \ldots, X_n$.
+$\mathbb{V}(X) = \mathbb{E}((X - \mathbb{E}(X))^2)$.
 
-Plug-in estimator (of $\theta = T(F)$)
-: Defined by $\hat{\theta}_n = T(\hat{F}_n)$.
+Mean squared error (MSE)
+: A loss function used to quantify goodness of fit of an estimator defined as:
+: $\text{mse} = \text{bias}^2(\hat{\theta}_n) + \mathbb{V}(\hat{\theta}_n)$. Also defined as:
+:  $R(f(x), \hat{f}_n(x)) = E ( L(f(x), \hat{f}_n(x)) )$.
+
+
+
+### Functional analysis
+
+The following come from functional analysis. 
 
 Linear functional (of $F$)
 : A functional of the form $\int a(x) dF(x)$.
 
-Influence function ($L_F(x)$)
-: $L_F(x) = \lim_{\epsilon \to 0} \frac{T((1 - \epsilon)F + \epsilon \delta_x) - T(F)}{\epsilon}$ where $\delta_x$ is a point mass at $x$.
+Sobolev space of order $m$ ($W^{(m)}$)
+: [Sobolev space](https://en.wikipedia.org/wiki/Sobolev_space) is a vector space of functions with a norm.
+: $\{ f \in L_2(0, 1) : D^m f \in L_2(0, 1) \}$ where $D^m f$ is the $m$th weak derivative of $f$.
 
-Empirical influence function ($\hat{L}(x)$)
-: $\hat{L}(x) = L_{\hat{F}_n}(x)$.
+Sobolev space of order $m$ and radius $c$ ($W^{(m, c)}$)
+: [Sobolev space](https://en.wikipedia.org/wiki/Sobolev_space) $\{ f : f \in W^{(m)}, \|D^m f \|_2 \leq c^2 \}$.
 
-Nonparametric delta method
-: The approximation $\frac{T(\hat{F}_n) - T(F)}{\hat{s}_e} \approx N(0, 1)$ where $\hat{s}_e = \hat{\tau}/\sqrt{n}$ and $\hat{\tau}^2 = \frac{1}{n} \sum_{i=1}^n \hat{L}^2(X_i)$.
+Periodic Sobolev class ($\tilde{W}^{(m, c)}$)
+: $\{ f \in W^{(m, c)} : D^j f(0) = D^j f(1), j = 0, \ldots, m - 1 \}$.
 
-Empirical probability distribution ($\hat{P}_n(A)$)
-: $\hat{P}_n(A) = \frac{\text{number of } X_i \in A}{n}$.
+Besov space ($B_{p,q}^\xi$)
+: [Besov space](https://en.wikipedia.org/wiki/Besov_space) generalizes Sobolev spaces and characterizes smoothness in terms of differences.
+
+Ellipsoid ($\Theta$)
+: $\{ \theta : \sum_{j=1}^\infty a_j^2 \theta_j^2 \leq c^2 \}$ where $a_j$ is a sequence of numbers such that $a_j \to \infty$ as $j \to \infty$.
 
 Gâteaux derivative (of $T$ at $F$ in the direction $G$)
 : $L_F(G) = \lim_{\epsilon \to 0} \frac{T((1 - \epsilon)F + \epsilon G) - T(F)}{\epsilon}$.
@@ -108,8 +149,20 @@ Hadamard differentiable (at $F$)
 Linear smoother (estimator $\hat{r}_n$ of $r$)
 : For each $x$, there exists a vector $\mathbf{l}(x) = (l_1(x), \ldots, l_n(x))^T$ such that $\hat{r}_n(x) = \sum_{i=1}^n l_i(x) Y_i$.
 
-Leave-one-out cross-validation score ($cv = \hat{R}(h)$)
-: $\hat{R}(h) = \frac{1}{n} \sum_{i=1}^n (Y_i - \hat{r}^{(-i)}(x_i))^2$ where $\hat{r}^{(-i)}$ is the estimator obtained by omitting the $i$th pair $(x_i, Y_i)$.
+Overcomplete dictionary
+: A set of basis functions where the number of basis functions $m$ is greater than the number of observations $n$.
+
+### Estimation theory
+
+Confidence set
+: Generalization of confidence intervals.
+: A set $C_n$ of possible values of a quantity of interest $\theta$, which depends on the data $X_1, \ldots, X_n$.
+
+Empirical probability distribution ($\hat{P}_n(A)$)
+: $\hat{P}_n(A) = \frac{\text{number of } X_i \in A}{n}$.
+
+Empirical influence function ($\hat{L}(x)$)
+: $\hat{L}(x) = L_{\hat{F}_n}(x)$.
 
 Histogram estimator ($\hat{f}_n(x)$)
 : $\hat{f}_n(x) = m \sum_{j=1} \frac{\hat{p}_j}{h} I(x \in B_j)$ where $h=1/m$ is the binwidth, $B_j$ are the bins, and $\hat{p}_j$ is the proportion of observations in bin $B_j$.
@@ -117,17 +170,16 @@ Histogram estimator ($\hat{f}_n(x)$)
 Cross-validation estimator of risk ($\hat{J}(h)$)
 : $\hat{J}(h) = \int \hat{f}_n^2(x) dx - \frac{2}{n} \sum_{i=1}^n \hat{f}_n^{(-i)}(X_i)$.
 
-Sobolev space of order $m$ ($W^{(m)}$)
-: $\{ f \in L_2(0, 1) : D^m f \in L_2(0, 1) \}$ where $D^m f$ is the $m$th weak derivative of $f$.
+Leave-one-out cross-validation score ($cv = \hat{R}(h)$)
+: $\hat{R}(h) = \frac{1}{n} \sum_{i=1}^n (Y_i - \hat{r}^{(-i)}(x_i))^2$ where $\hat{r}^{(-i)}$ is the estimator obtained by omitting the $i$th pair $(x_i, Y_i)$.
 
-Sobolev space of order $m$ and radius $c$ ($W^{(m, c)}$)
-: $\{ f : f \in W^{(m)}, \|D^m f \|_2 \leq c^2 \}$.
 
-Periodic Sobolev class ($\tilde{W}^{(m, c)}$)
-: $\{ f \in W^{(m, c)} : D^j f(0) = D^j f(1), j = 0, \ldots, m - 1 \}$.
+Plug-in estimator (of $\theta = T(F)$)
+: Defined by $\hat{\theta}_n = T(\hat{F}_n)$.
 
-Ellipsoid ($\Theta$)
-: $\{ \theta : \sum_{j=1}^\infty a_j^2 \theta_j^2 \leq c^2 \}$ where $a_j$ is a sequence of numbers such that $a_j \to \infty$ as $j \to \infty$.
+Influence function ($L_F(x)$)
+: $L_F(x) = \lim_{\epsilon \to 0} \frac{T((1 - \epsilon)F + \epsilon \delta_x) - T(F)}{\epsilon}$ where $\delta_x$ is a point mass at $x$.
+
 
 Minimax risk
 : $\inf_{\hat{\theta}_n} \sup_{\theta \in \Theta} E_\theta [L(\hat{\theta}_n, \theta)]$ where the infimum is over all estimators $\hat{\theta}_n$ and the supremum is over a class of parameters $\Theta$.
@@ -135,11 +187,41 @@ Minimax risk
 Linear shrinkage estimator (in Normal means problem)
 : $\hat{\theta} = bZ = (bZ_1, \ldots, b_n Z_n)$.
 
-Soft threshold estimator
-: $\hat{\theta}_i = \text{sign}(Z_i)(|Z_i| - \lambda)_+$.
+Thresholding
+: A nonlinear shrinkage method used in wavelet regression where small wavelet coefficients are set to zero.
 
 Hard threshold estimator
 : $\hat{\theta}_i = Z_i I(|Z_i| > \lambda)$.
+
+Hard thresholding (estimator $\hat{\beta}_{jk}$)
+: takes the following form
+
+$$
+\hat{\beta}_{jk} = 
+\begin{cases}
+ 0      & \text{if } |D_{jk}| < \lambda \\
+ D_{jk} & \text{if } |D_{jk}| \geq \lambda 
+\end{cases}
+$$
+
+Soft threshold estimator
+: $\hat{\theta}_i = \text{sign}(Z_i)(|Z_i| - \lambda)_+$.
+
+Soft thresholding (estimator $\hat{\beta}_{jk}$)
+: $\hat{\beta}_{jk} = \text{sign}(D_{jk})(|D_{jk}| - \lambda)_+$.
+
+Universal threshold ($\lambda$)
+: $\hat{\sigma} \sqrt{\frac{2 \log n}{n}}$.
+
+
+### Nonparametics
+
+Nonparametric delta method
+: The approximation $\frac{T(\hat{F}_n) - T(F)}{\hat{s}_e} \approx N(0, 1)$ where $\hat{s}_e = \hat{\tau}/\sqrt{n}$ and $\hat{\tau}^2 = \frac{1}{n} \sum_{i=1}^n \hat{L}^2(X_i)$.
+
+
+Wavelet regression
+: A method to estimate a regression function by projecting the data onto a wavelet basis and then shrinking the wavelet coefficients.
 
 Multiresolution analysis (MRA) of $\mathbb{R}$ (generated by $\phi$)
 : A sequence of closed subspaces $V_j \subset L_2(\mathbb{R})$, $j \in \mathbb{Z}$, such that $V_j \subset V_{j+1}$, $\bigcup_{j \in \mathbb{Z}} V_j$ is dense in $L_2(\mathbb{R})$, $\bigcap_{j \in \mathbb{Z}} V_j = \{0\}$, $f(x) \in V_j \Leftrightarrow f(2x) \in V_{j+1}$, and there exists a scaling function (father wavelet) $\phi \in V_0$ such that $\{\phi(x - k) : k \in \mathbb{Z}\}$ forms a Riesz basis for $V_0$.
@@ -150,58 +232,46 @@ Father wavelet (scaling function) ($\phi$)
 Mother wavelet ($\psi$)
 : A function such that $\{\psi_{jk}(x) = 2^{j/2}\psi(2^j x - k) : j, k \in \mathbb{Z}\}$ forms an orthonormal basis for $L_2(\mathbb{R})$.
 
-Wavelet regression
-: A method to estimate a regression function by projecting the data onto a wavelet basis and then shrinking the wavelet coefficients.
-
-Thresholding
-: A nonlinear shrinkage method used in wavelet regression where small wavelet coefficients are set to zero.
-
-Hard thresholding (estimator $\hat{\beta}_{jk}$)
-: $\hat{\beta}_{jk} = \left\{ \begin{array}{ll} 0 & \text{if } |D_{jk}| < \lambda \\ D_{jk} & \text{if } |D_{jk}| \geq \lambda \end{array} \right.$.
-
-Soft thresholding (estimator $\hat{\beta}_{jk}$)
-: $\hat{\beta}_{jk} = \text{sign}(D_{jk})(|D_{jk}| - \lambda)_+$.
-
-Universal threshold ($\lambda$)
-: $\hat{\sigma} \sqrt{\frac{2 \log n}{n}}$.
-
-Besov space ($B_{p,q}^\xi$)
-: A function space that generalizes Sobolev spaces and characterizes smoothness in terms of differences.
-
-Overcomplete dictionary
-: A set of basis functions where the number of basis functions $m$ is greater than the number of observations $n$.
 
 
-## Outline
+## Book Outline
 
 1. **Introduction**
-    * 1.1 **What Is Nonparametric Inference?**
-        * Basic idea: Use data to infer an unknown quantity with **minimal assumptions**.
-        * Often involves **infinite-dimensional statistical models**.
-        * The term 'nonparametric inference' in this book refers to modern statistical methods that aim to keep the number of underlying assumptions as weak as possible.
-        * Problems considered in the book include:
-            * Estimating the **distribution function (cdf)**: Given an iid sample $X_1, . . . , X_n \sim F$, estimate $F(x) = P(X ≤ x)$.
-            * Estimating **functionals**: Given an iid sample $X_1, . . . , X_n \sim F$, estimate a functional $T(F)$ such as the mean $T(F ) = ∫ xdF (x)$.
-            * **Density estimation**: Given an iid sample $X_1, . . . , X_n \sim F$, estimate the density $f(x) = F ′(x)$.
-            * **Nonparametric regression or curve estimation**: Given $(X_1, Y_1), . . . , (X_n, Yn)$ estimate the regression function $r(x) = E(Y |X = x)$.
-            * **Normal means**: Given $Y_i \sim N(θ_i, σ^2)$, $i = 1, . . . , n$, estimate $θ = (θ_1, . . . , θ_n)$.
-        * Typically assumes the unknown quantity (distribution $F$, density $f$, or regression function $r$) lies in some **large set $F$ called a statistical model**. For example, when estimating a density $f$, we might assume $f ∈ F = \{ g : ∫ (g′′(x))^2dx ≤ c^2 \}$.
+    * 1.1 What Is Nonparametric Inference?
+        * Basic idea: [Use data to infer an unknown quantity with **minimal assumptions** where the number of parameters can grow arbitrarily as required by the data.]{.mark}
+        * Here *nonparametric inference* refers to modern statistical methods that aim to keep the number of underlying assumptions as weak as possible.
+        * Problems considered:
+            * Estimating the **distribution function (cdf)**: Given an i.i.d sample $X_1, \ldots, X_n \sim F$, estimate $F(x) = P(X \leq x)$.
+            * Estimating **functionals**: Given an i.i.d sample $X_1, \ldots, X_n \sim F$, estimate a functional $T(F)$ such as the mean $T(F ) = ∫ xdF (x)$.
+            * **Density estimation**: Given an i.i.d sample $X_1, \ldots, X_n \sim F$, estimate the density $f(x) = F ′(x)$.
+            * **Nonparametric regression or curve estimation**: Given $(X_1, Y_1), \ldots, (X_n, Y_n)$ estimate the regression function $r(x) = \mathbb{E}(Y \mid X = x)$.
+            * **Normal means**: Given $Y_i \sim \mathcal{N}(\theta_i, \sigma^2)$, $i = 1, \ldots, n$, estimate $\theta= (\theta_1, \ldots, \theta_n)$.
+        * Typically assumes the unknown quantity (distribution $F$, density $f$, or regression function $r$) lies in some **large set $F$ called a statistical model**. For example, when estimating a density $f$, we might assume $f \in F = \{ g : \int (g′′(x))^2dx \leq c^2 \}$.
     * 1.2 **Notation and Background**
         * Summary of some useful notation (see also Table 1.1).
-        * Definition of **mean of $a$**: $E(a(X)) = ∫ a(x)dF (x) ≡ \{ ∫ a(x)f(x)dx$ continuous case, $∑_j a(x_j)f(x_j)$ discrete case.
+        * Definition of **mean of $a$**: $E(a(X)) = ∫ a(x)dF (x) ≡ \{ ∫ a(x)f(x)dx$ continuous case, $\sum_j a(x_j)f(x_j)$ discrete case.
         * Definition of **variance of $X$**: $V(X) = E(X − E(X))^2$.
         * Brief review of probability.
-            * **Sample space $Ω$**: The set of possible outcomes of an experiment.
-            * **Events and $σ$-field $A$**: A class of events $A$ is a $σ$-field if (i) $∅ ∈ A$, (ii) $A ∈ A$ implies that $A^c ∈ A$ and (iii) $A_1, A_2, . . . ∈ A$ implies that $⋃_{i=1}^∞ A_i ∈ A$.
-            * **Probability measure $P$**: A function $P$ defined on a $σ$-field $A$ such that $P(A) ≥ 0$ for all $A ∈ A$, $P(Ω) = 1$ and if $A_1, A_2, . . . ∈ A$ are disjoint then $P(⋃_{i=1}^∞ A_i) = ∑_{i=1}^∞ P(A_i)$.
-            * **Probability space $(Ω, A, P)$**: The triple consisting of the sample space, the $σ$-field, and the probability measure.
-            * **Random variable $X : Ω → R$**: A map $X : Ω → R$ such that, for every real $x$, $\{ω ∈ Ω : X(ω) ≤ x\} ∈ A$.
-            * **Mean squared error (mse)**: $mse = bias^2(θ̂_n) + V(θ̂_n)$ (1.10).
+            * **Sample space $\Omega$**: The set of possible outcomes of an experiment.
+            * **Events and $\sigma$-field $A$**: A class of events $A$ is a $\sigma$-field if 
+                1. $\emptyset \in A$, 
+                2. $A \in A$ implies that $A^c \in A$ and 
+                3. $A_1, A_2, \ldots\in A$ implies that $\cup_{i=1}^\infty A_i \in A$.
+            * **Probability measure $P$**: A function $P$ defined on a $\sigma$-field $A$ such that $P(A) \geq  0$ for all $A \in A$, $P(\Omega) = 1$ and if $A_1, A_2, \ldots \in A$ are disjoint then $P(\cup_{i=1}^\infty A_i) = \sum_{i=1}^\infty P(A_i)$.
+            * **Probability space $(\Omega, A, P)$**: The triple consisting of the sample space, the $\sigma$-field, and the probability measure.
+            * **Random variable $X : \Omega \to R$**: A map $X : \Omega \to R$ such that, for every real $x$, $\{\omega \in \Omega : X(\omega) \leq x\} \in A$.
+            * **Mean squared error (mse)**: $mse = bias^2(\hat{\theta}a_n) + V(\hat{\theta}_n)$ (1.10).
     * 1.3 **Confidence Sets**
-        * Much of nonparametric inference is devoted to finding an estimator $\hat{θ}_n$ of some quantity of interest $θ$ and providing **confidence sets** for these quantities.
-        * Let $F$ be a class of distribution functions and let $θ$ be some quantity of interest. Let $C_n$ be a set of possible values of $θ$ which depends on the data $X_1, . . . , X_n$. The coverage of $C_n$ is $P_F(θ ∈ C_n)$. $C_n$ is a $1 − α$ confidence set if $\inf_{F} P_F(θ ∈ C_n) ≥ 1 − α$.
+        - Much of nonparametric inference is devoted to finding an estimator $\hat{\theta}_n$ of some quantity of interest $\theta$ and providing **confidence sets** for these quantities.
+        - Let $F$ be a class of distribution functions and let $\theta$ be some quantity of interest. Let $C_n$ be a set of possible values of $\theta$ which depends on the data $X_1, \ldots, X_n$. The coverage of $C_n$ is $P_F(\theta\in C_n)$. $C_n$ is a $1 − \alpha$ confidence set if $\inf_{F} P_F(\theta\in C_n) \geq  1 − \alpha$.
+        - finite sample confidence set - 
+        - asymptotic confidence set - converge to 
+        - uniform asymptotic confidence set -
+        - point wise asymptotic confidence set - for a specific value
+        - confidence ball and bands - for functions
+        - confidence envelope
     * 1.4 **Useful Inequalities**
-        * **Jensen’s inequality**: If $g$ is convex then $Eg(X) ≥ g(EX)$ (1.32). If $g$ is concave then $Eg(X) ≤ g(EX)$ (1.33).
+        * **Jensen’s inequality**: If $g$ is convex then $Eg(X) \geq  g(EX)$ (1.32). If $g$ is concave then $Eg(X) \leq g(EX)$ (1.33).
     * 1.5 **Bibliographic Remarks**
         * References on probability inequalities and their use in statistics and pattern recognition include Devroye et al. (1996) and van der Vaart and Wellner (1996). To review basic probability and mathematical statistics, I recommend Casella and Berger (2002), van der Vaart (1998) and Wasserman (2004).
 
@@ -217,7 +287,7 @@ Overcomplete dictionary
         * Introduction to statistical functionals $T(F)$ which map a distribution function $F$ to a number.
         * Plug-in estimator: Estimate $T(F)$ by $T(\hat{F}_n)$.
         * Example 2.32 (The mean): Plug-in estimator for the mean $\theta = \int xdF(x)$ is $\hat{\theta} = \int xd\hat{F}_n(x) = \bar{X}_n$. Asymptotic nonparametric 95 percent confidence interval for $\theta$ is $\bar{X}_n \pm 2 \hat{se}$ where $\hat{se}^2 = \hat{\sigma}^2/n$.
-        * Statistical functionals in the form $T(F) = a(T_1(F), . . . , T_m(F))$.
+        * Statistical functionals in the form $T(F) = a(T_1(F), \ldots, T_m(F))$.
     * 2.3 **Influence Functions**
         * Definition of the influence function $L(x)$ of a functional $T$ at $F$.
         * $T((1 - \epsilon)F + \epsilon \delta_x) \approx T(F) + \epsilon L(x)$ for small $\epsilon$, where $\delta_x$ is a point mass at $x$.
@@ -237,7 +307,7 @@ Overcomplete dictionary
     * 3.1 **The Jackknife**
         * Introduction to the jackknife as a method for estimating bias and variance.
         * Definition of the jackknife estimator $T_{(i)}$: the estimator computed by omitting the $i$-th observation.
-        * Jackknife estimate of bias: $bias_{jack} = (n-1)(\bar{T}_{(.)} - T_n)$, where $\bar{T}_{(.)} = \frac{1}{n} \sum_{i=1}^n T_{(i)}$ and $T_n = T(X_1, . . . , X_n)$.
+        * Jackknife estimate of bias: $bias_{jack} = (n-1)(\bar{T}_{(.)} - T_n)$, where $\bar{T}_{(.)} = \frac{1}{n} \sum_{i=1}^n T_{(i)}$ and $T_n = T(X_1, \ldots, X_n)$.
         * Jackknife estimate of variance: $V_{jack} = \frac{n-1}{n} \sum_{i=1}^n (T_{(i)} - \bar{T}_{(.)})^2$.
         * Approximate $1 - \alpha$ confidence interval using the jackknife: $T_n \pm t_{n-1, 1-\alpha/2} \sqrt{V_{jack}}$.
         * Example 3.3 illustrating jackknife estimation of bias and standard error for the mean.
@@ -245,9 +315,9 @@ Overcomplete dictionary
     * 3.2 **The Bootstrap**
         * Introduction to the bootstrap as a general method for statistical inference based on resampling.
         * Nonparametric bootstrap procedure:
-            1. Draw a bootstrap sample $X^*_1, . . . , X^*_n$ with replacement from the original data $X_1, . . . , X_n$.
-            2. Compute the statistic of interest $T^*_n = T(X^*_1, . . . , X^*_n)$.
-            3. Repeat steps 1 and 2 $B$ times to get $T^*_{n,1}, . . . , T^*_{n,B}$.
+            1. Draw a bootstrap sample $X^*_1, \ldots, X^*_n$ with replacement from the original data $X_1, \ldots, X_n$.
+            2. Compute the statistic of interest $T^*_n = T(X^*_1, \ldots, X^*_n)$.
+            3. Repeat steps 1 and 2 $B$ times to get $T^*_{n,1}, \ldots, T^*_{n,B}$.
         * Bootstrap estimate of standard error: $se_{boot} = \sqrt{\frac{1}{B} \sum_{b=1}^B (T^*_{n,b} - \bar{T}^*_n)^2}$, where $\bar{T}^*_n = \frac{1}{B} \sum_{b=1}^B T^*_{n,b}$.
         * Example 3.12 provides pseudo-code for bootstrapping the median.
     * 3.3 **Parametric Bootstrap**
@@ -276,8 +346,8 @@ Overcomplete dictionary
 4. **Smoothing: General Concepts**
     * Introduction to the necessity of smoothing data to estimate curves like probability density functions ($f$) or regression functions ($r$).
     * Discussion of two main types of problems studied:
-        * **Density estimation**: Estimating the probability density function $f$ given a sample $X_1, . . . , X_n \sim f$.
-        * **Regression**: Estimating the regression function $r$ given pairs $(x_1, Y_1), . . . , (x_n, Yn)$ where $Y_i = r(x_i) + \epsilon_i$ and $E(\epsilon_i) = 0$.
+        * **Density estimation**: Estimating the probability density function $f$ given a sample $X_1, \ldots, X_n \sim f$.
+        * **Regression**: Estimating the regression function $r$ given pairs $(x_1, Y_1), \ldots, (x_n, Yn)$ where $Y_i = r(x_i) + \epsilon_i$ and $E(\epsilon_i) = 0$.
     * Example 4.3 (Density estimation) showing histograms of astronomy data with different amounts of smoothing.
     * Example 4.4 (Nonparametric regression) discussing the Cosmic Microwave Background (CMB) data.
     * Example 4.5 (Nonparametric regression) illustrating the LIDAR experiment data and regressograms.
@@ -305,7 +375,7 @@ Overcomplete dictionary
    
 5. **Nonparametric Regression**
     * Introduction to nonparametric regression, also known as "learning a function".
-    * Given $n$ pairs of observations $(x_1, Y_1), . . . , (x_n, Yn)$ where $Y_i = r(x_i) + \epsilon_i$ and $E(\epsilon_i) = 0$.
+    * Given $n$ pairs of observations $(x_1, Y_1), \ldots, (x_n, Yn)$ where $Y_i = r(x_i) + \epsilon_i$ and $E(\epsilon_i) = 0$.
     * The goal is to estimate the regression function $r(x) = E(Y |X = x)$.
     * Methods considered include local regression methods (kernel regression, local polynomial regression) and penalization methods (splines).
     * Chapter 8 and 9 will cover an approach based on orthogonal functions.
@@ -314,7 +384,7 @@ Overcomplete dictionary
         * Brief review of standard parametric regression techniques as a contrast to nonparametric methods.
     * 5.2 **Linear Smoothers**
         * Definition of a linear smoother: An estimator $\hat{r}_n$ of $r$ is a linear smoother if $\hat{r}_n(x) = \sum_{i=1}^n \beta_i(x)Y_i$.
-        * Vector of fitted values $r = (\hat{r}_n(x_1), . . . , \hat{r}_n(x_n))^T$.
+        * Vector of fitted values $r = (\hat{r}_n(x_1), \ldots, \hat{r}_n(x_n))^T$.
         * Relationship $r = LY$ where $L$ is the smoothing matrix.
     * 5.3 **Choosing the Smoothing Parameter**
         * The importance of selecting an appropriate smoothing parameter (e.g., bandwidth $h$).
@@ -363,12 +433,12 @@ Overcomplete dictionary
         * The scale-space surface $S = \{ r_h(x), x \in X , h \in H \}$.
         * Method SiZer (significant zero crossings of derivatives).
     * 5.12 **Multiple Regression**
-        * Nonparametric regression with multiple covariates $r(x_1, . . . , x_p)$.
+        * Nonparametric regression with multiple covariates $r(x_1, \ldots, x_p)$.
         * Challenges due to the curse of dimensionality.
         * **Additive models**: $r(x) = \mu + \sum_{j=1}^p r_j(x_j)$.
         * Backfitting algorithm for fitting additive models.
         * Example 5.126 applying additive models to rock data.
-        * **Projection pursuit regression**: $r(x_1, . . . , x_p) = \mu + \sum_{m=1}^M r_m(\alpha_m^T x)$.
+        * **Projection pursuit regression**: $r(x_1, \ldots, x_p) = \mu + \sum_{m=1}^M r_m(\alpha_m^T x)$.
         * Algorithm for projection pursuit regression.
         * Example 5.130 applying projection pursuit regression to rock data.
         * **Regression trees**: Partitioning the covariate space into rectangles and fitting a constant in each.
@@ -390,7 +460,7 @@ Overcomplete dictionary
 
 
 6. **Density Estimation**
-    * Introduction to the problem of estimating the probability density function $f(x)$ from a sample $X_1, . . . , X_n$.
+    * Introduction to the problem of estimating the probability density function $f(x)$ from a sample $X_1, \ldots, X_n$.
     * 6.1 **Cross-Validation**
         * Using cross-validation to evaluate the quality of a density estimator $\hat{f}_n$ with the risk $R = E(L)$ (integrated mean squared error).
     * 6.2 **Histograms**
@@ -433,7 +503,7 @@ Overcomplete dictionary
     * The chapter is noted as being more theoretical.
     * Recommendation for readers not interested in theoretical details to read sections 7.1, 7.2, and 7.3 and then skip to the next chapter.
     * 7.1 **The Normal Means Model**
-        * Defining the basic Normal means model: $Zi \sim N(\theta_i, \sigma^2_n)$, for $i = 1, 2, . . .$ (7.2), where $\theta = (\theta_1, \theta_2, . . .)$ is the unknown parameter and $\sigma^2_n$ is assumed known.
+        * Defining the basic Normal means model: $Zi \sim N(\theta_i, \sigma^2_n)$, for $i = 1, 2, \ldots$ (7.2), where $\theta = (\theta_1, \theta_2, \ldots)$ is the unknown parameter and $\sigma^2_n$ is assumed known.
         * Practical note: In reality, $\sigma^2_n$ would often need to be estimated (as discussed in Chapter 5), which might affect the exact theoretical results.
         * Example 7.3 illustrating the model with a one-way analysis of variance setup: $X_{ij} = \theta_i + \sigma \delta_{ij}$ where $\delta_{ij}$ are independent $N(0,1)$ random variables.
     * 7.2 **Function Spaces**
@@ -448,9 +518,9 @@ Overcomplete dictionary
         * Discussing the concept of minimax risk.
         * Introducing Pinsker's Theorem (Theorem 7.28) which gives an exact expression for the asymptotic minimax risk over an ellipsoid $\Theta(c^2) = \{\theta : \sum a_i^2 \theta_i^2 \leq c^2 \}$.
     * 7.6 **Linear Shrinkage and the James–Stein Estimator**
-        * Returning to model (7.1) and exploring improvements over the MLE using linear estimators of the form $\hat{\theta} = bZ = (bZ_1, . . . , bZ_n)$ where $0 \leq b \leq 1$.
+        * Returning to model (7.1) and exploring improvements over the MLE using linear estimators of the form $\hat{\theta} = bZ = (bZ_1, \ldots, bZ_n)$ where $0 \leq b \leq 1$.
         * Defining the set of linear shrinkage estimators $L = \{bZ : b \in\}$.
-        * Presenting the James-Stein estimator $\hat{\theta}^{JS} = (1 - \frac{(n-2)\sigma^2_n}{\|Z\|^2})_+ Z$ (7.41) and noting it minimizes the estimated risk over $L$.
+        * Presenting the **James-Stein estimator** $\hat{\theta}^{JS} = (1 - \frac{(n-2)\sigma^2_n}{\|Z\|^2})_+ Z$ (7.41) and noting it minimizes the estimated risk over $L$.
         * Mentioning a block estimation scheme by Cai et al. (2000) using the James-Stein estimator within blocks.
         * Theorem 7.50 (Cai, Low and Zhao, 2000) providing asymptotic optimality of their block estimator over Sobolev ellipsoids $\Theta(m, c) = \{\theta : \sum_{i=1}^\infty a_i^2 \theta^2_i \leq c^2 \}$ where $a_{2i} = a_{2i+1} = 1 + (2i\pi)^{2m}$.
     * 7.7 **Adaptive Estimation Over Sobolev Spaces**
@@ -475,9 +545,9 @@ Overcomplete dictionary
 
   -  This chapter introduces the use of orthogonal functions (e.g., Fourier series, wavelets) for nonparametric inference in both regression and density estimation.
   -    For nonparametric regression, the function is expanded in an orthonormal basis:
-    -  "r(x) = ∑∞ j=1 θjφj(x) (8.3)".
+    -  $r(x) = \sum^\infty_{j=1} \theta_j\phi_j(x)$ (8.3)".
   - The concept of a modulator is introduced for shrinking the coefficients:
-    - "A modulator is a vector b = (b1, . . . , bn) such that 0 ≤ bj ≤ 1, j = 1, . . . , n. A modulation estimator is an estimator of the form θ̂ = bZ = (b1Z1, b2Z2, . . . , bnZn). (8.8)".
+    - "A modulator is a vector $b = (b_1, \ldots, b_n)$ such that $0 \leq b_j \leq 1, j = 1, \ldots, n$. A modulation estimator is an estimator of the form $\hat{\theta} = bZ = (b_1 Z_1, b_2 Z_2, \ldots, b_nZ_n)$. (8.8)".
   - Risk estimation and minimization over classes of modulators are discussed, connecting to the Pinsker bound.
   - The chapter also covers irregular designs and density estimation using orthogonal functions.
 
@@ -485,12 +555,13 @@ Overcomplete dictionary
 
   - This chapter focuses on wavelets, a powerful tool for adaptive nonparametric estimation, particularly for functions with varying degrees of smoothness.
   - Haar wavelets are introduced as a simple example.
-  - The construction of more general wavelets through multiresolution analysis (MRA) is outlined:
-  - "9.11 Definition. Given a function φ, define V0, V1, . . . , as in (9.10). We say that φ generates a multiresolution analysis (MRA) of R if Vj ⊂ Vj+1, j ≥ 0, (9.12) and ⋃ j≥0 Vj is dense in L2(R). (9.13)".
+  - The construction of more general wavelets through multi-resolution analysis (MRA) is outlined:
+  - "9.11 Definition. Given a function $φ$, define $V0, V1, \ldots$, as in (9.10). We say that $φ$ generates a multi-resolution analysis (MRA) of $R$ if $V_{j} \subset V_{j+1}, j \geq 0$, (9.12) and $\cup_{j\geq 0} Vj$ is dense in L2(R). (9.13)".
   - Wavelet regression techniques, including wavelet thresholding (VisuShrink and SureShrink), are discussed for denoising and estimating functions from noisy data. The oracle risk and the performance of thresholding estimators are mentioned.
   - Besov spaces are introduced as function spaces that are well-suited for characterizing the properties of functions that can be effectively estimated using wavelets.
   - The construction of confidence sets using wavelet methods is covered.
   - Other adaptive methods, such as the Intersection of Confidence Intervals (ICI) method by Goldenshluger and Nemirovski, are briefly introduced as alternatives to wavelet-based approaches for adapting to unknown smoothness.
+
 10. Other Topics
 
   - This final chapter covers a range of more advanced and specialized topics in nonparametric inference.
@@ -548,7 +619,7 @@ Overcomplete dictionary
 
   Minimaxity in statistics refers to finding an estimator that performs optimally in the worst-case scenario over a given class of parameters or functions. In nonparametric inference, where the underlying function or parameter might belong to a large, infinite-dimensional space, minimax theory helps in understanding the fundamental limitations of estimation. It aims to find an estimator $\hat{\theta}$ that minimizes the maximum risk $R(\theta, \hat{\theta})$ over all $\theta$ in a class $\Theta$, where the risk $R$ quantifies the error of the estimator (e.g., mean squared error).
 
-  In the context of normal means problems, which serve as a simplified yet insightful model for many nonparametric problems (like regression or density estimation in an orthonormal basis), minimax theory helps determine the best possible rate of convergence for the risk. For instance, Pinsker's theorem provides the minimax mean squared error for estimating a function in a Sobolev ellipsoid, showing that the optimal rate depends on the smoothness of the function class.
+  In the context of normal means problems, which serve as a simplified yet insightful model for many nonparametric problems (like regression or density estimation in an orthonormal basis), minimax theory helps determine the best possible rate of convergence for the risk. For instance, [Pinsker's theorem](https://en.wikipedia.org/wiki/Pinsker%27s_inequality) provides the minimax mean squared error for estimating a function in a *Sobolev ellipsoid*, showing that the optimal rate depends on the smoothness of the function class.
 
   Minimax theory also guides the development of estimators that achieve these optimal rates. Examples like shrinkage estimators (e.g., James-Stein estimator in the finite normal means problem, and wavelet thresholding in the sequence space setting related to function estimation) are often motivated by minimax considerations, aiming to reduce risk compared to simpler estimators like the MLE, especially when many parameters are involved and some might be zero or small.
 
@@ -557,7 +628,7 @@ Orthogonal functions (like Fourier series, cosine basis) and wavelets provide fl
 
   Orthogonal Functions: By expanding an unknown function $r(x)$ in an orthonormal basis ${\phi_j(x)}$, we can represent it by its coefficients $\theta_j = \int r(x) \phi_j(x) dx$. The data can then be projected onto these basis functions, yielding noisy estimates of these coefficients. Nonparametric inference then proceeds by appropriately shrinking or selecting these coefficients. This approach transforms the problem of estimating a function into a problem of estimating a sequence of coefficients, which can be analyzed using techniques similar to the normal means problem. Modulator estimators, which apply weights $b_j$ to the estimated coefficients $Z_j$, are a common approach. The choice of basis can be tailored to the expected properties of the function (e.g., smoothness, periodicity).
 
-  Wavelets: Wavelets are basis functions that are localized in both time (or space) and frequency. This localization property makes them particularly well-suited for analyzing functions with local features like sharp changes or discontinuities. Wavelet methods involve decomposing the data into wavelet coefficients, applying a thresholding rule to these coefficients (to remove noise and capture important features), and then reconstructing the function from the thresholded coefficients. Wavelet shrinkage estimators like VisuShrink and SureShrink are popular nonparametric regression and density estimation techniques known for their adaptivity to varying smoothness of the underlying function. They can achieve near-optimal performance over a wide range of function spaces.
+  Wavelets: Wavelets are basis functions that are localized in both time (or space) and frequency. This localization property makes them particularly well-suited for analyzing functions with local features like sharp changes or discontinuities. Wavelet methods involve decomposing the data into wavelet coefficients, applying a thresholding rule to these coefficients (to remove noise and capture important features), and then reconstructing the function from the thresholded coefficients. Wavelet shrinkage estimators like [VisuShrink]() and [SureShrink]() are popular nonparametric regression and density estimation techniques known for their adaptivity to varying smoothness of the underlying function. They can achieve near-optimal performance over a wide range of function spaces.
 
   Both orthogonal functions and wavelets allow for a sparse representation of many signals and functions, meaning that many of their coefficients are close to zero. This sparsity is exploited in nonparametric methods to achieve efficient estimation and adaptivity.
 
@@ -572,7 +643,7 @@ The text touches upon several challenges and extensions in nonparametric inferen
 
   Nonparametric Bayes: This area combines the flexibility of nonparametric models with the framework of Bayesian inference, using priors over infinite-dimensional spaces of functions or distributions (e.g., Dirichlet process mixtures).
 
-  Semiparametric Inference: These methods combine parametric and nonparametric components in a model. For example, one might model the effect of some covariates parametrically while leaving the effect of others unspecified.
+  Semi-parametric Inference: These methods combine parametric and nonparametric components in a model. For example, one might model the effect of some covariates parametrically while leaving the effect of others unspecified.
 
   Correlated Errors: The standard assumptions of independence often do not hold in practice. Nonparametric methods for data with correlated errors are more complex and less developed than those for independent data.
 
@@ -589,4 +660,10 @@ The text touches upon several challenges and extensions in nonparametric inferen
 ## Some Thoughts 
 
 
-The book provide a comprehensive overview of nonparametric inference, starting from fundamental concepts like cdf and functional estimation and progressing to advanced topics such as wavelet analysis, minimax theory, and specialized problems. The book emphasizes both the theoretical underpinnings and the practical application of various nonparametric methods for regression, density estimation, and other inference tasks. The inclusion of exercises at the end of each chapter suggests that the book is intended as a textbook for students and researchers in statistics and related fields.
+The book provide a ~~comprehensive~~ overview of nonparametric inference, starting from fundamental concepts like cdf and functional estimation and progressing to advanced topics such as wavelet analysis, minimax theory, and specialized problems. The book emphasizes both the theoretical underpinnings and the practical application of various nonparametric methods for regression, density estimation, and other inference tasks.
+
+## Resources
+
+
+- Videos for [Nonparametric Statistics Course by Max Menzies](https://bimsa.net/activity/NonSta/) using this book
+

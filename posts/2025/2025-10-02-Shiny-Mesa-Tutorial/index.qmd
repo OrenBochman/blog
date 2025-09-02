@@ -1,37 +1,51 @@
 ---
-title: "Shiny Mesa Tutorial"
-format: html
+date: 2025-10-02
+title: ShinyLive ❤️ Mesa Tutorial
+subtitle: "POC of a Mesa tutorial running in the browser with ShinyLive for Python"
+description: "This is POC for running Mesa tutorial in ShinyLive app."
+categories: [Shinylive for python, Model thinking, Simulation]
+keywords: [Shiny, Shinylive for python, Mesa,Agent-Based Modeling, POC, Wealth distribution, Altair, Pyodide]
 filters:
   - shinylive
 ---
 
+In this is the Mesa tutorial integrated into a shiny app and running via `pyodide` in the browser from a static backend.
 
-In this is the Mesa tutorial intergrated into a shiny app and running via pyodide in the browser from a static backend.
+:::{.callout-note}
+
+## TL;DR: A POC for Getting Mesa Agent-Based Modeling to run in the browser via ShinyLive and Altair.
+
+This is a proof of concept (POC) for running the Mesa tutorial in a Shiny app using ShinyLive for Python.
+
+I've created hundreds of dashboards using BI tools but always considered Shiny as my goto solution for truly custom dashboards projects. Only I moved to python a decade or so back and Shiny was R only. Now with the new Shiny for Python, I can finally use Shiny with Python. Also Shiny needed a backend which is not ideal for lightweight projects like MVP and their POC. But with ShinyLive for Python it is possible to run on a static site with everything running in the browser.
+
+On the way I also started using Mesa for ABM and Altair for very lightweight declerative widgets. But these tools did not play. Until now Mesa also had a clunky backend which required a server. But as this POC demonstrates we can do it all in python and run it in the server.
+
+:::
+
+## The POC
+
 
 :::{.column-screen-inset}
-
 ```{shinylive-python}
 #| standalone: true
-#| components: [editor, viewer]
+#| viewerHeight: 600
+#| components: [viewer] #[editor, viewer]
 
+from shiny import reactive, render
 from shiny.express import input, ui
 from shinywidgets import render_altair
 
-# Has multi-dimensional arrays and matrices.
-# Has a large collection of mathematical functions to operate on these arrays.
 import numpy as np
-
-# Data manipulation and analysis.
 import pandas as pd
 
-# Data visualization tools.
 import seaborn as sns
+import altair as alt
+
 import mesa
-from shiny import reactive, render
-from shiny.express import input, ui
 
 
-### UI for Agent Sim #############################################################
+### UI for Agent Sim ##############################################
 
 DEFAULT_RUNS = 100
 DEFAULT_STEPS = 30
@@ -48,8 +62,7 @@ with ui.sidebar(open="desktop"):
     ui.input_action_button("reset", "Reset")
 
 
-
-### MESA MODEL ##########################################################################
+### MESA MODEL ###################################################
 
 
 class MoneyAgent(mesa.Agent):
@@ -88,7 +101,7 @@ class MoneyModel(mesa.Model):
         self.agents.shuffle_do("exchange")
 
 
-ui.input_selectize("var", "Select variable", choices=["bill_length_mm", "body_mass_g"])
+#ui.input_selectize("var", "Select variable", choices=["bill_length_mm", "body_mass_g"])
 
 
 # ---------- RESET BEHAVIOR ----------
@@ -121,7 +134,6 @@ def sim_df():
 # ---------- PLOT ----------
 @render_altair
 def hist():
-    import altair as alt·
     df = sim_df()  # depends on inputs via sim_df()
     return (
         alt.Chart(df, title="Wealth distribution")
@@ -140,6 +152,272 @@ anywidget
 palmerpenguins
 jsonschema
 mesa
+scipy
+tqdm
 ```
 :::
 
+---
+
+## About Wealth agents:
+
+We run 1-500 simulations (runs) of 1-500 (steps) each with 1-50 (agents).
+
+Each agent starts with one unit of wealth. At each step, every agent randomly selects another agent and gives them one unit of wealth if they have at least one unit to give. 
+
+After all runs are complete, we plot the distribution of wealth among all agents. Any change to the parameters re runs the simulation. Note that in
+ABM and RL we often run the simulation a number of times to avoid local view of the behavior. We then need to aggregate the data and if we do this well we get a deeper (more distributional view of the data.)
+
+
+---
+
+## Linear Notes
+
+- I wanted this for a long time but couldn't get it to work in quarto. 
+- I recently asked $GPT_5$ for help buy it faked the mesa code. It worked ok but I felt cheated.
+- I knew I could do better. So I decided to try running MVP mesa model on the Shiny for Python website using the playground.
+- Shiny was ok installing mesa - a good sign
+- The tutorial worked more or less.
+- But it refused to render in my quarto project. 
+- Getting it to work locally was 90% of the work 
+- I had the sine shiny app on my blog so I tried again there - it failed.
+- In fact this was just another failure in a long line of failures with shinylive.
+- I had many issues here is a summary from $GPT_5$ of the the main ones we troubleshooted together. 
+
+Moving parts:
+
+1. Quarto
+2. [ShinyLive extension](https://github.com/quarto-ext/shinylive) for Quarto
+    1. install `pip install shinylive --upgrade`
+    2. `quarto add quarto-ext/shinylive`
+    3. modify `_quarto.yml`
+
+    ```yml  
+    > filters:
+    >  - shinylive    
+    ```
+   
+    4. add to the quarto page frontmatter
+
+    ```yml
+    > filters:
+    >  - shinylive
+    ```
+
+    5. add `shinylive-python` code blocks with the actual app
+    6. to use more screen real estate wrap code with `::: {.column-screen-inset}`
+    7. Add dependency to `requirements.txt` in `shinylive-python` block
+
+```shinylive-python
+#| standalone: true
+#| components: [editor, viewer]
+## file: app.py
+from shiny import App, ui render
+from utils import square
+
+# [App code here...]
+
+## file: utils.py
+
+def square(x, n):
+    row = ui.div([x] * n)
+    return ui.div([row] * n)
+
+## file: requirements.txt
+shinyswatch
+
+## file: www/logo.png
+## type: binary
+iVBORw0KGgoAAAANSUhEUgAAACgAAA ...
+```
+
+3. ShinyLive for Python (CLI, assets, pyodide)
+    1. install `pip install shinylive shiny`
+    2. download assets tends to fail so I side-loaded it from [shinylive repo](https://github.com/posit-dev/shinylive/releases)
+    3. It tends to time out so I used `wget` with retries and unpacked it.
+    4. The shinylive expects it to be extracted.
+
+```bash
+cd ~/.cache/shinylive
+
+wget -c -4 \
+  --tries=0 \
+  --waitretry=5 \
+  --timeout=30 \
+  --read-timeout=30 \
+  --retry-connrefused \
+  --show-progress \
+  --server-response \
+  'https://github.com/posit-dev/shinylive/releases/download/v0.10.5/shinylive-0.10.5.tar.gz'
+
+tar -xzf shinylive-0.10.5.tar.gz
+```
+4. Shiny for Python (behind the scenes)
+5. Altair for charts
+    - add to requirements.txt per 1.
+6. Mesa for agent-based modeling (Heterogeneity)
+
+
+- The Mesa Tutorial gives us a layer for doing Agent Based Simulation of wealth distribution 
+- I figured how to add it to the altair demo
+- I dropped some widgets.
+- I added new widgets per the tutorial request
+- I then needed to make things reactive - i.e. refresh when the simulation parameters change
+  - Removed global vars for UI elements (replaced by default values)
+  - Added annotations for the UI elements
+  - Split chart rendering from simulation
+  - Made these parts reactive as well.
+  - Altair is great for small prototypes and quick visualizations. But crashes with large datasets. This is a known limitation but I have not fixed it in this version yet (todo: cap the number of row in the data frame, or aggregate so we don't exceed the Altair limits)
+- The shiny app can also show an editor with all of the code. This is part of the meta data at the top of the code block. I have hidden it for now.
+
+
+
+
+
+
+
+
+Here’s a summary + a fast triage for the *next* likely hiccups.
+
+# What we fixed (recap)
+
+* **Env mismatch** → Pointed Quarto to your venv (`execute.python: .venv/bin/python` or `QUARTO_PYTHON`).
+* **Wrong invocation** → Use the **`shinylive` CLI**, not `python -m shinylive`.
+* **Assets flakiness** → Side-loaded GitHub release assets and **unpacked** them under `~/.cache/shinylive/shinylive-0.10.x` (and, if needed, `~/.local/share/shinylive/`), verified with `shinylive assets info`.
+* **Clean builds** → Use `quarto render --clean` (no `quarto clean` command).
+
+# Minimal smoke test (kept for future)
+
+```bash
+source .venv/bin/activate
+export QUARTO_PYTHON="$(pwd)/.venv/bin/python"
+which shinylive && shinylive --version
+quarto render test-shinylive.qmd --log-level=debug -v
+```
+
+# Next-issue fast triage (pick the symptom)
+
+### 1) “Shiny app loads but is blank / JS errors in console”
+
+* **Cause:** Missing/blocked assets or wrong asset path.
+* **Fixes:**
+
+  * Confirm assets visible: `shinylive assets info` lists the version you unpacked.
+  * If your site is served under a subpath (e.g., `/blog/`), add in `_quarto.yml`:
+
+    ```yaml
+    website:
+      site-url: https://<user>.github.io/blog/
+      base-url: /blog/
+    ```
+  * Hard refresh / clear cache (service worker from earlier builds can stale-cache files).
+
+### 2) 404s for `pyodide.worker.js` / `.wasm` on GitHub Pages
+
+* **Cause:** Case-sensitive paths or stale service worker.
+* **Fixes:**
+
+  * Inspect Network tab; ensure files exist in `docs/` with the same paths your HTML requests.
+  * Re-deploy after `quarto render --clean`.
+  * If using a custom domain or subfolder, ensure `base-url` is set (see above).
+
+### 3) “Works locally, breaks on Pages”
+
+* **Cause:** Different asset versions or missing files in repo.
+* **Fixes:**
+
+  * Commit the exported app folders (if you use `shinylive export`) or ensure Quarto copies them.
+  * In CI, install `shinylive` too (even if you pre-export apps locally) to keep versions aligned:
+
+    ```bash
+    pip install -U shinylive shiny
+    ```
+
+### 4) Slow local renders (big blog)
+
+* **Quick wins:**
+
+  * Use a **local profile**: `_quarto-profile-local.yml`
+
+    ```yaml
+    execute:
+      python: .venv/bin/python
+      cache: true
+      freeze: auto
+    ```
+
+    Run with:
+
+    ```bash
+    QUARTO_PROFILE=local quarto render --cache-refresh
+    ```
+  * Render surgically during debugging:
+
+    ```bash
+    quarto render path/to/page.qmd --log-level=debug -v
+    ```
+  * Skip execution for known-good posts:
+
+    ```yaml
+    execute:
+      freeze: auto
+    ```
+
+    (Only re-exec when source changes.)
+
+### 5) CLI not found intermittently
+
+* **Cause:** New shell without venv on PATH.
+* **Fixes:**
+
+  * Always `source .venv/bin/activate` before rendering, or set once per shell:
+
+    ```bash
+    export PATH="$(pwd)/.venv/bin:$PATH"
+    export QUARTO_PYTHON="$(pwd)/.venv/bin/python"
+    ```
+
+### 6) Pin versions to keep things stable
+
+* **`requirements.txt`** (example):
+
+  ```
+  shiny>=0.10.5
+  shinylive==0.8.3
+  ```
+* Recreate venv reproducibly:
+
+  ```bash
+  python -m venv .venv && source .venv/bin/activate
+  pip install --upgrade pip
+  pip install -r requirements.txt
+  ```
+
+---
+
+If you tell me what symptom you’re seeing now (blank UI, 404s, wrong base path, render slowness, etc.), I’ll jump straight to a one-liner fix or the exact `_quarto.yml` snippet you need.
+
+## Future plans
+
+So I've had a number of successful shiny and mesa apps over the last three years but now it's time to integrate them into interactive versions that users can engage with in thier browsers.
+
+Also I think that the ability to specify multiple files in one code block is ideal for vibe coding POC or MVPs.
+
+1. Adding space part of the tutorial on this page
+2. Sugarscape and other model thinking models I've developed.
+3. Demand from preferences Microeconomics model
+4. Demand curve simulator and forecasting 
+5. Lewis Signaling Bayesian algs. and RL
+6. Sugarscape as a POMDP with  RL or MARL.
+7. PYMC NDLM POC using ABM for simulating consumer behavior (in progress)
+8. Urn Models with ABM
+9. Lotka-Volterra equations population dynamics demos
+10. SIR models with ABM
+11. Bayesian MCMC algorithms demos
+12. BNP (Bayesian Nonparametric Models) demos
+13. Integrating with LLM support in Shiny.
+    - [chatlas](https://github.com/posit-dev/chatlas)
+    - [querychat](https://github.com/posit-dev/querychat)
+14. Price theory demos
+
+for starters

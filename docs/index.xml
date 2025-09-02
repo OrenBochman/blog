@@ -15,7 +15,674 @@
 <link>https://orenbochman.github.io/</link>
 </image>
 <generator>quarto-1.8.21</generator>
-<lastBuildDate>Tue, 30 Sep 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 01 Oct 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>ShinyLive ❤️ Mesa Tutorial</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/2025-10-02-Shiny-Mesa-Tutorial/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<p>In this is the Mesa tutorial integrated into a shiny app and running via <code>pyodide</code> in the browser from a static backend.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>TL;DR: A POC for Getting Mesa Agent-Based Modeling to run in the browser via ShinyLive and Altair.
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a proof of concept (POC) for running the Mesa tutorial in a Shiny app using ShinyLive for Python.</p>
+<p>I’ve created hundreds of dashboards using BI tools but always considered Shiny as my goto solution for truly custom dashboards projects. Only I moved to python a decade or so back and Shiny was R only. Now with the new Shiny for Python, I can finally use Shiny with Python. Also Shiny needed a backend which is not ideal for lightweight projects like MVP and their POC. But with ShinyLive for Python it is possible to run on a static site with everything running in the browser.</p>
+<p>On the way I also started using Mesa for ABM and Altair for very lightweight declerative widgets. But these tools did not play. Until now Mesa also had a clunky backend which required a server. But as this POC demonstrates we can do it all in python and run it in the server.</p>
+</div>
+</div>
+<section id="the-poc" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-poc">The POC</h2>
+<div class="column-screen-inset">
+<pre class="shinylive-python" data-engine="python"><code>#| '!! shinylive warning !!': |
+#|   shinylive does not work in self-contained HTML documents.
+#|   Please set `embed-resources: false` in your metadata.
+#| standalone: true
+#| viewerHeight: 600
+#| components: [viewer] #[editor, viewer]
+
+from shiny import reactive, render
+from shiny.express import input, ui
+from shinywidgets import render_altair
+
+import numpy as np
+import pandas as pd
+
+import seaborn as sns
+import altair as alt
+
+import mesa
+
+
+### UI for Agent Sim ##############################################
+
+DEFAULT_RUNS = 100
+DEFAULT_STEPS = 30
+DEFAULT_AGENTS = 12
+
+# Add page title and sidebar
+ui.page_opts(title="Mesa Wealth Agents Tutorial in Shineylive for Python", fillable=True)
+
+
+with ui.sidebar(open="desktop"):
+    ui.input_slider("runs", "Runs", min=1, max=500, value=DEFAULT_RUNS)
+    ui.input_slider("steps", "Steps per run", min=1, max=500, value=DEFAULT_STEPS)
+    ui.input_slider("agents", "Agents", min=1, max=50, value=DEFAULT_AGENTS)
+    ui.input_action_button("reset", "Reset")
+
+
+### MESA MODEL ###################################################
+
+
+class MoneyAgent(mesa.Agent):
+    """An agent with fixed initial wealth."""
+
+    def __init__(self, model):
+        # Pass the parameters to the parent class.
+        super().__init__(model)
+
+        # Create the agent's variable and set the initial values.
+        self.wealth = 1
+
+    def exchange(self):
+        # Verify agent has some wealth
+        if self.wealth &gt; 0:
+            other_agent = self.random.choice(self.model.agents)
+            if other_agent is not None:
+                other_agent.wealth += 1
+                self.wealth -= 1
+
+
+class MoneyModel(mesa.Model):
+    """A model with some number of agents."""
+
+    def __init__(self, n):
+        super().__init__()
+        self.num_agents = n
+
+        # Create agents
+        MoneyAgent.create_agents(model=self, n=n)
+
+    def step(self):
+        """ Advance the model by one step."""
+        # This function pseudo-randomly reorders the list of agent objects and
+        # then iterates through calling the function passed in as the parameter
+        self.agents.shuffle_do("exchange")
+
+
+#ui.input_selectize("var", "Select variable", choices=["bill_length_mm", "body_mass_g"])
+
+
+# ---------- RESET BEHAVIOR ----------
+@reactive.effect
+@reactive.event(input.reset)
+def _reset_sliders():
+    # These update_* helpers pick up the current session implicitly in Shiny Express
+    ui.update_slider("runs", value=DEFAULT_RUNS)
+    ui.update_slider("steps", value=DEFAULT_STEPS)
+    ui.update_slider("agents", value=DEFAULT_AGENTS)
+
+# ---------- SIMULATION (reactive) ----------
+@reactive.calc
+def sim_df():
+    runs = input.runs()
+    steps = input.steps()
+    n = input.agents()
+
+    all_wealth = []
+    for _ in range(runs):
+        model = MoneyModel(n)
+        for _ in range(steps):
+            model.step()
+        # collect wealth after final step of this run
+        all_wealth.extend(a.wealth for a in model.agents)
+
+    return pd.DataFrame({"wealth": all_wealth})
+
+
+# ---------- PLOT ----------
+@render_altair
+def hist():
+    df = sim_df()  # depends on inputs via sim_df()
+    return (
+        alt.Chart(df, title="Wealth distribution")
+        .mark_bar()
+        .encode(x=alt.X("wealth:Q", bin=True, title="Wealth"),
+                y=alt.Y("count()", title="Agents"))
+        .properties(width="container", height=300)
+        .interactive()
+    )
+
+
+## file: requirements.txt
+shinyswatch
+altair
+anywidget
+palmerpenguins
+jsonschema
+mesa
+scipy
+tqdm</code></pre>
+</div>
+<hr>
+</section>
+<section id="about-wealth-agents" class="level2">
+<h2 class="anchored" data-anchor-id="about-wealth-agents">About Wealth agents:</h2>
+<p>We run 1-500 simulations (runs) of 1-500 (steps) each with 1-50 (agents).</p>
+<p>Each agent starts with one unit of wealth. At each step, every agent randomly selects another agent and gives them one unit of wealth if they have at least one unit to give.</p>
+<p>After all runs are complete, we plot the distribution of wealth among all agents. Any change to the parameters re runs the simulation. Note that in ABM and RL we often run the simulation a number of times to avoid local view of the behavior. We then need to aggregate the data and if we do this well we get a deeper (more distributional view of the data.)</p>
+<hr>
+</section>
+<section id="linear-notes" class="level2">
+<h2 class="anchored" data-anchor-id="linear-notes">Linear Notes</h2>
+<ul>
+<li>I wanted this for a long time but couldn’t get it to work in quarto.</li>
+<li>I recently asked <img src="https://latex.codecogs.com/png.latex?GPT_5"> for help buy it faked the mesa code. It worked ok but I felt cheated.</li>
+<li>I knew I could do better. So I decided to try running MVP mesa model on the Shiny for Python website using the playground.</li>
+<li>Shiny was ok installing mesa - a good sign</li>
+<li>The tutorial worked more or less.</li>
+<li>But it refused to render in my quarto project.</li>
+<li>Getting it to work locally was 90% of the work</li>
+<li>I had the sine shiny app on my blog so I tried again there - it failed.</li>
+<li>In fact this was just another failure in a long line of failures with shinylive.</li>
+<li>I had many issues here is a summary from <img src="https://latex.codecogs.com/png.latex?GPT_5"> of the the main ones we troubleshooted together.</li>
+</ul>
+<p>Moving parts:</p>
+<ol type="1">
+<li>Quarto</li>
+<li><a href="https://github.com/quarto-ext/shinylive">ShinyLive extension</a> for Quarto
+<ol type="1">
+<li>install <code>pip install shinylive --upgrade</code></li>
+<li><code>quarto add quarto-ext/shinylive</code></li>
+<li>modify <code>_quarto.yml</code></li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">&gt; filters</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb2-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">&gt;  - shinylive    </span></span></code></pre></div></div>
+<ol start="4" type="1">
+<li>add to the quarto page frontmatter</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">&gt; filters</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">&gt;  - shinylive</span></span></code></pre></div></div>
+<ol start="5" type="1">
+<li>add <code>shinylive-python</code> code blocks with the actual app</li>
+<li>to use more screen real estate wrap code with <code>::: {.column-screen-inset}</code></li>
+<li>Add dependency to <code>requirements.txt</code> in <code>shinylive-python</code> block</li>
+</ol></li>
+</ol>
+<pre class="shinylive-python"><code>#| standalone: true
+#| components: [editor, viewer]
+## file: app.py
+from shiny import App, ui render
+from utils import square
+
+# [App code here...]
+
+## file: utils.py
+
+def square(x, n):
+    row = ui.div([x] * n)
+    return ui.div([row] * n)
+
+## file: requirements.txt
+shinyswatch
+
+## file: www/logo.png
+## type: binary
+iVBORw0KGgoAAAANSUhEUgAAACgAAA ...</code></pre>
+<ol start="3" type="1">
+<li>ShinyLive for Python (CLI, assets, pyodide)
+<ol type="1">
+<li>install <code>pip install shinylive shiny</code></li>
+<li>download assets tends to fail so I side-loaded it from <a href="https://github.com/posit-dev/shinylive/releases">shinylive repo</a></li>
+<li>It tends to time out so I used <code>wget</code> with retries and unpacked it.</li>
+<li>The shinylive expects it to be extracted.</li>
+</ol></li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">cd</span> ~/.cache/shinylive</span>
+<span id="cb5-2"></span>
+<span id="cb5-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">wget</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-c</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-4</span> <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb5-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--tries</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>0 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb5-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--waitretry</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>5 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb5-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--timeout</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>30 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb5-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--read-timeout</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>30 <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb5-8">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--retry-connrefused</span> <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb5-9">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--show-progress</span> <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb5-10">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--server-response</span> <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">\</span></span>
+<span id="cb5-11">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'https://github.com/posit-dev/shinylive/releases/download/v0.10.5/shinylive-0.10.5.tar.gz'</span></span>
+<span id="cb5-12"></span>
+<span id="cb5-13"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tar</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-xzf</span> shinylive-0.10.5.tar.gz</span></code></pre></div></div>
+<ol start="4" type="1">
+<li>Shiny for Python (behind the scenes)</li>
+<li>Altair for charts
+<ul>
+<li>add to requirements.txt per 1.</li>
+</ul></li>
+<li>Mesa for agent-based modeling (Heterogeneity)</li>
+</ol>
+<ul>
+<li>The Mesa Tutorial gives us a layer for doing Agent Based Simulation of wealth distribution</li>
+<li>I figured how to add it to the altair demo</li>
+<li>I dropped some widgets.</li>
+<li>I added new widgets per the tutorial request</li>
+<li>I then needed to make things reactive - i.e.&nbsp;refresh when the simulation parameters change
+<ul>
+<li>Removed global vars for UI elements (replaced by default values)</li>
+<li>Added annotations for the UI elements</li>
+<li>Split chart rendering from simulation</li>
+<li>Made these parts reactive as well.</li>
+<li>Altair is great for small prototypes and quick visualizations. But crashes with large datasets. This is a known limitation but I have not fixed it in this version yet (todo: cap the number of row in the data frame, or aggregate so we don’t exceed the Altair limits)</li>
+</ul></li>
+<li>The shiny app can also show an editor with all of the code. This is part of the meta data at the top of the code block. I have hidden it for now.</li>
+</ul>
+<p>Here’s a summary + a fast triage for the <em>next</em> likely hiccups.</p>
+</section>
+<section id="what-we-fixed-recap" class="level1">
+<h1>What we fixed (recap)</h1>
+<ul>
+<li><strong>Env mismatch</strong> → Pointed Quarto to your venv (<code>execute.python: .venv/bin/python</code> or <code>QUARTO_PYTHON</code>).</li>
+<li><strong>Wrong invocation</strong> → Use the <strong><code>shinylive</code> CLI</strong>, not <code>python -m shinylive</code>.</li>
+<li><strong>Assets flakiness</strong> → Side-loaded GitHub release assets and <strong>unpacked</strong> them under <code>~/.cache/shinylive/shinylive-0.10.x</code> (and, if needed, <code>~/.local/share/shinylive/</code>), verified with <code>shinylive assets info</code>.</li>
+<li><strong>Clean builds</strong> → Use <code>quarto render --clean</code> (no <code>quarto clean</code> command).</li>
+</ul>
+</section>
+<section id="minimal-smoke-test-kept-for-future" class="level1">
+<h1>Minimal smoke test (kept for future)</h1>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">source</span> .venv/bin/activate</span>
+<span id="cb6-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">export</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">QUARTO_PYTHON</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">$(</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">pwd</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">)</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">/.venv/bin/python"</span></span>
+<span id="cb6-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">which</span> shinylive <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">&amp;&amp;</span> <span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">shinylive</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--version</span></span>
+<span id="cb6-4"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">quarto</span> render test-shinylive.qmd <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--log-level</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>debug <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-v</span></span></code></pre></div></div>
+</section>
+<section id="next-issue-fast-triage-pick-the-symptom" class="level1">
+<h1>Next-issue fast triage (pick the symptom)</h1>
+<section id="shiny-app-loads-but-is-blank-js-errors-in-console" class="level3">
+<h3 class="anchored" data-anchor-id="shiny-app-loads-but-is-blank-js-errors-in-console">1) “Shiny app loads but is blank / JS errors in console”</h3>
+<ul>
+<li><p><strong>Cause:</strong> Missing/blocked assets or wrong asset path.</p></li>
+<li><p><strong>Fixes:</strong></p>
+<ul>
+<li><p>Confirm assets visible: <code>shinylive assets info</code> lists the version you unpacked.</p></li>
+<li><p>If your site is served under a subpath (e.g., <code>/blog/</code>), add in <code>_quarto.yml</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb7-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">website</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb7-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">site-url</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> https://&lt;user&gt;.github.io/blog/</span></span>
+<span id="cb7-3"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">base-url</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> /blog/</span></span></code></pre></div></div></li>
+<li><p>Hard refresh / clear cache (service worker from earlier builds can stale-cache files).</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="s-for-pyodide.worker.js-.wasm-on-github-pages" class="level3">
+<h3 class="anchored" data-anchor-id="s-for-pyodide.worker.js-.wasm-on-github-pages">2) 404s for <code>pyodide.worker.js</code> / <code>.wasm</code> on GitHub Pages</h3>
+<ul>
+<li><p><strong>Cause:</strong> Case-sensitive paths or stale service worker.</p></li>
+<li><p><strong>Fixes:</strong></p>
+<ul>
+<li>Inspect Network tab; ensure files exist in <code>docs/</code> with the same paths your HTML requests.</li>
+<li>Re-deploy after <code>quarto render --clean</code>.</li>
+<li>If using a custom domain or subfolder, ensure <code>base-url</code> is set (see above).</li>
+</ul></li>
+</ul>
+</section>
+<section id="works-locally-breaks-on-pages" class="level3">
+<h3 class="anchored" data-anchor-id="works-locally-breaks-on-pages">3) “Works locally, breaks on Pages”</h3>
+<ul>
+<li><p><strong>Cause:</strong> Different asset versions or missing files in repo.</p></li>
+<li><p><strong>Fixes:</strong></p>
+<ul>
+<li><p>Commit the exported app folders (if you use <code>shinylive export</code>) or ensure Quarto copies them.</p></li>
+<li><p>In CI, install <code>shinylive</code> too (even if you pre-export apps locally) to keep versions aligned:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">pip</span> install <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-U</span> shinylive shiny</span></code></pre></div></div></li>
+</ul></li>
+</ul>
+</section>
+<section id="slow-local-renders-big-blog" class="level3">
+<h3 class="anchored" data-anchor-id="slow-local-renders-big-blog">4) Slow local renders (big blog)</h3>
+<ul>
+<li><p><strong>Quick wins:</strong></p>
+<ul>
+<li><p>Use a <strong>local profile</strong>: <code>_quarto-profile-local.yml</code></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb9-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">execute</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb9-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">python</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> .venv/bin/python</span></span>
+<span id="cb9-3"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cache</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">true</span></span>
+<span id="cb9-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">freeze</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> auto</span></span></code></pre></div></div>
+<p>Run with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">QUARTO_PROFILE</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>local <span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">quarto</span> render <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--cache-refresh</span></span></code></pre></div></div></li>
+<li><p>Render surgically during debugging:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">quarto</span> render path/to/page.qmd <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--log-level</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>debug <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-v</span></span></code></pre></div></div></li>
+<li><p>Skip execution for known-good posts:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">execute</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb12-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">freeze</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> auto</span></span></code></pre></div></div>
+<p>(Only re-exec when source changes.)</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="cli-not-found-intermittently" class="level3">
+<h3 class="anchored" data-anchor-id="cli-not-found-intermittently">5) CLI not found intermittently</h3>
+<ul>
+<li><p><strong>Cause:</strong> New shell without venv on PATH.</p></li>
+<li><p><strong>Fixes:</strong></p>
+<ul>
+<li><p>Always <code>source .venv/bin/activate</code> before rendering, or set once per shell:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">export</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">PATH</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">$(</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">pwd</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">)</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">/.venv/bin:</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">$PATH</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span></span>
+<span id="cb13-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">export</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">QUARTO_PYTHON</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">$(</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">pwd</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">)</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">/.venv/bin/python"</span></span></code></pre></div></div></li>
+</ul></li>
+</ul>
+</section>
+<section id="pin-versions-to-keep-things-stable" class="level3">
+<h3 class="anchored" data-anchor-id="pin-versions-to-keep-things-stable">6) Pin versions to keep things stable</h3>
+<ul>
+<li><p><strong><code>requirements.txt</code></strong> (example):</p>
+<pre><code>shiny&gt;=0.10.5
+shinylive==0.8.3</code></pre></li>
+<li><p>Recreate venv reproducibly:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">python</span> <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-m</span> venv .venv <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">&amp;&amp;</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">source</span> .venv/bin/activate</span>
+<span id="cb15-2"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">pip</span> install <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--upgrade</span> pip</span>
+<span id="cb15-3"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">pip</span> install <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-r</span> requirements.txt</span></code></pre></div></div></li>
+</ul>
+<hr>
+<p>If you tell me what symptom you’re seeing now (blank UI, 404s, wrong base path, render slowness, etc.), I’ll jump straight to a one-liner fix or the exact <code>_quarto.yml</code> snippet you need.</p>
+</section>
+<section id="future-plans" class="level2">
+<h2 class="anchored" data-anchor-id="future-plans">Future plans</h2>
+<p>So I’ve had a number of successful shiny and mesa apps over the last three years but now it’s time to integrate them into interactive versions that users can engage with in thier browsers.</p>
+<p>Also I think that the ability to specify multiple files in one code block is ideal for vibe coding POC or MVPs.</p>
+<ol type="1">
+<li>Adding space part of the tutorial on this page</li>
+<li>Sugarscape and other model thinking models I’ve developed.</li>
+<li>Demand from preferences Microeconomics model</li>
+<li>Demand curve simulator and forecasting</li>
+<li>Lewis Signaling Bayesian algs. and RL</li>
+<li>Sugarscape as a POMDP with RL or MARL.</li>
+<li>PYMC NDLM POC using ABM for simulating consumer behavior (in progress)</li>
+<li>Urn Models with ABM</li>
+<li>Lotka-Volterra equations population dynamics demos</li>
+<li>SIR models with ABM</li>
+<li>Bayesian MCMC algorithms demos</li>
+<li>BNP (Bayesian Nonparametric Models) demos</li>
+<li>Integrating with LLM support in Shiny.
+<ul>
+<li><a href="https://github.com/posit-dev/chatlas">chatlas</a></li>
+<li><a href="https://github.com/posit-dev/querychat">querychat</a></li>
+</ul></li>
+<li>Price theory demos</li>
+</ol>
+<p>for starters</p>
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman,
+  author = {Bochman, Oren},
+  title = {ShinyLive ❤️ {Mesa} {Tutorial}},
+  url = {https://orenbochman.github.io/posts/2025/2025-10-02-Shiny-Mesa-Tutorial/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. n.d. <span>“ShinyLive ❤️ Mesa Tutorial.”</span> <a href="https://orenbochman.github.io/posts/2025/2025-10-02-Shiny-Mesa-Tutorial/">https://orenbochman.github.io/posts/2025/2025-10-02-Shiny-Mesa-Tutorial/</a>.
+</div></div></section></div> ]]></description>
+  <category>Shinylive for python</category>
+  <category>Model thinking</category>
+  <category>Simulation</category>
+  <guid>https://orenbochman.github.io/posts/2025/2025-10-02-Shiny-Mesa-Tutorial/</guid>
+  <pubDate>Wed, 01 Oct 2025 21:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
 <item>
   <title>Updates to the github action</title>
   <dc:creator>Oren Bochman</dc:creator>
@@ -25523,189 +26190,6 @@ Bochman, Oren. 2025. <span>“Emergent Languages.”</span> January 14,
   <category>linguistics</category>
   <category>complex signaling system</category>
   <guid>https://orenbochman.github.io/posts/2025/2025-01-14-Desiderata-for-Emergent-Languages/</guid>
-  <pubDate>Mon, 13 Jan 2025 22:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/images/cover.png" medium="image" type="image/png" height="144" width="144"/>
-</item>
-<item>
-  <title>Planning in the Complex Lewis Game</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2025/2025-03-09-planning-in-complex-lewis-game/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-<p>Today I want to consider a couple of weak assumption about planning in the Complex Lewis game. Yet before I do I ought to revisit the basic form of the Lewis Signaling game and the referential version of the game^ and the complex version of the game, and how these are formalized in Game Theory and in Reinforcement Learning. This is perhaps an onerous detour but it might be useful to help make progress that the weak assumptions I want to consider.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>The referential Lewis Game
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>In the referential game the sender has un unrestricted lexicon. The receiver gets to picks from a restricted set of states. Since it can remember them learning can proceed much faster. if there are 4 options the trial adds clues about 4 slots in the state/signal matrix but it also excludes all the other signals for that states.</p>
-<p>When I went over the referential Lewis game I was able to realize a fascinating distinction between this version and the original formulation which is described in greater detail in the <a href="../2025-03-09-referential-lewis-game/index.html">next research note</a>. What it suggests is that by restricting the options of the receiver to a subset of the states the game becomes much easier to solve. The details are less important but I can say it changes from <img src="https://latex.codecogs.com/png.latex?O(N%5E2)"> to <img src="https://latex.codecogs.com/png.latex?O(N)"> in terms of the number of trials required to solve the game and the memory requirements are also reduced.</p>
-<p>On the other hand as described below the complex version which seems to be equivalent to the basic formulation with the restriction of the symbols can be exactly as hard as the basic formulation or much harder problem depending on the senders choice of either a contiguous and thus finite set of signals or a sparse in what can be potentially infinite set of signals.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Tables v.s. Rules - Motivating function approximation
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>I learned about the formal definition of a functions in a course on set theory by <a href="https://en.wikipedia.org/wiki/Yaacov_Choueka">Yaacov Choueka</a> who headed the <a href="https://www.responsa.org.il/">Bar Ilan Responsa Project</a> and played a leadership role in the <a href="https://www.ravmilim.co.il/naerr.asp">Rav-Milim project</a> which was is run by <a href="https://melingo.com/">Melingo</a> for which I worked for. Now one of the many insight I gained in that course is that a function which I alway thought of a a rule is nothing more then a table of values. There are some columns for the inputs and one column for the output. (Perhaps more if it is a multi-valued function). Another fascinating point made in this class and echoes later throughout many mathematics courses is that even absent a rule we can posit that a choice function exists that maps the inputs to the outputs. This seems to be a basic and unassailable assumption in mathematics called the axiom of choice and I even read a couple of fascinating books Titled Equivalents of the Axiom of Choice, I &amp; II, c.f. <span class="citation" data-cites="rubin1963equivalents">(Rubin and Rubin 1963)</span>, and <span class="citation" data-cites="rubin1985equivalents">(Rubin and Rubin 1985)</span> which demonstrate that this notion of a choice function is actually quite pervasive in mathematics and often less intuitive then the axiom of choice itself. Also it is used in the proof of the existence of many mathematical objects that are not easily constructed. One example that comes to mind is the existence of an equilibrium in the Lewis signaling game with some arbitrary structure!</p>
-<p>Now the point of this nostalgic digression is that although in my mind for many years the distinction between the table (albeit with a continua of entries) and a rule had been erased. When I learned a about RL a fine distinction was made which made me realize that the two are not one and the same. After learning about tabular methods we are told that the problem with a table is that it does not generalize. What you learn about an entry any number of <img src="https://latex.codecogs.com/png.latex?x"> and <img src="https://latex.codecogs.com/png.latex?f(x)"> does not help you predict the value of any other <img src="https://latex.codecogs.com/png.latex?x">. Because the choice function can spit out any pair of <img src="https://latex.codecogs.com/png.latex?x"> and <img src="https://latex.codecogs.com/png.latex?f(x)"> it wants. But if we use a rule e.g.&nbsp;a linear function approximator or a Neural Net then the parameter learn a rule, perhaps also the importance of the different inputs and can generalize to new inputs. And there is also a very neat result - linear function approximation cant be used to represent any table, though at the cost of having a potentially one parameter for each input in the table. (E.g. I didn’t say it wan’t a trivial result).</p>
-<p>Now I told this little story because as I survey the literature I see that many authors like I did fail to make this simple distinction, they are discussing experiments in Tabular setting but then talking about results concerning rules.</p>
-<p>In terms of RL these are distinct algorithms. Function approximators require features and parameters. Tabular methods do not. So while discussion about rules in the context of Lewis signaling games may be interesting they cannot be complete when omit the features and algorithms that can learn such rules and it seems that no less significant is the importance function used to evaluate the loss on different examples. It also follows that the features are drawn directly from the pre-linguistic objects that we associate with the states!</p>
-<p>So to sum up: [RL agents don’t say that agents learn rules in the Lewis signaling game. While rules and generalization are very powerful elements in language modeling, they don’t typically arise from the Lewis signaling game. None of the algorithms in the book signals are suitable to learn rules - they are generally tabular algorithms. So without suitable structures being explicitly included in the state space as appropriate prelinguistic objects, features and algorithms we may be at a loss as to explain how agents learn such rules.</p>
-</div>
-</div>
-<div class="no-row-height column-margin column-container"><div id="ref-rubin1985equivalents" class="csl-entry">
-———. 1985. <em>Equivalents of the Axiom of Choice, II</em>. Studies in Logic and the Foundations of Mathematics. North Holland. <a href="https://books.google.co.il/books?id=LSsbBU9FesQC">https://books.google.co.il/books?id=LSsbBU9FesQC</a>.
-</div></div><div class="no-row-height column-margin column-container"><div id="ref-rubin1963equivalents" class="csl-entry">
-Rubin, H., and J. E. Rubin. 1963. <em>Equivalents of the Axiom of Choice</em>. Studies in Logic and the Foundations of Mathematics. North-Holland Publishing Company. <a href="https://books.google.co.il/books?id=pToedF7dZ7sC">https://books.google.co.il/books?id=pToedF7dZ7sC</a>.
-</div></div><p>Also now that this is clarified it seems quite interesting to fill in the details about how we may acquire such features and develop an algorithm.</p>
-<p>To avoid confusion lets state these assumptions up front.</p>
-<p>Before we consider how a sophisticated language evolves in the complex signaling system might evolve that is like a language we should consider the trivial case. By this I mean how can the agents overcome the limitation of having a large set of states <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BS%7D=%5C%7Bs_i%5C%7D"> and a much smaller set of signals <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BL%7D=%5C%7Bl_i%5C%7D">. Clearly, they will need to send sequences of signals or they will be stuck in a partial pooling equilibria and with a very low success rate, corresponding to the number of signals divided by the number of states. We can reference this language as <img src="https://latex.codecogs.com/png.latex?L%5E*">. where the star symbol is the Kleene star and indicates that the language is a set of strings of signals.</p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Trivial Complex Signaling Systems
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The trivial formulation and its as follows:</p>
-<ol type="1">
-<li>The Sender enumerates the states. <img src="https://latex.codecogs.com/png.latex?1,%5Cldots,%7CS%7C">. As there are <img src="https://latex.codecogs.com/png.latex?%7CS%7C!"> ways to enumerate the states. This enumeration may seem like a choice that sender can defer to when each state appears but the Lords of Entropy will not allow this - he must decide ahead of time on a strategy and that means a signal for each state must be chosen.<br>
-In the bayesian view The enumeration is predetermined by Nature. We might further imagine that the sender is assigned a lexicon of states to signals, but perhaps there is just a barcode reader that scans a state and returns a number.</li>
-<li>The sender converts the enumeration to base in <img src="https://latex.codecogs.com/png.latex?%5B2,%5Cldots,%7CL%7C%5D">, we could assume he picks the largest.</li>
-<li>The sender transliterates each digit to a signal in L* by converting each digit to a signal in the alphabet <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BL%7D">. He again as a L! ways to do this but again the Gods of entropy, require that he must pick them ahead of time. In the bayesian view he might be provided by a decoder ring to do this… ex-ante. But if he subscribes to the frequentest orthodoxy he might toss aside the decoder and pick the mapping at random the first time he transliterates each digit.</li>
-<li>He then sends the resulting sequence to the receiver.</li>
-<li>In the bayesian view the receiver has a pile of decoder rings and state-enumeration lexicons all he needs is to figure out the type the sender is using and so he can choose the ones that reverse the original process. Or if he subscribes to the frequentest orthodoxy he can just try states by trial and error and keep tabs of what he has tried and what the sender has sent.</li>
-</ol>
-<p>To sum this up the sender is assigned a type from S!*L! possible types. He encodes the states using base L enumeration and sends it to the receiver.</p>
-<p>The receiver can use any algorithm it used in the simple Lewis game.</p>
-<p>Note: if we make the assumption that the agents can both count and share the digits. Then we can also assume that the sender will have picker the first <img src="https://latex.codecogs.com/png.latex?%7CS%7C"> numbers in base <img src="https://latex.codecogs.com/png.latex?%7CL%7C">. Under this assumption the receiver can test each <img src="https://latex.codecogs.com/png.latex?%7CS%7C%5E2"> possible options, string out any signals,state combo that has already been eliminated, giving a total of <img src="https://latex.codecogs.com/png.latex?%7CS%7C(%7CS%7C-1)/2"> tests in the worst case… which is exactly the same as the simple lewis game.</p>
-</div>
-</div>
-<p>The trivial game is tabular in nature - the encoding is a table assigned by nature. The decoding is by necessity the inverse table as they must compose to the identity.</p>
-<p>Now I get to ask and answer what I never asked my teachers: “Why bother with this trivial case?”</p>
-<ol type="1">
-<li>Because it is the simplest case and it is a good starting point to consider the more complex cases.</li>
-<li>Also the RL agent generally smuggle without a some solution no matter how bad before they can learn to find the optimal policy. In other words the trivial solution is the greater half of the battle.</li>
-<li>Moving forward in RL is usually based on making steps with minimal improvements. I already have many ideas on making minimal improvement based on ideas listed in the article on the <a href="../../2025/2025-01-14-Desiderata-For-Emergent-Languages/index.qmd">desiderata of emergent communication</a></li>
-</ol>
-<p>We can now think about adapting this problem to existing tabular RL methods or for developing new ones.</p>
-<p>Naturally we may wonder if the agents can do better than the trivial solution? Can we do any better without adding more structure to the state space?</p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Non-trivial Complex Signaling Systems - Noisy channel
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>If the channel is perfect, the sender might want to use the first contiguous N numbers. But if there is a noisy channel it could do better by pick the first N numbers that are each at a (hamming) distance of K from each other. This would alow the receiver to recover messages with k errors.</p>
-<p>This suggest that the receiver cannot assume the sender is using the first <img src="https://latex.codecogs.com/png.latex?%7CS%7C_%7B%7CL%7C%7D"> numbers. In this case it cannot even be sure that there are <img src="https://latex.codecogs.com/png.latex?%7CS%7C"> signals as they can be corrupted to many more signals.</p>
-<p>What should the reciever do in this case ? If it can figure out the (hamming) distance between codes it can use that to recover the original message. But it also needs to figure out what the correct message means.</p>
-<p>So adding an error correction might help agents in the long term but it might increase the search space for the receiver by a orders of magnitude</p>
-<p>So this is a challenge. For a large state space this will be a show stopper. However if the agent is learning functions rather then tables it might be ok. This is because it could learn the function on a small state space and then use this to generalize to the larger state space. This combines function approximation with curriculum learning. We may revisit this scenario later on.</p>
-</div>
-</div>
-<ul>
-<li>If there is a inherent structure in the states, the sender might select an encoding <img src="https://latex.codecogs.com/png.latex?e(s)"> should preserve this structure. For example if S has a group structure the sender might use an encoding that is a group homomorphism. If there is are partial orders in the states the sender might use an encoding that if monotonic with respect to the partial order.
-<ul>
-<li>We may call a minimal set of states as a base lexicon if knowledge of the base lexicon and the encoding function is sufficient to recover the rest of the lexicon automatically. In terms of linguistics we might call these the parts of the lexicon that is not in the base as the derived lexicon as it contains inflections, declensions, and derivations of the base forms.</li>
-<li>In such a case though the sender might not want to pick the first N numbers but might want to pick a different set of numbers that are more suited to the structure of the states! The receiver who decodes some example might use analogies to infer additional states and eventually learn the decoder and the base lexicon.</li>
-<li>If the receiver is like a child it may see many analogies and learn the decoder. If the receiver is less bright it could still learn the decoder the hard way (i.e.&nbsp;by trial and error over the full lexicon)</li>
-</ul></li>
-</ul>
-<p>In the Lewis signaling game, the sender and receiver have to coordinate their actions to maximize their reward. The sender has to choose a signal that will help the receiver identify the correct state. The receiver has to interpret the signal and choose the correct state. This requires planning and coordination between the two agents.</p>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Caution</span>Bayesian view of the Lewis game
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>What do the agents know pre-ante?</p>
-<ol type="1">
-<li>do they know the full state space?</li>
-<li>do they know the distribution of states?</li>
-<li>do they know all possible signaling systems?</li>
-<li>do they know the other possible equilibria?</li>
-</ol>
-<p>The receiver in game theory needs a strategy and in that strategy is a response to all possible actions by the sender. If there are sufficient rounds the receiver has a strategy for solving the full coordination problem before the game starts.</p>
-<p>If there are N states and signals, there are N! ways to map the states to signals we can consider that these are the different possible lexicons. While the sender might pick a signal at random for each new state, in terms of game theory she too must have a strategy, i.e.&nbsp;a choice of signal for each contingent state. And we can follow the convention of Bayesian games and that this choice is made before the game starts by nature picking a type for the sender from the N! possible types. We may also assume that nature has picked a vector of states to be presented to the sender and receiver but this is not necessary as once the strategies are pre-determined we can use bayesian game theory to work out the actions of the agents that will lead to the equilibria with the highest payoffs. Since this is a bayesian game the solution concept is a bayesian Nash equilibrium.</p>
-<p>Each time the sender solves on of the senders signals she can eliminate all the incompatible types until only one type remains and the receiver has inferred the mapping that decodes the sender’s signals for all but one state and thus knows the senders type.</p>
-<p>In reality this changes very little in terms of the game, it’s just a more precise way of thinking about the game in terms of what Game theory formalism requires.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Caution</span>Reinforcement Learning view of the Lewis game
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Note that when we think about the same game in reinforcement learning we may not require the agents to decide on a full strategy before the game starts. In RL settings they are in a PMDP a partially observed Markov Decision Process.</p>
-</div>
-</div>
-<p>We could consider these as different lexicons. In a bayesian settings we might go further and consider that there are N! senders each with a different lexicon and that the receiver must infer type of sender rather than the the correct signal for the current state.</p>
-<p>The state space can be simple or structured and anything in between. If the state space is simple the sender will use the original Lewis game to create a lexicon. If the state space is structured the sender and receiver may do better - particularly if the number of simple signals is smaller than the number of states and sequences of signals must be used.</p>
-<p>If the state space is a list of binary fields then the sender can use a fixed template of length n and two signals encoding on or off. If the Planning in the Lewis game is a complex problem</p>
-<p>It seems a daunting task to plan the whole language when presented with say the first state or perhaps a million states. We can assume from the game theoretic nature of the Lewis Game that the sender and receivers know the full states space even if not the distribution of states. I say this because how could the receiver know from what options to respond to the sender if it did not know the full state space.</p>
-<p>In the referential game the receiver only seed a few states and must infer the right one from the signal. In this case we may relax the previous assumption and say that the sender and receiver may have a partial view of the state space.</p>
-<p>More so what if the sender must start without even being exposed to the full state space or it</p>
-<ol type="1">
-<li>morphology</li>
-</ol>
-<section id="analogies" class="level2">
-<h2 class="anchored" data-anchor-id="analogies">Analogies</h2>
-
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {Planning in the {Complex} {Lewis} {Game}},
-  date = {2025-01-14},
-  url = {https://orenbochman.github.io/posts/2025/2025-03-09-planning-in-complex-lewis-game/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“Planning in the Complex Lewis Game.”</span>
-January 14, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-03-09-planning-in-complex-lewis-game/">https://orenbochman.github.io/posts/2025/2025-03-09-planning-in-complex-lewis-game/</a>.
-</div></div></section></div> ]]></description>
-  <category>compositionality</category>
-  <category>emergent languages</category>
-  <category>reinforcement learning</category>
-  <category>transfer learning</category>
-  <category>information theory</category>
-  <category>linguistics</category>
-  <guid>https://orenbochman.github.io/posts/2025/2025-03-09-planning-in-complex-lewis-game/</guid>
   <pubDate>Mon, 13 Jan 2025 22:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/images/cover.png" medium="image" type="image/png" height="144" width="144"/>
 </item>

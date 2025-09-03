@@ -2,14 +2,20 @@
 date: 2025-10-02
 title: ShinyLive ❤️ Mesa Tutorial
 subtitle: "POC of a Mesa tutorial running in the browser with ShinyLive for Python"
-description: "This is POC for running Mesa tutorial in ShinyLive app."
+description: "This is my vibe coding guide on how I built a POC of concept for running Mesa app (their tutorial) in ShinyLive app so it can run in the browser without a front end."
 categories: [Shinylive for python, Model thinking, Simulation]
 keywords: [Shiny, Shinylive for python, Mesa,Agent-Based Modeling, POC, Wealth distribution, Altair, Pyodide]
 filters:
   - shinylive
 ---
 
-In this is the Mesa tutorial integrated into a shiny app and running via `pyodide` in the browser from a static backend.
+In this is the Mesa tutorial integrated into a shiny app and running via `Pyodide` in the browser from a static backend. I had some background with both shiny and mesa. However, it was a while since I coded with  either and I realized that both had some major changes. I actually fixed some mesa bugs and made a custom version for this blog. But Mesa is getting lots of changes and so I needed something simple for the POC. 
+I wanted to use a co-pilot for getting up to speed on the changes and for filling in the gaps about things like reactive programming which I also have some experience but less so in python. So In this post we
+will cover
+
+1. The challenges of adapting Mesa to work with the reactive architecture required by Shiny. Shiny apps are usually split into UI and Server parts. We want to be able to have good control of the mesa sim running in the server without exposing it directly to the UI.
+1. For a long time the Shiny-Quarto integration raised  issues which turned out to be show stoppers. I cover how I faced and solved them some of these into notes. 
+3. Vibe coding Working with a ai-copilot was a major requirement for this project. I find that the ai can help with a quick start but also may become a liability if not handled well. I realize, many people are facing this type of challenge and I am trying to also indicate how I used the copilot to overcome some of my own weaknesses from previous projects. 
 
 :::{.callout-note}
 
@@ -19,11 +25,40 @@ This is a proof of concept (POC) for running the Mesa tutorial in a Shiny app us
 
 I've created hundreds of dashboards using BI tools but always considered Shiny as my goto solution for truly custom dashboards projects. Only I moved to python a decade or so back and Shiny was R only. Now with the new Shiny for Python, I can finally use Shiny with Python. Also Shiny needed a backend which is not ideal for lightweight projects like MVP and their POC. But with ShinyLive for Python it is possible to run on a static site with everything running in the browser.
 
-On the way I also started using Mesa for ABM and Altair for very lightweight declerative widgets. But these tools did not play. Until now Mesa also had a clunky backend which required a server. But as this POC demonstrates we can do it all in python and run it in the server.
-
+On the way I also started using Mesa for ABM and Altair for very lightweight declarative widgets. But these tools did not play. Until now Mesa also had a clunky backend which required a server. But as this POC demonstrates we can do it all in python and run it in the server.
 :::
 
 ## The POC
+
+- Chat GPT was able to write some small shiny and some mesa sims over the last three years. But getting shiny and mesa together was more that It could stomach when I asked for this. It would create a mesa lite clone from scratch instead when asked to create a hybrid solution.
+
+- So to make the POC I got started on the playground with shinylive.io. I quickly found out that since my last visit it was ok running MESA. Mesa had had since dropped some dependencies and `Pyodide` added support for `scipy` which Mesa depends on. (I actually made a version of `mesa` without this as only one function was used from `scipy` and I had created a tree line replacement.) This however required running everything locally which ended up a problematic proposition.
+
+- Moving on I was able to add the two main classes from the mesa tutorial, add the changes required and integrate with the shiny. I replaced the the plotting with altair using another demo. This required more changes like exposing the state as a dataframe. But I had something working in less than an hour. 
+
+- I think that most of the time LLMs are glorified cut and paste solutions - they can rewrite bit and pieces early well but they need to be able to retrieve something that is close enough. Usually someone has coded something smarter and better than your next idea and the LLM has seen it in training. There is lots of mesa and shiny code out these. But probably nothing very helpful for chat GPT so it messed up. On the other hand making POCs for my idea has always been one of my core strength when it comes to coding. A second one is the ability to handle fairly complex systems. And one of my weakness is deviating from KISS.
+
+- Next steps were to get the initial demo fully functional. I had reactivity issues, extra code, no interactivity in the ui. The tutorial called for checking different setting of steps, agents and repetitions. 
+
+- I added some ui for these as well a dashboard title. but it didn't get picked up by the sim.
+
+- I was missing some annotation to make the sim function reactive.
+- I needed to access the UI sliders for the current values instead of using a global state
+- Once I had these in place it was more or less done.
+- I need to remove some extra bits of code and do the write up.
+- I had used $GPT_5$ as my copilot to get some minor fixes. It generally said great job just fix this line and gave a drop in replacement. In the next bit - the grid it would again be less helpful at coding and more as a troubleshooter.
+
+
+::: {.callout-tip}
+## Trouble shooting with a co-pilot
+
+- Java is well known for hundreds of line cascading error messages. This was exacerbated by an idiomatic/idiotic style of deeply nested anonymous constructs. I thought I liked Java for many years but felt that I was just waiting for the day I would design something soo much better to code in.
+- In this setting (quarto + filters + python + shinylive + mesa + altair + `Pyodide`) I quickly found that there were long cascading errors and some might be in the command line other in the `shiny` console with other yet in the browser's console.
+- Instead of trying to decipher these issues I asked my co-pilot for help. This saved my eyes and sanity.
+- [We come to a project with very limited human resources. The LLM can be either multiply and mentor or it it can become a demon that completely eat our limited capacity using complexity or via griefing ( not being helpful). It is up to us to figure out how to go with multiply and learn while avoiding any griefing process as soon as it starts. ]{.mark}
+- Ask the co-pilot was able to help me identify these issues. If it can't fix them this is a strong indicator indicator that you should step in. You are now in charge of the fix and you get to ask for advice on specific parts of your plan. This will save lots of time and get you more familiar with reading the code.
+- Always remember you are the boss, stakeholder etc and the co-pilot should be your side-kick.
+:::
 
 
 :::{.column-screen-inset}
@@ -180,7 +215,7 @@ ABM and RL we often run the simulation a number of times to avoid local view of 
 - The tutorial worked more or less.
 - But it refused to render in my quarto project. 
 - Getting it to work locally was 90% of the work 
-- I had the sine shiny app on my blog so I tried again there - it failed.
+- I had the Sine shiny app on my blog so I tried again there - it failed.
 - In fact this was just another failure in a long line of failures with shinylive.
 - I had many issues here is a summary from $GPT_5$ of the the main ones we troubleshooted together. 
 
@@ -197,7 +232,7 @@ Moving parts:
     >  - shinylive    
     ```
    
-    4. add to the quarto page frontmatter
+    4. add to the quarto page frontmatter yml
 
     ```yml
     > filters:
@@ -231,7 +266,7 @@ shinyswatch
 iVBORw0KGgoAAAANSUhEUgAAACgAAA ...
 ```
 
-3. ShinyLive for Python (CLI, assets, pyodide)
+3. ShinyLive for Python (CLI, assets, `Pyodide`)
     1. install `pip install shinylive shiny`
     2. download assets tends to fail so I side-loaded it from [shinylive repo](https://github.com/posit-dev/shinylive/releases)
     3. It tends to time out so I used `wget` with retries and unpacked it.
@@ -270,132 +305,48 @@ tar -xzf shinylive-0.10.5.tar.gz
   - Altair is great for small prototypes and quick visualizations. But crashes with large datasets. This is a known limitation but I have not fixed it in this version yet (todo: cap the number of row in the data frame, or aggregate so we don't exceed the Altair limits)
 - The shiny app can also show an editor with all of the code. This is part of the meta data at the top of the code block. I have hidden it for now.
 
+## What Next Part 2 Adding the grid to Mesa
+
+1. In this part I quickly got the grid in place. 
+2. I did not know how to handle a `seaborn` chart in 
+shiny, it is actually simpler than `altair` which requires `shinyextras`
+
+::: {.callout-tip} 
+
+### vibe coding - Roles switching
+
+Vibe coding means being able to expediently switch roles between Project Manager, Lead dev, Trouble shooter etc. Expediency is primarily being on top of cost benefit of working with a co-pilot over even other devs.
+
+The co-pilot is often an idiot-savant it knows a lot but can get stuck on tiny details. It is here that you can lose a lot of time. Rather than getting it to fix it you should ideally always be able to jump in and do the fix yourself. I used to work with the legendry "David Allouch" who said once "I never ask my workers to do anything I can't do myself".
+
+ If it knows a lot more than you do about some part of the project that is fine so long as you remember that you are the lead and you will quickly catch up. 
+
+
+
+- It is good document what you want to do on two levels
+    1. you need a plan, 
+    1. you need to remember everything
+    2. you need to communicate what you are want doing to your co-pilot
+- It smart to comment on the shortcoming of what has been done so far. You co-pilot can sometimes suggest quick or immediate fixes to things you don't even want to think about because there are bigger issues. 
+:::
+
+1. I want to be able to be able to switch between interactive mode on an off
+    1. On - View the sim step by step
+    2. Off run many sims. Turn of in
+    3. See where we are
 
 
 
 
+Here’s a summary + a fast triage for some hiccups.
 
-
-
-Here’s a summary + a fast triage for the *next* likely hiccups.
-
-# What we fixed (recap)
+### What we fixed (recap)
 
 * **Env mismatch** → Pointed Quarto to your venv (`execute.python: .venv/bin/python` or `QUARTO_PYTHON`).
 * **Wrong invocation** → Use the **`shinylive` CLI**, not `python -m shinylive`.
 * **Assets flakiness** → Side-loaded GitHub release assets and **unpacked** them under `~/.cache/shinylive/shinylive-0.10.x` (and, if needed, `~/.local/share/shinylive/`), verified with `shinylive assets info`.
 * **Clean builds** → Use `quarto render --clean` (no `quarto clean` command).
 
-# Minimal smoke test (kept for future)
-
-```bash
-source .venv/bin/activate
-export QUARTO_PYTHON="$(pwd)/.venv/bin/python"
-which shinylive && shinylive --version
-quarto render test-shinylive.qmd --log-level=debug -v
-```
-
-# Next-issue fast triage (pick the symptom)
-
-### 1) “Shiny app loads but is blank / JS errors in console”
-
-* **Cause:** Missing/blocked assets or wrong asset path.
-* **Fixes:**
-
-  * Confirm assets visible: `shinylive assets info` lists the version you unpacked.
-  * If your site is served under a subpath (e.g., `/blog/`), add in `_quarto.yml`:
-
-    ```yaml
-    website:
-      site-url: https://<user>.github.io/blog/
-      base-url: /blog/
-    ```
-  * Hard refresh / clear cache (service worker from earlier builds can stale-cache files).
-
-### 2) 404s for `pyodide.worker.js` / `.wasm` on GitHub Pages
-
-* **Cause:** Case-sensitive paths or stale service worker.
-* **Fixes:**
-
-  * Inspect Network tab; ensure files exist in `docs/` with the same paths your HTML requests.
-  * Re-deploy after `quarto render --clean`.
-  * If using a custom domain or subfolder, ensure `base-url` is set (see above).
-
-### 3) “Works locally, breaks on Pages”
-
-* **Cause:** Different asset versions or missing files in repo.
-* **Fixes:**
-
-  * Commit the exported app folders (if you use `shinylive export`) or ensure Quarto copies them.
-  * In CI, install `shinylive` too (even if you pre-export apps locally) to keep versions aligned:
-
-    ```bash
-    pip install -U shinylive shiny
-    ```
-
-### 4) Slow local renders (big blog)
-
-* **Quick wins:**
-
-  * Use a **local profile**: `_quarto-profile-local.yml`
-
-    ```yaml
-    execute:
-      python: .venv/bin/python
-      cache: true
-      freeze: auto
-    ```
-
-    Run with:
-
-    ```bash
-    QUARTO_PROFILE=local quarto render --cache-refresh
-    ```
-  * Render surgically during debugging:
-
-    ```bash
-    quarto render path/to/page.qmd --log-level=debug -v
-    ```
-  * Skip execution for known-good posts:
-
-    ```yaml
-    execute:
-      freeze: auto
-    ```
-
-    (Only re-exec when source changes.)
-
-### 5) CLI not found intermittently
-
-* **Cause:** New shell without venv on PATH.
-* **Fixes:**
-
-  * Always `source .venv/bin/activate` before rendering, or set once per shell:
-
-    ```bash
-    export PATH="$(pwd)/.venv/bin:$PATH"
-    export QUARTO_PYTHON="$(pwd)/.venv/bin/python"
-    ```
-
-### 6) Pin versions to keep things stable
-
-* **`requirements.txt`** (example):
-
-  ```
-  shiny>=0.10.5
-  shinylive==0.8.3
-  ```
-* Recreate venv reproducibly:
-
-  ```bash
-  python -m venv .venv && source .venv/bin/activate
-  pip install --upgrade pip
-  pip install -r requirements.txt
-  ```
-
----
-
-If you tell me what symptom you’re seeing now (blank UI, 404s, wrong base path, render slowness, etc.), I’ll jump straight to a one-liner fix or the exact `_quarto.yml` snippet you need.
 
 ## Future plans
 
@@ -419,5 +370,3 @@ Also I think that the ability to specify multiple files in one code block is ide
     - [chatlas](https://github.com/posit-dev/chatlas)
     - [querychat](https://github.com/posit-dev/querychat)
 14. Price theory demos
-
-for starters

@@ -27,7 +27,12 @@
 
 
 
-<p>In this is the Mesa tutorial integrated into a shiny app and running via <code>pyodide</code> in the browser from a static backend.</p>
+<p>In this is the Mesa tutorial integrated into a shiny app and running via <code>Pyodide</code> in the browser from a static backend. I had some background with both shiny and mesa. However, it was a while since I coded with either and I realized that both had some major changes. I actually fixed some mesa bugs and made a custom version for this blog. But Mesa is getting lots of changes and so I needed something simple for the POC. I wanted to use a co-pilot for getting up to speed on the changes and for filling in the gaps about things like reactive programming which I also have some experience but less so in python. So In this post we will cover</p>
+<ol type="1">
+<li>The challenges of adapting Mesa to work with the reactive architecture required by Shiny. Shiny apps are usually split into UI and Server parts. We want to be able to have good control of the mesa sim running in the server without exposing it directly to the UI.</li>
+<li>For a long time the Shiny-Quarto integration raised issues which turned out to be show stoppers. I cover how I faced and solved them some of these into notes.</li>
+<li>Vibe coding Working with a ai-copilot was a major requirement for this project. I find that the ai can help with a quick start but also may become a liability if not handled well. I realize, many people are facing this type of challenge and I am trying to also indicate how I used the copilot to overcome some of my own weaknesses from previous projects.</li>
+</ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -40,11 +45,44 @@ TL;DR: A POC for Getting Mesa Agent-Based Modeling to run in the browser via Shi
 <div class="callout-body-container callout-body">
 <p>This is a proof of concept (POC) for running the Mesa tutorial in a Shiny app using ShinyLive for Python.</p>
 <p>I’ve created hundreds of dashboards using BI tools but always considered Shiny as my goto solution for truly custom dashboards projects. Only I moved to python a decade or so back and Shiny was R only. Now with the new Shiny for Python, I can finally use Shiny with Python. Also Shiny needed a backend which is not ideal for lightweight projects like MVP and their POC. But with ShinyLive for Python it is possible to run on a static site with everything running in the browser.</p>
-<p>On the way I also started using Mesa for ABM and Altair for very lightweight declerative widgets. But these tools did not play. Until now Mesa also had a clunky backend which required a server. But as this POC demonstrates we can do it all in python and run it in the server.</p>
+<p>On the way I also started using Mesa for ABM and Altair for very lightweight declarative widgets. But these tools did not play. Until now Mesa also had a clunky backend which required a server. But as this POC demonstrates we can do it all in python and run it in the server.</p>
 </div>
 </div>
 <section id="the-poc" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="the-poc">The POC</h2>
+<ul>
+<li><p>Chat GPT was able to write some small shiny and some mesa sims over the last three years. But getting shiny and mesa together was more that It could stomach when I asked for this. It would create a mesa lite clone from scratch instead when asked to create a hybrid solution.</p></li>
+<li><p>So to make the POC I got started on the playground with shinylive.io. I quickly found out that since my last visit it was ok running MESA. Mesa had had since dropped some dependencies and <code>Pyodide</code> added support for <code>scipy</code> which Mesa depends on. (I actually made a version of <code>mesa</code> without this as only one function was used from <code>scipy</code> and I had created a tree line replacement.) This however required running everything locally which ended up a problematic proposition.</p></li>
+<li><p>Moving on I was able to add the two main classes from the mesa tutorial, add the changes required and integrate with the shiny. I replaced the the plotting with altair using another demo. This required more changes like exposing the state as a dataframe. But I had something working in less than an hour.</p></li>
+<li><p>I think that most of the time LLMs are glorified cut and paste solutions - they can rewrite bit and pieces early well but they need to be able to retrieve something that is close enough. Usually someone has coded something smarter and better than your next idea and the LLM has seen it in training. There is lots of mesa and shiny code out these. But probably nothing very helpful for chat GPT so it messed up. On the other hand making POCs for my idea has always been one of my core strength when it comes to coding. A second one is the ability to handle fairly complex systems. And one of my weakness is deviating from KISS.</p></li>
+<li><p>Next steps were to get the initial demo fully functional. I had reactivity issues, extra code, no interactivity in the ui. The tutorial called for checking different setting of steps, agents and repetitions.</p></li>
+<li><p>I added some ui for these as well a dashboard title. but it didn’t get picked up by the sim.</p></li>
+<li><p>I was missing some annotation to make the sim function reactive.</p></li>
+<li><p>I needed to access the UI sliders for the current values instead of using a global state</p></li>
+<li><p>Once I had these in place it was more or less done.</p></li>
+<li><p>I need to remove some extra bits of code and do the write up.</p></li>
+<li><p>I had used <img src="https://latex.codecogs.com/png.latex?GPT_5"> as my copilot to get some minor fixes. It generally said great job just fix this line and gave a drop in replacement. In the next bit - the grid it would again be less helpful at coding and more as a troubleshooter.</p></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Trouble shooting with a co-pilot
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Java is well known for hundreds of line cascading error messages. This was exacerbated by an idiomatic/idiotic style of deeply nested anonymous constructs. I thought I liked Java for many years but felt that I was just waiting for the day I would design something soo much better to code in.</li>
+<li>In this setting (quarto + filters + python + shinylive + mesa + altair + <code>Pyodide</code>) I quickly found that there were long cascading errors and some might be in the command line other in the <code>shiny</code> console with other yet in the browser’s console.</li>
+<li>Instead of trying to decipher these issues I asked my co-pilot for help. This saved my eyes and sanity.</li>
+<li><mark>We come to a project with very limited human resources. The LLM can be either multiply and mentor or it it can become a demon that completely eat our limited capacity using complexity or via griefing ( not being helpful). It is up to us to figure out how to go with multiply and learn while avoiding any griefing process as soon as it starts.</mark></li>
+<li>Ask the co-pilot was able to help me identify these issues. If it can’t fix them this is a strong indicator indicator that you should step in. You are now in charge of the fix and you get to ask for advice on specific parts of your plan. This will save lots of time and get you more familiar with reading the code.</li>
+<li>Always remember you are the boss, stakeholder etc and the co-pilot should be your side-kick.</li>
+</ul>
+</div>
+</div>
 <div class="column-screen-inset">
 <pre class="shinylive-python" data-engine="python"><code>#| '!! shinylive warning !!': |
 #|   shinylive does not work in self-contained HTML documents.
@@ -195,7 +233,7 @@ tqdm</code></pre>
 <li>The tutorial worked more or less.</li>
 <li>But it refused to render in my quarto project.</li>
 <li>Getting it to work locally was 90% of the work</li>
-<li>I had the sine shiny app on my blog so I tried again there - it failed.</li>
+<li>I had the Sine shiny app on my blog so I tried again there - it failed.</li>
 <li>In fact this was just another failure in a long line of failures with shinylive.</li>
 <li>I had many issues here is a summary from <img src="https://latex.codecogs.com/png.latex?GPT_5"> of the the main ones we troubleshooted together.</li>
 </ul>
@@ -218,7 +256,7 @@ font-style: inherit;">:</span></span>
 background-color: null;
 font-style: inherit;">&gt;  - shinylive    </span></span></code></pre></div>
 <ol start="4" type="1">
-<li>add to the quarto page frontmatter</li>
+<li>add to the quarto page frontmatter yml</li>
 </ol>
 <div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -256,7 +294,7 @@ shinyswatch
 ## type: binary
 iVBORw0KGgoAAAANSUhEUgAAACgAAA ...</code></pre>
 <ol start="3" type="1">
-<li>ShinyLive for Python (CLI, assets, pyodide)
+<li>ShinyLive for Python (CLI, assets, <code>Pyodide</code>)
 <ol type="1">
 <li>install <code>pip install shinylive shiny</code></li>
 <li>download assets tends to fail so I side-loaded it from <a href="https://github.com/posit-dev/shinylive/releases">shinylive repo</a></li>
@@ -352,10 +390,48 @@ font-style: inherit;">-xzf</span> shinylive-0.10.5.tar.gz</span></code></pre></d
 </ul></li>
 <li>The shiny app can also show an editor with all of the code. This is part of the meta data at the top of the code block. I have hidden it for now.</li>
 </ul>
-<p>Here’s a summary + a fast triage for the <em>next</em> likely hiccups.</p>
 </section>
-<section id="what-we-fixed-recap" class="level1">
-<h1>What we fixed (recap)</h1>
+<section id="what-next-part-2-adding-the-grid-to-mesa" class="level2">
+<h2 class="anchored" data-anchor-id="what-next-part-2-adding-the-grid-to-mesa">What Next Part 2 Adding the grid to Mesa</h2>
+<ol type="1">
+<li>In this part I quickly got the grid in place.</li>
+<li>I did not know how to handle a <code>seaborn</code> chart in shiny, it is actually simpler than <code>altair</code> which requires <code>shinyextras</code></li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+vibe coding - Roles switching
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Vibe coding means being able to expediently switch roles between Project Manager, Lead dev, Trouble shooter etc. Expediency is primarily being on top of cost benefit of working with a co-pilot over even other devs.</p>
+<p>The co-pilot is often an idiot-savant it knows a lot but can get stuck on tiny details. It is here that you can lose a lot of time. Rather than getting it to fix it you should ideally always be able to jump in and do the fix yourself. I used to work with the legendry “David Allouch” who said once “I never ask my workers to do anything I can’t do myself”.</p>
+<p>If it knows a lot more than you do about some part of the project that is fine so long as you remember that you are the lead and you will quickly catch up.</p>
+<ul>
+<li>It is good document what you want to do on two levels
+<ol type="1">
+<li>you need a plan,</li>
+<li>you need to remember everything</li>
+<li>you need to communicate what you are want doing to your co-pilot</li>
+</ol></li>
+<li>It smart to comment on the shortcoming of what has been done so far. You co-pilot can sometimes suggest quick or immediate fixes to things you don’t even want to think about because there are bigger issues.</li>
+</ul>
+</div>
+</div>
+<ol type="1">
+<li>I want to be able to be able to switch between interactive mode on an off
+<ol type="1">
+<li>On - View the sim step by step</li>
+<li>Off run many sims. Turn of in</li>
+<li>See where we are</li>
+</ol></li>
+</ol>
+<p>Here’s a summary + a fast triage for some hiccups.</p>
+<section id="what-we-fixed-recap" class="level3">
+<h3 class="anchored" data-anchor-id="what-we-fixed-recap">What we fixed (recap)</h3>
 <ul>
 <li><strong>Env mismatch</strong> → Pointed Quarto to your venv (<code>execute.python: .venv/bin/python</code> or <code>QUARTO_PYTHON</code>).</li>
 <li><strong>Wrong invocation</strong> → Use the <strong><code>shinylive</code> CLI</strong>, not <code>python -m shinylive</code>.</li>
@@ -363,279 +439,6 @@ font-style: inherit;">-xzf</span> shinylive-0.10.5.tar.gz</span></code></pre></d
 <li><strong>Clean builds</strong> → Use <code>quarto render --clean</code> (no <code>quarto clean</code> command).</li>
 </ul>
 </section>
-<section id="minimal-smoke-test-kept-for-future" class="level1">
-<h1>Minimal smoke test (kept for future)</h1>
-<div class="sourceCode" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">source</span> .venv/bin/activate</span>
-<span id="cb6-2"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">export</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">QUARTO_PYTHON</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">$(</span><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">pwd</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">)</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">/.venv/bin/python"</span></span>
-<span id="cb6-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">which</span> shinylive <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">&amp;&amp;</span> <span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">shinylive</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--version</span></span>
-<span id="cb6-4"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">quarto</span> render test-shinylive.qmd <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--log-level</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>debug <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-v</span></span></code></pre></div>
-</section>
-<section id="next-issue-fast-triage-pick-the-symptom" class="level1">
-<h1>Next-issue fast triage (pick the symptom)</h1>
-<section id="shiny-app-loads-but-is-blank-js-errors-in-console" class="level3">
-<h3 class="anchored" data-anchor-id="shiny-app-loads-but-is-blank-js-errors-in-console">1) “Shiny app loads but is blank / JS errors in console”</h3>
-<ul>
-<li><p><strong>Cause:</strong> Missing/blocked assets or wrong asset path.</p></li>
-<li><p><strong>Fixes:</strong></p>
-<ul>
-<li><p>Confirm assets visible: <code>shinylive assets info</code> lists the version you unpacked.</p></li>
-<li><p>If your site is served under a subpath (e.g., <code>/blog/</code>), add in <code>_quarto.yml</code>:</p>
-<div class="sourceCode" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb7-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">website</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb7-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">site-url</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> https://&lt;user&gt;.github.io/blog/</span></span>
-<span id="cb7-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">base-url</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> /blog/</span></span></code></pre></div></li>
-<li><p>Hard refresh / clear cache (service worker from earlier builds can stale-cache files).</p></li>
-</ul></li>
-</ul>
-</section>
-<section id="s-for-pyodide.worker.js-.wasm-on-github-pages" class="level3">
-<h3 class="anchored" data-anchor-id="s-for-pyodide.worker.js-.wasm-on-github-pages">2) 404s for <code>pyodide.worker.js</code> / <code>.wasm</code> on GitHub Pages</h3>
-<ul>
-<li><p><strong>Cause:</strong> Case-sensitive paths or stale service worker.</p></li>
-<li><p><strong>Fixes:</strong></p>
-<ul>
-<li>Inspect Network tab; ensure files exist in <code>docs/</code> with the same paths your HTML requests.</li>
-<li>Re-deploy after <code>quarto render --clean</code>.</li>
-<li>If using a custom domain or subfolder, ensure <code>base-url</code> is set (see above).</li>
-</ul></li>
-</ul>
-</section>
-<section id="works-locally-breaks-on-pages" class="level3">
-<h3 class="anchored" data-anchor-id="works-locally-breaks-on-pages">3) “Works locally, breaks on Pages”</h3>
-<ul>
-<li><p><strong>Cause:</strong> Different asset versions or missing files in repo.</p></li>
-<li><p><strong>Fixes:</strong></p>
-<ul>
-<li><p>Commit the exported app folders (if you use <code>shinylive export</code>) or ensure Quarto copies them.</p></li>
-<li><p>In CI, install <code>shinylive</code> too (even if you pre-export apps locally) to keep versions aligned:</p>
-<div class="sourceCode" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">pip</span> install <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-U</span> shinylive shiny</span></code></pre></div></li>
-</ul></li>
-</ul>
-</section>
-<section id="slow-local-renders-big-blog" class="level3">
-<h3 class="anchored" data-anchor-id="slow-local-renders-big-blog">4) Slow local renders (big blog)</h3>
-<ul>
-<li><p><strong>Quick wins:</strong></p>
-<ul>
-<li><p>Use a <strong>local profile</strong>: <code>_quarto-profile-local.yml</code></p>
-<div class="sourceCode" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb9-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">execute</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb9-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">python</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> .venv/bin/python</span></span>
-<span id="cb9-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">cache</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="ch" style="color: #20794D;
-background-color: null;
-font-style: inherit;">true</span></span>
-<span id="cb9-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">freeze</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> auto</span></span></code></pre></div>
-<p>Run with:</p>
-<div class="sourceCode" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">QUARTO_PROFILE</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>local <span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">quarto</span> render <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--cache-refresh</span></span></code></pre></div></li>
-<li><p>Render surgically during debugging:</p>
-<div class="sourceCode" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">quarto</span> render path/to/page.qmd <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--log-level</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>debug <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-v</span></span></code></pre></div></li>
-<li><p>Skip execution for known-good posts:</p>
-<div class="sourceCode" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">execute</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb12-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">freeze</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> auto</span></span></code></pre></div>
-<p>(Only re-exec when source changes.)</p></li>
-</ul></li>
-</ul>
-</section>
-<section id="cli-not-found-intermittently" class="level3">
-<h3 class="anchored" data-anchor-id="cli-not-found-intermittently">5) CLI not found intermittently</h3>
-<ul>
-<li><p><strong>Cause:</strong> New shell without venv on PATH.</p></li>
-<li><p><strong>Fixes:</strong></p>
-<ul>
-<li><p>Always <code>source .venv/bin/activate</code> before rendering, or set once per shell:</p>
-<div class="sourceCode" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">export</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">PATH</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">$(</span><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">pwd</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">)</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">/.venv/bin:</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">$PATH</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"</span></span>
-<span id="cb13-2"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">export</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">QUARTO_PYTHON</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">$(</span><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">pwd</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">)</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">/.venv/bin/python"</span></span></code></pre></div></li>
-</ul></li>
-</ul>
-</section>
-<section id="pin-versions-to-keep-things-stable" class="level3">
-<h3 class="anchored" data-anchor-id="pin-versions-to-keep-things-stable">6) Pin versions to keep things stable</h3>
-<ul>
-<li><p><strong><code>requirements.txt</code></strong> (example):</p>
-<pre><code>shiny&gt;=0.10.5
-shinylive==0.8.3</code></pre></li>
-<li><p>Recreate venv reproducibly:</p>
-<div class="sourceCode" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">python</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-m</span> venv .venv <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">&amp;&amp;</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">source</span> .venv/bin/activate</span>
-<span id="cb15-2"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">pip</span> install <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--upgrade</span> pip</span>
-<span id="cb15-3"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">pip</span> install <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-r</span> requirements.txt</span></code></pre></div></li>
-</ul>
-<hr>
-<p>If you tell me what symptom you’re seeing now (blank UI, 404s, wrong base path, render slowness, etc.), I’ll jump straight to a one-liner fix or the exact <code>_quarto.yml</code> snippet you need.</p>
 </section>
 <section id="future-plans" class="level2">
 <h2 class="anchored" data-anchor-id="future-plans">Future plans</h2>
@@ -661,10 +464,8 @@ font-style: inherit;">-r</span> requirements.txt</span></code></pre></div></li>
 </ul></li>
 <li>Price theory demos</li>
 </ol>
-<p>for starters</p>
 
 
-</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,

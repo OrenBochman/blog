@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="keywords" content="Shiny, Shinylive for python, Mesa, Agent-Based Modeling, POC, Wealth distribution, Altair, Pyodide">
+<meta name="keywords" content="Shiny, Shinylive for python, Mesa, Agent-Based Modeling, POC, Wealth distribution, Altair, Pyodide, Boltzmann Wealth Model">
 <meta name="description" content="This is my vibe coding guide on how I built a POC of concept for running Mesa app (their tutorial) in ShinyLive app so it can run in the browser without a front end.">
 
 <title>ShinyLive ❤️ Mesa Tutorial – Oren Bochman’s Blog</title>
@@ -519,7 +519,7 @@ window.Quarto = {
   <div>
     <div class="keywords">
       <div class="block-title">Keywords</div>
-      <p>Shiny, Shinylive for python, Mesa, Agent-Based Modeling, POC, Wealth distribution, Altair, Pyodide</p>
+      <p>Shiny, Shinylive for python, Mesa, Agent-Based Modeling, POC, Wealth distribution, Altair, Pyodide, Boltzmann Wealth Model</p>
     </div>
   </div>
   
@@ -1768,12 +1768,6 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-10-01-Updates/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Updates to the github action</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-01-06-research-notes/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Complex Signals Questions</span></a>
   </div>
@@ -1782,6 +1776,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-03-11-partial-pooling/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The roles of Partial pooling and mixed strategies in the Lewis signaling game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-10-04-Bag-Of-Tricks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AI a bag of tricks</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1806,6 +1806,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-04-02-research-questions/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Research Questions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-10-01-Updates-to-the-github-action/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Updates to the github action</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
@@ -1946,7 +1952,7 @@ DEFAULT_STEPS = 30
 DEFAULT_AGENTS = 12
 
 # Add page title and sidebar
-ui.page_opts(title="Mesa Wealth Agents Tutorial in Shineylive for Python", fillable=True)
+ui.page_opts(title="Mesa Boltzmann Wealth Model Tutorial in Shineylive for Python", fillable=True)
 
 
 with ui.sidebar(open="desktop"):
@@ -2237,7 +2243,8 @@ DEFAULT_GRID_W = 5
 DEFAULT_GRID_H = 5
 
 # -------------------- UI: page + sidebar --------------------
-ui.page_opts(title="Mesa Wealth Agents Tutorial in ShinyLive (Python)", fillable=True)
+# Add page title and sidebar
+ui.page_opts(title="Mesa Boltzmann Wealth Model Tutorial in Shineylive for Python", fillable=True)
 
 with ui.sidebar(open="desktop"):
     ui.input_switch("interactive_mode", "Interactive mode", value=True)
@@ -2266,11 +2273,22 @@ def _reset_sliders():
     ui.update_slider("grid_w", value=DEFAULT_GRID_W)
     ui.update_slider("grid_h", value=DEFAULT_GRID_H)
 
-# -------------------- MESA model --------------------
+#### Mesa Boltzmann Wealth Model ##############################
+
 import mesa
 from mesa.discrete_space import CellAgent, OrthogonalMooreGrid
 
+# Add function for model level collection
+def compute_gini(model):
+    agent_wealths = [agent.wealth for agent in model.agents]
+    x = sorted(agent_wealths)
+    n = model.num_agents
+    B = sum(xi * (n - i) for i, xi in enumerate(x)) / (n * sum(x))
+    return 1 + (1 / n) - 2 * B
+
 class MoneyAgent(CellAgent):
+    """An agent with fixed initial wealth."""
+
     def __init__(self, model, cell):
         super().__init__(model)
         self.cell = cell
@@ -2281,7 +2299,10 @@ class MoneyAgent(CellAgent):
         self.move_to(new_cell)
 
     def give_money(self):
-        cellmates = [a for a in self.cell.agents if a is not self]
+        cellmates = [
+            a for a in self.cell.agents if a is not self
+        ]  # Get all agents in cell
+
         if self.wealth &gt; 0 and cellmates:
             other = self.random.choice(cellmates)
             other.wealth += 1
@@ -2303,6 +2324,12 @@ class MoneyModel(mesa.Model):
             (width, height), torus=True, capacity=10, random=self.random
         )
 
+        # Instantiate DataCollector
+        self.datacollector = mesa.DataCollector(
+            model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
+        )
+
+
         # Create agents (assumes CellAgent.create_agents helper exists in this env)
         _agents = MoneyAgent.create_agents(
             self,
@@ -2311,6 +2338,8 @@ class MoneyModel(mesa.Model):
         )
 
     def step(self):
+0        self.datacollector.collect(self)
+
         order = list(self.agents)
         self.random.shuffle(order)
         for idx, a in enumerate(order, start=1):

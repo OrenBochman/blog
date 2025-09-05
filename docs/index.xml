@@ -121,7 +121,7 @@ This is a collection of command-line tools and techniques for data science, enab
 Deepchecks is a library for testing and validating machine learning models.
 </dd>
 </dl>
-<!-- TODO add agentic, rag, and local lls, -->
+<!-- TODO add agentic, rag, and local lls, apis -->
 
 
 
@@ -141,6 +141,372 @@ Bochman, Oren. 2025. <span>“AI a Bag of Tricks.”</span> October 4, 2025.
   <category>Techniques</category>
   <guid>https://orenbochman.github.io/posts/2025/2025-10-04-Bag-Of-Tricks/</guid>
   <pubDate>Fri, 03 Oct 2025 21:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Demand from Preferences</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<p>In this post I wish to develop a microeconomic model of consumer demand the aggregation of individual preferences.</p>
+<p>Although I have studied microeconomics as well as supply and demand curves, elasticity etc it seems that a view of demand based on a variance covariance matrix of demand functions or even as a precursor to a elasticity cross elasticity matrix can lead to inconsistency.</p>
+<p>The … model of demand discusses thier model which is supposedly consistent.</p>
+<p>I recall however that Ariel Rubinstien’s Book on microeconomic theory starts with the concept of preferences then builds it into utility. So perhaps if we can model preferences we could be on the way to a more consistent model of demand.</p>
+<p>We will see that the Polya urn model is consitant with the Rubinstien axioms of preferences that make the prefrences a rational ordering.</p>
+<p>i.e.&nbsp;</p>
+<ol type="1">
+<li>for any two products the consumer to be able to state a preference of one over the other or indifference.</li>
+<li>there is no order effect</li>
+<li>transitivity.</li>
+</ol>
+<p>p.s. one issues with preferences is how do they map to price. I guess we will need to deal with that too.</p>
+<ol type="1">
+<li>There are k (10) products in the market each with a price and some id.</li>
+<li>We have a square grid of side L with agents</li>
+<li>Agent start with an endowment and some preference over products</li>
+<li>Preferences are based on numbers of colored balls in an agent’s Polya urn. Initially there is just one ball per product.</li>
+<li>Each turn the agent draws a random colored ball from the urn but returns 2 such colored balls. This reinforces the agent’s preference for the product associated with the ball.</li>
+</ol>
+<p>Ok so we have a process that creates heterogenous preferences that reinforce over time.</p>
+<p>That is a good start but we see that if we aggregate we get a very steady uniform demand.</p>
+<p>We may want to see the welfare of the agents. How often can they satisfy their preference ?</p>
+<p>To understand behavior be need to map preferences to a budget allocation. We have imposed a budget constraint on the agent by setting an individual endowment. Now we want to see how they will allocate their budget based on their preferences.</p>
+<p>One idea is that should attempt to maximize their utility given their budget constraint.</p>
+<p>But I talk about utility informally.</p>
+<p>The may however assume that the agents will will want to buy as products in proportion to thier their preferences. Also we may also suppose that for these agents having more is better than having less so they will want to maximize their consumption.</p>
+<p>So here we see that the urn meets the market.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>sku</th>
+<th>count</th>
+<th>price</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>4</td>
+<td>30</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>3</td>
+<td>20</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>they would want to buy a market basket that is the maximal largest multiple of within their budget.</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A3%20sku_1%20+%202%20sku_2%20+%201%20sku_3%0A"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AQ_i%20=%20%5Carg%20%5Cmax_k%20k%20%5Ctimes%20%5Csum%20count_i%20%5Ctimes%20price_i%20%20%5Cleq%20budget%0A"></p>
+<p>One important edge case is what will they do if they want more than they can afford. In this case preferences will be truncated to what they can afford.</p>
+<p>say they have a budget of 30 should they buy</p>
+<p>one of thier #1 prefernce or one of thier #2 preference and five of their #3 preference.</p>
+<p>demand. If I like chicken twice as much as rice and I have some budget how much would I allocate to each product?</p>
+<ol start="6" type="1">
+<li>Agent than buy the top preferred products and gain a happiness score in to
+<ol type="1">
+<li>number of top k-products they can afford</li>
+<li></li>
+</ol></li>
+<li>Prices for</li>
+</ol>
+<div class="column-screen-inset-right">
+<pre class="shinylive-python" data-engine="python"><code>#| '!! shinylive warning !!': |
+#|   shinylive does not work in self-contained HTML documents.
+#|   Please set `embed-resources: false` in your metadata.
+#| standalone: true
+#| viewerHeight: 600
+#| components: [viewer] #[editor, viewer]
+
+_='''{.markdown} 
+## Tasks:
+
+'''
+
+# app.py — ShinyLive-ready ABM Polya-Urn demo (Mesa-lite core) + Altair via shinywidgets.
+# Paste into shinylive.io/py/examples as app.py and Run.
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
+import random
+from collections import Counter
+
+import pandas as pd
+import altair as alt
+
+from shiny import App, Inputs, Outputs, Session, reactive, render, ui
+from shinywidgets import render_altair, output_widget
+
+# ---------- helpers ----------
+def top_n(d: Dict[int, int], n: int) -&gt; List[Tuple[int, int]]:
+    return sorted(d.items(), key=lambda kv: (-kv[1], kv[0]))[:n]
+
+def weighted_choice(keys: List[int], weights: List[int]) -&gt; int:
+    return random.choices(keys, weights=weights, k=1)[0]
+
+# ---------- domain ----------
+@dataclass(frozen=True)
+class Product:
+    idx: int
+    sku: str
+    letter: str
+    price: float
+
+@dataclass
+class Agent:
+    aid: int
+    wealth: float
+    urn: Dict[int, int]        # sku_idx -&gt; bead count
+    counts: Dict[int, int]     # cumulative draws per sku
+    top4: List[int]
+    happy: bool
+
+    def step(self, products: List[Product], l: int = 1) -&gt; int:
+        last = -1
+        for _ in range(l):
+            ks = list(self.urn.keys())
+            ws = [self.urn[k] for k in ks]
+            k = weighted_choice(ks, ws)
+            self.urn[k] += 1               # Polya reinforcement
+            self.counts[k] = self.counts.get(k, 0) + 1
+            last = k
+        self.top4 = [k for k, _ in top_n(self.counts, 4)]
+        total_price = sum(products[k].price for k in self.top4) if self.top4 else 0.0
+        self.happy = (total_price &lt;= self.wealth)
+        return last
+
+class Market:
+    def __init__(self, K:int=8, n_agents:int=100, seed:int=42, base_wealth:float=10.0, wealth_jitter:float=2.0):
+        random.seed(seed)
+        self.products = make_products(K)
+        self.agents = [
+            Agent(
+                aid=i+1,
+                wealth=max(0.0, random.gauss(base_wealth, wealth_jitter)),
+                urn={j:1 for j in range(K)},  # one bead per SKU
+                counts={},
+                top4=[],
+                happy=False,
+            )
+            for i in range(n_agents)
+        ]
+        self.t = 0
+        self._demand_rows: List[Dict] = []
+
+    def step(self, l:int=1):
+        self.t += 1
+        drawn = [a.step(self.products, l=l) for a in self.agents]
+        tick_counts = Counter(drawn)
+        for idx, cnt in sorted(tick_counts.items()):
+            p = self.products[idx]
+            self._demand_rows.append({"t": self.t, "sku_idx": idx, "sku": p.sku, "letter": p.letter, "count": cnt})
+
+    def grid_df(self) -&gt; pd.DataFrame:
+        ids = list(range(1, len(self.agents)+1))
+        return pd.DataFrame({
+            "id": ids,
+            "happy": [a.happy for a in self.agents],
+        })
+
+    def top4_df(self) -&gt; pd.DataFrame:
+        recs = []
+        for a in self.agents:
+            letters = [self.products[k].letter for k in a.top4]
+            price_sum = round(sum(self.products[k].price for k in a.top4), 2)
+            recs.append({"agent": a.aid, "top4": "".join(letters), "sum_price": price_sum, "happy": a.happy})
+        return pd.DataFrame(recs)
+
+    @property
+    def demand_ts(self) -&gt; pd.DataFrame:
+        return pd.DataFrame(self._demand_rows) if self._demand_rows else pd.DataFrame(columns=["t","sku_idx","sku","letter","count"])
+
+# ---------- factories ----------
+def make_products(K:int=8) -&gt; List[Product]:
+    letters = [chr(ord("A")+i) for i in range(K)]
+    prices  = [round(1.0 + 0.5*i, 2) for i in range(K)]
+    return [Product(i, f"SKU{i+1:02d}", letters[i], prices[i]) for i in range(K)]
+
+def reset_market(K:int, seed:int, wealth_mu:float, wealth_sd:float) -&gt; Market:
+    return Market(K=K, n_agents=100, seed=seed, base_wealth=wealth_mu, wealth_jitter=wealth_sd)
+
+# ---------- UI ----------
+PERSON_PATH = (
+    "M1.7 -1.7h-0.8c0.3 -0.2 0.6 -0.5 0.6 -0.9c0 -0.6 "
+    "-0.4 -1 -1 -1c-0.6 0 -1 0.4 -1 1c0 0.4 0.2 0.7 0.6 "
+    "0.9h-0.8c-0.4 0 -0.7 0.3 -0.7 0.6v1.9c0 0.3 0.3 0.6 "
+    "0.6 0.6h0.2c0 0 0 0.1 0 0.1v1.9c0 0.3 0.2 0.6 0.3 "
+    "0.6h1.3c0.2 0 0.3 -0.3 0.3 -0.6v-1.8c0 0 0 -0.1 0 "
+    "-0.1h0.2c0.3 0 0.6 -0.3 0.6 -0.6v-2c0.2 -0.3 -0.1 "
+    "-0.6 -0.4 -0.6z"
+)
+
+app_ui = ui.page_fluid(
+    ui.h2("ABM Polya-Urn Demand (Mesa-lite)"),
+    ui.row(
+        ui.column(3,
+            ui.input_numeric("seed", "Seed", 7),
+            ui.input_slider("K", "Number of products K", min=4, max=12, value=8),
+            ui.input_slider("wealth_mu", "Wealth mean", min=2, max=30, value=10),
+            ui.input_slider("wealth_sd", "Wealth sd", min=0, max=10, value=2),
+            ui.input_numeric("l_draws", "Draws per tick (l)", 1, min=1, max=4),
+            ui.input_action_button("btn_reset", "Reset"),
+            ui.input_action_button("btn_step",  "Step"),
+            ui.input_action_button("btn_10",    "Run 10"),
+            ui.hr(),
+            ui.output_table("price_table"),
+            ui.hr(),
+            ui.output_table("last_tick_demand"),
+        ),
+        ui.column(5,
+            ui.card(
+                ui.card_header("Agents on 10×10 grid (blue=happy, red=unhappy)"),
+                output_widget("grid_plot"),
+            ),
+            ui.card(
+                ui.card_header("Demand time series by SKU (lines)"),
+                output_widget("demand_plot"),
+            ),
+        ),
+        ui.column(4,
+            ui.card(
+                ui.card_header("Top-4 per agent (after last tick)"),
+                ui.output_table("top4_table"),
+            ),
+        )
+    ),
+)
+
+# ---------- server ----------
+def server(input: Inputs, output: Outputs, session: Session):
+
+    market = reactive.value(reset_market(K=8, seed=7, wealth_mu=10, wealth_sd=2))
+
+    @reactive.effect
+    @reactive.event(input.btn_reset)
+    def _reset():
+        market.set(reset_market(K=int(input.K()), seed=int(input.seed()),
+                                wealth_mu=float(input.wealth_mu()), wealth_sd=float(input.wealth_sd())))
+
+    @reactive.effect
+    @reactive.event(input.btn_step)
+    def _step_once():
+        market().step(l=int(input.l_draws()))
+
+    @reactive.effect
+    @reactive.event(input.btn_10)
+    def _step_10():
+        for _ in range(10):
+            market().step(l=int(input.l_draws()))
+
+    @output
+    @render.table
+    def price_table():
+        prods = market().products
+        return pd.DataFrame({
+            "idx":[p.idx for p in prods],
+            "sku":[p.sku for p in prods],
+            "letter":[p.letter for p in prods],
+            "price":[p.price for p in prods],
+        })
+
+    @output
+    @render.table
+    def last_tick_demand():
+        ts = market().demand_ts
+        if ts.empty:
+            return pd.DataFrame(columns=["t","sku","letter","count"])
+        last_t = ts["t"].max()
+        return ts.loc[ts["t"]==last_t, ["t","sku","letter","count"]].sort_values(["letter"])
+
+    @output
+    @render.table
+    def top4_table():
+        return market().top4_df().sort_values(["happy","sum_price","agent"], ascending=[False, True, True])
+
+    @output
+    @render_altair
+    def grid_plot():
+        df = market().grid_df().assign(
+            status=lambda d: d["happy"].map({True: "Happy", False: "Unhappy"})
+        )
+        return (
+            alt.Chart(df)
+            .transform_calculate(row="ceil(datum.id/10)")
+            .transform_calculate(col="(datum.id - 1) % 10 + 1")
+            .mark_point(filled=True, size=60)
+            .encode(
+                alt.X("col:O").axis(None),
+                alt.Y("row:O").axis(None),
+                alt.ShapeValue(PERSON_PATH),
+                color=alt.Color(
+                    "status:N",
+                    scale=alt.Scale(domain=["Happy", "Unhappy"], range=["#3A86FF", "#E63946"]),
+                ),
+                tooltip=["id", "status"],
+            )
+            .properties(width=420, height=420)
+            .configure_view(strokeWidth=0)
+        )
+
+    @output
+    @render_altair
+    def demand_plot():
+        ts = market().demand_ts
+        df = ts if not ts.empty else pd.DataFrame({"t": [], "count": [], "letter": []})
+        return (
+            alt.Chart(df)
+            .mark_line(interpolate="monotone")
+            .encode(
+                x="t:Q",
+                y="count:Q",
+                color="letter:N",
+                tooltip=["t", "letter", "count"],
+            )
+            .properties(width=460, height=300)
+        )
+
+app = App(app_ui, server)
+
+
+## file: requirements.txt
+altair
+anywidget
+palmerpenguins
+jsonschema</code></pre>
+</div>
+
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {Demand from {Preferences}},
+  date = {2025-10-02},
+  url = {https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2025. <span>“Demand from Preferences.”</span> October 2,
+2025. <a href="https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences/">https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences/</a>.
+</div></div></section></div> ]]></description>
+  <category>Shinylive for python</category>
+  <category>Model thinking</category>
+  <category>Simulation</category>
+  <guid>https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences/</guid>
+  <pubDate>Wed, 01 Oct 2025 21:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 <item>
@@ -595,7 +961,8 @@ DEFAULT_GRID_W = 5
 DEFAULT_GRID_H = 5
 
 # -------------------- UI: page + sidebar --------------------
-ui.page_opts(title="Mesa Wealth Agents Tutorial in ShinyLive (Python)", fillable=True)
+# Add page title and sidebar
+ui.page_opts(title="Mesa Boltzmann Wealth Model Tutorial in Shineylive for Python", fillable=True)
 
 with ui.sidebar(open="desktop"):
     ui.input_switch("interactive_mode", "Interactive mode", value=True)
@@ -624,11 +991,22 @@ def _reset_sliders():
     ui.update_slider("grid_w", value=DEFAULT_GRID_W)
     ui.update_slider("grid_h", value=DEFAULT_GRID_H)
 
-# -------------------- MESA model --------------------
+#### Mesa Boltzmann Wealth Model ##############################
+
 import mesa
 from mesa.discrete_space import CellAgent, OrthogonalMooreGrid
 
+# Add function for model level collection
+def compute_gini(model):
+    agent_wealths = [agent.wealth for agent in model.agents]
+    x = sorted(agent_wealths)
+    n = model.num_agents
+    B = sum(xi * (n - i) for i, xi in enumerate(x)) / (n * sum(x))
+    return 1 + (1 / n) - 2 * B
+
 class MoneyAgent(CellAgent):
+    """An agent with fixed initial wealth."""
+
     def __init__(self, model, cell):
         super().__init__(model)
         self.cell = cell
@@ -639,7 +1017,10 @@ class MoneyAgent(CellAgent):
         self.move_to(new_cell)
 
     def give_money(self):
-        cellmates = [a for a in self.cell.agents if a is not self]
+        cellmates = [
+            a for a in self.cell.agents if a is not self
+        ]  # Get all agents in cell
+
         if self.wealth &gt; 0 and cellmates:
             other = self.random.choice(cellmates)
             other.wealth += 1
@@ -661,6 +1042,12 @@ class MoneyModel(mesa.Model):
             (width, height), torus=True, capacity=10, random=self.random
         )
 
+        # Instantiate DataCollector
+        self.datacollector = mesa.DataCollector(
+            model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
+        )
+
+
         # Create agents (assumes CellAgent.create_agents helper exists in this env)
         _agents = MoneyAgent.create_agents(
             self,
@@ -669,6 +1056,8 @@ class MoneyModel(mesa.Model):
         )
 
     def step(self):
+0        self.datacollector.collect(self)
+
         order = list(self.agents)
         self.random.shuffle(order)
         for idx, a in enumerate(order, start=1):
@@ -938,7 +1327,7 @@ Bochman, Oren. 2025. <span>“ShinyLive ❤️ Mesa Tutorial.”</span> October
 <item>
   <title>Updates to the github action</title>
   <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2025/2025-10-01-Updates/</link>
+  <link>https://orenbochman.github.io/posts/2025/2025-10-01-Updates-to-the-github-action/</link>
   <description><![CDATA[ 
 
 
@@ -947,7 +1336,7 @@ Bochman, Oren. 2025. <span>“ShinyLive ❤️ Mesa Tutorial.”</span> October
 
 
 <p>In the last few dates I made some updates to the blog, cleaning things up but it broke down.</p>
-<p>Today it is back to speed and I think it might useful for other quarto bloggers to look at my current github action as I made a couple of changes to the inital script.</p>
+<p>Today it is back to speed and I think it might useful for other quarto bloggers to look at my current github action as I made a couple of changes to the initial script.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
@@ -1450,14 +1839,14 @@ font-style: inherit;"> ${{ secrets.GITHUB_TOKEN }}</span></span></code></pre></d
   author = {Bochman, Oren},
   title = {Updates to the Github Action},
   date = {2025-10-01},
-  url = {https://orenbochman.github.io/posts/2025/2025-10-01-Updates/},
+  url = {https://orenbochman.github.io/posts/2025/2025-10-01-Updates-to-the-github-action/},
   langid = {en}
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2025. <span>“Updates to the Github Action.”</span>
-October 1, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-10-01-Updates/">https://orenbochman.github.io/posts/2025/2025-10-01-Updates/</a>.
+October 1, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-10-01-Updates-to-the-github-action/">https://orenbochman.github.io/posts/2025/2025-10-01-Updates-to-the-github-action/</a>.
 </div></div></section></div> ]]></description>
-  <guid>https://orenbochman.github.io/posts/2025/2025-10-01-Updates/</guid>
+  <guid>https://orenbochman.github.io/posts/2025/2025-10-01-Updates-to-the-github-action/</guid>
   <pubDate>Tue, 30 Sep 2025 21:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
@@ -25561,140 +25950,6 @@ Powerful Text Encoders.”</span> February 15, 2025. <a href="https://orenbochma
   <guid>https://orenbochman.github.io/reviews/2024/LLM2Vec/</guid>
   <pubDate>Fri, 14 Feb 2025 22:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/reviews/2024/LLM2Vec/cover.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>MambaVision A Hybrid Mamba-Transformer Vision Backbone</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2024/mamba-vision/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-<section id="introduction" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>In <span class="citation" data-cites="hatamizadeh2024mambavision">(Hatamizadeh and Kautz 2024)</span>, the authors apply the State Space Model (SSM) inherent in recently introduced Mamba architecture, <span class="citation" data-cites="gu2023mamba">(Gu and Dao 2023)</span>, for vision tasks. They point out that prior work on using the Mamba architecture for vision was ill-suited these tasks and propose a remedy in the form of a hybrid Mamba-Transformer architecture which they call MambaVision. Thier experiment show that MambaVision outperforms other vision architectures on ImageNet-1K, MS COCO and ADE20K datasets.</p>
-<div class="no-row-height column-margin column-container"><div id="ref-gu2023mamba" class="csl-entry">
-Gu, Albert, and Tri Dao. 2023. <span>“Mamba: Linear-Time Sequence Modeling with Selective State Spaces.”</span> <em>arXiv Preprint arXiv:2312.00752</em>.
-</div></div><p>The paper’s main innovation is <mark>more self-attention blocks in the final layers of the transformer which improves the models ability to capture long-range spatial dependencies</mark>.</p>
-</section>
-<section id="the-problems-with-mamba-for-vision-tasks" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="the-problems-with-mamba-for-vision-tasks">The problems with Mamba for vision tasks</h2>
-<p>A <em>dilettante reader</em> like myself might be interested in the author’s outline of the shortcomings of the Mamba architecture for vision tasks and earlier attempt in <span class="citation" data-cites="zhu2024vision">(Zhu et al. 2024)</span> <em>vision mamba</em> model which directed thier efforts the right direction.</p>
-<div class="no-row-height column-margin column-container"><div id="ref-zhu2024vision" class="csl-entry">
-Zhu, Lianghui, Bencheng Liao, Qian Zhang, Xinlong Wang, Wenyu Liu, and Xinggang Wang. 2024. <span>“Vision Mamba: Efficient Visual Representation Learning with Bidirectional State Space Model.”</span> <em>arXiv Preprint arXiv:2401.09417</em>.
-</div></div><div class="page-columns page-full"><blockquote class="blockquote">
-<p>… the Mamba’s autoregressive formulation, while effective for tasks requiring sequential data processing, faces limitations in computer vision tasks that benefit from a <strong>full receptive field</strong><sup>1</sup>:</p>
-<ol type="1">
-<li><p>Unlike sequences where order matters, image pixels do not have a sequential dependency in the same way. Instead, spatial relationships are often local and need to be considered in a more parallel and integrated manner. Hence, this results in inefficiency for processing spatial data</p></li>
-<li><p>an autoregressive model like Mamba processes data step-by-step, limiting its ability to capture and utilize global context in one forward pass. In contrast, vision tasks often require understanding the global context to make accurate predictions about local regions</p></li>
-</ol>
-</blockquote><div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;seeing the full picture or at least big parts of it</p></div></div></div>
-<div class="page-columns page-full"><blockquote class="blockquote">
-<p>Vision Mamba (Vim) and others have proposed modifications such as bidirectional SSMs to address lack of global context and spatial understanding. While bidirectional SSMs have the potential to capture more comprehensive context, they introduce significant latency due to the need to process the entire sequence before making predictions. Additionally, the increased complexity can lead to challenges in training, risk of overfitting, and may not always result in better accuracy. Due to these pitfalls, backbones with Vision Transformer (ViT) and Convolutional Neural Network (CNN) architectures still outperform best Mamba-based vision models on different vision tasks. — <span class="citation" data-cites="hatamizadeh2024mambavision">(Hatamizadeh and Kautz 2024, 2)</span></p>
-</blockquote><div class="no-row-height column-margin column-container"><div id="ref-hatamizadeh2024mambavision" class="csl-entry">
-Hatamizadeh, Ali, and Jan Kautz. 2024. <span>“MambaVision: A Hybrid Mamba-Transformer Vision Backbone.”</span> <em>arXiv Preprint arXiv:2407.08083</em>.
-</div></div></div>
-<p>To sum all this up - Mamba’s auto regressive nature is well suited to temporal and sequential data like text and speech but is ill suited to handle spatial data like images where order manifests as a hierarchy of spatial neighborhoods which should be processed in parallel. Thus for vision, mamba suffer a loss in the efficiency of the flow of information both locally and globally. As such pre mamba vision models fare better.</p>
-<p>The next section outlines the ideas espoused in prior work both pre and post mamba. This section summarizes both the earlier work on computer vision models since the introduction of Transformers and some results since the introduction of the Mamba architecture.</p>
-<ul>
-<li>Vision Transformer (ViT) <span class="citation" data-cites="dosovitskiy2021imageworth16x16words">(Dosovitskiy et al. 2021)</span> showed that CNNs can be replaced with self-attention, but wasn’t data efficient.</li>
-<li>Data-efficient Image Transformer (DeiT) <span class="citation" data-cites="touvron2021training">(Touvron et al. 2021)</span> used distillation to train ViT more efficient.</li>
-<li>LeViT model <span class="citation" data-cites="graham2021levit">(Graham et al. 2021)</span> introduced a redesign for MLP and self-attention with a Lenet like pyramid pooling structure.</li>
-<li>Cross-covariance Image Transformer (XCiT) <span class="citation" data-cites="ali2021xcit">(Ali et al. 2021)</span> introduced transposed self-attention mechanism more effectively modeling interactions between feature channels.</li>
-<li>The Pyramid Vision Transformer (PVT) <span class="citation" data-cites="wang2021pyramid">(Wang et al. 2021)</span> improving efficiency by adopting a hierarchical structure with patch embedding at the start of each stage and spatial dimension reduction.</li>
-<li>Swin Transformer <span class="citation" data-cites="liu2021swin">(Liu et al. 2021)</span> used shifted windows to improve the efficiency of self-attention computation.</li>
-<li>Twins Transformer <span class="citation" data-cites="chu2021twins">(Chu et al. 2021)</span> featured spatially separable self-attention that significantly enhanced efficiency.</li>
-<li>Focal Transformer <span class="citation" data-cites="yang2021focal">(Yang et al. 2021)</span> used a focal mechanism to improve the efficiency of self-attention computation for capturing long-range interactions.</li>
-</ul>
-<div class="no-row-height column-margin column-container"><div id="ref-dosovitskiy2021imageworth16x16words" class="csl-entry">
-Dosovitskiy, Alexey, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, et al. 2021. <span>“An Image Is Worth 16x16 Words: Transformers for Image Recognition at Scale.”</span> <a href="https://arxiv.org/abs/2010.11929">https://arxiv.org/abs/2010.11929</a>.
-</div><div id="ref-touvron2021training" class="csl-entry">
-Touvron, Hugo, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, and Hervé Jégou. 2021. <span>“Training Data-Efficient Image Transformers &amp; Distillation Through Attention.”</span> In <em>International Conference on Machine Learning</em>, 10347–57. PMLR.
-</div><div id="ref-graham2021levit" class="csl-entry">
-Graham, Benjamin, Alaaeldin El-Nouby, Hugo Touvron, Pierre Stock, Armand Joulin, Hervé Jégou, and Matthijs Douze. 2021. <span>“Levit: A Vision Transformer in Convnet’s Clothing for Faster Inference.”</span> In <em>Proceedings of the IEEE/CVF International Conference on Computer Vision</em>, 12259–69.
-</div><div id="ref-ali2021xcit" class="csl-entry">
-Ali, Alaaeldin, Hugo Touvron, Mathilde Caron, Piotr Bojanowski, Matthijs Douze, Armand Joulin, Ivan Laptev, et al. 2021. <span>“Xcit: Cross-Covariance Image Transformers.”</span> <em>Advances in Neural Information Processing Systems</em> 34: 20014–27.
-</div><div id="ref-wang2021pyramid" class="csl-entry">
-Wang, Wenhai, Enze Xie, Xiang Li, Deng-Ping Fan, Kaitao Song, Ding Liang, Tong Lu, Ping Luo, and Ling Shao. 2021. <span>“Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction Without Convolutions.”</span> In <em>Proceedings of the IEEE/CVF International Conference on Computer Vision</em>, 568–78.
-</div><div id="ref-liu2021swin" class="csl-entry">
-Liu, Ze, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, and Baining Guo. 2021. <span>“Swin Transformer: Hierarchical Vision Transformer Using Shifted Windows.”</span> In <em>Proceedings of the IEEE/CVF International Conference on Computer Vision</em>, 10012–22.
-</div><div id="ref-chu2021twins" class="csl-entry">
-Chu, Xiangxiang, Zhi Tian, Yuqing Wang, Bo Zhang, Haibing Ren, Xiaolin Wei, Huaxia Xia, and Chunhua Shen. 2021. <span>“Twins: Revisiting the Design of Spatial Attention in Vision Transformers.”</span> <em>Advances in Neural Information Processing Systems</em> 34: 9355–66.
-</div><div id="ref-yang2021focal" class="csl-entry">
-Yang, Jianwei, Chunyuan Li, Pengchuan Zhang, Xiyang Dai, Bin Xiao, Lu Yuan, and Jianfeng Gao. 2021. <span>“Focal Attention for Long-Range Interactions in Vision Transformers.”</span> <em>Advances in Neural Information Processing Systems</em> 34: 30008–22.
-</div></div></section>
-<section id="the-mambavision-architecture---macro" class="level2">
-<h2 class="anchored" data-anchor-id="the-mambavision-architecture---macro">3.1 The MambaVision Architecture - Macro</h2>
-<p>MambaVision has a hierarchical architecture consisting of 4 different stages. The first two stages consist of CNN-based layers for fast feature extraction at higher input resolutions, while stage 3 and 4 include the proposed MambaVision and Transformer blocks.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="fig2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Architecture of hierarchical MambaVision"><img src="https://orenbochman.github.io/reviews/2024/mamba-vision/fig2.png" class="img-fluid figure-img" alt="Architecture of hierarchical MambaVision"></a></p>
-<figcaption>Architecture of hierarchical MambaVision</figcaption>
-</figure>
-</div>
-<p>The first two blocks in stages 1 and 2</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Chat%20z%20=%20GELU(BN(Conv_%7B3%C3%973%7D(z)))%0A"></p>
-<p><img src="https://latex.codecogs.com/png.latex?%0Az%20=%20BN(Conv_%7B3%C3%973%7D(%5Chat%20z))%20+%20z%0A"></p>
-<p>Where GELU is the Gaussian Error Linear Unit activation function, a modern alternative to the rectified linear unit (ReLU) function, and BN is good old batch normalization layer which transforms the inputs to have zero mean and unit variance which speeds up training.</p>
-</section>
-<section id="the-mambavision-architecture---micro" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="the-mambavision-architecture---micro">3.2 The MambaVision Architecture - Micro</h2>
-
-<div class="no-row-height column-margin column-container"><div id="fig-micro" class="quarto-float quarto-figure quarto-figure-left anchored" data-group="my-gallery" data-fig-align="left">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-micro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="fig3.png" class="lightbox" data-gallery="my-gallery" title="Figure&nbsp;1: Architecture of MambaVision block"><img src="https://orenbochman.github.io/reviews/2024/mamba-vision/fig3.png" class="img-fluid quarto-figure quarto-figure-left figure-img" width="300"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-micro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Architecture of MambaVision block
-</figcaption>
-</figure>
-</div></div><p>The authors redesigned the original Mamba mixer to make it more suitable for vision tasks.</p>
-<ol type="1">
-<li>regular convolution replaces causal convolution</li>
-<li>added a symmetric branch without SSM , consisting of an additional convolution and SiLU activation, to compensate for any content lost due to the sequential constraints of SSMs.</li>
-<li>These branches are concatenated and project via a final linear layer.</li>
-</ol>
-<p>This combination ensures that the final feature representation incorporates both the sequential and spatial information, leveraging the strengths of both branches.</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Balign*%7D%0AX_1%20&amp;=%20Scan(%CF%83(Conv(Linear(C,%20%5Cfrac%7BC%7D%7B2%7D%20)(X_%7Bin%7D))))%20%5C%5C%0AX_2%20&amp;=%20%CF%83(Conv(Linear(C,%20%5Cfrac%7BC%7D%7B2%7D%20)(X_%7Bin%7D)))%20%5C%5C%0AX_%7Bout%7D%20&amp;=%20Linear(%20%5Cfrac%7BC%7D%7B2%7D%20,%20C)(Concat(X_1,%20X_2))%20%5C%5C%0A%5Cend%7Balign*%7D%0A"></p>
-</section>
-<section id="ablation-studies" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="ablation-studies">Ablation Studies</h2>
-<p>Section 4 the experiment looks at MambaVision’s performance in image classification as well as other downstream tasks like, object detection, instance segmentation and semantic segmentation tasks. The authors note that the model was equipped with the model with specialized heads for different tasks and required fine tuning the original model. I am a somewhat critical of calling this the performance on downstream tasks when we are talking about models with different layers that were fine tuned using different optimizers on task specific datasets.</p>
-<p>The results section outline an <strong>ablation study</strong><sup>2</sup> used to identify the optimal way to integrate the Vision Transformer (ViT) with the Mamba architecture.</p>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;investigating the effects of removing parts of a model</p></div></div><p>As usual, the authors provide a family of models with different sizes to gauge the performance characteristics for scaling the model.</p>
-<p>The various models</p>
-</section>
-<section id="resources" class="level2">
-<h2 class="anchored" data-anchor-id="resources">Resources</h2>
-<ul>
-<li><a href="https://arxiv.org/pdf/2407.08083">paper</a></li>
-<li><a href="https://github.com/NVlabs/MambaVision">code</a></li>
-</ul>
-
-
-
-</section>
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {MambaVision {A} {Hybrid} {Mamba-Transformer} {Vision}
-    {Backbone}},
-  date = {2025-02-15},
-  url = {https://orenbochman.github.io/reviews/2024/mamba-vision/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“MambaVision A Hybrid Mamba-Transformer
-Vision Backbone.”</span> February 15, 2025. <a href="https://orenbochman.github.io/reviews/2024/mamba-vision/">https://orenbochman.github.io/reviews/2024/mamba-vision/</a>.
-</div></div></section></div> ]]></description>
-  <guid>https://orenbochman.github.io/reviews/2024/mamba-vision/</guid>
-  <pubDate>Fri, 14 Feb 2025 22:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/reviews/2024/mamba-vision/cover.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

@@ -1,0 +1,2919 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.34">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="keywords" content="Shiny, Shinylive for python, Mesa, Agent-Based Modeling, POC, Wealth distribution, Altair, Pyodide">
+
+<title>Demand from Preferences Part 1 – Oren Bochman’s Blog</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<link href="../../../posts/2025/2025-03-09-planning-in-complex-lewis-game/index.html" rel="next">
+<link href="../../../posts/2025/2025-10-04-Bag-Of-Tricks/index.html" rel="prev">
+<link href="../../../favicon.ico" rel="icon">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-c8ad9e5dbd60b7b70b38521ab19b7da4.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-befe23ebd2f54d8af2c8a89d1a1611f1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-c8ad9e5dbd60b7b70b38521ab19b7da4.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-cd2c15051e4e380d82a3a6bf6e2d0429.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark-a4771ea619ace3379c9f2bf9b3b10453.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../../site_libs/bootstrap/bootstrap-cd2c15051e4e380d82a3a6bf6e2d0429.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<meta name="shinylive:serviceworker_dir" content="../../..">
+<script src="../../../site_libs/quarto-contrib/shinylive-0.10.4/shinylive/load-shinylive-sw.js" type="module"></script>
+<script src="../../../site_libs/quarto-contrib/shinylive-0.10.4/shinylive/run-python-blocks.js" type="module"></script>
+<link href="../../../site_libs/quarto-contrib/shinylive-0.10.4/shinylive/shinylive.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-contrib/shinylive-quarto-css/shinylive-quarto.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-GYZ17VPVEJ"></script>
+
+<script type="text/plain" cookie-consent="tracking">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GYZ17VPVEJ', { 'anonymize_ip': true});
+</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"headline",
+  "consent_type":"express",
+  "palette":"dark",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+<script type="application/json" class="js-hypothesis-config">
+{
+  "theme": "clean",
+  "openSidebar": false
+}
+</script>
+<script async="" src="https://hypothes.is/embed.js"></script>
+<script>
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    document.body.classList.add('hypothesis-enabled');
+  });
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" integrity="sha384-5TcZemv2l/9On385z///+d7MSYlvIEw9FuZTIdZ14vJLqWphw7e7ZPuOiCHJcFCP" crossorigin="anonymous">
+<script>
+  window.WebFontConfig = {
+    custom: {
+      families: ['KaTeX_AMS', 'KaTeX_Caligraphic:n4,n7', 'KaTeX_Fraktur:n4,n7',
+        'KaTeX_Main:n4,n7,i4,i7', 'KaTeX_Math:i4,i7', 'KaTeX_Script',
+        'KaTeX_SansSerif:n4,n7,i4', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3',
+        'KaTeX_Size4', 'KaTeX_Typewriter'],
+    },
+  };
+</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js" integrity="sha384-cMkvdD8LoxVzGF/RPUKAcvmm49FQ0oxwDF3BGKtDXcEc+T1b2N+teh/OJfpU0jr6" crossorigin="anonymous"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+  <script defer="" src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="twitter:title" content="Demand from Preferences Part 1 – Oren Bochman’s Blog">
+<meta name="twitter:description" content="Microeconomics Model of Consumer Demand from Preferences">
+<meta name="twitter:image" content="https://orenbochman.github.io//images/calabi_yau_manifold.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image-height" content="1024">
+<meta name="twitter:image-width" content="1024">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-01-11-a-garden-of-forking-paths/index.html">2025</a></li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-09-10-Demand-From-Prefrences-1/index.html">Demand from Preferences Part 1</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-01-11-a-garden-of-forking-paths/index.html">2025</a></li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-09-10-Demand-From-Prefrences-1/index.html">Demand from Preferences Part 1</a></li></ol></nav>
+      <h1 class="title">Demand from Preferences Part 1</h1>
+            <p class="subtitle lead">Microeconomics Model of Consumer Demand from Preferences</p>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Shinylive for python</div>
+                <div class="quarto-category">Model thinking</div>
+                <div class="quarto-category">Simulation</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">Thursday, October 2, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+
+  <div>
+    <div class="keywords">
+      <div class="block-title">Keywords</div>
+      <p>Shiny, Shinylive for python, Mesa, Agent-Based Modeling, POC, Wealth distribution, Altair, Pyodide</p>
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true"><i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text">Notes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://orenbochman.github.io/notes-bayes/" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian Specialization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://orenbochman.github.io/notes-rl/" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reinforcement Learning Specialization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://orenbochman.github.io/notes-model-thinking/" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model Thinking</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://orenbochman.github.io/notes-nlp" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NLP Specialization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://orenbochman.github.io/notes-ab-testing" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AB testing</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../index.html" class="sidebar-item-text sidebar-link"><i class="bi bi-substack" role="img">
+</i> 
+ <span class="menu-text">Posts</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Posts</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">2011</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2011/2011-11-29-npl-python/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text Mining With Python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2011/2011-11-29-tidy-text-mining-with-r/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tidy Text Mining With R</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2011/2011-11-29-text-mining-with-r/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text Mining With R</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2011/2011-08-11-time-management/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Time management Tips</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">2012</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2012/2012-07-26-wikisym-2012_files/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wikisym 2012</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">2013</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2013/2013-06-07-lifehacks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">life hacks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">2014</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">2014 10 06 FinTech</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">2015</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">2015 02 07 Analytics Checklist</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2015/2015-02-07-analytics-checklist/2015-02-07-analytics-checklist.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Analytics Checklist</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">2015 02 07 Optimal Bidding</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">2015 04 20 All Things Data</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2015/2015-04-20-all-things-data/2015-04-20-hotjar-heat-map-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HotJar Heat Map Analysis - Dr.&nbsp;David Darmanin</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2015/2015-04-20-all-things-data/2015-04-20-organizational-culture-of-analytics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using Competitive Analysis to Benchmark Your Marketing Efforts Ariel Rosenstein - Similar Web</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2015/2015-04-20-all-things-data/2015-04-20-using-competitive-analysis-to-benchmark Your-Marketing-Efforts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using Competitive Analysis to Benchmark Your Marketing Efforts - Ariel Rosenstein - Similar Web</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false">
+ <span class="menu-text">2016</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2016/2016-12-14-Travel-checklist/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Travel checklist</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false">
+ <span class="menu-text">2017</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2017/2017-07-30-experimental-design/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A/B testing cost and risks?</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false">
+ <span class="menu-text">2018</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2018/2018-01-16-BRAT/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">text annotation with BRAT</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false">
+ <span class="menu-text">2019</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-16" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2019/2019-11-24-keys-to-the-kingdom-extracting-api-keys-from-a-json-file-with-jq/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Docker for data science</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2019/2019-07-31-Exploding-and-vanishing-nodes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exploding and vanishing nodes.</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="false">
+ <span class="menu-text">2020</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/2020-06-12-bash-tricks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">brace expansion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/2020-03-04-pandas-challanges/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pandas Productivity Challenge?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/2020-02-20-avoid-cross-site-scriptin-errors-with-a-Jupyter-local-runtime/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How to avoid cross site scripting (XSS) errors with the Jupyter local runtime for Colab</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/2020-11-29-numpy-meltdown/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">numpy melt down</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/2020-12-30-meme-bank/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Meme bank</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/2020-10-25-deep-learning-relu-intutions/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deep Learning Intuitions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false">
+ <span class="menu-text">2021</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-10-15-storytelling-and-other-essentials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Storytelling and other essentials</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-05-29-djvu-to-pdf/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ebook Hacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-09-modeling-events/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Modeling Events</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-16-python-graphs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Graphs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-10-clv-models-1/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Customer Lifetime Value - Pareto/NBD (BTYD) Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-08-13-hackathon-notes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hackathon session link dumps &amp; notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-27-getting-more-from-your-agency/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Getting more from your agency ?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-08-18-transfer-learning-nlp/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transfer learning in NLP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-22-what-is-in-a-citation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">What is in a citation?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-07-14-type-witness-evolving-idiom/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A type of Witness and an evolving Idiom</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-07-ten-tips-to-improve-your-workflow/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Tips To Improve Your Workflow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-06-10-layout-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TensorFlow probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-27-wingrad-schema/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Q&amp;A and the Winograd schemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-11-12-language-models-and-explainability/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Language models and explainability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-24-statistics-for-marketing-in-python/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Excel 2019 for Marketing Statistics in pandas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-25-bayesian-agent/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian agents</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-05-16-mulitlevel-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multilevel Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-09-advertising-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Advertising Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-08-13-inlining-citations/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inlining Citations for Wikipedia articles</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-24-summerization/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatic Summarization Task</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-08-wave-net-review/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">WaveNet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-07-01-json-ld/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">json-ld</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
+ <span class="menu-text">2021 12 07 Attention for Sensor Fusion</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-12-07-attention-for-sensor-fusion/2021-12-07-attention-for-sensor-fusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Attention for sensor fusion</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-20" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-20" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-20" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-03-05-m1/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Set Up M1 MacBooks for DS &amp; ML</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-09-12-robust-regression/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Robust Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-21" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022 04 01 Bandits</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-21" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-21" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-22" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022 05 05 Command Line</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-22" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-22" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-05-05-command_line/2022-05-05-command_line.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">command line</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-23" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022 09 16 Adaptive Learning Rate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-23" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-23" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-24" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022 09 16 Loss Engineering</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-24" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-24" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-09-16-loss-engineering/2022-09-16-loss-engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Loss engineering and uncertainty for multi-task learning</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-25" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022 09 22 Entropy for Uncertainty Quantification</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-25" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-25" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-09-22-entropy_for_uncertainty_quantification/2022-09-22-entropy_for_uncertainty_quantification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">entropy for uncertainty quantification</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="false">
+ <span class="menu-text">2023</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-26" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/2023-04-11-quarto-loves-psudocode/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quarto loves pseudocode</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/2023-12-20-autogluon/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AutoGluon Cheetsheets</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/2023-05-10-migration-notes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Great Migration</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/2023-04-22-mcmc-algs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCMC algorithms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-27" role="navigation" aria-expanded="false">
+ <span class="menu-text">2023 02 01 Ds from Scratch</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-27" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-27" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/2023-02-01-ds-from-scratch/ols-regression-from-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OLS regression From Scratch</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false">
+ <span class="menu-text">2023 02 20 Ts Nonlinear</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-28" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false">
+ <span class="menu-text">2023 02 28 NLP.IL Booking.com</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-29" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/2023-02-28-NLP.IL-Booking.com/NLP-IL-Booking Text2Topic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text2topic Leverage reviews data for multi-label topics classification in Booking.com</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/2023-02-28-NLP.IL-Booking.com/NLP-IL-Booking Validating NLP.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validating NLP data and models</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false">
+ <span class="menu-text">2023 03 01 Braindump</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-30" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false">
+ <span class="menu-text">2023 03 01 Spark Emr</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-31" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-32" role="navigation" aria-expanded="false">
+ <span class="menu-text">2023 03 08 Responsible AI</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-32" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-32" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-33" role="navigation" aria-expanded="false">
+ <span class="menu-text">2023 06 01 Spark</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-33" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-33" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/2023-06-01-spark/spark-progress.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Spark Tips</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false">
+ <span class="menu-text">2023 06 01 Synthesis and Stabilization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-34" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/2023-06-01-Synthesis-and-Stabilization/2023-06-01-Synthesis-and-Stabilization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Summary: Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-35" role="navigation" aria-expanded="false">
+ <span class="menu-text">S3 Series</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-35" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-35" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-36" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-36" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-36" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-11-risk-constrained-MDP/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Risk-constrained Markov decision processes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-12-mermaid-mindmap/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">😁 Quarto 💖 Mermaid🧜 Mindmaps 🧠</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-06-bayesian-perspective/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lewis Game from a Bayesian Perspective</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-10-marco-baoni-composionality/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Is compositionality overrated? The view from language emergence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-07-01-generalization-in-ML/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">two ideas on generalization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-04-04-rad-repl/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAD REPL</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-11-more-sugar-please/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">More Sugar please</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-12-post-with-code/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Post With Code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-02-Shanon-Game/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shannon Game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-12-12-the-valentines-day-massacre/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Villeny pure and simple</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-31-mesa-lessons/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mesa Lessons</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2023-03-16-events-generator/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">event generator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-10-lewis-petting-zoo/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lewis Signaling Game for PettingZoo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-07-signaling-experiment/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Signals Experiment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-01-topological-alignment/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TL-DR rethinking 💭 topological alignment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-01-04-understanding-emergent-languages/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Understanding Emergent Languages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-28-missing-link/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLM and the missing link</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-28-ocr-bd/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OCR - Brain Dump</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-05-complex-signal/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ad hoc complex signaling systems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-27-NLP-RL/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NLP with RL</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-22-transformations/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformations in Linguistic Representation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-18-readings-in-rl/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">readings in rl</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-01-02-d3/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">D3.js in in Quarto Observable</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-28-ocr/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OCR building blocks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-26-deduction-evaluation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deduction Evaluation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-25-readability/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tune llm for Style and Grammar advice.</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-12-Evolutionary-games-and-population-dynamics/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evolutionary Games and Population Dynamics Summary</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-01-10-superlearner/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SuperLearner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-31-sugarscapes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sugar Scapes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-30-LLMs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLM the good the bad and the ugly</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-08-26-six-quick-tips/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Six quick tips to improve modeling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-11-Vitter-alg/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vitter’s Algorithm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-08-08-TS-with-Stumpy/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stumpy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-03-a-definition-by-p-winston/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A definition by Patrick Henry Winston</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-07-02-replay-buffer-questions/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">replay buffer questions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-37" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 02 01 Quarto Bootstrap</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-37" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-37" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-38" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 02 19 Rhetoric</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-38" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-38" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-19-rhetoric/rhetoric-ideas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rhetoric NLP Tasks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-39" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 05 02 Signaling Games Tikz</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-39" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-39" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 05 03 Urn Models</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-40" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-03-urn-models/urn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Urn models using Numpy</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 05 04 Signals Bib</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-41" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-42" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 05 09 Roth Erev RL</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-42" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-42" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-09-Roth-Erev-RL/re-rel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Roth Erev learning in Lewis signaling games</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 01 Bayesian Agents</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-43" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 12 Logic Puzzles</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-44" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 13 Hyper</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-45" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-13-hyper/2024-06-13-hyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hyperparameter Optimization</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 23 Zero Inflated Data</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-46" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-23-zero-inflated-data/2024-06-23-zero-inflated-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">zero inflated data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 25 Mesa Rl</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-47" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-25-mesa-rl/mesa-rl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mesa &amp; RL</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Misbehavior of Markets and Scaling in financial prices 1-4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-48" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-48" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part1/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling in financial prices 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part4/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling in financial prices 4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part3/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling in financial prices 3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part2/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling in financial prices 2</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-49" role="navigation" aria-expanded="true">
+ <span class="menu-text">2025</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-49" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-49" class="collapse list-unstyled sidebar-section depth3 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-11-a-garden-of-forking-paths/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A garden of forking paths</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-26-vibe-coding/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vibe coding GPT5 Edition</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-10-Demand-From-Prefrences-2/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Demand from Preferences Part 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-02-rethinking-signaling-systems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rethinking Signaling systems via the lens of compositionality</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-10-Engineering-RL-Algs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Engineering Reinforcement Learning Algorithms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2015-sept-06/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Allegations of War Crimes and the Palestinian Genocide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-04-03-langtalks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Langtalks Resources # 43</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-04-off-policy-learning/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Off-Policy Learning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-09-referential-lewis-game/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Referential Lewis Signaling Game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-10-02-Shiny-Mesa-Tutorial/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ShinyLive ❤️ Mesa Tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-04-02-a-morphology/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Base line Morphology Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/marketing mix model/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Marketing Mix Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-10-Demand-From-Prefrences-3/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Demand from Preferences Part 3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-06-research-notes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Complex Signals Questions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-11-partial-pooling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The roles of Partial pooling and mixed strategies in the Lewis signaling game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-10-04-Bag-Of-Tricks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AI a bag of tricks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-10-Demand-From-Prefrences-1/index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Demand from Preferences Part 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-09-planning-in-complex-lewis-game/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Planning in the Complex Lewis Game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-01-books/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Books, Courses Tools</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-14-Desiderata-for-Emergent-Languages/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Emergent Languages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-04-02-research-questions/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Research Questions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-10-01-Updates-to-the-github-action/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Updates to the github action</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../posts/2025/2025-01-05-bifurcating-paths-to-signaling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Many Path To A Signaling System</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-50" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-50" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-05-bifurcating-paths-to-signaling/podcast.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Podcast</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+    </ul>
+    </div>
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#challenges-of-multi-arm-bandit-problems" id="toc-challenges-of-multi-arm-bandit-problems" class="nav-link active" data-scroll-target="#challenges-of-multi-arm-bandit-problems">Challenges of Multi-arm Bandit problems</a></li>
+  <li><a href="#simulations-a-closed-world-approach-to-ground-truth" id="toc-simulations-a-closed-world-approach-to-ground-truth" class="nav-link" data-scroll-target="#simulations-a-closed-world-approach-to-ground-truth">Simulations a closed world approach to ground truth</a></li>
+  <li><a href="#game-theory" id="toc-game-theory" class="nav-link" data-scroll-target="#game-theory">Game Theory</a></li>
+  <li><a href="#rl" id="toc-rl" class="nav-link" data-scroll-target="#rl">RL</a></li>
+  <li><a href="#two-related-problems" id="toc-two-related-problems" class="nav-link" data-scroll-target="#two-related-problems">Two related problems</a>
+  <ul class="collapse">
+  <li><a href="#demand-from-preferences" id="toc-demand-from-preferences" class="nav-link" data-scroll-target="#demand-from-preferences">Demand from Preferences</a></li>
+  <li><a href="#from-abm-to-mdp-by-inducing-learning-a-reward-function" id="toc-from-abm-to-mdp-by-inducing-learning-a-reward-function" class="nav-link" data-scroll-target="#from-abm-to-mdp-by-inducing-learning-a-reward-function">From ABM to MDP by inducing learning a reward function</a></li>
+  </ul></li>
+  <li><a href="#models-of-demand" id="toc-models-of-demand" class="nav-link" data-scroll-target="#models-of-demand">Models of demand</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+
+<p>In this series of posts I will explore an approach to modeling consumer demand I had some years back after working on pricing.</p>
+<p>A couple of reasons made me come back to this problem after a long hiatus. First I have gotten interested in bayesian non-parametric models like the Dirichlet process, Stick breaking, the Chinese Restaurant Process. I also got learned a lot about Agent Based Models (ABM), these are simulation in which we can easily capture heterogeneity and local interactions that are not easy to capture in more traditional equation based models.</p>
+<p>Putting these two tools together lets you think of models that are not only more flexible and realistic but probably quite different to think about without these tools.</p>
+<section id="challenges-of-multi-arm-bandit-problems" class="level3">
+<h3 class="anchored" data-anchor-id="challenges-of-multi-arm-bandit-problems">Challenges of Multi-arm Bandit problems</h3>
+<blockquote class="blockquote">
+<p>you only see the response to the arm you pull and you are the way the problem is setup you are much more likely to pull the wrong arms until you have solved the problem. If you could see the real response you would be able to learn much faster. So if we want to evaluate different predictive models or different pricing strategies, or taxation schemes in other words different hypotheses we would be better placed to evaluate them if we were operating in a closed world where we could see the response to all actions not just the ones we take.</p>
+</blockquote>
+<p>Forecasting demand can be challenging. It is similar to a bandit problem. You only get to see the reaction to the prices you set. Also the market is reacting to everything else that is going on in the world so you don’t really know if the response you see is due to your actions or something else.</p>
+<p>There is lots of theory on demand of course but when it comes to practice even the best models are not very good at keeping up this what the theory prescribes. The theory in economics came from practitioners in other fields like biology and seems to me rather odd. I have often wondered if there are simpler and better ways to think about demand etc. However getting back to this problem, what we often need to do is test how our methods work on a simulated market - i.e.&nbsp;one which we could know the ground truth and not just the response to our actions.</p>
+</section>
+<section id="simulations-a-closed-world-approach-to-ground-truth" class="level3">
+<h3 class="anchored" data-anchor-id="simulations-a-closed-world-approach-to-ground-truth">Simulations a closed world approach to ground truth</h3>
+<p>The problem with developing a simulation is that you have to bake in some assumption like how you simplify reality by dropping unimportant details while keeping the important ones. Problem is who can say what is truly important and what is not. I was challenged more than once by a colleague who asked me “how do you know your model is right ?”. This was a rude awakening for me. My answer was along the lines of</p>
+<blockquote class="blockquote">
+<p>“When an army goes to a battle they are only as good as their practice and training. If they have bad intelligence they will struggle but if they couldn’t hit a target or reach a goal in training it too much to expect them to do so in a real battle”.</p>
+</blockquote>
+<p>The models suffered from noisy data, inflated zeros, due to competition, stock outs, scare stories in the media, bird flue or hoof and mouth disease rummers? Frequent periods that brake with the most basic of theoretical assumption like downward sloping demand curves. E.g. rollup candy which was trending on social media and got 1000x demand or a consumer embargo on cottage cheese due to price hikes.</p>
+<p>Sparsity in price changes for most product because most retailers only have capacity to relabel a few products each month.</p>
+<p>Scaling challenges and causality issues. (Not being able to control for confounding factors). e.g.&nbsp;when price and quantity are both affected by a moderating variable like seasonality. Oh and Seasonality and changing trends.</p>
+<p>Some products like refrigerators are consumed once in a decade. Others like chicken are consumed daily but if there is a big enough promotion you may see people stuff their freezer full of chicken and not buy any for months.</p>
+<p>And we haven’t covered issues like income effects, cannibalization, competition, advertising, recommendation sites, social media and influencer, geophysical factors like location, macroeconomic factors like inflation, marketing, behavioral economics issues, and the list goes on and on</p>
+<p>Put all of these in the model and wont fit for for more than a handful of products. Leave one out and you will get crazy results on many cases if you are predicting demand at scale.</p>
+<p>Ideally one should have a model that is robust to many of these issues, that can handle different cases but more significantly one that can make the least assumption about the each case but support growing complexity if it exists in the data. And having safety rails in the form of uncertainty estimates and regularizing priors are also a useful</p>
+</section>
+<section id="game-theory" class="level2">
+<h2 class="anchored" data-anchor-id="game-theory">Game Theory</h2>
+<p>Getting back to the problem at hand. One of the modern approaches to microeconomics has been placing it on a firm theoretical foundation based on game theory. It still worth recalling that compared with economics, game theory is relatively new. In fact it was only in the 1940s that John von Neumann and Oskar Morgenstern published their book “Theory of Games and Economic Behavior” which laid the foundations for game theory as a mathematical discipline. So while it got started with economic behavior lots of aspects of game theory are still being worked out and don’t always make sense or make very good predictions. This is unfortunate because this is perhaps the best tool we have to make economic more rigorous. Anyhow my take away are:</p>
+<ol type="1">
+<li>Go for simple models they also tend to have far wider applications</li>
+<li>Take the results with a grain of salt and use them as a guide not a bible</li>
+</ol>
+</section>
+<section id="rl" class="level2">
+<h2 class="anchored" data-anchor-id="rl">RL</h2>
+<p>In practice I learned game theory first but than I was introduced to reinforcement learning (RL). This generally solves the simpler field of decision theory - i.e.&nbsp;single agent scenarios. I found RL to be more intuitive and practical. It also has a lot of algorithms that can be used to solve problems. And while game theory introduces many challenging strategic scenarios, RL can find optimal policies for an agent in environments so complex we don’t see game theorist tackling them.</p>
+<p>I mean chess is a classic game considered by any introductory game theory book yet they have very little to say about solving it. But RL gave us AlphaZero which can learn to play chess at a superhuman level in a few hours. Backgammon is another classic game that was gave superhuman performance by RL algorithms like TD-Gammon.</p>
+</section>
+<section id="two-related-problems" class="level2">
+<h2 class="anchored" data-anchor-id="two-related-problems">Two related problems</h2>
+<p>When it comes to RL, and when we want to understand demand based on preferences we want to understand how preferences map to actions and more importantly how individual actions aggregate to market level demand curves with the properties we observe in the real world.</p>
+<p>But for the sake of this post I think we want to consider the most parsimonious model that can capture the essence of demand from preferences. Why start with preferences, because lots of economic theory assumptions arise from from how we aggregate individual preferences, so we need to start before that step and make aggregation depend on parameters we can control.</p>
+<p>How does this tie into RL though ?</p>
+<p>The problem in converting an ABM to an MDP is that we need to transition from a rule based system to one that has</p>
+<ol type="1">
+<li>a state space.</li>
+<li>actions with probabilities of transitions.</li>
+<li>reward signals.</li>
+</ol>
+<p>In ABM we usually embody 2 using rules. The state space is often implicit and is explicitly represented in at two level, the environment and the agents.</p>
+<p>So while it takes some work, we can extract a state space with actions and transitions. There is no guarantee that we get the Markov property i.e future states depend depend on the past condition only on the present state. But for micro-economics we should be fine. Also we can use a family of related models to learn much about the state space if we can collect data in the form of a replay buffer of past states and actions. I am referring to trifecta of HMM algorithms consiting of:</p>
+<ol type="1">
+<li><a href="https://en.wikipedia.org/wiki/Viterbi_algorithm">Viterbi</a> to find most likely sequence of hidden states given the observation</li>
+<li><a href="https://en.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm">Baum-Welch</a> to estimate transition and emision probabilities and the</li>
+<li><a href="https://en.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm">Forward–backward</a> algorithm which computes the <del>posterior marginals</del> probabilities of all hidden state variables given a sequence of observations/emissions. AKA smoothing.</li>
+</ol>
+<p>If one has access to the dynamics we could use a kalman filter or a a baysian filter or a dynamic linear model (DLM).</p>
+<p>So the real challenge is the reward function. In RL we often assume that the reward function is given. But in practice it is challenging to to define a reward function.</p>
+<p>And this is where preferences come in. If we can model preferences we can use them to define a reward function.</p>
+<p>I have thinking about two problems and it seems that they may be related in an interesting ways.</p>
+<section id="demand-from-preferences" class="level3">
+<h3 class="anchored" data-anchor-id="demand-from-preferences">Demand from Preferences</h3>
+<p>The first involves developing a demand model based on a non-parametric model for preferences.</p>
+</section>
+<section id="from-abm-to-mdp-by-inducing-learning-a-reward-function" class="level3">
+<h3 class="anchored" data-anchor-id="from-abm-to-mdp-by-inducing-learning-a-reward-function">From ABM to MDP by inducing learning a reward function</h3>
+<p>I, along with over a million other students took an online course called model thinking. You can see my notes in the link. When I took the courses in the Reinforcement Learning specialization one of the point ,ade by Scott kept resonating again and again, which was that there is the following hierarchy for behavioral models:</p>
+<ol type="1">
+<li><strong>Rule based</strong> - In rule based models agent follow simple predetermined rules yet we often see how even one rule can lead to complex emergent behavior. Sugarscape is a classic example.</li>
+<li><strong>Formal Models</strong> - Formal models are not explained as well in the course, but clearly they are a step up from rule based models in which the modeler has formalized using mathematical equations. The predator prey model which is governed by the Lotka-Volterra equations is a classic example. And it can be shown that the predator prey model is a special case of the more general replicator dynamics model from evolutionary game theory.</li>
+<li><strong>Game Theoretic Models</strong> - in which we have agents have clearly defined actions and payoffs. The prisoners dilemma is such a game. One advantage of a game theoretic model is that we can use game theory to find the equilibria and use these for study the different possible strategies.</li>
+</ol>
+<p>After learning about RL I came to believe that Game theoretical models often require infinite sets to define and that some RL algorithms can do thier magic with a very limited sample from such a game. In retrospect it is an important point though not very precise. RL requires MDP which have the same issues as Game Theoretical models at least as far as a a formal specification is involved. However the RL algorithms can find an optimal policy and at times with very limited resources. However RL was only considering single agents scenarios and I was just as interested in the strategic case of multiple agents.</p>
+<p>The second is about how to convert an agent based model ABM into a markov decision process (MDP). If we can do that we can use an RL algorithm like Q-learning to find optimal policy for an agent and perhaps even consider how it relates to global optima that we may find by optimizing a global welfare function for many agents.</p>
+<p>Some of the guest lectures in the RL courses I took discussed the issue of learning rewards. I later realized that both state transition and rewards were often something that were not known in advance. So this is a real problem and we may often be able to learn to approximate given sufficient samples of actual behavior.</p>
+<p>More recently I learned about the Bayesian view of state space models. Here one can use algorithms like the Kalman Filter and DLM to learn to to predict future and past states based on noisy trajectories.</p>
+</section>
+</section>
+<section id="models-of-demand" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="models-of-demand">Models of demand</h2>
+<ul>
+<li>In this post I will develop a Polya-Rubinstien microeconomic model of consumer demand. The model focuses on the aggregation of individual preferences.</li>
+</ul>
+<p>In the next posts I will consider how to make the model more useful. So we can develop notions like substitutes and complements. For this we may want to add a clustering structure to the products perhaps extending the Polya urn to the closely related Chinese Restaurant Process. And to add another level of interest.</p>
+<p>Although I have studied microeconomics as well as supply and demand curves, elasticity etc it seems that a view of demand based on a variance covariance matrix of demand functions or even as a precursor to a elasticity cross elasticity matrix can lead to inconsistency.</p>
+<p>The … model of demand discusses thier model which is supposedly consistent.</p>
+<p>I recall however that Ariel Rubinstien’s Book on microeconomic theory starts with the concept of preferences then builds it into utility. So perhaps if we can model preferences we could be on the way to a more consistent model of demand.</p>
+<p>We will see that the Polya urn model is consistent with the Rubinstien axioms of preferences that make the preferences a rational ordering.</p>
+<p>i.e.&nbsp;</p>
+<ol type="1">
+<li>for any two products the consumer to be able to state a preference of one over the other or indifference.</li>
+<li>there is no order effect</li>
+<li>transitivity.</li>
+</ol>
+<p>p.s. one issues with preferences is how do they map to price. I guess we will need to deal with that too.</p>
+<ol type="1">
+<li>There are k (10) products in the market each with a price and some id.</li>
+<li>We have a square grid of side L with agents</li>
+<li>Agent start with an endowment and some preference over products</li>
+<li>Preferences are based on numbers of colored balls in an agent’s Polya urn. Initially there is just one ball per product.</li>
+<li>Each turn the agent draws a random colored ball from the urn but returns 2 such colored balls. This reinforces the agent’s preference for the product associated with the ball.</li>
+</ol>
+<p>Ok so we have a process that creates heterogenous preferences that reinforce over time.</p>
+<p>That is a good start but we see that if we aggregate we get a very steady uniform demand.</p>
+<p>We may want to see the welfare of the agents. How often can they satisfy their preference ?</p>
+<p>To understand behavior be need to map preferences to a budget allocation. We have imposed a budget constraint on the agent by setting an individual endowment. Now we want to see how they will allocate their budget based on their preferences.</p>
+<p>One idea is that should attempt to maximize their utility given their budget constraint.</p>
+<p>But I talk about utility informally.</p>
+<p>The may however assume that the agents will will want to buy as products in proportion to thier their preferences. Also we may also suppose that for these agents having more is better than having less so they will want to maximize their consumption.</p>
+<p>So here we see that the urn meets the market.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>sku</th>
+<th>count</th>
+<th>price</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>4</td>
+<td>30</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>3</td>
+<td>20</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>they would want to buy a market basket that is the maximal largest multiple of within their budget.</p>
+<p><span class="math display">
+3 sku_1 + 2 sku_2 + 1 sku_3
+</span></p>
+<p><span class="math display">
+Q_i = \arg \max_k k \times \sum count_i \times price_i  \leq budget
+</span></p>
+<p>One important edge case is what will they do if they want more than they can afford. In this case preferences will be truncated to what they can afford.</p>
+<p>say they have a budget of 30 should they buy</p>
+<p>one of thier #1 preference or one of thier #2 preference and five of their #3 preference.</p>
+<p>demand. If I like chicken twice as much as rice and I have some budget how much would I allocate to each product?</p>
+<ol start="6" type="1">
+<li>Agent than buy the top preferred products and gain a happiness score in to
+<ol type="1">
+<li>number of top k-products they can afford</li>
+<li></li>
+</ol></li>
+<li>Prices for</li>
+</ol>
+<div class="column-screen-inset-right">
+<pre class="shinylive-python" data-engine="python"><code>#| '!! shinylive warning !!': |
+#|   shinylive does not work in self-contained HTML documents.
+#|   Please set `embed-resources: false` in your metadata.
+#| standalone: true
+#| viewerHeight: 600
+#| components: [viewer] #[editor, viewer]
+_='''{.markdown} 
+from __future__ import annotations
+## Tasks:
+
+'''
+
+# app.py — ShinyLive-ready ABM Polya-Urn demo (Mesa-lite core) + Altair 
+
+
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
+import random
+from collections import Counter
+
+import pandas as pd
+import altair as alt
+
+from shiny import App, Inputs, Outputs, Session, reactive, render, ui
+from shinywidgets import render_altair, output_widget
+
+import mesa
+from mesa import Model, Agent, space
+
+### Two NonParametric Helper Models (Polya Urn and Hoppe Urn)
+
+class PolyaUrn:
+    """A Polya urn model for generating reinforcing preferences based on a Dirichlet process.
+       
+       Note: 
+    
+       - Since products are generated by a CRP process (Hoppe Urn), we need to support adding new products via a draw_new_product() method.
+
+       - We may consider using Moran steps to model a drift from many products to a few products, i.e. we draw a ball replacing it with a ball of another color based on the urn's diriclet distribution.
+       or we may drift according to some exogenous process. e.g. advertising or social influence. We may do this once or until
+       we converge to some top-k products.
+
+
+    Attributes:
+        alpha (float): The reinforcement parameter.
+        num_products (int): The number of products (colors).
+        urn (Dict[int, int]): A dictionary representing the urn with product indices as keys and bead counts as values.
+
+    """
+
+    def __init__(self, alpha: int = 1, num_products: int = 1):
+        self.alpha = alpha
+        self.num_products = num_products
+        self.urn = {i: 1 for i in range(num_products)}  # one bead per product
+
+    def draw(self) -&gt; int:
+        """Draw a ball from the urn and reinforce."""
+        total = sum(self.urn.values()) 
+        probs = [self.urn[i] / total for i in range(self.num_products)]
+        drawn = random.choices(list(self.urn.keys()), weights=probs, k=1)[0]
+        self.urn[drawn] += 1  # Reinforce
+        return drawn
+
+    def draw_new_product(self) -&gt; int:
+        """Draw a new product (color) from the urn."""
+        new_product_idx = self.num_products
+        self.urn[new_product_idx] = 1  # Add new product with one bead
+        self.num_products += 1
+        return new_product_idx
+
+class HoppeUrn:
+    """A Hoppe urn model for generating new products.
+       
+       Note: 
+       The current model assumes all products are independent.
+       
+       We will later extend this to support the addition of product categories and affinity between products, allowing us to model substitutes and complements.
+       We may also want to assign products to Maslow's hierarchy of needs.
+
+       Ideally, though, the structure of the product space should be easily accessible from this Model.
+    """
+
+    def __init__(self, initial_products: int = 2, innovation: float = 1.0):
+        
+        self.urn = {i: 1 for i in range(initial_products)}  # one bead per product
+        self.inovation = innovation
+        print(f"initial hoppe urn {self.urn}")
+
+    def draw(self) -&gt; int:
+        """ Draw a ball from the urn and reinforce."""
+        total = sum(self.urn.values())
+        probs = [self.urn[i] / total for i in self.urn.keys()]
+        drawn = random.choices(list(self.urn.keys()), weights=probs, k=1)[0]
+        if drawn == 0:  # "new product" 
+            new_product_idx = max(self.urn.keys()) + 1
+            self.urn[new_product_idx] = 1  # Add new product with one bead
+            #drawn = new_product_idx
+        else:
+            self.urn[drawn] += 1  # Reinforce
+        return drawn
+
+### Mesa Agent code - Dirichlet Process for preferences
+
+class DemandAgent(mesa.Agent):
+    """An agent with fixed initial wealth and a Polya urn for its preferences."""
+
+    def __init__(self, model):
+        # Pass the parameters to the parent class.
+        super().__init__(model)
+
+        # Create the agent's attribute and set the initial values.
+        self.endowment = random.uniform(5, 15)  # Random initial wealth 
+        self.wealth = self.endowment  
+        self.urn = PolyaUrn()
+
+    def say_hi(self):
+        # The agent's step will go here.
+        # For demonstration purposes we will print the agent's unique_id
+        #print(f"Hi, I am an agent, you can call me {self.unique_id!s}.")
+        if self.model.draw == 0:
+            self.urn.draw_new_product()
+        
+        drawn = self.urn.draw()
+        print(f"Agent {self.unique_id!s:2} drew: {drawn} | prefrences: {self.urn.urn.values()}")
+
+
+### Server code
+
+class DemandModel(mesa.Model):
+    """A model with some number of agents."""
+
+    def __init__(self, n,counter, innovation: float = 1.0, seed=None):
+        super().__init__(seed=seed)
+        self.num_agents = n
+        self.counter=counter
+        self.urn=HoppeUrn(innovation=innovation)
+        # Create n agents
+        DemandAgent.create_agents(model=self, n=n)
+        self.ticks=0
+        self.draw=None
+        self.num_products_history = [len(self.urn.urn)]  # &lt;-- track unique products over time
+
+    def step(self):
+        """ Advance the model by one step."""
+        # This function pseudo-randomly reorders the list of agent objects and
+        # then iterates through calling the function passed in as the parameter
+        self.draw  = self.urn.draw()
+        self.ticks +=1
+        print(f"drew: {self.draw} | products : {self.urn.urn.values()}")
+        self.agents.shuffle_do("say_hi")
+        self.num_products_history.append(len(self.urn.urn))  # &lt;-- record after each step
+
+    
+### Mesa entry points
+
+### Shiny UI
+
+### Step button
+
+
+
+### Shiny APP
+
+from shiny.express import input, render, ui
+
+
+## UI
+ui.input_slider("n", "Total Agants", 1, 100, 5)
+ui.input_slider("theta", "Innovation", 0, 100, 1)
+
+
+ui.input_action_button("btnStep", "Step")
+ui.input_action_button("btnReset", "Reset")
+ui.tags.br()
+
+model_val = reactive.Value(None)
+counter_val = reactive.Value(0)
+
+def build_model():
+    # Build a fresh model using the current UI and counter
+    return DemandModel(n=input.n(), counter=counter_val.get(), innovation=input.theta()/100.0)
+
+@reactive.calc
+def current_model():
+    return model_val.get()
+
+
+@reactive.effect
+@reactive.event(input.btnReset)
+def reset_sim():
+    print("resetting")
+    # Bump a counter if you want to track resets
+    counter_val.set(counter_val.get() + 1)
+    # Create and store a fresh model
+    model_val.set(build_model())
+    starter_model=model_val.get()
+    print(f"model version {starter_model.counter}")   
+    # Do an initial step if desired
+
+@reactive.effect 
+@reactive.event(input.btnStep)
+def sim_step(): 
+    if model_val.get() is None:
+        model_val.set(build_model())
+    starter_model=model_val.get()
+    print(f"model version {starter_model.counter}")   
+    model_val.get().step()
+
+# --- helpers ---------------------------------------------------------------
+def prefs_df(model) -&gt; pd.DataFrame:
+    """Rows: agent, product, count."""
+    if model is None:
+        return pd.DataFrame(columns=["agent", "product", "count"])
+    rows = []
+    for ag in model.agents:
+        for prod, cnt in ag.urn.urn.items():
+            rows.append({"agent": str(ag.unique_id), "product": str(prod), "count": cnt})
+    return pd.DataFrame(rows)
+
+# --- UI slot ---------------------------------------------------------------
+ui.h3("Agent preference shares")
+#output_widget("pref_chart")
+
+# --- Server render ---------------------------------------------------------
+
+@render_altair
+@reactive.event(input.btnStep)
+def pref_chart():
+    m = current_model()
+    df = prefs_df(m)
+    if df.empty:
+        return alt.Chart(pd.DataFrame({"x": []})).mark_text().encode()  # harmless placeholder
+
+    # normalized, stacked bars like the barley example
+    return (
+        alt.Chart(df)
+        .mark_bar()
+        .encode(
+            x=alt.X("sum(count):Q", stack="normalize", title="Preference share"),
+            y=alt.Y("agent:N", sort="-x", title="Agent"),
+            color=alt.Color("product:N", title="Product"),
+            tooltip=["agent:N", "product:N", "count:Q"]
+        )
+        .properties(height=400)
+    )
+
+
+# --- helpers ---------------------------------------------------------------
+import numpy as np
+
+def kn_live_df(model) -&gt; pd.DataFrame:
+    if model is None or not getattr(model, "num_products_history", None):
+        return pd.DataFrame(columns=["t", "K"])
+    hist = model.num_products_history
+    return pd.DataFrame({"t": np.arange(len(hist)), "K": hist})
+
+def kn_theory_df(nmax: int, alphas=(0.1, 0.3, 1.0, 3.0, 10.0)) -&gt; pd.DataFrame:
+    t = np.arange(1, max(2, nmax) + 1)
+    parts = []
+    for a in alphas:
+        parts.append(pd.DataFrame({"t": t, "alpha": str(a), "E[K_t]": a * np.log(t)}))
+    return pd.concat(parts, ignore_index=True)
+
+# --- UI slot ---------------------------------------------------------------
+ui.h3("Unique products over time: theory vs. live")
+#output_widget("kn_chart")
+
+# --- Server render ---------------------------------------------------------
+@render_altair
+@reactive.event(input.btnStep)
+def kn_chart():
+    m = current_model()
+    nmax = (m.ticks if m else 200) or 200
+
+    df_theory = kn_theory_df(nmax)
+    base = (
+        alt.Chart(df_theory)
+        .mark_line()
+        .encode(
+            x=alt.X("t:Q", title="Steps (t)"),
+            y=alt.Y("E[K_t]:Q", title="Unique products K_t"),
+            color=alt.Color("alpha:N", title="α (innovation)")
+        )
+    )
+
+    df_live = kn_live_df(m)
+    live_layer = (
+        alt.Chart(df_live)
+        .mark_line(point=True)
+        .encode(
+            x="t:Q",
+            y="K:Q",
+            tooltip=["t:Q", "K:Q"]
+        )
+        .properties(title="Live K_t")
+    )
+
+    return (base + live_layer).properties(height=350)
+
+
+## file: requirements.txt
+altair
+anywidget
+jsonschema
+mesa</code></pre>
+</div>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {Demand from {Preferences} {Part} 1},
+  date = {2025-10-02},
+  url = {https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-1/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2025. <span>“Demand from Preferences Part 1.”</span>
+October 2, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-1/">https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-1/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+            // default icon
+            link.classList.add("external");
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+        for (let i=0; i<annoteTargets.length; i++) {
+          const annoteTarget = annoteTargets[i];
+          const targetCell = annoteTarget.getAttribute("data-target-cell");
+          const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+          const contentFn = () => {
+            const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+            if (content) {
+              const tipContent = content.cloneNode(true);
+              tipContent.classList.add("code-annotation-tip-content");
+              return tipContent.outerHTML;
+            }
+          }
+          const config = {
+            allowHTML: true,
+            content: contentFn,
+            onShow: (instance) => {
+              selectCodeLines(instance.reference);
+              instance.reference.classList.add('code-annotation-active');
+              window.tippy.hideAll();
+            },
+            onHide: (instance) => {
+              unselectCodeLines();
+              instance.reference.classList.remove('code-annotation-active');
+            },
+            maxWidth: 300,
+            delay: [50, 0],
+            duration: [200, 0],
+            offset: [5, 10],
+            arrow: true,
+            appendTo: function(el) {
+              return el.parentElement.parentElement.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'quarto',
+            placement: 'right',
+            popperOptions: {
+              modifiers: [
+              {
+                name: 'flip',
+                options: {
+                  flipVariations: false, // true by default
+                  allowedAutoPlacements: ['right'],
+                  fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+                },
+              },
+              {
+                name: 'preventOverflow',
+                options: {
+                  mainAxis: false,
+                  altAxis: false
+                }
+              }
+              ]        
+            }      
+          };
+          window.tippy(annoteTarget, config); 
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../../posts/2025/2025-10-04-Bag-Of-Tricks/index.html" class="pagination-link" aria-label="AI a bag of tricks">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">AI a bag of tricks</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../../posts/2025/2025-03-09-planning-in-complex-lewis-game/index.html" class="pagination-link" aria-label="Planning in the Complex Lewis Game">
+        <span class="nav-page-text">Planning in the Complex Lewis Game</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2025, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+    <script type="text/javascript">
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let pseudocodeOptions = {
+          indentSize: el.dataset.indentSize || "1.2em",
+          commentDelimiter: el.dataset.commentDelimiter || "//",
+          lineNumber: el.dataset.lineNumber === "true" ? true : false,
+          lineNumberPunc: el.dataset.lineNumberPunc || ":",
+          noEnd: el.dataset.noEnd === "true" ? true : false,
+          titlePrefix: el.dataset.captionPrefix || "Algorithm"
+        };
+        pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+      });
+    })(document);
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let captionSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+        if (captionSpan !== null) {
+          let captionPrefix = el.dataset.captionPrefix + " ";
+          let captionNumber = "";
+          if (el.dataset.pseudocodeNumber) {
+            captionNumber = el.dataset.pseudocodeNumber + " ";
+            if (el.dataset.chapterLevel) {
+              captionNumber = el.dataset.chapterLevel + "." + captionNumber;
+            }
+          }
+          captionSpan.innerHTML = captionPrefix + captionNumber;
+        }
+      });
+    })(document);
+    </script>
+  
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -146,7 +146,859 @@ Bochman, Oren. 2025. <span>“AI a Bag of Tricks.”</span> October 4, 2025.
 <item>
   <title>Demand from Preferences Part 1</title>
   <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences/</link>
+  <link>https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-1/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<p>In this series of posts I will explore an approach to modeling consumer demand I had some years back after working on pricing.</p>
+<p>A couple of reasons made me come back to this problem after a long hiatus. First I have gotten interested in bayesian non-parametric models like the Dirichlet process, Stick breaking, the Chinese Restaurant Process. I also got learned a lot about Agent Based Models (ABM), these are simulation in which we can easily capture heterogeneity and local interactions that are not easy to capture in more traditional equation based models.</p>
+<p>Putting these two tools together lets you think of models that are not only more flexible and realistic but probably quite different to think about without these tools.</p>
+<section id="challenges-of-multi-arm-bandit-problems" class="level3">
+<h3 class="anchored" data-anchor-id="challenges-of-multi-arm-bandit-problems">Challenges of Multi-arm Bandit problems</h3>
+<blockquote class="blockquote">
+<p>you only see the response to the arm you pull and you are the way the problem is setup you are much more likely to pull the wrong arms until you have solved the problem. If you could see the real response you would be able to learn much faster. So if we want to evaluate different predictive models or different pricing strategies, or taxation schemes in other words different hypotheses we would be better placed to evaluate them if we were operating in a closed world where we could see the response to all actions not just the ones we take.</p>
+</blockquote>
+<p>Forecasting demand can be challenging. It is similar to a bandit problem. You only get to see the reaction to the prices you set. Also the market is reacting to everything else that is going on in the world so you don’t really know if the response you see is due to your actions or something else.</p>
+<p>There is lots of theory on demand of course but when it comes to practice even the best models are not very good at keeping up this what the theory prescribes. The theory in economics came from practitioners in other fields like biology and seems to me rather odd. I have often wondered if there are simpler and better ways to think about demand etc. However getting back to this problem, what we often need to do is test how our methods work on a simulated market - i.e.&nbsp;one which we could know the ground truth and not just the response to our actions.</p>
+</section>
+<section id="simulations-a-closed-world-approach-to-ground-truth" class="level3">
+<h3 class="anchored" data-anchor-id="simulations-a-closed-world-approach-to-ground-truth">Simulations a closed world approach to ground truth</h3>
+<p>The problem with developing a simulation is that you have to bake in some assumption like how you simplify reality by dropping unimportant details while keeping the important ones. Problem is who can say what is truly important and what is not. I was challenged more than once by a colleague who asked me “how do you know your model is right ?”. This was a rude awakening for me. My answer was along the lines of</p>
+<blockquote class="blockquote">
+<p>“When an army goes to a battle they are only as good as their practice and training. If they have bad intelligence they will struggle but if they couldn’t hit a target or reach a goal in training it too much to expect them to do so in a real battle”.</p>
+</blockquote>
+<p>The models suffered from noisy data, inflated zeros, due to competition, stock outs, scare stories in the media, bird flue or hoof and mouth disease rummers? Frequent periods that brake with the most basic of theoretical assumption like downward sloping demand curves. E.g. rollup candy which was trending on social media and got 1000x demand or a consumer embargo on cottage cheese due to price hikes.</p>
+<p>Sparsity in price changes for most product because most retailers only have capacity to relabel a few products each month.</p>
+<p>Scaling challenges and causality issues. (Not being able to control for confounding factors). e.g.&nbsp;when price and quantity are both affected by a moderating variable like seasonality. Oh and Seasonality and changing trends.</p>
+<p>Some products like refrigerators are consumed once in a decade. Others like chicken are consumed daily but if there is a big enough promotion you may see people stuff their freezer full of chicken and not buy any for months.</p>
+<p>And we haven’t covered issues like income effects, cannibalization, competition, advertising, recommendation sites, social media and influencer, geophysical factors like location, macroeconomic factors like inflation, marketing, behavioral economics issues, and the list goes on and on</p>
+<p>Put all of these in the model and wont fit for for more than a handful of products. Leave one out and you will get crazy results on many cases if you are predicting demand at scale.</p>
+<p>Ideally one should have a model that is robust to many of these issues, that can handle different cases but more significantly one that can make the least assumption about the each case but support growing complexity if it exists in the data. And having safety rails in the form of uncertainty estimates and regularizing priors are also a useful</p>
+</section>
+<section id="game-theory" class="level2">
+<h2 class="anchored" data-anchor-id="game-theory">Game Theory</h2>
+<p>Getting back to the problem at hand. One of the modern approaches to microeconomics has been placing it on a firm theoretical foundation based on game theory. It still worth recalling that compared with economics, game theory is relatively new. In fact it was only in the 1940s that John von Neumann and Oskar Morgenstern published their book “Theory of Games and Economic Behavior” which laid the foundations for game theory as a mathematical discipline. So while it got started with economic behavior lots of aspects of game theory are still being worked out and don’t always make sense or make very good predictions. This is unfortunate because this is perhaps the best tool we have to make economic more rigorous. Anyhow my take away are:</p>
+<ol type="1">
+<li>Go for simple models they also tend to have far wider applications</li>
+<li>Take the results with a grain of salt and use them as a guide not a bible</li>
+</ol>
+</section>
+<section id="rl" class="level2">
+<h2 class="anchored" data-anchor-id="rl">RL</h2>
+<p>In practice I learned game theory first but than I was introduced to reinforcement learning (RL). This generally solves the simpler field of decision theory - i.e.&nbsp;single agent scenarios. I found RL to be more intuitive and practical. It also has a lot of algorithms that can be used to solve problems. And while game theory introduces many challenging strategic scenarios, RL can find optimal policies for an agent in environments so complex we don’t see game theorist tackling them.</p>
+<p>I mean chess is a classic game considered by any introductory game theory book yet they have very little to say about solving it. But RL gave us AlphaZero which can learn to play chess at a superhuman level in a few hours. Backgammon is another classic game that was gave superhuman performance by RL algorithms like TD-Gammon.</p>
+</section>
+<section id="two-related-problems" class="level2">
+<h2 class="anchored" data-anchor-id="two-related-problems">Two related problems</h2>
+<p>When it comes to RL, and when we want to understand demand based on preferences we want to understand how preferences map to actions and more importantly how individual actions aggregate to market level demand curves with the properties we observe in the real world.</p>
+<p>But for the sake of this post I think we want to consider the most parsimonious model that can capture the essence of demand from preferences. Why start with preferences, because lots of economic theory assumptions arise from from how we aggregate individual preferences, so we need to start before that step and make aggregation depend on parameters we can control.</p>
+<p>How does this tie into RL though ?</p>
+<p>The problem in converting an ABM to an MDP is that we need to transition from a rule based system to one that has</p>
+<ol type="1">
+<li>a state space.</li>
+<li>actions with probabilities of transitions.</li>
+<li>reward signals.</li>
+</ol>
+<p>In ABM we usually embody 2 using rules. The state space is often implicit and is explicitly represented in at two level, the environment and the agents.</p>
+<p>So while it takes some work, we can extract a state space with actions and transitions. There is no guarantee that we get the Markov property i.e future states depend depend on the past condition only on the present state. But for micro-economics we should be fine. Also we can use a family of related models to learn much about the state space if we can collect data in the form of a replay buffer of past states and actions. I am referring to trifecta of HMM algorithms consiting of:</p>
+<ol type="1">
+<li><a href="https://en.wikipedia.org/wiki/Viterbi_algorithm">Viterbi</a> to find most likely sequence of hidden states given the observation</li>
+<li><a href="https://en.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm">Baum-Welch</a> to estimate transition and emision probabilities and the</li>
+<li><a href="https://en.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm">Forward–backward</a> algorithm which computes the <del>posterior marginals</del> probabilities of all hidden state variables given a sequence of observations/emissions. AKA smoothing.</li>
+</ol>
+<p>If one has access to the dynamics we could use a kalman filter or a a baysian filter or a dynamic linear model (DLM).</p>
+<p>So the real challenge is the reward function. In RL we often assume that the reward function is given. But in practice it is challenging to to define a reward function.</p>
+<p>And this is where preferences come in. If we can model preferences we can use them to define a reward function.</p>
+<p>I have thinking about two problems and it seems that they may be related in an interesting ways.</p>
+<section id="demand-from-preferences" class="level3">
+<h3 class="anchored" data-anchor-id="demand-from-preferences">Demand from Preferences</h3>
+<p>The first involves developing a demand model based on a non-parametric model for preferences.</p>
+</section>
+<section id="from-abm-to-mdp-by-inducing-learning-a-reward-function" class="level3">
+<h3 class="anchored" data-anchor-id="from-abm-to-mdp-by-inducing-learning-a-reward-function">From ABM to MDP by inducing learning a reward function</h3>
+<p>I, along with over a million other students took an online course called model thinking. You can see my notes in the link. When I took the courses in the Reinforcement Learning specialization one of the point ,ade by Scott kept resonating again and again, which was that there is the following hierarchy for behavioral models:</p>
+<ol type="1">
+<li><strong>Rule based</strong> - In rule based models agent follow simple predetermined rules yet we often see how even one rule can lead to complex emergent behavior. Sugarscape is a classic example.</li>
+<li><strong>Formal Models</strong> - Formal models are not explained as well in the course, but clearly they are a step up from rule based models in which the modeler has formalized using mathematical equations. The predator prey model which is governed by the Lotka-Volterra equations is a classic example. And it can be shown that the predator prey model is a special case of the more general replicator dynamics model from evolutionary game theory.</li>
+<li><strong>Game Theoretic Models</strong> - in which we have agents have clearly defined actions and payoffs. The prisoners dilemma is such a game. One advantage of a game theoretic model is that we can use game theory to find the equilibria and use these for study the different possible strategies.</li>
+</ol>
+<p>After learning about RL I came to believe that Game theoretical models often require infinite sets to define and that some RL algorithms can do thier magic with a very limited sample from such a game. In retrospect it is an important point though not very precise. RL requires MDP which have the same issues as Game Theoretical models at least as far as a a formal specification is involved. However the RL algorithms can find an optimal policy and at times with very limited resources. However RL was only considering single agents scenarios and I was just as interested in the strategic case of multiple agents.</p>
+<p>The second is about how to convert an agent based model ABM into a markov decision process (MDP). If we can do that we can use an RL algorithm like Q-learning to find optimal policy for an agent and perhaps even consider how it relates to global optima that we may find by optimizing a global welfare function for many agents.</p>
+<p>Some of the guest lectures in the RL courses I took discussed the issue of learning rewards. I later realized that both state transition and rewards were often something that were not known in advance. So this is a real problem and we may often be able to learn to approximate given sufficient samples of actual behavior.</p>
+<p>More recently I learned about the Bayesian view of state space models. Here one can use algorithms like the Kalman Filter and DLM to learn to to predict future and past states based on noisy trajectories.</p>
+</section>
+</section>
+<section id="models-of-demand" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="models-of-demand">Models of demand</h2>
+<ul>
+<li>In this post I will develop a Polya-Rubinstien microeconomic model of consumer demand. The model focuses on the aggregation of individual preferences.</li>
+</ul>
+<p>In the next posts I will consider how to make the model more useful. So we can develop notions like substitutes and complements. For this we may want to add a clustering structure to the products perhaps extending the Polya urn to the closely related Chinese Restaurant Process. And to add another level of interest.</p>
+<p>Although I have studied microeconomics as well as supply and demand curves, elasticity etc it seems that a view of demand based on a variance covariance matrix of demand functions or even as a precursor to a elasticity cross elasticity matrix can lead to inconsistency.</p>
+<p>The … model of demand discusses thier model which is supposedly consistent.</p>
+<p>I recall however that Ariel Rubinstien’s Book on microeconomic theory starts with the concept of preferences then builds it into utility. So perhaps if we can model preferences we could be on the way to a more consistent model of demand.</p>
+<p>We will see that the Polya urn model is consistent with the Rubinstien axioms of preferences that make the preferences a rational ordering.</p>
+<p>i.e.&nbsp;</p>
+<ol type="1">
+<li>for any two products the consumer to be able to state a preference of one over the other or indifference.</li>
+<li>there is no order effect</li>
+<li>transitivity.</li>
+</ol>
+<p>p.s. one issues with preferences is how do they map to price. I guess we will need to deal with that too.</p>
+<ol type="1">
+<li>There are k (10) products in the market each with a price and some id.</li>
+<li>We have a square grid of side L with agents</li>
+<li>Agent start with an endowment and some preference over products</li>
+<li>Preferences are based on numbers of colored balls in an agent’s Polya urn. Initially there is just one ball per product.</li>
+<li>Each turn the agent draws a random colored ball from the urn but returns 2 such colored balls. This reinforces the agent’s preference for the product associated with the ball.</li>
+</ol>
+<p>Ok so we have a process that creates heterogenous preferences that reinforce over time.</p>
+<p>That is a good start but we see that if we aggregate we get a very steady uniform demand.</p>
+<p>We may want to see the welfare of the agents. How often can they satisfy their preference ?</p>
+<p>To understand behavior be need to map preferences to a budget allocation. We have imposed a budget constraint on the agent by setting an individual endowment. Now we want to see how they will allocate their budget based on their preferences.</p>
+<p>One idea is that should attempt to maximize their utility given their budget constraint.</p>
+<p>But I talk about utility informally.</p>
+<p>The may however assume that the agents will will want to buy as products in proportion to thier their preferences. Also we may also suppose that for these agents having more is better than having less so they will want to maximize their consumption.</p>
+<p>So here we see that the urn meets the market.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>sku</th>
+<th>count</th>
+<th>price</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>4</td>
+<td>30</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>3</td>
+<td>20</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>they would want to buy a market basket that is the maximal largest multiple of within their budget.</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A3%20sku_1%20+%202%20sku_2%20+%201%20sku_3%0A"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AQ_i%20=%20%5Carg%20%5Cmax_k%20k%20%5Ctimes%20%5Csum%20count_i%20%5Ctimes%20price_i%20%20%5Cleq%20budget%0A"></p>
+<p>One important edge case is what will they do if they want more than they can afford. In this case preferences will be truncated to what they can afford.</p>
+<p>say they have a budget of 30 should they buy</p>
+<p>one of thier #1 preference or one of thier #2 preference and five of their #3 preference.</p>
+<p>demand. If I like chicken twice as much as rice and I have some budget how much would I allocate to each product?</p>
+<ol start="6" type="1">
+<li>Agent than buy the top preferred products and gain a happiness score in to
+<ol type="1">
+<li>number of top k-products they can afford</li>
+<li></li>
+</ol></li>
+<li>Prices for</li>
+</ol>
+<div class="column-screen-inset-right">
+<pre class="shinylive-python" data-engine="python"><code>#| '!! shinylive warning !!': |
+#|   shinylive does not work in self-contained HTML documents.
+#|   Please set `embed-resources: false` in your metadata.
+#| standalone: true
+#| viewerHeight: 600
+#| components: [viewer] #[editor, viewer]
+_='''{.markdown} 
+from __future__ import annotations
+## Tasks:
+
+'''
+
+# app.py — ShinyLive-ready ABM Polya-Urn demo (Mesa-lite core) + Altair 
+
+
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
+import random
+from collections import Counter
+
+import pandas as pd
+import altair as alt
+
+from shiny import App, Inputs, Outputs, Session, reactive, render, ui
+from shinywidgets import render_altair, output_widget
+
+import mesa
+from mesa import Model, Agent, space
+
+### Two NonParametric Helper Models (Polya Urn and Hoppe Urn)
+
+class PolyaUrn:
+    """A Polya urn model for generating reinforcing preferences based on a Dirichlet process.
+       
+       Note: 
+    
+       - Since products are generated by a CRP process (Hoppe Urn), we need to support adding new products via a draw_new_product() method.
+
+       - We may consider using Moran steps to model a drift from many products to a few products, i.e. we draw a ball replacing it with a ball of another color based on the urn's diriclet distribution.
+       or we may drift according to some exogenous process. e.g. advertising or social influence. We may do this once or until
+       we converge to some top-k products.
+
+
+    Attributes:
+        alpha (float): The reinforcement parameter.
+        num_products (int): The number of products (colors).
+        urn (Dict[int, int]): A dictionary representing the urn with product indices as keys and bead counts as values.
+
+    """
+
+    def __init__(self, alpha: int = 1, num_products: int = 1):
+        self.alpha = alpha
+        self.num_products = num_products
+        self.urn = {i: 1 for i in range(num_products)}  # one bead per product
+
+    def draw(self) -&gt; int:
+        """Draw a ball from the urn and reinforce."""
+        total = sum(self.urn.values()) 
+        probs = [self.urn[i] / total for i in range(self.num_products)]
+        drawn = random.choices(list(self.urn.keys()), weights=probs, k=1)[0]
+        self.urn[drawn] += 1  # Reinforce
+        return drawn
+
+    def draw_new_product(self) -&gt; int:
+        """Draw a new product (color) from the urn."""
+        new_product_idx = self.num_products
+        self.urn[new_product_idx] = 1  # Add new product with one bead
+        self.num_products += 1
+        return new_product_idx
+
+class HoppeUrn:
+    """A Hoppe urn model for generating new products.
+       
+       Note: 
+       The current model assumes all products are independent.
+       
+       We will later extend this to support the addition of product categories and affinity between products, allowing us to model substitutes and complements.
+       We may also want to assign products to Maslow's hierarchy of needs.
+
+       Ideally, though, the structure of the product space should be easily accessible from this Model.
+    """
+
+    def __init__(self, initial_products: int = 2, innovation: float = 1.0):
+        
+        self.urn = {i: 1 for i in range(initial_products)}  # one bead per product
+        self.inovation = innovation
+        print(f"initial hoppe urn {self.urn}")
+
+    def draw(self) -&gt; int:
+        """ Draw a ball from the urn and reinforce."""
+        total = sum(self.urn.values())
+        probs = [self.urn[i] / total for i in self.urn.keys()]
+        drawn = random.choices(list(self.urn.keys()), weights=probs, k=1)[0]
+        if drawn == 0:  # "new product" 
+            new_product_idx = max(self.urn.keys()) + 1
+            self.urn[new_product_idx] = 1  # Add new product with one bead
+            #drawn = new_product_idx
+        else:
+            self.urn[drawn] += 1  # Reinforce
+        return drawn
+
+### Mesa Agent code - Dirichlet Process for preferences
+
+class DemandAgent(mesa.Agent):
+    """An agent with fixed initial wealth and a Polya urn for its preferences."""
+
+    def __init__(self, model):
+        # Pass the parameters to the parent class.
+        super().__init__(model)
+
+        # Create the agent's attribute and set the initial values.
+        self.endowment = random.uniform(5, 15)  # Random initial wealth 
+        self.wealth = self.endowment  
+        self.urn = PolyaUrn()
+
+    def say_hi(self):
+        # The agent's step will go here.
+        # For demonstration purposes we will print the agent's unique_id
+        #print(f"Hi, I am an agent, you can call me {self.unique_id!s}.")
+        if self.model.draw == 0:
+            self.urn.draw_new_product()
+        
+        drawn = self.urn.draw()
+        print(f"Agent {self.unique_id!s:2} drew: {drawn} | prefrences: {self.urn.urn.values()}")
+
+
+### Server code
+
+class DemandModel(mesa.Model):
+    """A model with some number of agents."""
+
+    def __init__(self, n,counter, innovation: float = 1.0, seed=None):
+        super().__init__(seed=seed)
+        self.num_agents = n
+        self.counter=counter
+        self.urn=HoppeUrn(innovation=innovation)
+        # Create n agents
+        DemandAgent.create_agents(model=self, n=n)
+        self.ticks=0
+        self.draw=None
+        self.num_products_history = [len(self.urn.urn)]  # &lt;-- track unique products over time
+
+    def step(self):
+        """ Advance the model by one step."""
+        # This function pseudo-randomly reorders the list of agent objects and
+        # then iterates through calling the function passed in as the parameter
+        self.draw  = self.urn.draw()
+        self.ticks +=1
+        print(f"drew: {self.draw} | products : {self.urn.urn.values()}")
+        self.agents.shuffle_do("say_hi")
+        self.num_products_history.append(len(self.urn.urn))  # &lt;-- record after each step
+
+    
+### Mesa entry points
+
+### Shiny UI
+
+### Step button
+
+
+
+### Shiny APP
+
+from shiny.express import input, render, ui
+
+
+## UI
+ui.input_slider("n", "Total Agants", 1, 100, 5)
+ui.input_slider("theta", "Innovation", 0, 100, 1)
+
+
+ui.input_action_button("btnStep", "Step")
+ui.input_action_button("btnReset", "Reset")
+ui.tags.br()
+
+model_val = reactive.Value(None)
+counter_val = reactive.Value(0)
+
+def build_model():
+    # Build a fresh model using the current UI and counter
+    return DemandModel(n=input.n(), counter=counter_val.get(), innovation=input.theta()/100.0)
+
+@reactive.calc
+def current_model():
+    return model_val.get()
+
+
+@reactive.effect
+@reactive.event(input.btnReset)
+def reset_sim():
+    print("resetting")
+    # Bump a counter if you want to track resets
+    counter_val.set(counter_val.get() + 1)
+    # Create and store a fresh model
+    model_val.set(build_model())
+    starter_model=model_val.get()
+    print(f"model version {starter_model.counter}")   
+    # Do an initial step if desired
+
+@reactive.effect 
+@reactive.event(input.btnStep)
+def sim_step(): 
+    if model_val.get() is None:
+        model_val.set(build_model())
+    starter_model=model_val.get()
+    print(f"model version {starter_model.counter}")   
+    model_val.get().step()
+
+# --- helpers ---------------------------------------------------------------
+def prefs_df(model) -&gt; pd.DataFrame:
+    """Rows: agent, product, count."""
+    if model is None:
+        return pd.DataFrame(columns=["agent", "product", "count"])
+    rows = []
+    for ag in model.agents:
+        for prod, cnt in ag.urn.urn.items():
+            rows.append({"agent": str(ag.unique_id), "product": str(prod), "count": cnt})
+    return pd.DataFrame(rows)
+
+# --- UI slot ---------------------------------------------------------------
+ui.h3("Agent preference shares")
+#output_widget("pref_chart")
+
+# --- Server render ---------------------------------------------------------
+
+@render_altair
+@reactive.event(input.btnStep)
+def pref_chart():
+    m = current_model()
+    df = prefs_df(m)
+    if df.empty:
+        return alt.Chart(pd.DataFrame({"x": []})).mark_text().encode()  # harmless placeholder
+
+    # normalized, stacked bars like the barley example
+    return (
+        alt.Chart(df)
+        .mark_bar()
+        .encode(
+            x=alt.X("sum(count):Q", stack="normalize", title="Preference share"),
+            y=alt.Y("agent:N", sort="-x", title="Agent"),
+            color=alt.Color("product:N", title="Product"),
+            tooltip=["agent:N", "product:N", "count:Q"]
+        )
+        .properties(height=400)
+    )
+
+
+# --- helpers ---------------------------------------------------------------
+import numpy as np
+
+def kn_live_df(model) -&gt; pd.DataFrame:
+    if model is None or not getattr(model, "num_products_history", None):
+        return pd.DataFrame(columns=["t", "K"])
+    hist = model.num_products_history
+    return pd.DataFrame({"t": np.arange(len(hist)), "K": hist})
+
+def kn_theory_df(nmax: int, alphas=(0.1, 0.3, 1.0, 3.0, 10.0)) -&gt; pd.DataFrame:
+    t = np.arange(1, max(2, nmax) + 1)
+    parts = []
+    for a in alphas:
+        parts.append(pd.DataFrame({"t": t, "alpha": str(a), "E[K_t]": a * np.log(t)}))
+    return pd.concat(parts, ignore_index=True)
+
+# --- UI slot ---------------------------------------------------------------
+ui.h3("Unique products over time: theory vs. live")
+#output_widget("kn_chart")
+
+# --- Server render ---------------------------------------------------------
+@render_altair
+@reactive.event(input.btnStep)
+def kn_chart():
+    m = current_model()
+    nmax = (m.ticks if m else 200) or 200
+
+    df_theory = kn_theory_df(nmax)
+    base = (
+        alt.Chart(df_theory)
+        .mark_line()
+        .encode(
+            x=alt.X("t:Q", title="Steps (t)"),
+            y=alt.Y("E[K_t]:Q", title="Unique products K_t"),
+            color=alt.Color("alpha:N", title="α (innovation)")
+        )
+    )
+
+    df_live = kn_live_df(m)
+    live_layer = (
+        alt.Chart(df_live)
+        .mark_line(point=True)
+        .encode(
+            x="t:Q",
+            y="K:Q",
+            tooltip=["t:Q", "K:Q"]
+        )
+        .properties(title="Live K_t")
+    )
+
+    return (base + live_layer).properties(height=350)
+
+
+## file: requirements.txt
+altair
+anywidget
+jsonschema
+mesa</code></pre>
+</div>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {Demand from {Preferences} {Part} 1},
+  date = {2025-10-02},
+  url = {https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-1/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2025. <span>“Demand from Preferences Part 1.”</span>
+October 2, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-1/">https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-1/</a>.
+</div></div></section></div> ]]></description>
+  <category>Shinylive for python</category>
+  <category>Model thinking</category>
+  <category>Simulation</category>
+  <guid>https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-1/</guid>
+  <pubDate>Thu, 02 Oct 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Demand from Preferences Part 1</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-2/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<p>This post covers a second ABM model for demand This model uses mesa and shinylive for python.</p>
+<p>The second model uses mesa + shinylive + altair-viz.</p>
+<p>But more significantly it uses a Polya urn model to model preferences over products. And the products come from a Hoppe urn model which is closely related to the Chinese Restaurant Process.</p>
+<p>The outcome is still a preliminary model of demand. In the next installment I wish to add a negative feedback mechanism to the model so that agents can use thier happiness as a measure of thier welfare to adjust thier purchasing decisions to be more in line with thier budget constraint.</p>
+<p>Currently the products follow a Hoppe urn model which is closely related to the Chinese Restaurant Process. The Hoppe urn model I implemented below is based on the generlised polya urn model, meaning that we can addjust the rate of innovation.</p>
+<p>I point this out since in most runs the number of products grows increasingly slowly tapering our at 8 after 100 steps. This is one of the two things I track in this model. The second is the preferences of each agent over the products. The initial setting only shows a few agents and their preferences are not so different. But when I pick say 40 agents things get dramatically different and we see a much more diverse set of preferences evolving.</p>
+<p>This also suggest a second direction for generalization of the model - looking at aggregation from different population segments (sorted by income or by similar preferences?).</p>
+<p>Further work on this specific model is to see how demand aggregates as we get more agents.</p>
+<p>Further work on other models are broken into</p>
+<ul>
+<li>adding a budget constraint and a negative feedback loop to get agents to adjust thier purchasing decisions based on thier happiness (utility) and thier budget constraint.</li>
+<li>adding segregation to get local markets.</li>
+<li>adding product categories and affinity between products, allowing us to model substitutes and complements.</li>
+<li>Associating products with hierarchy similar to Maslow’s hierarchy of needs. This should help partition the preference into hard and soft preferences. (Needs vs wants) with multiple levels of wants. This should be a smal tree. I think a nested CRP may be a good model for this. Or a Pitman-Yor process to keep the levels of the tree small. Within the model we want to be able to also have categories of products. In each categories are substitutes and sub-categories.</li>
+</ul>
+<p>Some questions I will address in future posts is how to translate preferences into buying patterns for individual agents.</p>
+<ol type="1">
+<li>How many products will an agent buy given a budget constraint? (The ideal and quick approximation</li>
+<li>Given relative preferences and actual price how much of each product should the agent buy? I recall chicago price theory has the derivations for this in the first two lectures.</li>
+<li>This leads to a high dimensional convex optimization problem. How can we solve this efficiently?</li>
+<li>Alternatively we can use importance sampling to generate a large collection of possible baskets. An approach similar to monte carlo tree search can be used to find the best basket. I like this direction as more complex models may not be so easy to solve empirically.</li>
+</ol>
+<div class="column-screen-inset-right">
+<pre class="shinylive-python" data-engine="python"><code>#| '!! shinylive warning !!': |
+#|   shinylive does not work in self-contained HTML documents.
+#|   Please set `embed-resources: false` in your metadata.
+#| standalone: true
+#| viewerHeight: 600
+#| components: [viewer] #[editor, viewer]
+_='''{.markdown} 
+from __future__ import annotations
+## Tasks:
+
+'''
+
+# app.py — ShinyLive-ready ABM Polya-Urn demo (Mesa-lite core) + Altair 
+
+
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
+import random
+from collections import Counter
+
+import pandas as pd
+import altair as alt
+
+from shiny import App, Inputs, Outputs, Session, reactive, render, ui
+from shinywidgets import render_altair, output_widget
+
+import mesa
+from mesa import Model, Agent, space
+
+### Two NonParametric Helper Models (Polya Urn and Hoppe Urn)
+
+class PolyaUrn:
+    """A Polya urn model for generating reinforcing preferences based on a Dirichlet process.
+       
+       Note: 
+    
+       - Since products are generated by a CRP process (Hoppe Urn), we need to support adding new products via a draw_new_product() method.
+
+       - We may consider using Moran steps to model a drift from many products to a few products, i.e. we draw a ball replacing it with a ball of another color based on the urn's diriclet distribution.
+       or we may drift according to some exogenous process. e.g. advertising or social influence. We may do this once or until
+       we converge to some top-k products.
+
+
+    Attributes:
+        alpha (float): The reinforcement parameter.
+        num_products (int): The number of products (colors).
+        urn (Dict[int, int]): A dictionary representing the urn with product indices as keys and bead counts as values.
+
+    """
+
+    def __init__(self, alpha: int = 1, num_products: int = 1):
+        self.alpha = alpha
+        self.num_products = num_products
+        self.urn = {i: 1 for i in range(num_products)}  # one bead per product
+
+    def draw(self) -&gt; int:
+        """Draw a ball from the urn and reinforce."""
+        total = sum(self.urn.values()) 
+        probs = [self.urn[i] / total for i in range(self.num_products)]
+        drawn = random.choices(list(self.urn.keys()), weights=probs, k=1)[0]
+        self.urn[drawn] += 1  # Reinforce
+        return drawn
+
+    def draw_new_product(self) -&gt; int:
+        """Draw a new product (color) from the urn."""
+        new_product_idx = self.num_products
+        self.urn[new_product_idx] = 1  # Add new product with one bead
+        self.num_products += 1
+        return new_product_idx
+
+class HoppeUrn:
+    """A Hoppe urn model for generating new products.
+       
+       Note: 
+       The current model assumes all products are independent.
+       
+       We will later extend this to support the addition of product categories and affinity between products, allowing us to model substitutes and complements.
+       We may also want to assign products to Maslow's hierarchy of needs.
+
+       Ideally, though, the structure of the product space should be easily accessible from this Model.
+    """
+
+    def __init__(self, initial_products: int = 2, innovation: float = 1.0):
+        
+        self.urn = {i: 1 for i in range(initial_products)}  # one bead per product
+        self.inovation = innovation
+        print(f"initial hoppe urn {self.urn}")
+
+    def draw(self) -&gt; int:
+        """ Draw a ball from the urn and reinforce."""
+        total = sum(self.urn.values())
+        probs = [self.urn[i] / total for i in self.urn.keys()]
+        drawn = random.choices(list(self.urn.keys()), weights=probs, k=1)[0]
+        if drawn == 0:  # "new product" 
+            new_product_idx = max(self.urn.keys()) + 1
+            self.urn[new_product_idx] = 1  # Add new product with one bead
+            #drawn = new_product_idx
+        else:
+            self.urn[drawn] += 1  # Reinforce
+        return drawn
+
+### Mesa Agent code - Dirichlet Process for preferences
+
+class DemandAgent(mesa.Agent):
+    """An agent with fixed initial wealth and a Polya urn for its preferences."""
+
+    def __init__(self, model):
+        # Pass the parameters to the parent class.
+        super().__init__(model)
+
+        # Create the agent's attribute and set the initial values.
+        self.endowment = random.uniform(5, 15)  # Random initial wealth 
+        self.wealth = self.endowment  
+        self.urn = PolyaUrn()
+
+    def say_hi(self):
+        # The agent's step will go here.
+        # For demonstration purposes we will print the agent's unique_id
+        #print(f"Hi, I am an agent, you can call me {self.unique_id!s}.")
+        if self.model.draw == 0:
+            self.urn.draw_new_product()
+        
+        drawn = self.urn.draw()
+        print(f"Agent {self.unique_id!s:2} drew: {drawn} | prefrences: {self.urn.urn.values()}")
+
+
+### Server code
+
+class DemandModel(mesa.Model):
+    """A model with some number of agents."""
+
+    def __init__(self, n,counter, innovation: float = 1.0, seed=None):
+        super().__init__(seed=seed)
+        self.num_agents = n
+        self.counter=counter
+        self.urn=HoppeUrn(innovation=innovation)
+        # Create n agents
+        DemandAgent.create_agents(model=self, n=n)
+        self.ticks=0
+        self.draw=None
+        self.num_products_history = [len(self.urn.urn)]  # &lt;-- track unique products over time
+
+    def step(self):
+        """ Advance the model by one step."""
+        # This function pseudo-randomly reorders the list of agent objects and
+        # then iterates through calling the function passed in as the parameter
+        self.draw  = self.urn.draw()
+        self.ticks +=1
+        print(f"drew: {self.draw} | products : {self.urn.urn.values()}")
+        self.agents.shuffle_do("say_hi")
+        self.num_products_history.append(len(self.urn.urn))  # &lt;-- record after each step
+
+    
+### Mesa entry points
+
+### Shiny UI
+
+### Step button
+
+
+
+### Shiny APP
+
+from shiny.express import input, render, ui
+
+
+## UI
+ui.input_slider("n", "Total Agants", 1, 100, 5)
+ui.input_slider("theta", "Innovation", 0, 100, 1)
+
+
+ui.input_action_button("btnStep", "Step")
+ui.input_action_button("btnReset", "Reset")
+ui.tags.br()
+
+model_val = reactive.Value(None)
+counter_val = reactive.Value(0)
+
+def build_model():
+    # Build a fresh model using the current UI and counter
+    return DemandModel(n=input.n(), counter=counter_val.get(), innovation=input.theta()/100.0)
+
+@reactive.calc
+def current_model():
+    return model_val.get()
+
+
+@reactive.effect
+@reactive.event(input.btnReset)
+def reset_sim():
+    print("resetting")
+    # Bump a counter if you want to track resets
+    counter_val.set(counter_val.get() + 1)
+    # Create and store a fresh model
+    model_val.set(build_model())
+    starter_model=model_val.get()
+    print(f"model version {starter_model.counter}")   
+    # Do an initial step if desired
+
+@reactive.effect 
+@reactive.event(input.btnStep)
+def sim_step(): 
+    if model_val.get() is None:
+        model_val.set(build_model())
+    starter_model=model_val.get()
+    print(f"model version {starter_model.counter}")   
+    model_val.get().step()
+
+# --- helpers ---------------------------------------------------------------
+def prefs_df(model) -&gt; pd.DataFrame:
+    """Rows: agent, product, count."""
+    if model is None:
+        return pd.DataFrame(columns=["agent", "product", "count"])
+    rows = []
+    for ag in model.agents:
+        for prod, cnt in ag.urn.urn.items():
+            rows.append({"agent": str(ag.unique_id), "product": str(prod), "count": cnt})
+    return pd.DataFrame(rows)
+
+# --- UI slot ---------------------------------------------------------------
+ui.h3("Agent preference shares")
+#output_widget("pref_chart")
+
+# --- Server render ---------------------------------------------------------
+
+@render_altair
+@reactive.event(input.btnStep)
+def pref_chart():
+    m = current_model()
+    df = prefs_df(m)
+    if df.empty:
+        return alt.Chart(pd.DataFrame({"x": []})).mark_text().encode()  # harmless placeholder
+
+    # normalized, stacked bars like the barley example
+    return (
+        alt.Chart(df)
+        .mark_bar()
+        .encode(
+            x=alt.X("sum(count):Q", stack="normalize", title="Preference share"),
+            y=alt.Y("agent:N", sort="-x", title="Agent"),
+            color=alt.Color("product:N", title="Product"),
+            tooltip=["agent:N", "product:N", "count:Q"]
+        )
+        .properties(height=400)
+    )
+
+
+# --- helpers ---------------------------------------------------------------
+import numpy as np
+
+def kn_live_df(model) -&gt; pd.DataFrame:
+    if model is None or not getattr(model, "num_products_history", None):
+        return pd.DataFrame(columns=["t", "K"])
+    hist = model.num_products_history
+    return pd.DataFrame({"t": np.arange(len(hist)), "K": hist})
+
+def kn_theory_df(nmax: int, alphas=(0.1, 0.3, 1.0, 3.0, 10.0)) -&gt; pd.DataFrame:
+    t = np.arange(1, max(2, nmax) + 1)
+    parts = []
+    for a in alphas:
+        parts.append(pd.DataFrame({"t": t, "alpha": str(a), "E[K_t]": a * np.log(t)}))
+    return pd.concat(parts, ignore_index=True)
+
+# --- UI slot ---------------------------------------------------------------
+ui.h3("Unique products over time: theory vs. live")
+#output_widget("kn_chart")
+
+# --- Server render ---------------------------------------------------------
+@render_altair
+@reactive.event(input.btnStep)
+def kn_chart():
+    m = current_model()
+    nmax = (m.ticks if m else 200) or 200
+
+    df_theory = kn_theory_df(nmax)
+    base = (
+        alt.Chart(df_theory)
+        .mark_line()
+        .encode(
+            x=alt.X("t:Q", title="Steps (t)"),
+            y=alt.Y("E[K_t]:Q", title="Unique products K_t"),
+            color=alt.Color("alpha:N", title="α (innovation)")
+        )
+    )
+
+    df_live = kn_live_df(m)
+    live_layer = (
+        alt.Chart(df_live)
+        .mark_line(point=True)
+        .encode(
+            x="t:Q",
+            y="K:Q",
+            tooltip=["t:Q", "K:Q"]
+        )
+        .properties(title="Live K_t")
+    )
+
+    return (base + live_layer).properties(height=350)
+
+
+## file: requirements.txt
+altair
+anywidget
+jsonschema
+mesa</code></pre>
+</div>
+
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {Demand from {Preferences} {Part} 1},
+  date = {2025-10-02},
+  url = {https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-2/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2025. <span>“Demand from Preferences Part 1.”</span>
+October 2, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-2/">https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-2/</a>.
+</div></div></section></div> ]]></description>
+  <category>Shinylive for python</category>
+  <category>Model thinking</category>
+  <category>Simulation</category>
+  <guid>https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-2/</guid>
+  <pubDate>Thu, 02 Oct 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Demand from Preferences Part 3</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-3/</link>
   <description><![CDATA[ 
 
 
@@ -238,7 +1090,7 @@ Bochman, Oren. 2025. <span>“AI a Bag of Tricks.”</span> October 4, 2025.
 <p><img src="https://latex.codecogs.com/png.latex?%0AQ_i%20=%20%5Carg%20%5Cmax_k%20k%20%5Ctimes%20%5Csum%20count_i%20%5Ctimes%20price_i%20%20%5Cleq%20budget%0A"></p>
 <p>One important edge case is what will they do if they want more than they can afford. In this case preferences will be truncated to what they can afford.</p>
 <p>say they have a budget of 30 should they buy</p>
-<p>one of thier #1 prefernce or one of thier #2 preference and five of their #3 preference.</p>
+<p>one of thier #1 preference or one of thier #2 preference and five of their #3 preference.</p>
 <p>demand. If I like chicken twice as much as rice and I have some budget how much would I allocate to each product?</p>
 <ol start="6" type="1">
 <li>Agent than buy the top preferred products and gain a happiness score in to
@@ -255,16 +1107,14 @@ Bochman, Oren. 2025. <span>“AI a Bag of Tricks.”</span> October 4, 2025.
 #| standalone: true
 #| viewerHeight: 600
 #| components: [viewer] #[editor, viewer]
-
 _='''{.markdown} 
+from __future__ import annotations
 ## Tasks:
 
 '''
 
-# app.py — ShinyLive-ready ABM Polya-Urn demo (Mesa-lite core) + Altair via shinywidgets.
-# Paste into shinylive.io/py/examples as app.py and Run.
+# app.py — ShinyLive-ready ABM Polya-Urn demo (Mesa-lite core) + Altair 
 
-from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Dict, List, Tuple
@@ -277,242 +1127,285 @@ import altair as alt
 from shiny import App, Inputs, Outputs, Session, reactive, render, ui
 from shinywidgets import render_altair, output_widget
 
-# ---------- helpers ----------
-def top_n(d: Dict[int, int], n: int) -&gt; List[Tuple[int, int]]:
-    return sorted(d.items(), key=lambda kv: (-kv[1], kv[0]))[:n]
+import mesa
+from mesa import Model, Agent, space
 
-def weighted_choice(keys: List[int], weights: List[int]) -&gt; int:
-    return random.choices(keys, weights=weights, k=1)[0]
+### Two NonParametric Helper Models (Polya Urn and Hoppe Urn)
 
-# ---------- domain ----------
-@dataclass(frozen=True)
-class Product:
-    idx: int
-    sku: str
-    letter: str
-    price: float
+class PolyaUrn:
+    """A Polya urn model for generating reinforcing preferences based on a Dirichlet process.
+       
+       Note: 
+    
+       - Since products are generated by a CRP process (Hoppe Urn), we need to support adding new products via a draw_new_product() method.
 
-@dataclass
-class Agent:
-    aid: int
-    wealth: float
-    urn: Dict[int, int]        # sku_idx -&gt; bead count
-    counts: Dict[int, int]     # cumulative draws per sku
-    top4: List[int]
-    happy: bool
+       - We may consider using Moran steps to model a drift from many products to a few products, i.e. we draw a ball replacing it with a ball of another color based on the urn's diriclet distribution.
+       or we may drift according to some exogenous process. e.g. advertising or social influence. We may do this once or until
+       we converge to some top-k products.
 
-    def step(self, products: List[Product], l: int = 1) -&gt; int:
-        last = -1
-        for _ in range(l):
-            ks = list(self.urn.keys())
-            ws = [self.urn[k] for k in ks]
-            k = weighted_choice(ks, ws)
-            self.urn[k] += 1               # Polya reinforcement
-            self.counts[k] = self.counts.get(k, 0) + 1
-            last = k
-        self.top4 = [k for k, _ in top_n(self.counts, 4)]
-        total_price = sum(products[k].price for k in self.top4) if self.top4 else 0.0
-        self.happy = (total_price &lt;= self.wealth)
-        return last
 
-class Market:
-    def __init__(self, K:int=8, n_agents:int=100, seed:int=42, base_wealth:float=10.0, wealth_jitter:float=2.0):
-        random.seed(seed)
-        self.products = make_products(K)
-        self.agents = [
-            Agent(
-                aid=i+1,
-                wealth=max(0.0, random.gauss(base_wealth, wealth_jitter)),
-                urn={j:1 for j in range(K)},  # one bead per SKU
-                counts={},
-                top4=[],
-                happy=False,
-            )
-            for i in range(n_agents)
-        ]
-        self.t = 0
-        self._demand_rows: List[Dict] = []
+    Attributes:
+        alpha (float): The reinforcement parameter.
+        num_products (int): The number of products (colors).
+        urn (Dict[int, int]): A dictionary representing the urn with product indices as keys and bead counts as values.
 
-    def step(self, l:int=1):
-        self.t += 1
-        drawn = [a.step(self.products, l=l) for a in self.agents]
-        tick_counts = Counter(drawn)
-        for idx, cnt in sorted(tick_counts.items()):
-            p = self.products[idx]
-            self._demand_rows.append({"t": self.t, "sku_idx": idx, "sku": p.sku, "letter": p.letter, "count": cnt})
+    """
 
-    def grid_df(self) -&gt; pd.DataFrame:
-        ids = list(range(1, len(self.agents)+1))
-        return pd.DataFrame({
-            "id": ids,
-            "happy": [a.happy for a in self.agents],
-        })
+    def __init__(self, alpha: int = 1, num_products: int = 1):
+        self.alpha = alpha
+        self.num_products = num_products
+        self.urn = {i: 1 for i in range(num_products)}  # one bead per product
 
-    def top4_df(self) -&gt; pd.DataFrame:
-        recs = []
-        for a in self.agents:
-            letters = [self.products[k].letter for k in a.top4]
-            price_sum = round(sum(self.products[k].price for k in a.top4), 2)
-            recs.append({"agent": a.aid, "top4": "".join(letters), "sum_price": price_sum, "happy": a.happy})
-        return pd.DataFrame(recs)
+    def draw(self) -&gt; int:
+        """Draw a ball from the urn and reinforce."""
+        total = sum(self.urn.values()) 
+        probs = [self.urn[i] / total for i in range(self.num_products)]
+        drawn = random.choices(list(self.urn.keys()), weights=probs, k=1)[0]
+        self.urn[drawn] += 1  # Reinforce
+        return drawn
 
-    @property
-    def demand_ts(self) -&gt; pd.DataFrame:
-        return pd.DataFrame(self._demand_rows) if self._demand_rows else pd.DataFrame(columns=["t","sku_idx","sku","letter","count"])
+    def draw_new_product(self) -&gt; int:
+        """Draw a new product (color) from the urn."""
+        new_product_idx = self.num_products
+        self.urn[new_product_idx] = 1  # Add new product with one bead
+        self.num_products += 1
+        return new_product_idx
 
-# ---------- factories ----------
-def make_products(K:int=8) -&gt; List[Product]:
-    letters = [chr(ord("A")+i) for i in range(K)]
-    prices  = [round(1.0 + 0.5*i, 2) for i in range(K)]
-    return [Product(i, f"SKU{i+1:02d}", letters[i], prices[i]) for i in range(K)]
+class HoppeUrn:
+    """A Hoppe urn model for generating new products.
+       
+       Note: 
+       The current model assumes all products are independent.
+       
+       We will later extend this to support the addition of product categories and affinity between products, allowing us to model substitutes and complements.
+       We may also want to assign products to Maslow's hierarchy of needs.
 
-def reset_market(K:int, seed:int, wealth_mu:float, wealth_sd:float) -&gt; Market:
-    return Market(K=K, n_agents=100, seed=seed, base_wealth=wealth_mu, wealth_jitter=wealth_sd)
+       Ideally, though, the structure of the product space should be easily accessible from this Model.
+    """
 
-# ---------- UI ----------
-PERSON_PATH = (
-    "M1.7 -1.7h-0.8c0.3 -0.2 0.6 -0.5 0.6 -0.9c0 -0.6 "
-    "-0.4 -1 -1 -1c-0.6 0 -1 0.4 -1 1c0 0.4 0.2 0.7 0.6 "
-    "0.9h-0.8c-0.4 0 -0.7 0.3 -0.7 0.6v1.9c0 0.3 0.3 0.6 "
-    "0.6 0.6h0.2c0 0 0 0.1 0 0.1v1.9c0 0.3 0.2 0.6 0.3 "
-    "0.6h1.3c0.2 0 0.3 -0.3 0.3 -0.6v-1.8c0 0 0 -0.1 0 "
-    "-0.1h0.2c0.3 0 0.6 -0.3 0.6 -0.6v-2c0.2 -0.3 -0.1 "
-    "-0.6 -0.4 -0.6z"
-)
+    def __init__(self, initial_products: int = 2, innovation: float = 1.0):
+        
+        self.urn = {i: 1 for i in range(initial_products)}  # one bead per product
+        self.inovation = innovation
+        print(f"initial hoppe urn {self.urn}")
 
-app_ui = ui.page_fluid(
-    ui.h2("ABM Polya-Urn Demand (Mesa-lite)"),
-    ui.row(
-        ui.column(3,
-            ui.input_numeric("seed", "Seed", 7),
-            ui.input_slider("K", "Number of products K", min=4, max=12, value=8),
-            ui.input_slider("wealth_mu", "Wealth mean", min=2, max=30, value=10),
-            ui.input_slider("wealth_sd", "Wealth sd", min=0, max=10, value=2),
-            ui.input_numeric("l_draws", "Draws per tick (l)", 1, min=1, max=4),
-            ui.input_action_button("btn_reset", "Reset"),
-            ui.input_action_button("btn_step",  "Step"),
-            ui.input_action_button("btn_10",    "Run 10"),
-            ui.hr(),
-            ui.output_table("price_table"),
-            ui.hr(),
-            ui.output_table("last_tick_demand"),
-        ),
-        ui.column(5,
-            ui.card(
-                ui.card_header("Agents on 10×10 grid (blue=happy, red=unhappy)"),
-                output_widget("grid_plot"),
-            ),
-            ui.card(
-                ui.card_header("Demand time series by SKU (lines)"),
-                output_widget("demand_plot"),
-            ),
-        ),
-        ui.column(4,
-            ui.card(
-                ui.card_header("Top-4 per agent (after last tick)"),
-                ui.output_table("top4_table"),
-            ),
+    def draw(self) -&gt; int:
+        """ Draw a ball from the urn and reinforce."""
+        total = sum(self.urn.values())
+        probs = [self.urn[i] / total for i in self.urn.keys()]
+        drawn = random.choices(list(self.urn.keys()), weights=probs, k=1)[0]
+        if drawn == 0:  # "new product" 
+            new_product_idx = max(self.urn.keys()) + 1
+            self.urn[new_product_idx] = 1  # Add new product with one bead
+            #drawn = new_product_idx
+        else:
+            self.urn[drawn] += 1  # Reinforce
+        return drawn
+
+### Mesa Agent code - Dirichlet Process for preferences
+
+class DemandAgent(mesa.Agent):
+    """An agent with fixed initial wealth and a Polya urn for its preferences."""
+
+    def __init__(self, model):
+        # Pass the parameters to the parent class.
+        super().__init__(model)
+
+        # Create the agent's attribute and set the initial values.
+        self.endowment = random.uniform(5, 15)  # Random initial wealth 
+        self.wealth = self.endowment  
+        self.urn = PolyaUrn()
+
+    def say_hi(self):
+        # The agent's step will go here.
+        # For demonstration purposes we will print the agent's unique_id
+        #print(f"Hi, I am an agent, you can call me {self.unique_id!s}.")
+        if self.model.draw == 0:
+            self.urn.draw_new_product()
+        
+        drawn = self.urn.draw()
+        print(f"Agent {self.unique_id!s:2} drew: {drawn} | prefrences: {self.urn.urn.values()}")
+
+
+### Server code
+
+class DemandModel(mesa.Model):
+    """A model with some number of agents."""
+
+    def __init__(self, n,counter, innovation: float = 1.0, seed=None):
+        super().__init__(seed=seed)
+        self.num_agents = n
+        self.counter=counter
+        self.urn=HoppeUrn(innovation=innovation)
+        # Create n agents
+        DemandAgent.create_agents(model=self, n=n)
+        self.ticks=0
+        self.draw=None
+        self.num_products_history = [len(self.urn.urn)]  # &lt;-- track unique products over time
+
+    def step(self):
+        """ Advance the model by one step."""
+        # This function pseudo-randomly reorders the list of agent objects and
+        # then iterates through calling the function passed in as the parameter
+        self.draw  = self.urn.draw()
+        self.ticks +=1
+        print(f"drew: {self.draw} | products : {self.urn.urn.values()}")
+        self.agents.shuffle_do("say_hi")
+        self.num_products_history.append(len(self.urn.urn))  # &lt;-- record after each step
+
+    
+### Mesa entry points
+
+### Shiny UI
+
+### Step button
+
+
+
+### Shiny APP
+
+from shiny.express import input, render, ui
+
+
+## UI
+ui.input_slider("n", "Total Agants", 1, 100, 5)
+ui.input_slider("theta", "Innovation", 0, 100, 1)
+
+
+ui.input_action_button("btnStep", "Step")
+ui.input_action_button("btnReset", "Reset")
+ui.tags.br()
+
+model_val = reactive.Value(None)
+counter_val = reactive.Value(0)
+
+def build_model():
+    # Build a fresh model using the current UI and counter
+    return DemandModel(n=input.n(), counter=counter_val.get(), innovation=input.theta()/100.0)
+
+@reactive.calc
+def current_model():
+    return model_val.get()
+
+
+@reactive.effect
+@reactive.event(input.btnReset)
+def reset_sim():
+    print("resetting")
+    # Bump a counter if you want to track resets
+    counter_val.set(counter_val.get() + 1)
+    # Create and store a fresh model
+    model_val.set(build_model())
+    starter_model=model_val.get()
+    print(f"model version {starter_model.counter}")   
+    # Do an initial step if desired
+
+@reactive.effect 
+@reactive.event(input.btnStep)
+def sim_step(): 
+    if model_val.get() is None:
+        model_val.set(build_model())
+    starter_model=model_val.get()
+    print(f"model version {starter_model.counter}")   
+    model_val.get().step()
+
+# --- helpers ---------------------------------------------------------------
+def prefs_df(model) -&gt; pd.DataFrame:
+    """Rows: agent, product, count."""
+    if model is None:
+        return pd.DataFrame(columns=["agent", "product", "count"])
+    rows = []
+    for ag in model.agents:
+        for prod, cnt in ag.urn.urn.items():
+            rows.append({"agent": str(ag.unique_id), "product": str(prod), "count": cnt})
+    return pd.DataFrame(rows)
+
+# --- UI slot ---------------------------------------------------------------
+ui.h3("Agent preference shares")
+#output_widget("pref_chart")
+
+# --- Server render ---------------------------------------------------------
+
+@render_altair
+@reactive.event(input.btnStep)
+def pref_chart():
+    m = current_model()
+    df = prefs_df(m)
+    if df.empty:
+        return alt.Chart(pd.DataFrame({"x": []})).mark_text().encode()  # harmless placeholder
+
+    # normalized, stacked bars like the barley example
+    return (
+        alt.Chart(df)
+        .mark_bar()
+        .encode(
+            x=alt.X("sum(count):Q", stack="normalize", title="Preference share"),
+            y=alt.Y("agent:N", sort="-x", title="Agent"),
+            color=alt.Color("product:N", title="Product"),
+            tooltip=["agent:N", "product:N", "count:Q"]
         )
-    ),
-)
+        .properties(height=400)
+    )
 
-# ---------- server ----------
-def server(input: Inputs, output: Outputs, session: Session):
 
-    market = reactive.value(reset_market(K=8, seed=7, wealth_mu=10, wealth_sd=2))
+# --- helpers ---------------------------------------------------------------
+import numpy as np
 
-    @reactive.effect
-    @reactive.event(input.btn_reset)
-    def _reset():
-        market.set(reset_market(K=int(input.K()), seed=int(input.seed()),
-                                wealth_mu=float(input.wealth_mu()), wealth_sd=float(input.wealth_sd())))
+def kn_live_df(model) -&gt; pd.DataFrame:
+    if model is None or not getattr(model, "num_products_history", None):
+        return pd.DataFrame(columns=["t", "K"])
+    hist = model.num_products_history
+    return pd.DataFrame({"t": np.arange(len(hist)), "K": hist})
 
-    @reactive.effect
-    @reactive.event(input.btn_step)
-    def _step_once():
-        market().step(l=int(input.l_draws()))
+def kn_theory_df(nmax: int, alphas=(0.1, 0.3, 1.0, 3.0, 10.0)) -&gt; pd.DataFrame:
+    t = np.arange(1, max(2, nmax) + 1)
+    parts = []
+    for a in alphas:
+        parts.append(pd.DataFrame({"t": t, "alpha": str(a), "E[K_t]": a * np.log(t)}))
+    return pd.concat(parts, ignore_index=True)
 
-    @reactive.effect
-    @reactive.event(input.btn_10)
-    def _step_10():
-        for _ in range(10):
-            market().step(l=int(input.l_draws()))
+# --- UI slot ---------------------------------------------------------------
+ui.h3("Unique products over time: theory vs. live")
+#output_widget("kn_chart")
 
-    @output
-    @render.table
-    def price_table():
-        prods = market().products
-        return pd.DataFrame({
-            "idx":[p.idx for p in prods],
-            "sku":[p.sku for p in prods],
-            "letter":[p.letter for p in prods],
-            "price":[p.price for p in prods],
-        })
+# --- Server render ---------------------------------------------------------
+@render_altair
+@reactive.event(input.btnStep)
+def kn_chart():
+    m = current_model()
+    nmax = (m.ticks if m else 200) or 200
 
-    @output
-    @render.table
-    def last_tick_demand():
-        ts = market().demand_ts
-        if ts.empty:
-            return pd.DataFrame(columns=["t","sku","letter","count"])
-        last_t = ts["t"].max()
-        return ts.loc[ts["t"]==last_t, ["t","sku","letter","count"]].sort_values(["letter"])
-
-    @output
-    @render.table
-    def top4_table():
-        return market().top4_df().sort_values(["happy","sum_price","agent"], ascending=[False, True, True])
-
-    @output
-    @render_altair
-    def grid_plot():
-        df = market().grid_df().assign(
-            status=lambda d: d["happy"].map({True: "Happy", False: "Unhappy"})
+    df_theory = kn_theory_df(nmax)
+    base = (
+        alt.Chart(df_theory)
+        .mark_line()
+        .encode(
+            x=alt.X("t:Q", title="Steps (t)"),
+            y=alt.Y("E[K_t]:Q", title="Unique products K_t"),
+            color=alt.Color("alpha:N", title="α (innovation)")
         )
-        return (
-            alt.Chart(df)
-            .transform_calculate(row="ceil(datum.id/10)")
-            .transform_calculate(col="(datum.id - 1) % 10 + 1")
-            .mark_point(filled=True, size=60)
-            .encode(
-                alt.X("col:O").axis(None),
-                alt.Y("row:O").axis(None),
-                alt.ShapeValue(PERSON_PATH),
-                color=alt.Color(
-                    "status:N",
-                    scale=alt.Scale(domain=["Happy", "Unhappy"], range=["#3A86FF", "#E63946"]),
-                ),
-                tooltip=["id", "status"],
-            )
-            .properties(width=420, height=420)
-            .configure_view(strokeWidth=0)
-        )
+    )
 
-    @output
-    @render_altair
-    def demand_plot():
-        ts = market().demand_ts
-        df = ts if not ts.empty else pd.DataFrame({"t": [], "count": [], "letter": []})
-        return (
-            alt.Chart(df)
-            .mark_line(interpolate="monotone")
-            .encode(
-                x="t:Q",
-                y="count:Q",
-                color="letter:N",
-                tooltip=["t", "letter", "count"],
-            )
-            .properties(width=460, height=300)
+    df_live = kn_live_df(m)
+    live_layer = (
+        alt.Chart(df_live)
+        .mark_line(point=True)
+        .encode(
+            x="t:Q",
+            y="K:Q",
+            tooltip=["t:Q", "K:Q"]
         )
+        .properties(title="Live K_t")
+    )
 
-app = App(app_ui, server)
+    return (base + live_layer).properties(height=350)
 
 
 ## file: requirements.txt
 altair
 anywidget
-palmerpenguins
-jsonschema</code></pre>
+jsonschema
+mesa</code></pre>
 </div>
 
 
@@ -520,19 +1413,19 @@ jsonschema</code></pre>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
   author = {Bochman, Oren},
-  title = {Demand from {Preferences} {Part} 1},
+  title = {Demand from {Preferences} {Part} 3},
   date = {2025-10-02},
-  url = {https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences/},
+  url = {https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-3/},
   langid = {en}
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“Demand from Preferences Part 1.”</span>
-October 2, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences/">https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences/</a>.
+Bochman, Oren. 2025. <span>“Demand from Preferences Part 3.”</span>
+October 2, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-3/">https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-3/</a>.
 </div></div></section></div> ]]></description>
   <category>Shinylive for python</category>
   <category>Model thinking</category>
   <category>Simulation</category>
-  <guid>https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences/</guid>
+  <guid>https://orenbochman.github.io/posts/2025/2025-09-10-Demand-From-Prefrences-3/</guid>
   <pubDate>Thu, 02 Oct 2025 00:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
@@ -2007,6 +2900,218 @@ Bochman, Oren. 2025. <span>“Vibe Coding GPT5 Edition.”</span> September
   <category>vibe coding</category>
   <guid>https://orenbochman.github.io/posts/2025/2025-09-26-vibe-coding/</guid>
   <pubDate>Thu, 25 Sep 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Marketing Mix Model</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/marketing mix model/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<p>Here is a quick brain dump on marketing mix models and why a Bayesian approach is useful for this task.</p>
+<p>Caveat: My experience is that most people working in digital marketing don’t have time, capacity or know how to do (Bayesian) modeling, they are busy writing copy, twiddling buttons or looking at dashboards someone else built.</p>
+<p>I saw on social media that there is an interesting workshop on <a href="https://www.pymc-labs.com/workshops/applied-bayesian-modeling">Bayesian uncertainty quantification</a>. I saw that they say that they don’t cover MMMs. Err what are MMMs? So I thought I would write a quick post on what is a marketing mix model and why a Bayesian approach is useful for this task.</p>
+<p>Perhaps when I’m done with my backlog I’ll do a worked MMM example in PyMC as I had already done one for one of my projects as a Capstone Project in one of the courses in the Bayesian Statistics Specialization I took recently on Coursera.</p>
+<section id="what-is-a-marketing-mix-model" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="what-is-a-marketing-mix-model">What is a marketing mix model?</h2>
+
+<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://upload.wikimedia.org/wikipedia/commons/4/43/4Ps.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Product, Price, Place, and Promotion"><img src="https://upload.wikimedia.org/wikipedia/commons/4/43/4Ps.jpg" class="img-fluid figure-img" alt="Product, Price, Place, and Promotion"></a></p>
+<figcaption>Product, Price, Place, and Promotion</figcaption>
+</figure>
+</div></div><p>Back in the day I learned about <a href="https://en.wikipedia.org/wiki/Marketing_mix">Marketing Mix</a> form reading one of <a href="https://en.wikipedia.org/wiki/Philip_Kotler">Philip Kotler’s</a> many tomes on Marketing Management. If I recall correctly marketing Mix refers to the brands or products that a firm offers to its customers. The marketing mix is often referred to as the “4 Ps” of marketing: Product, Price, Place, and Promotion. But the wikipedia article suggest that there are Seven or even Eight P for different marketers.</p>
+<p>The marketing mix is a framework that helps businesses plan and execute their marketing strategies effectively.</p>
+<p>This leads to the question of what is a marketing mix model?</p>
+<p>Marketing mix models (MMM) are statistical models that estimate the impact of various marketing tactics on sales and other key performance indicators (KPIs). They help businesses understand how different marketing channels contribute to their overall performance, allowing them to optimize their marketing spend and strategies.</p>
+<p>In reality though we are talking about when we say MMM model is inferring the the response of different media channels on a KPI like sales.</p>
+</section>
+<section id="what-does-a-bayesian-marketing-mix-model-add" class="level2">
+<h2 class="anchored" data-anchor-id="what-does-a-bayesian-marketing-mix-model-add">What does a Bayesian marketing mix model add?</h2>
+<p>The Bayesian approach to marketing mix modeling offers several advantages over traditional methods:</p>
+<ol type="1">
+<li><strong>Updating with New Data</strong>: Bayesian models can be updated as new data becomes available, allowing for more dynamic and responsive marketing strategies. This is particularly useful as online marketing provides lots of data where consumer response can be fast-changing and agility can translate into competitive advantage. In contrast non-Bayesian models tend to be static which causes model drift and requires retraining validation etc.</li>
+<li><strong>Uncertainty Quantification</strong>: Bayesian models provide a natural way to quantify uncertainty in the estimates. This are known unknowns that are essential for decision-making, as it allows marketers to understand the confidence they can have in the results and make more informed choices. Non-Bayesian models give a best estimate but can’t quantify uncertainty in a way that is useful for decision-makers.</li>
+<li><strong>Incorporation of Prior Knowledge</strong>: Bayesian models require the integration of prior knowledge or expert opinions into the analysis. This is more work but often turns out to be an advantage This is particularly useful when historical data is limited or when certain marketing channels have known effects based on previous campaigns.</li>
+<li><strong>Flexibility</strong>: Bayesian models can easily accommodate complex relationships and interactions between marketing channels.</li>
+<li><strong>Model Checking and Validation</strong>: Bayesian methods provide a framework for model checking and validation. We can use posterior predictive checks to assess how well the model fits the data and identify potential areas for improvement.</li>
+</ol>
+<p>The Bayesian approach also has many other bit and pieces of machinery which can be incorporated into the workflow.</p>
+<ul>
+<li>E.g. we can use empirical bayes to set priors or hyper priors based on the data. We can avoid the tunnel vision of point estimates and instead look at the full posterior distribution which can let us avoid making bad decisions. MCMC methods also provide diagnostics to check model fit and convergence.</li>
+</ul>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {Marketing {Mix} {Model}},
+  date = {2025-09-10},
+  url = {https://orenbochman.github.io/posts/2025/marketing mix model/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2025. <span>“Marketing Mix Model.”</span> September 10,
+2025. <a href="https://orenbochman.github.io/posts/2025/marketing mix model/">https://orenbochman.github.io/posts/2025/marketing
+mix model/</a>.
+</div></div></section></div> ]]></description>
+  <category>models</category>
+  <guid>https://orenbochman.github.io/posts/2025/marketing mix model/</guid>
+  <pubDate>Wed, 10 Sep 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Allegations of War Crimes and the Palestinian Genocide</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/2015-sept-06/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<p>Many people claim that war crimes are being committed in Gaza, that a genocide is underway, and that starvation is being used as a weapon of war. Some of these claims are made by people who claim to be experts on Genocide and War Crimes. Most of these claims have been made without any independent verification or observation of the situation on the ground or any real understanding of the laws of armed conflict. What is generally evident that many of these claims are made by people who have a strong antisemitic bias or are aligned with Hamas and the Palestinian cause or are simply repeating what they have heard from others without any real understanding of the situation. One of the maxims of politics is that if you repeat a lie no matter how large often enough people will believe it to be true. In the age of fake news and social media, this maxim has never been more true.</p>
+<p>I am not an apologist for this war. War is tragic. Hamas should not have attacked; many Palestinians now say its leaders misjudged Israel’s response. In my view, Israel should have dismantled Hamas’s military capabilities as quickly as possible and then negotiated a ceasefire. Instead, the war became prolonged—arguably the only politically viable outcome for the governing parties—at great cost. Israel has lost many soldiers and has been drawn into conflicts with Iranian proxies in Lebanon, Syria, Yemen, and Iraq, as well as direct clashes with Iran. The war relies heavily on reservists and has disrupted the economy and daily life. While Israel has suffered missile and drone attacks on civilians, investments in missile defense, shelters, and a strong military have limited casualties compared to the other side.</p>
+<p>Below I explain why I do not think the claims of genocide or starvation as a deliberate weapon are justified, and I address the broader allegations of war crimes.</p>
+<p>I am not a lawyer and have not studied international law in depth. However I followed the proceeding of the International Criminal Court (ICC) in The Hague and I have also helped edit some of related wikipedia articles on the subject. I have also been to Gaza, the West Bank and witnessed the situation there first hand though not during the war.</p>
+<section id="allegations-of-war-crimes" class="level2">
+<h2 class="anchored" data-anchor-id="allegations-of-war-crimes">Allegations of War Crimes</h2>
+<p>War is brutal. In Gaza, Hamas fighters do not typically wear uniforms or operate away from civilians. Gaza is densely populated, and Hamas embeds military assets in the most sensitive civilian areas—schools, hospitals, mosques, and apartment buildings—according to footage released by the IDF. This strategy both shields Hamas and increases civilian casualties, which historically have fueled international pressure to halt Israeli operations.</p>
+<p>Note that the conventions governing warfare tacitly assume that the combatants are state actors with formal militaries and have their own civilians and infrastructure to protect. In asymmetric warfare, these assumptions break down and we should not be aware that the Hamas strategy is one that does not prioritize their own civilian safety.</p>
+<p>By contrast, the IDF has a formal code of conduct and a liberal public that demands minimization of civilian harm even to hostile civilian population. The IDF has often warned civilians—via leaflets, texts, phone calls, and media—before strikes. Still, when an enemy operates within civilian areas, soldiers must protect themselves. In fast-moving situations, a soldier may misidentify a perceived threat. Such tragedies—including cases where the victim is an escaped hostage or a child—are not automatically war crimes when they stem from mistakes in combat.</p>
+<p>The IDF operates in a way that responsibility for illegal action goes up the chain of command unless the soldier who committed the act are proven to have acted outside the orders they were given. This gives senior officers a strong incentive to ensure that their orders are lawful and that their soldiers understand them and that they are held accountable for their actions.</p>
+</section>
+<section id="a-war-of-necessity" class="level2">
+<h2 class="anchored" data-anchor-id="a-war-of-necessity">A war of Necessity</h2>
+<p>The current war in Gaza began in reaction to the October 7, 2023, Hamas attack on Israeli civilians and soldiers. The attack killed over 1,400 people and took more than 200 hostages, many of whom remain captive. The attack was planned and executed by Hamas together with large number of civilian supporters.</p>
+<p>We know much of what took place on October 7th because many of the Hamas fighters took thier victims phones and streamed thier execution on thier social media feeds. Again this was not a spontaneous attack but a well planned and coordinated attack that took years of planning and preparation.</p>
+<section id="some-of-the-hamas-atrocities" class="level3">
+<h3 class="anchored" data-anchor-id="some-of-the-hamas-atrocities">Some of the Hamas atrocities:</h3>
+<p>Hamas and a large number of Palestinian civilians participated in the October 7th attacks. They committed many atrocities against Israeli civilians and soldiers on October 7th. Many of these are either war crimes or crimes against humanity. Here is a short list of some of these atrocities:</p>
+<ol type="1">
+<li>Attacks on civilians population centers with rockets and mortars.</li>
+<li>Eco terrorism causing fires in civilian areas with incendiary balloons.</li>
+<li>Attacks on civilians population</li>
+<li>Execution of Israeli civilians who were unarmed and helpless (Jewish and Muslim)</li>
+<li>Systematic Rape and sexual violence against civilians (Crime against humanity)</li>
+<li>Systematic burning of civilians alive in thier homes. (Crime against humanity)</li>
+<li>Broadcasting these acts live on social media to great suffering to the victims and thier families (Crime against humanity)</li>
+<li>Looting civilian homes and businesses.</li>
+<li>Mutilation and Burning of bodies of enemy soldiers and civilians.</li>
+<li>Taking civilians as hostages.</li>
+<li>Looting civilian homes and businesses and stealing cars, pets and burning what they could not take with them.</li>
+<li>Not giving enemy soldiers the right of Enemy Combatant status.</li>
+<li>Executing both enemy soldiers and civilians after capture.</li>
+<li>Withholding medical treatment from wounded enemy soldiers and civilians.</li>
+<li>Withholding food and water from the hostages.</li>
+<li>Torture of captured enemy soldiers.</li>
+<li>Perfidy i.e.&nbsp;fighting dressed as civilians to exploit protection of soldiers under the laws of armed conflict.</li>
+<li>Pretending to be a civilian to kill enemy soldiers.</li>
+<li>Traveling in ambulances and using medical facilities to transport weapons and fighters.</li>
+</ol>
+<p>These atrocities were perpetrated against both Jewish and Arab civilians. Any muslim civilian who was met by hamas was asked to assist them and executed as a traitor if they refused.</p>
+<p>They were often filmed and broadcast live on social media to great suffering of the victims and their families. We now know that these attacks were sanctioned by the Hamas leadership and thier Clerics before the attack of October 7th 2023. The fact that Hamas fighters did this openly and brazenly shows that they had no fear of being prosecuted for these crimes or that they expected to die in the process and become martyrs.</p>
+<p>There is no court of law in Gaza or the West Bank that would prosecute Hamas for these crimes if an election was to be held they would oust the government of the. The casualties of Hamas are considered martyrs and thier families are rewarded with a monthly stipends by the Palestinian Authority.</p>
+<p>It therefore incumbent upon the state of Israel to prosecute these crimes and more importantly to prevent them from happening again. This is what the war in Gaza is about. Many of Hamas leaders and fighters have been killed but many more have taken their place. So far it appears that Hamas is still in power and has been able to recover and regroup. It militants insist that they be allowed to continue to steal aid and use it to finance thier war effort. They are not yet ready to give up thier arms nor thier goal of the complete destruction of the state of Israel.</p>
+</section>
+<section id="rules-of-engagement" class="level3">
+<h3 class="anchored" data-anchor-id="rules-of-engagement">Rules of Engagement</h3>
+<p>A soldier’s first obligation is to protect themselves and their unit. IDF rules of engagement are intended to minimize harm: typically, a verbal warning in Arabic, then a warning shot, then a non-lethal shot, and only then lethal force. In the fog of war, escalation steps may not be feasible when there is an imminent threat. Intentionally killing civilians—or combatants who have surrendered—is a war crime. However, when armed individuals within a crowd open fire or pose an imminent threat, soldiers may return fire, even if civilians are present. Proving an intentional killing without perceived threat is a high bar in a battlefield context.</p>
+<p>IDF Soldiers are attacked by Hamas fighters in civilian clothes coming from underground peers, sniper attacks from buildings and numerous IEDs and booby traps. Reports of soldiers awaking as thier based is under attack are not uncommon. Such is the form of warfare taking place that IDF soldiers have learned to take many precautions and few chances when it comes to thier own safety.</p>
+</section>
+<section id="disproportionate-force-and-dual-use-targets" class="level3">
+<h3 class="anchored" data-anchor-id="disproportionate-force-and-dual-use-targets">Disproportionate Force and Dual-Use Targets</h3>
+<p>“Disproportionate force” can constitute a war crime, but proportionality is judged relative to the concrete and direct military advantage anticipated, not by a simple comparison of weapons or casualty counts. Armies may strike legitimate military objectives even when civilians are nearby, provided the expected collateral damage is not excessive. Many targets in Gaza are dual-use (civilian facilities used for military purposes). Striking such targets, with feasible precautions, is legally permitted though often tragic in effect.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Duel use of an apartment building?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In practice Hamas often uses an apartment for a sniper nest or a missile launcher. IN such a case the entire building then becomes a legitimate target.</p>
+<p>There have been cases where IDF sent special forces to rescue hostages from such buildings but if there are no hostage and instead a high value target such as a senior Hamas commander it may be decided to level the entire building without a warning. Such decisions are not taken lightly but any modern army would operate in a similar manner depending on their military objectives and the people who wrote the laws allow commanders to make such decisions within the framework of the law of armed conflict.</p>
+<p>As for the remaining residents if they choose to stay are then at risk of being caught in the crossfire.</p>
+<p>The IDF may attack the apartment but the option of leveling the entire building may be the preferred option if the IDF believes the building is being used for military purposes. The IDF though may prefer to warn residents through leaflets and phone calls to evacuate buildings before striking them.</p>
+</div>
+</div>
+</section>
+<section id="air-strikes-and-artillery" class="level3">
+<h3 class="anchored" data-anchor-id="air-strikes-and-artillery">Air Strikes and Artillery</h3>
+<p>The IDF has frequently used precision-guided munitions to reduce collateral damage (though stocks may run low in protracted wars). Warnings and evacuations are often attempted. Commanders must balance military necessity with civilian risk; delays to minimize harm are common, but once a strike is underway it can endanger civilians, enemy combatants, and IDF forces alike. In dense urban warfare against an adversary that disregards the laws of war, the reliance on air and artillery support to limit friendly casualties is predictable.</p>
+<p>An AI-assisted targeting process reportedly helps compile targets and centralize approval. Typically, pilots seek authorization from a command center, which approves attacks when there is sufficient evidence of a military or dual-use objective.</p>
+</section>
+<section id="war-crimes-summary" class="level3">
+<h3 class="anchored" data-anchor-id="war-crimes-summary">War Crimes: Summary</h3>
+<p>I do not claim the IDF is perfect or that no violations have occurred. I do claim that the legal threshold for proving a war crime is high, and that the IDF maintains rules of engagement aimed at reducing civilian harm. Senior officers are accountable; allegations are investigated by the military police and legal authorities. The war cabinet has also taken pains to frame operations as lawful. One can argue the war’s goals are unrealistic or politically prolonged without that alone establishing illegality. There is no fixed formula for proportionality; commanders must make case-by-case judgments.</p>
+<p>Compared to other recent conflicts—Syria’s civil war, the Jordanian expulsion of Palestinians, or the famine in Yemen and Somalia—civilian harm in this war is not “uniquely” unprecedented, even though it remains devastating. Other actors in the region, including Iran and its proxies, have also committed grave violations. My point is not that Israeli misconduct would be excusable if others have done worse; it is that raw casualty figures and damage alone do not prove war crimes. Many media claims should be weighed against decades of propaganda aimed at delegitimizing Israel. In my view, while some allegations may be substantiated, many appear to be part of psychological warfare intended to fracture Israeli society and undermine support for the war.</p>
+</section>
+</section>
+<section id="genocide-and-starvation-as-a-weapon-of-war" class="level2">
+<h2 class="anchored" data-anchor-id="genocide-and-starvation-as-a-weapon-of-war">Genocide and Starvation as a Weapon of War</h2>
+<p>Much criticism comes from outlets or institutions that have not deployed independent observers in Gaza and rely on sources aligned with Hamas, such as the Gaza health ministry. UN reports and international filings often focus on Israeli actions while saying little about Hamas’s. Wikipedia aspires to neutrality but inevitably reflects the biases of its editors.</p>
+<section id="is-there-a-state-sponsored-genocide" class="level3">
+<h3 class="anchored" data-anchor-id="is-there-a-state-sponsored-genocide">Is There a State-Sponsored Genocide?</h3>
+<p>Given the centrality of Holocaust education and memory in Israel, the claim that the state is pursuing genocide is shocking. I see no evidence of cabinet decisions or parliamentary approvals for any “final solution.” Israel’s politics are leaky; such a plan would be hard to conceal.</p>
+</section>
+<section id="is-there-bosnia-style-ethnic-cleansing-by-militias" class="level3">
+<h3 class="anchored" data-anchor-id="is-there-bosnia-style-ethnic-cleansing-by-militias">Is There Bosnia-Style Ethnic Cleansing by Militias?</h3>
+<p>Militias in the West Bank have been accused of harassment and reprisals, and Israeli authorities have taken actions against offenders. But no Israelis live in Gaza since the 2005 disengagement; it is a closed military zone. Only specific IDF units operate there. The notion of non-IDF militias conducting ethnic cleansing in Gaza does not fit the reality on the ground.</p>
+<p>Inside Israel, Jews and Arabs live in mixed cities; many Arab citizens serve in public institutions, and some serve in the IDF. If organized ethnic cleansing by Israeli forces were occurring, one would expect widespread, concrete allegations in courts, media, and human rights channels. To date, the most prominent international accusations target top leaders for authorizing the war—not field-level ethnic cleansing campaigns.</p>
+</section>
+<section id="is-there-rwanda-style-incitement" class="level3">
+<h3 class="anchored" data-anchor-id="is-there-rwanda-style-incitement">Is There Rwanda-Style Incitement?</h3>
+<p>After the Rabin assassination, Israeli law and norms have been particularly sensitive to incitement. While harsh rhetoric appears on panels and social media, mainstream broadcasters do not openly coordinate violence. Complaints of incitement are prosecuted. The early-war Hamas incitement and bounties on hostages illustrate the opposite side’s tactics, which many outside observers downplay.</p>
+</section>
+</section>
+<section id="starvation-in-gaza" class="level2">
+<h2 class="anchored" data-anchor-id="starvation-in-gaza">Starvation in Gaza</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Overthinking the Milk Shortages in Israel
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Israel sold much of its dairy production capacity to Chinese investors. Prices for many dairy products rose over the years; regulated items like basic milk and cheese could not simply be repriced upward, so supply was allegedly reduced instead, creating recurring “shortages.” During the war, enforcement against such practices has been lax, benefiting entrenched interests. This microcosm of regulatory failure and profiteering may help explain how shortages can be manufactured—or at least tolerated—during crises.</p>
+</div>
+</div>
+<p>The war has disrupted labor and supply chains in Israel itself; conditions in Gaza are far worse. Still, it is difficult to prove a deliberate strategy to starve civilians. UN agencies repeatedly warned of risk from the outset, but Gaza’s long-standing dependence on aid and Hamas’s governance choices complicate the picture. When Israel withdrew in 2005, greenhouses and fields were left behind; Gaza could have expanded self-sufficiency but invested heavily in tunnels and armaments instead.</p>
+<p>Reports indicate Hamas has diverted aid, taxed or resold supplies, and used distribution to reward loyalty and punish dissent. Meanwhile, prices have soared, and access to food and medicine is hardest for the vulnerable: the sick, elderly, and children—many now orphaned or out of school.</p>
+<p>Israeli leadership often practices brinkmanship, delaying decisions to gain leverage. At times officials threatened to halt aid, water, or electricity; in practice, aid has continued to flow—sometimes financed by Israel—despite diversion risks. Logistics are messy even for the IDF itself; supplying troops hot meals in the field has not been trivial for a modern army. It is therefore unsurprising that civilian supply in Gaza is inconsistent and often inadequate.</p>
+<p><strong>Recap:</strong> Gaza has made limited investments in food and energy self-sufficiency and has relied on aid while Hamas prioritized military infrastructure. The war disrupted supply, displacement hindered access, and diversion further reduced availability. There is a real shortage; some people are starving while others manage. That reality can stem from Hamas’s co</p>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {Allegations of {War} {Crimes} and the {Palestinian}
+    {Genocide}},
+  date = {2025-09-07},
+  url = {https://orenbochman.github.io/posts/2025/2015-sept-06/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2025. <span>“Allegations of War Crimes and the
+Palestinian Genocide.”</span> September 7, 2025. <a href="https://orenbochman.github.io/posts/2025/2015-sept-06/">https://orenbochman.github.io/posts/2025/2015-sept-06/</a>.
+</div></div></section></div> ]]></description>
+  <category>current affairs</category>
+  <guid>https://orenbochman.github.io/posts/2025/2015-sept-06/</guid>
+  <pubDate>Sun, 07 Sep 2025 00:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 <item>
@@ -24734,1249 +25839,6 @@ Reasoners via Compute-Optimal Sampling.”</span> March 20, 2025. <a href="https
   <guid>https://orenbochman.github.io/reviews/2024/smaller-weaker-yet-better/</guid>
   <pubDate>Thu, 20 Mar 2025 00:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/reviews/2024/smaller-weaker-yet-better/cover.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>🗣️ Talking to Neighbors: Evolution of Regional Meaning in Communication Games</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2005/zolman-talking-to-neighbours/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-<!-- LEDE Try to provide some personal context for reviewing this paper -->
-<p>I came across this paper in the bibliography section of signals. Based on the titles of his work <a href="https://www.kevinzollman.com/about-kevin-zollman.html">Kevin J. S. Zollman</a> seems not only a solid researcher but also interested in many of the questions I find fascinating.</p>
-<p>I decided to review this one as it investigates how augmenting the Lewis signaling alters its stability.</p>
-<p>Stability is not the first concept that comes to mind when thinking about game theory. I am usually interested in understanding what behaviors are possible in a game and how changing incentives might alter these. (Not all games have equilibria.)</p>
-<p>Languages are known to change over time. when it comes to Agent based modeling time can pass much faster then in the real world. We can actually see the evolution a dynamic system like a languages in real time. If the language is hard to interpret we may not be happy if it also keeps changing. The stability of equilibria may also be of value to an algorithm designer looking for unique behaviors that exists in unique equilibria. If these are hard to get by chance then we may need better algorithms to find/learn them.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-TL;DR - Spatial Structure and Communication in Game Theory
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="../../../images/in_the_nut_shell_coach_retouched.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Emergent Languages In a Nutshell"><img src="https://orenbochman.github.io/images/in_the_nut_shell_coach_retouched.jpg" class="img-fluid figure-img" alt="Emergent Languages In a Nutshell"></a></p>
-<figcaption>Emergent Languages In a Nutshell</figcaption>
-</figure>
-</div>
-<p>The main research questions being explored in this paper are:</p>
-<ul>
-<li><strong>What is the effect of adding spatial structure to communication games?</strong>
-<ul>
-<li>looks at adding spatial structure to the <strong>Lewis Signaling</strong> game and a modified <strong>Stag Hunt</strong> game.</li>
-</ul></li>
-<li><strong>What happens when both communication and spatial arrangement are combined in these models?</strong>
-<ul>
-<li>The author highlight that these two modifications have largely been studied individually, and their paper aims to study the combined models. This leads to the question of whether combining them yields new insights.</li>
-</ul></li>
-<li><strong>Does increasing the complexity of the model by adding spatial structure and/or communication add explanatory value for social cooperation?</strong>
-<ul>
-<li>The author questions whether more complex models behave analogously to simpler ones or if new features emerge that can explain other types of social behavior. More specifically he want to determine if these richer models provide equally good or better explanations for the evolution of social behavior than prior models.</li>
-</ul></li>
-<li><strong>Does increasing the realism of the model by adding these complexities generally assist in the evolution of cooperative behavior?</strong>
-<ul>
-<li>The authors explicitly aim to assess the “general lesson” that the probability of cooperation increases as models become more realistic. They also explore whether this holds true when communication and spatial structure are combined, acknowledging the possibility that these modifications might interfere with each other. The paper investigates two types of cooperation in this context: achieving the Pareto optimum payoff and the achievement of meaning.</li>
-</ul></li>
-<li><strong>How does the addition of spatial structure affect the emergence and nature of meaning in signals?</strong>
-<ul>
-<li>The paper analyzes the status of meaning of signals in both the Sender-Receiver game and the Stag Hunt game in the spatial context. They specifically examine if signals have meaning (provide more information than prior beliefs) and how this meaning evolves in a spatially structured population, leading to the concept of “regional meaning”. They compare the nature of meaning in the spatial model to that observed in non-spatial models using replicator dynamics.</li>
-</ul></li>
-</ul>
-<p>In essence, the overarching research goal is to understand how making game-theoretic models more realistic by incorporating spatial interaction and communication influences the evolution of cooperation and the emergence of meaning.</p>
-</div>
-</div>
-<p>Here is a light hearted Deep Dive into the paper:</p>
-<audio controls="1">
-<source src="podcast.mp3" data-external="1" type="audio/mpeg">
-
-</audio>
-<section id="abstract" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="abstract">Abstract</h3>
-<div class="page-columns page-full"><blockquote class="blockquote">
-<p>In seeking to explain the evolution of social cooperation, many scholars are using increasingly complex game-theoretic models. These complexities often model readily observable features of human and animal populations. In the case of previous games analyzed in the literature, these modifications have had radical effects on the stability and efficiency properties of the models. We will analyze the effect of adding spatial structure to two communication games: the Lewis Sender-Receiver game and a modified Stag Hunt game. For the Stag Hunt, we find that the results depart strikingly from previous models. In all cases, the departures increase the explanatory value of the models for social phenomenon. — <span class="citation" data-cites="Zollman_2005">(Zollman 2005)</span></p>
-</blockquote><div class="no-row-height column-margin column-container"><div id="ref-Zollman_2005" class="csl-entry">
-Zollman, Kevin J. S. 2005. <span>“Talking to Neighbors: The Evolution of Regional Meaning.”</span> <em>Philosophy of Science</em> 72 (1): 69–85. <a href="https://doi.org/10.1086/428390">https://doi.org/10.1086/428390</a>.
-</div></div></div>
-</section>
-<section id="glossary" class="level2">
-<h2 class="anchored" data-anchor-id="glossary">Glossary</h2>
-<p>This paper has a number of <strong>big words</strong> that seem technical and may seem impediments to understanding it. Here are some key definitions to help us navigate the content:</p>
-<dl>
-<dt>Replicator Dynamics</dt>
-<dd>
-A mathematical model describing how the frequencies of different strategies in a population change over time based on their relative payoffs.
-</dd>
-<dt>Nash Equilibrium</dt>
-<dd>
-A state in a game where no player can improve their payoff by unilaterally changing their strategy, assuming the other players’ strategies remain the same.
-</dd>
-<dt>Payoff Dominant Equilibrium</dt>
-<dd>
-A Nash equilibrium where all players receive higher payoffs compared to any other equilibrium.
-</dd>
-</dl>
-<p>Babbling Equilibrium: An equilibrium in a communication game where signals convey no information about the state of the world or the sender’s intentions.</p>
-<dl>
-<dt>Evolutionarily Stable Strategy (ESS)</dt>
-<dd>
-A strategy that, if adopted by a population, cannot be invaded by any alternative strategy under the replicator dynamics.
-</dd>
-<dt>Spatial Structure</dt>
-<dd>
-The arrangement of individuals in a population, often modeled as a grid or network, influencing who interacts with whom.
-</dd>
-<dt>Imitate-the-Best Dynamics</dt>
-<dd>
-A strategy updating rule in spatial models where individuals adopt the strategy of their most successful neighbor.
-</dd>
-<dt>Secret Handshake</dt>
-<dd>
-A signal used by a subpopulation to coordinate their actions and achieve cooperative outcomes by identifying each other.
-</dd>
-<dt>Polymorphic Equilibrium</dt>
-<dd>
-A stable state in a population where multiple strategies coexist at specific frequencies.
-</dd>
-<dt>Regional Meaning</dt>
-<dd>
-The phenomenon where a signal’s meaning becomes localized to a specific area within a population due to spatial clustering of signaling systems.
-</dd>
-<dt>Aumann Stag Hunt</dt>
-<dd>
-A variation of the Stag Hunt game where Hare Hunters would prefer their partner to hunt Stag, even though they choose to hunt Hare themselves.
-</dd>
-</dl>
-</section>
-<section id="outline" class="level2">
-<h2 class="anchored" data-anchor-id="outline">Outline</h2>
-<p>Here is an outline summary of the paper “Talking to Neighbors: The Evolution of Regional Meaning”:</p>
-<ol type="1">
-<li><strong>Introduction</strong>
-<ul>
-<li>The paper investigates the evolution of social cooperation using game-theoretic models by adding complexities that model observable features of human and animal populations.</li>
-<li>Traditional equilibrium analysis is often inadequate to explain observed social practices, leading to the increasing use of dynamic models like replicator dynamics and myopic best response.</li>
-<li>The paper focuses on the effect of adding <strong>spatial structure</strong> and <strong>communication</strong> to two communication games: the Lewis Sender-Receiver game and a modified Stag Hunt game.</li>
-<li>Previous literature suggests that increasing the reality of models by adding communication or spatial arrangement often helps cooperation, but this may be an oversimplification as new pitfalls can be introduced.</li>
-<li>Studying the combined effects of communication and spatial arrangement can reveal if increased model complexity adds explanatory value and test the general lesson that realism enhances cooperation.</li>
-<li>The paper examines two types of cooperation: achieving mutually beneficial outcomes and the emergence of meaning in signals.</li>
-</ul></li>
-<li><strong>The Sender-Receiver Game</strong>
-<ul>
-<li>David Lewis proposed that meaning can be explained by communicators using strategies in repeated cooperation games.</li>
-<li>A simple Sender-Receiver game with two states, acts, and signals has two high-payoff equilibria and babbling equilibria where signals lack meaning.</li>
-<li>Standard equilibrium analysis requires high cognitive capabilities, which may not be realistic for humans or animals.</li>
-<li>While factors like natural salience and focal points have been suggested for the emergence of signaling systems, they have limitations in explaining all cases, especially in creatures with low cognitive capacities.</li>
-<li>Blume et al.&nbsp;(1998) found that humans can converge to a signaling system even with meaningless signals.</li>
-<li>Skyrms (1996) used evolutionary game theory with replicator dynamics to show that signaling systems can evolve from various starting points and are evolutionarily stable.</li>
-<li>To address concerns about the assumptions of replicator dynamics, the paper introduces a spatial model with 10,000 players on a torus, each interacting with eight neighbors and updating strategies by imitating more successful neighbors.</li>
-<li>Simulations of this spatial model show the emergence of both possible signaling systems, leading to a neutrally stable state unlike the unstable equilibrium in Skyrms’s model.</li>
-<li>A small proportion of starting points in the spatial model can lead to populations of babblers, which can be invaded by signalers.</li>
-<li>Similar results of coexisting conventions in spatial populations have been found with different dynamics like myopic best-reply (Berninghaus and Schwalbe, 1996) and in slightly different games (Grim et al., 2001).</li>
-<li>In the spatial model, signals acquire <strong>regional meaning</strong>, where the signal provides perfect information about the state of the world if the receiver knows the region of the sender.</li>
-<li>Replacing replicator dynamics with a spatial model strengthens the explanation for the evolution of meaning and explains the emergence of different signaling systems in different locations.</li>
-</ul></li>
-<li><strong>The Stag Hunt</strong>
-<ul>
-<li>The Stag Hunt game models situations where individuals must risk cooperation for a higher payoff. It has two Nash equilibria: all hunt stag (payoff dominant) and all hunt hare (less risky).</li>
-<li>Replicator dynamics analysis suggests that stag hunting takes over only if initially present in more than three-quarters of the population.</li>
-<li>The paper examines the Stag Hunt with communication and spatial structure, both individually and combined.</li>
-<li><strong>Stag Hunt with Communication:</strong> Aumann (1990) raised concerns about costless preplay communication, arguing signals might be meaningless. However, Skyrms (2002) found that signals can significantly promote cooperative (stag hunting) behavior using replicator dynamics.</li>
-<li><strong>Spatial Stag Hunt:</strong> Ellison (1993) found that with best-reply dynamics on a circle, hare hunting usually dominates. Lee and Valentinyi (2000) found a similar result on a two-dimensional lattice with best-reply dynamics and no mutations. Skyrms (2004) found that with imitate-the-best dynamics on a two-dimensional lattice, stag hunting prevails in 99% of cases. On a circle with imitate-the-best, neither equilibrium is contagious without a larger imitation neighborhood.</li>
-<li><strong>Spatial Stag Hunt with Communication:</strong> The paper uses the same spatial structure and imitate-the-best dynamics as in the Sender-Receiver game, with strategies represented by a 3-tuple (Signal, Act if signal 1, Act if signal 2).</li>
-<li>Simulations show that almost all populations evolve to a state with six of the eight strategies coexisting, and everyone hunting stag. This stability relies on inertia in the model (players only switch if a neighbor does better).</li>
-<li>Even with relaxed inertia or variations in payoffs and mutation rates, stag hunting remains prevalent. Aumann Stag Hunts take longer to stabilize but still mostly result in stag hunting.</li>
-<li>Populations of Hare Hunters with an unused signal can be invaded by two neighboring Nationalists using a “secret handshake”. This invasion is possible under certain payoff conditions or with a larger imitation neighborhood.</li>
-<li>The polymorphic equilibrium of Individualists found in Skyrms’s replicator dynamic model can be invaded by Stag Hunters in the spatial model.</li>
-<li>Signals in the spatial Stag Hunt with communication contribute beyond spatial structure alone. Invading an all-hare-hunting population requires only two non-simultaneous mutations compared to at least six in the spatial Stag Hunt without communication.</li>
-<li>Signals in the combined model acquire more global meaning, indicating a higher probability of a sender being a Stag Hunter or Nationalist, and provide evidence of a player’s propensity to cooperate with those sending the same signal. They also exhibit regional meaning.</li>
-</ul></li>
-<li><strong>Conclusion</strong>
-<ul>
-<li>The combination of signaling and spatial arrangement leads to new results not observed in simpler models. For the Sender-Receiver game, it explains the emergence of different signaling systems within a population. For the Stag Hunt, it results in a radically different population structure.</li>
-<li>The general lesson that increasing model complexity helps cooperation is <strong>partially confirmed</strong>.
-<ul>
-<li>Achieving the Pareto optimum payoff (highest mutual benefit) is generally enhanced in both games with increased complexity.</li>
-<li>Population-wide meaning is harmed by spatial structure but a weaker form of <strong>regional meaning</strong> emerges.</li>
-</ul></li>
-<li>Overall, increasing the reality of the model assists the evolution of cooperative behavior in the Sender-Receiver and Stag Hunt games, suggesting simpler models do not fully capture the dynamics of cooperation and spatial structure.</li>
-</ul></li>
-</ol>
-</section>
-<section id="the-review" class="level2">
-<h2 class="anchored" data-anchor-id="the-review">The Review</h2>
-<p>So adding spatial structure to the Lewis signaling game and the Stag Hunt game has some interesting effects. The paper shows that the spatial structure can lead to the emergence of different signaling systems within a population. This is a significant departure from the traditional equilibrium analysis of these games.</p>
-</section>
-<section id="the-paper" class="level2">
-<h2 class="anchored" data-anchor-id="the-paper">The paper</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="./paper.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="paper"><embed src="./paper.pdf" class="col-page" width="800" height="1000"></a></p>
-<figcaption>paper</figcaption>
-</figure>
-</div>
-
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {🗣️ {Talking} to {Neighbors:} {Evolution} of {Regional}
-    {Meaning} in {Communication} {Games}},
-  date = {2025-03-13},
-  url = {https://orenbochman.github.io/reviews/2005/zolman-talking-to-neighbours/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“🗣️ Talking to Neighbors: Evolution of
-Regional Meaning in Communication Games.”</span> March 13, 2025. <a href="https://orenbochman.github.io/reviews/2005/zolman-talking-to-neighbours/">https://orenbochman.github.io/reviews/2005/zolman-talking-to-neighbours/</a>.
-</div></div></section></div> ]]></description>
-  <category>draft</category>
-  <category>review</category>
-  <guid>https://orenbochman.github.io/reviews/2005/zolman-talking-to-neighbours/</guid>
-  <pubDate>Thu, 13 Mar 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/reviews/2005/zolman-talking-to-neighbours/cover.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>The roles of Partial pooling and mixed strategies in the Lewis signaling game</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2025/2025-03-11-partial-pooling/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-<p>Today I posit a couple of questions on the Lewis signaling game.</p>
-<ol type="1">
-<li>Are there useful<sup>1</sup> interpretation of some equilibria in the Lewis signaling game that are not fully separable equilibria?</li>
-<li>Are some partial pooling equilibria more useful than others?</li>
-<li>Might agents prefer to employ partial pooling strategies over fully separable equilibria?</li>
-<li>Might agents want to employ mixed strategies?</li>
-</ol>
-<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;for signaling agents</p></div></div><p>These questions lead to an understanding of a mechanism that explains</p>
-<ol type="1">
-<li>How symmetry breaking may lead to a sub-optimal languages in terms of overall fitness.</li>
-<li>How semantic categories may be encoded compactly</li>
-<li>How distributional semantics arise in natural languages</li>
-<li>A mechanism demonstrating use of unmarked and marked items in different classes<sup>2</sup></li>
-<li>Partial pooling also explains another aspect of natural languages. Natural languages have low degree of ambiguity in the long tail but do tend to have ambiguity in the highest frequency words. This seems to fit with a the same mechanism at work but operating in a more contextual pattern. I.e. if we talked about [category-prefix, disambiguate-suffix] we can also consider that once a suffix becomes a morpheme it’s signal can be re-purposed as [prefix-sense, context] and more generally [morpheme-sense, context]. High frequency words tend to be short and reusing them increases compression, of the language.</li>
-</ol>
-<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;this kind of pattern once it develops in multiple categories may easily recognised from a few examples and become on of the cues used for creating rules for a grammar morphology/syntax.</p></div></div><section id="partial-pooling" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="partial-pooling">Partial Pooling</h2>
-<p>let’s imagine we have this signaling system</p>
-<div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> IPython.display <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> Markdown</span>
-<span id="cb1-2"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> tabulate <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> tabulate</span>
-<span id="cb1-3"></span>
-<span id="cb1-4">lexicon <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> {}</span>
-<span id="cb1-5"></span>
-<span id="cb1-6">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'falcon'</span>]  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 00'</span></span>
-<span id="cb1-7">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'hawk'</span>]    <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 01'</span></span>
-<span id="cb1-8">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'eagle'</span>]   <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 10'</span></span>
-<span id="cb1-9">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'panther'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111 00'</span></span>
-<span id="cb1-10">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'leopard'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111 01'</span></span>
-<span id="cb1-11">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'jaguar'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>  <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111 11'</span></span>
-<span id="cb1-12"></span>
-<span id="cb1-13"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># converting the lexicon to a table</span></span>
-<span id="cb1-14">table <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> [[k, v] <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> k, v <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> lexicon.items()]</span>
-<span id="cb1-15"></span>
-<span id="cb1-16"></span>
-<span id="cb1-17">Markdown(tabulate(</span>
-<span id="cb1-18">  table, </span>
-<span id="cb1-19">  headers<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Pre-Linguistic- Object"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"signal"</span>]</span>
-<span id="cb1-20">))</span></code></pre></div>
-<div id="tbl-predators" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-predators-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: predators and their signals for tribe 1
-</figcaption>
-<div aria-describedby="tbl-predators-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="1">
-<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Pre-Linguistic- Object</th>
-<th style="text-align: left;">signal</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">falcon</td>
-<td style="text-align: left;">000 00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">hawk</td>
-<td style="text-align: left;">000 01</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">eagle</td>
-<td style="text-align: left;">000 10</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">panther</td>
-<td style="text-align: left;">111 00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">leopard</td>
-<td style="text-align: left;">111 01</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">jaguar</td>
-<td style="text-align: left;">111 11</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</figure>
-</div>
-</div>
-<p>A spider monkey, the response for a raptor might be dealt with by descending from the top of trees to the second or third level of the canopy. A feline might be dealt with by moving to the top of the tree.</p>
-<p>Clearly though there is little time to waste. So the monkey should be moving with aleracticy as soon as it hears either ‘0’ or ‘1’.</p>
-<p>But ‘0’ and ‘1’ are not signals they are artifacts of the lexicon. Or are they?</p>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">lexicon <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> {}</span>
-<span id="cb2-2"></span>
-<span id="cb2-3">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'raptor'</span>]  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 '</span></span>
-<span id="cb2-4">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'hawk'</span>]    <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 '</span></span>
-<span id="cb2-5">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'eagle'</span>]   <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 '</span></span>
-<span id="cb2-6">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'raptor'</span>]  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 '</span></span>
-<span id="cb2-7"></span>
-<span id="cb2-8">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'feline'</span>]  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111'</span></span>
-<span id="cb2-9">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'panther'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111'</span></span>
-<span id="cb2-10">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'leopard'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111'</span></span>
-<span id="cb2-11">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'jaguar'</span>]  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111'</span></span>
-<span id="cb2-12"></span>
-<span id="cb2-13"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># converting the lexicon to a table</span></span>
-<span id="cb2-14">table <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> [[k, v] <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> k, v <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> lexicon.items()]</span>
-<span id="cb2-15"></span>
-<span id="cb2-16">Markdown(tabulate(</span>
-<span id="cb2-17">  table, </span>
-<span id="cb2-18">  headers<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Pre-Linguistic- Object"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"signal"</span>]</span>
-<span id="cb2-19">))</span></code></pre></div>
-<div id="tbl-predators-categories" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="2">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-predators-categories-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: predators categories and their signals
-</figcaption>
-<div aria-describedby="tbl-predators-categories-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="2">
-<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Pre-Linguistic- Object</th>
-<th style="text-align: right;">signal</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">raptor</td>
-<td style="text-align: right;">000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">hawk</td>
-<td style="text-align: right;">000</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">eagle</td>
-<td style="text-align: right;">000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">feline</td>
-<td style="text-align: right;">111</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">panther</td>
-<td style="text-align: right;">111</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">leopard</td>
-<td style="text-align: right;">111</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">jaguar</td>
-<td style="text-align: right;">111</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</figure>
-</div>
-</div>
-<p>This is only a partial pooling equilibrium. It doesn’t allow the monkeys to distinguish between the different types of raptors or felines.</p>
-<p>We care about it because it can serve the monkeys as a starting point for more complex signaling systems like the one above that are compatible with the semantics captured in this one - that there are two groups with two urgent actions. The has an implicit prefix that is compatible with the semantics of the category. The prefix arises in part from choice of using prefix codes inspired by Huffman codes <span class="citation" data-cites="Huffman1952Method">(Huffman 1952)</span></p>
-<div class="no-row-height column-margin column-container"><div id="ref-Huffman1952Method" class="csl-entry">
-Huffman, David A. 1952. <span>“A Method for the Construction of Minimum-Redundancy Codes.”</span> <em>Proceedings of the IRE</em> 40 (9): 1098–1101. <a href="https://doi.org/10.1109/JRPROC.1952.273898">https://doi.org/10.1109/JRPROC.1952.273898</a>.
-</div></div><p>If all the monkeys care about is the up down response the partial pooling equilibrium is all they need to learn. If they have benefits at distinguishing between the different types of predators, when they are at a distance, they would need to learn a more complex signaling system.</p>
-<p>But when threat is imminent, the partial pooling equilibrium is what they should be using both as sender and as receiver.</p>
-<p>Also it is conceivable that a number of signaling systems compatible with Table&nbsp;2 might arise by further spontaneous symmetry breaking once this equilibrium is established. with Table&nbsp;1 being one such option.</p>
-<p>Now in most research on simple signaling system we often emphasize how signaling systems can arise via spontaneous symmetry breaking. Suppose the monkey learn the following signaling system.</p>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> IPython.display <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> Markdown</span>
-<span id="cb3-2"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> tabulate <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> tabulate</span>
-<span id="cb3-3"></span>
-<span id="cb3-4">lexicon <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> {}</span>
-<span id="cb3-5"></span>
-<span id="cb3-6">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'falcon'</span>]  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 00'</span></span>
-<span id="cb3-7">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'hawk'</span>]    <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111 00'</span></span>
-<span id="cb3-8">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'eagle'</span>]   <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 10'</span></span>
-<span id="cb3-9">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'leopard'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111 01'</span></span>
-<span id="cb3-10">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'panther'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 01'</span></span>
-<span id="cb3-11">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'jaguar'</span>]  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111 11'</span></span>
-<span id="cb3-12"></span>
-<span id="cb3-13"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># converting the lexicon to a table</span></span>
-<span id="cb3-14">table <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> [[k, v] <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> k, v <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> lexicon.items()]</span>
-<span id="cb3-15"></span>
-<span id="cb3-16"></span>
-<span id="cb3-17">Markdown(tabulate(</span>
-<span id="cb3-18">  table, </span>
-<span id="cb3-19">  headers<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Pre-Linguistic- Object"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"signal"</span>]</span>
-<span id="cb3-20">))</span></code></pre></div>
-<div id="tbl-predators-incompatible" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="3">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-predators-incompatible-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3: predators and their signals for tribe 2
-</figcaption>
-<div aria-describedby="tbl-predators-incompatible-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="3">
-<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Pre-Linguistic- Object</th>
-<th style="text-align: left;">signal</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">falcon</td>
-<td style="text-align: left;">000 00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">hawk</td>
-<td style="text-align: left;">111 00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">eagle</td>
-<td style="text-align: left;">000 10</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">leopard</td>
-<td style="text-align: left;">111 01</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">panther</td>
-<td style="text-align: left;">000 01</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">jaguar</td>
-<td style="text-align: left;">111 11</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</figure>
-</div>
-</div>
-<p>Here hawk and panther have been swapped. This system is no longer compatible with the structure of the partial pooling equilibrium. The prefix ‘0’, ‘1’ no longer map to the category. Now instead of being able to respond after 1 letter, the tribe need to listen five times before responding.</p>
-<p>The spider monkeys in this case might exhibit reduced fitness as a group as they have to hear the full signal before they can respond. If the two tribes lived in adjacent groves the predators would quickly notice that this second group is much slower to respond to threat and preferentially target its members.</p>
-<p>This can also lead to a break in communication. If the monkeys ignore anything after the first letter they will be correct 2/3 of the time. This would be acceptable if the delays leads to casualties due to predation more than 1/3 of the time.</p>
-<p>Another way out might be to use a mixed strategy. If they could alternate between two systems they can get the benefits of both.</p>
-<p>Here we might think of some mixture between Table&nbsp;3 and Table&nbsp;1. The problem here is that in game theory we generally consider such a strategy as 20% of one and 80% of the other and some randomizer picking between the two. But what we want is to allow the choice to be deterministic. The problem is there is no way for the receivers to tell which system is being used even if the sender know.</p>
-<p>So the senders may notice the problem and since they are required to send long signals they are exposed to greater threats. They may take steps to remedy the shortcomings of the signaling systems. We could analyze this further in terms of a costly signal where cost for predators is a function of length and or number of ‘loud’ letters.</p>
-<p>Leaving aside the formal question we can see that on the path to learning a full signaling system agents may pass though many states in which they do not have a full signaling system and may be only equipped with partial pooling equilibria.</p>
-<p>Another view might be as follows:</p>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> IPython.display <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> Markdown</span>
-<span id="cb4-2"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> tabulate <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> tabulate</span>
-<span id="cb4-3"></span>
-<span id="cb4-4">lexicon <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> {}</span>
-<span id="cb4-5"></span>
-<span id="cb4-6">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'falcon'</span>]  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000'</span></span>
-<span id="cb4-7">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'jaguar'</span>]  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111'</span></span>
-<span id="cb4-8"></span>
-<span id="cb4-9"></span>
-<span id="cb4-10"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># converting the lexicon to a table</span></span>
-<span id="cb4-11">table <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> [[k, v] <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> k, v <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> lexicon.items()]</span>
-<span id="cb4-12"></span>
-<span id="cb4-13"></span>
-<span id="cb4-14">Markdown(tabulate(</span>
-<span id="cb4-15">  table, </span>
-<span id="cb4-16">  headers<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Pre-Linguistic- Object"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"signal"</span>]</span>
-<span id="cb4-17">))</span></code></pre></div>
-<div id="tbl-predators-partial" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="4">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-predators-partial-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4: predators and their signals 3
-</figcaption>
-<div aria-describedby="tbl-predators-partial-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="4">
-<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Pre-Linguistic- Object</th>
-<th style="text-align: right;">signal</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">falcon</td>
-<td style="text-align: right;">000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">jaguar</td>
-<td style="text-align: right;">111</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</figure>
-</div>
-</div>
-<p>So how can we tell if a signaling system if better than another that arises the from a different spontaneous symmetry breaking?</p>
-<p>We need to test it for compatability with such a partial pooling equilibria. If we use these two codes as categories we can constrain new signals to conform to the hierarchy by using these codes as prefixes. Note that we could compose these in ways that would be much harder than with fully fleshed hieracies</p>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> IPython.display <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> Markdown</span>
-<span id="cb5-2"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> tabulate <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> tabulate</span>
-<span id="cb5-3"></span>
-<span id="cb5-4">lexicon <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> {}</span>
-<span id="cb5-5">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'raptor'</span>]    <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000'</span></span>
-<span id="cb5-6">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'fruit'</span>]     <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'001'</span></span>
-<span id="cb5-7">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'logic'</span>]     <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'010'</span> <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># suffix for not and or </span></span>
-<span id="cb5-8">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'verbs'</span>]     <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'011'</span></span>
-<span id="cb5-9">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'space'</span>]     <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'100'</span></span>
-<span id="cb5-10">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'hierarchy'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'101'</span></span>
-<span id="cb5-11">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'grammar'</span>]   <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'110'</span> <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># sufixes for grammarical words</span></span>
-<span id="cb5-12">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'feline'</span>]    <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111'</span></span>
-<span id="cb5-13"></span>
-<span id="cb5-14"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># converting the lexicon to a table</span></span>
-<span id="cb5-15">table <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> [[k, v] <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> k, v <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> lexicon.items()]</span>
-<span id="cb5-16"></span>
-<span id="cb5-17"></span>
-<span id="cb5-18">Markdown(tabulate(</span>
-<span id="cb5-19">  table, </span>
-<span id="cb5-20">  headers<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Pre-Linguistic- Object"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"signal"</span>]</span>
-<span id="cb5-21">))</span></code></pre></div>
-<div id="tbl-predators-partial-composition" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="5">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-predators-partial-composition-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;5: partial equilibria for many hierarcies
-</figcaption>
-<div aria-describedby="tbl-predators-partial-composition-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="5">
-<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Pre-Linguistic- Object</th>
-<th style="text-align: right;">signal</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">raptor</td>
-<td style="text-align: right;">000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">fruit</td>
-<td style="text-align: right;">001</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">logic</td>
-<td style="text-align: right;">010</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">verbs</td>
-<td style="text-align: right;">011</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">space</td>
-<td style="text-align: right;">100</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">hierarchy</td>
-<td style="text-align: right;">101</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">grammar</td>
-<td style="text-align: right;">110</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">feline</td>
-<td style="text-align: right;">111</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</figure>
-</div>
-</div>
-<p>This suggest a new insight into complex signaling systems.</p>
-<p>Hierarchies can learned early, perhaps based on the most common representative. This may be due to inductive bias of senders. IT might happen due to planning. Otherwise these structures would need to be learned by evolving/refining inferior systems. What is certain that using spontaneous symetry breaking is unlikely to be copatible with such systems. And that even if it is not possible to plan these in advance a good algorithem would revise the signaling system to be compatible with each detected hierarcies and the recivers would need a protocol letting them know that a known state/signals pairs are being reassigned.</p>
-</section>
-<section id="markedness" class="level2">
-<h2 class="anchored" data-anchor-id="markedness">Markedness</h2>
-<p>Members of a class in a hierarchy are assigned unique suffices for the codes to follow the unmarked form which is assigned to the most common representative and used as a prefix. This is pattern is called markedness.</p>
-<div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> IPython.display <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> Markdown</span>
-<span id="cb6-2"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> tabulate <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> tabulate</span>
-<span id="cb6-3"></span>
-<span id="cb6-4">lexicon <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> {}</span>
-<span id="cb6-5"></span>
-<span id="cb6-6">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'raptor/falcon'</span>]  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000'</span></span>
-<span id="cb6-7">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'hawk'</span>]    <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 0'</span></span>
-<span id="cb6-8">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'eagle'</span>]   <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'000 1'</span></span>
-<span id="cb6-9">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'feline/panther'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111'</span></span>
-<span id="cb6-10">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'leopard'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111 0'</span></span>
-<span id="cb6-11">lexicon[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'jaguar'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>  <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'111 1'</span></span>
-<span id="cb6-12"></span>
-<span id="cb6-13"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># converting the lexicon to a table</span></span>
-<span id="cb6-14">table <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> [[k, v] <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> k, v <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> lexicon.items()]</span>
-<span id="cb6-15"></span>
-<span id="cb6-16"></span>
-<span id="cb6-17">Markdown(tabulate(</span>
-<span id="cb6-18">  table, </span>
-<span id="cb6-19">  headers<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Pre-Linguistic- Object"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"signal"</span>]</span>
-<span id="cb6-20">))</span></code></pre></div>
-<div id="tbl-predators-markedness" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="6">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-predators-markedness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;6: predators their categories with markedness
-</figcaption>
-<div aria-describedby="tbl-predators-markedness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="6">
-<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Pre-Linguistic- Object</th>
-<th style="text-align: left;">signal</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">raptor/falcon</td>
-<td style="text-align: left;">000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">hawk</td>
-<td style="text-align: left;">000 0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">eagle</td>
-<td style="text-align: left;">000 1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">feline/panther</td>
-<td style="text-align: left;">111</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">leopard</td>
-<td style="text-align: left;">111 0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">jaguar</td>
-<td style="text-align: left;">111 1</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</figure>
-</div>
-</div>
-<p>Note: that we could have used single digits prefix making these codes even shorter. I originally envisioned that there are also categories for forging etc and so the predators prefix might be longer than if the signaling systems was exclusively for these 6 terms.</p>
-<p>This pattern can arise from the way Huffman codes are constructed given suitable frequencies. However it might become ritualized into a rule. On the other hand if the tribe moves off to a new grove they might find that the new predators are not well represented by the suffixes and that falcons are now rare. The category might be kept and the falcon reassigned to a new signal with a longer suffix. This could happen with felines too resulting in a system like Table&nbsp;1. And we can interpret the prefix as a bound morpheme and the suffixes as a free morpheme.</p>
-</section>
-<section id="distributional-semantics" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="distributional-semantics">Distributional Semantics</h2>
-<p>What we demonstrated is how we rearranged unrelated signals into a categories. Using a template: [category-prefix, designation-suffix]. This split the semantics over multiple symbols, but the full semantics require multiple symbols to appear in proximity to each other. This is the basis of distributional semantics because now the probabilities of semantics in the languages are defined by joint distribution of the prefix and suffix. And if there are many birds of note they may get their own prefix by further splitting raptor into [00,0] and putting non raptor birds into [001,designation-suffix]</p>
-<p>This is clearly not the only way distributional semantics arises, but likely all the other mechanism are small variants and a future investigation should reveal that these may well have partial pooling equilibria as a basis<sup>3</sup>.</p>
-<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;Perhaps even a topological basis in the</p></div></div><p>Morphology can be setup using an ordered sequence of inflectional prefixes followed by a stem-suffix. verbs and nouns might even share some of these. verb := [pos, number, person, gender, etc, stem].</p>
-<p>Tense, Aspect and mood, modality might be be lexical as above or it might be grammatical e.g.&nbsp;the form [verb,aux] rather than verb := [pos, number, person, aux, mood, etc, stem]. if their usage is less frequent then other inflections or if the verb was established before these were introduced. In a future article I plan to consider this in greater detail using a hierarchial Bayesian models from cognitive psychology.</p>
-<p>Another way semantics might become distributed is due to agreement. i.e.&nbsp;[X,number,gender, Z ] [number,gender,A] here we attach number to A to indicate their semantics are somewhat correlated and thus not quite independent. This requires a tricky mechanism.</p>
-<p>And more generally we can use templates like [prefix-sense, context] and even [context, morpheme, context] to create the highly ambiguous syntactical structures we often see in natural languages.</p>
-<p>This more general form may make more sense to receivers who see many rules and seek to streamline them further to the bare essentials by discarding information where it may be inferred from the joint distribution.</p>
-</section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>Languages are works in progress today’s signaling system is just a partial pooling equilibrium for tommorow’s signaling system.</p>
-<p>This will become clearer once we formalize morphology and grammar in terms of function approximations. Function approximation means we will want to fit semantics for certain states better than others. Falcon nest v.s. Raptor!!!</p>
-<p>Morphology approximations will allow us to add for each new (suffix) a large but finite co-set of predictable semantics.</p>
-<p>Grammar approximations when recursive will allow us to combine the morphological form into infinite varieties.</p>
-<p>Even so we may missing some signals for as yet unseen states. We may be able to use our approximation (prefixes and categories) or we may need to be more specific by adding some new suffixes. We will also have signals in reserve for which we have potential semantics but no states assigned.</p>
-</section>
-<section id="further-work-and-brain-dump" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="further-work-and-brain-dump">Further Work and Brain dump</h2>
-<p>As time is short here are a bunch of points for further exploration</p>
-<ol type="1">
-<li><strong>The partial pooling equilibrium correspond to subsets of Bayesian senders.</strong></li>
-<li>we show a category but we mean full hierarchies of categories. These are a preorder and thus imply a topological structure on the state space. This is the <a href="https://en.wikipedia.org/wiki/Alexandrov_topology">Alexandrov Topology</a> (Topology from a Preorder)</li>
-<li>we can learn hierarchies of categories by learning an representative. But learning a representative for each category is also the basis of a clarifier. A classifier is also a type of decision we want to carry out on states to determine the action we should take. In this sense we are talking about a process for rough to fine specification of semantics.</li>
-<li>Each hierarchy of categories represents a <strong>semantic symmetry</strong>. Members share a rough semantic meaning but differ in the fine details.</li>
-<li>We might also repurpose this idea for other symmetries like morphology and phonology.</li>
-<li>If each category is imbued with a prefix we end up with many prefixes corresponding to atoms of discourse. If there are not too many we might build words from these prefixes.</li>
-<li>As there is an increased fitness for languages with prefix and at least certain hierarchies of categories we can see that this may be a desiderata for the evolution of signaling systems. More so we might want an RL algorithm to step between a lattice of such partial pooling equilibria rather then learning by spontaneous symmetry breaking.</li>
-<li>This is planning of hierarchies of categories. However in reality we inherit the hierarchies from the state space of from the prelinguistic objects.</li>
-<li>Another form of using mixed strategies is code switching - where we switch between partial pooling equilibria - each learned for a specific sender. At certain points such a code switching receiver might become promoted to a sender and use the information in the partial pooling equilibria to infer/plan a full language from the different languages it ha learned. This is a form of transfer learning. The result might be a pidgin or a creole depending if the receiver uses a lexicon or a linear function approximate which is a generalization of a lexicon!</li>
-<li>In Natural Languages we do not see semantic categories encoded systematically as systems of prefixes or suffixes. Why not ? <sup>4</sup> <sup>5</sup> In fact they are only encoded in a very limited fashion using a suffix like great, greater, greatest. Numbers do tend to have a base 10 encoding but not as clean as a prefix code. Languages do have many hierarchies encoded into thesauri and wordnets. I think that at some level (e.g.&nbsp;semantic roles labeling) and phrase structure hierarchies can shape languages evolution.</li>
-<li>Why is this type of hierarchies absent from the lexicon of natural Languages?</li>
-<li>The quest for a perfectly regular interlingua might be shaped by an algorithm that learn to encode thesauri like hierarchies down into the phonetic stratum and via algorithms that jump between partial pooling equilibria. <sup>6</sup></li>
-<li>Another point I did not raise is that there are lots more partial equilibria than fully separating equilibria. This suggest that it should be easy for a language ‘planner’ to find nearly compatible partial pooling equilibria with an existing language. By switching around the incompatibilities the language can then gain a new categorical prefix and be easier to learn as well as require less processing going forward.</li>
-</ol>
-
-
-<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;might requires a planning with high algorithmic complexity?</p></div><div id="fn5"><p><sup>5</sup>&nbsp;without such planning, would necessitate frequent revisions of the semantics of large parts of the lexicon as frequency changes?</p></div><div id="fn6"><p><sup>6</sup>&nbsp;A language with rich yet fully pooling morphology and a thesaurus-like-lexicon</p></div></div>
-</section>
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {The Roles of {Partial} Pooling and Mixed Strategies in the
-    {Lewis} Signaling Game},
-  date = {2025-03-11},
-  url = {https://orenbochman.github.io/posts/2025/2025-03-11-partial-pooling/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“The Roles of Partial Pooling and Mixed
-Strategies in the Lewis Signaling Game.”</span> March 11, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-03-11-partial-pooling/">https://orenbochman.github.io/posts/2025/2025-03-11-partial-pooling/</a>.
-</div></div></section></div> ]]></description>
-  <category>emergent languages</category>
-  <category>lewis signaling game</category>
-  <category>game theory</category>
-  <category>complex signaling system</category>
-  <guid>https://orenbochman.github.io/posts/2025/2025-03-11-partial-pooling/</guid>
-  <pubDate>Tue, 11 Mar 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/images/cover.png" medium="image" type="image/png" height="144" width="144"/>
-</item>
-<item>
-  <title>TheoremLlama An End-To-End Framework to Train a General-Purpose Large Language Model to Become a Lean4 Expert</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2024/theorem-llama/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-<section id="abstract" class="level2">
-<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
-<blockquote class="blockquote">
-<p>Proving mathematical theorems using computer-verifiable formal languages like Lean significantly impacts mathematical reasoning. One approach to formal theorem proving involves generating complete proofs using Large Language Models (LLMs) based on Natural Language (NL) proofs. Similar methods have shown promising results in code generation. However, most modern LLMs exhibit suboptimal performance due to the scarcity of aligned NL and Formal Language (FL) theorem-proving data. This scarcity results in a paucity of methodologies for training LLMs and techniques to fully utilize their capabilities in composing formal proofs. To address the challenges, this paper proposes TheoremLlama, an end-to-end framework to train a general-purpose LLM to become a Lean4 expert. This framework encompasses NL-FL aligned dataset generation methods, training approaches for the LLM formal theorem prover, and techniques for LLM Lean4 proof writing. Using the dataset generation method, we provide <a href="https://huggingface.co/datasets/RickyDeSkywalker/OpenBootstrappedTheorem">Open Bootstrapped Theorems</a> (OBT), an NL-FL aligned and bootstrapped dataset. A key innovation in this framework is the NL-FL bootstrapping method, where NL proofs are integrated into Lean4 code for training datasets, leveraging the NL reasoning ability of LLMs for formal reasoning. The TheoremLlama framework achieves cumulative accuracies of 36.48% and 33.61% on MiniF2F-Valid and Test datasets respectively, surpassing the GPT-4 baseline of 22.95% and 25.41%. We have also open-sourced our model checkpoints and generated dataset1, and will soon make all the code publicly available2.</p>
-</blockquote>
-</section>
-<section id="introduction" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p><span class="citation" data-cites="wang2024theoremllamatransforminggeneralpurposellms">(Wang et al. 2024)</span> the authors present an end-to-end framework to train a Large Language Model (LLM) to become a <a href="https://github.com/leanprover/lean4">Lean4</a> expert. <sup>1</sup> <mark>The framework includes NL-FL aligned dataset generation methods, training approaches for the LLM formal theorem prover, and techniques for LLM Lean4 proof writing.</mark> The authors demonstrate the effectiveness of TheoremLlama by achieving cumulative accuracies of 36.48% and 33.61% on MiniF2F-Valid and Test datasets respectively, surpassing the GPT-4 baseline of 22.95% and 25.41%.<sup>2</sup></p>
-<div class="no-row-height column-margin column-container"><div id="ref-wang2024theoremllamatransforminggeneralpurposellms" class="csl-entry">
-Wang, Ruida, Jipeng Zhang, Yizhen Jia, Rui Pan, Shizhe Diao, Renjie Pi, and Tong Zhang. 2024. <span>“TheoremLlama: Transforming General-Purpose LLMs into Lean4 Experts.”</span> <a href="https://arxiv.org/abs/2407.03203">https://arxiv.org/abs/2407.03203</a>.
-</div><div id="fn1"><p><sup>1</sup>&nbsp;Note: lean has a serious learning curve and is used in many current mathematics research projects.</p></div><div id="fn2"><p><sup>2</sup>&nbsp;But is this sufficient to make a difference in the real world? GPT-4 isn’t expected to do well on lean…. </p></div></div><p>TheoremLlama is a significant step towards using LLMs’ natural language abilities to formalize theorem proving in Lean4, improving mathematical reasoning, and tackling major issues with data alignment and training approaches.</p>
-<p>However, <mark>the lack of aligned NL and Formal Language (FL) theorem-proving data frequently makes it difficult for contemporary LLMs to operate efficiently.</mark> The lack of available resources impedes the advancement of efficient training approaches and strategies to fully utilize LLMs’ potential in creating formal mathematical proofs. In order to overcome these limitations, a team of researchers from The Hong Kong University of Science and Technology and the University of Illinois Urban-Champagin has introduced TheoremLlama, an end-to-end framework created to specialize a general-purpose LLM in Lean4 theorem proving.</p>
-<p>TheoremLlama is made up of various important parts, which are as follows:</p>
-<ul>
-<li><p>NL-FL Aligned Dataset Generation: TheoremLlama presents techniques for creating an NL-FL-aligned dataset in order to get over data shortage. This dataset, called Open Bootstrapped Theorems (OBT), uses a bootstrapping technique to include NL proofs into Lean4 code. By integrating NL reasoning into Lean4 scenarios, the framework improves LLMs’ comprehension and execution of formal reasoning.</p></li>
-<li><p>Formal Training for LLM Theorem Provers: The system applies new training strategies to help LLMs become successful Lean4 theorem provers. Methods like block training and curriculum data sorting have been utilized to enhance the LLM’s in-context learning and guarantee reliable training on the OBT dataset. LLM Lean4 Proof Writing: This part is about improving the LLM’s capacity to write formal proofs in Lean4 on its own. The LLM refines its formal reasoning abilities iteratively by using correctly generated proofs as examples.</p></li>
-<li><p>TheoremLlama’s NL-FL bootstrapping approach is a significant invention that enables efficient training by coordinating natural language reasoning with formal mathematical language constraints. The framework’s efficiency has been demonstrated by experimental findings, which on the MiniF2F-Valid and Test datasets, respectively, yielded cumulative accuracies of 36.48% and 33.61%. These outcomes outperformed GPT-4’s baseline findings, which on the same datasets yielded accuracies of 22.95% and 25.41%.</p></li>
-</ul>
-<p>In conclusion, TheoremLlama is an important step towards using LLMs’ natural language abilities to formalize theorem proving in Lean4, improving mathematical reasoning, and tackling major issues with data alignment and training approaches</p>
-</section>
-<section id="see-also" class="level2">
-<h2 class="anchored" data-anchor-id="see-also">See also:</h2>
-<ul>
-<li><a href="https://arxiv.org/abs/2407.03203">paper</a></li>
-<li>https://www.marktechpost.com/2024/07/10/theoremllama-an-end-to-end-framework-to-train-a-general-purpose-large-language-model-to-become-a-lean4-expert/</li>
-</ul>
-
-
-
-</section>
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {TheoremLlama {An} {End-To-End} {Framework} to {Train} a
-    {General-Purpose} {Large} {Language} {Model} to {Become} a {Lean4}
-    {Expert}},
-  date = {2025-03-10},
-  url = {https://orenbochman.github.io/reviews/2024/theorem-llama/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“TheoremLlama An End-To-End Framework to
-Train a General-Purpose Large Language Model to Become a Lean4
-Expert.”</span> March 10, 2025. <a href="https://orenbochman.github.io/reviews/2024/theorem-llama/">https://orenbochman.github.io/reviews/2024/theorem-llama/</a>.
-</div></div></section></div> ]]></description>
-  <guid>https://orenbochman.github.io/reviews/2024/theorem-llama/</guid>
-  <pubDate>Mon, 10 Mar 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/reviews/2024/theorem-llama/cover.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>LLM2Vec: Large Language Models Are Secretly Powerful Text Encoders</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2024/LLM2Vec/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-<section id="tldr" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="tldr">TL;DR</h2>
-<p>In <span class="citation" data-cites="behnamghader2024llm2veclargelanguagemodels">(BehnamGhader et al. 2024)</span> the authors consider using LLMs which are mostly decoder only transformers as text encoders. This allows them to use the LLMs for NLP tasks like chunking, NEW and POS. Recall that T5 <span class="citation" data-cites="raffel2020exploring">(Raffel et al. 2020)</span> can do this is a decoder encode model.</p>
-<div class="no-row-height column-margin column-container"><div id="ref-behnamghader2024llm2veclargelanguagemodels" class="csl-entry">
-BehnamGhader, Parishad, Vaibhav Adlakha, Marius Mosbach, Dzmitry Bahdanau, Nicolas Chapados, and Siva Reddy. 2024. <span>“LLM2Vec: Large Language Models Are Secretly Powerful Text Encoders.”</span> <a href="https://arxiv.org/abs/2404.05961">https://arxiv.org/abs/2404.05961</a>.
-</div><div id="ref-raffel2020exploring" class="csl-entry">
-Raffel, Colin, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J Liu. 2020. <span>“Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer.”</span> <em>Journal of Machine Learning Research</em> 21 (140): 1–67.
-</div></div></section>
-<section id="tricks" class="level2 callout-info">
-<h2 class="anchored" data-anchor-id="tricks">Tricks</h2>
-<ol type="1">
-<li>enabling bidirectional attention,</li>
-<li>masked next token prediction, and</li>
-<li>unsupervised contrastive learning.</li>
-</ol>
-</section>
-<section id="abstract" class="level2">
-<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
-<blockquote class="blockquote">
-<p>Large decoder-only language models (LLMs) are the state-of-the-art models on most of today’s NLP tasks and benchmarks. Yet, the community is only slowly adopting these models for text embedding tasks, which require rich contextualized representations. In this work, we introduce LLM2Vec, a simple unsupervised approach that can transform any decoder-only LLM into a strong text encoder. LLM2Vec consists of three simple steps: 1) enabling bidirectional attention, 2) masked next token prediction, and 3) unsupervised contrastive learning. We demonstrate the effectiveness of LLM2Vec by applying it to 4 popular LLMs ranging from 1.3B to 8B parameters and evaluate the transformed models on English word- and sequence-level tasks. We outperform encoder-only models by a large margin on word-level tasks and reach a new unsupervised state-of-the-art performance on the Massive Text Embeddings Benchmark (MTEB). Moreover, when combining LLM2Vec with supervised contrastive learning, we achieve state-of-the-art performance on MTEB among models that train only on publicly available data (as of May 24, 2024). Our strong empirical results and extensive analysis demonstrate that LLMs can be effectively transformed into universal text encoders in a parameter-efficient manner without the need for expensive adaptation or synthetic GPT-4 generated data.</p>
-</blockquote>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="fig1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="The 3 steps of LLM2Vec"><img src="https://orenbochman.github.io/reviews/2024/LLM2Vec/fig1.png" class="img-fluid figure-img" alt="The 3 steps of LLM2Vec"></a></p>
-<figcaption>The 3 steps of LLM2Vec</figcaption>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="fig2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Evaluation on word level tasks"><img src="https://orenbochman.github.io/reviews/2024/LLM2Vec/fig2.png" class="img-fluid figure-img" alt="Evaluation on word level tasks"></a></p>
-<figcaption>Evaluation on word level tasks</figcaption>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="fig3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Unsupervised results"><img src="https://orenbochman.github.io/reviews/2024/LLM2Vec/fig3.png" class="img-fluid figure-img" alt="Unsupervised results"></a></p>
-<figcaption>Unsupervised results</figcaption>
-</figure>
-</div>
-</section>
-<section id="the-paper" class="level2">
-<h2 class="anchored" data-anchor-id="the-paper">The paper</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="paper.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="paper"><embed src="paper.pdf" class="col-page" width="800"></a></p>
-<figcaption>paper</figcaption>
-</figure>
-</div>
-</section>
-<section id="resources" class="level2">
-<h2 class="anchored" data-anchor-id="resources">Resources</h2>
-<ul>
-<li><a href="https://github.com/McGill-NLP/llm2vec">code</a></li>
-</ul>
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/44OukEJyRsU" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
-
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {LLM2Vec: {Large} {Language} {Models} {Are} {Secretly}
-    {Powerful} {Text} {Encoders}},
-  date = {2025-02-15},
-  url = {https://orenbochman.github.io/reviews/2024/LLM2Vec/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“LLM2Vec: Large Language Models Are Secretly
-Powerful Text Encoders.”</span> February 15, 2025. <a href="https://orenbochman.github.io/reviews/2024/LLM2Vec/">https://orenbochman.github.io/reviews/2024/LLM2Vec/</a>.
-</div></div></section></div> ]]></description>
-  <guid>https://orenbochman.github.io/reviews/2024/LLM2Vec/</guid>
-  <pubDate>Sat, 15 Feb 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/reviews/2024/LLM2Vec/cover.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

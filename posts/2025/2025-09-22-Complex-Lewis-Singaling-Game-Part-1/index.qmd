@@ -1,0 +1,211 @@
+---
+title: Research note for the Complex Lewis Signaling Game - Part 1
+date: 2025-09-22
+categories: [Research Notes, Signaling Games, Lewis Signaling Game, Complex Signaling Games]
+description: A research note for the Complex Lewis Signaling Game - Part 1
+image: ./2025-09-22-Complex-Lewis-Singaling-Game-Part-1.png
+draft: true
+---
+
+This will be a research note for the Complex Lewis Signaling Game. I explained earlier this blog also functions as a research notebook for me - based on another bright idea from Turing Award winning Richard S. Sutton.
+
+This note is a follow up to my previous titled [Complex Lewis Signaling - The Research Questions](./2025-04-02-research-questions/) in which I clarified and narrowed the scope of my current research question for investigating the Complex Lewis Signaling Game.
+
+The main research question is:
+
+> "Find an inference algorithm based on a separate BNP models for sender and receiver that facilitate a Sender agent to quickly and efficiently plan, teach a language possibly using a grammar for communicating states over a channel using a sequence of symbols drawn from a restricted alphabet."
+
+
+## Plan for the Research Problem
+
+1. Understand the problem.
+2. Make a plan for solving the problem.
+3. Carry out the plan
+4. Look back and reflect on the work, How can it be improved? What are the next steps?
+
+
+### Understanding the Problem
+
+
+There are three things that are different about the Complex Lewis Signaling Game compared to the standard Lewis Signaling Game.
+
+1. The number of symbols in the alphabet is fixed and small compared to the number of states that need to be communicated. I will assume for most cases that the alphabet is binary i.e. two symbols 0 and 1. ~~However digging deeper I conceive of the message as a statement in a formal language like First Order Logic. However we will see that this deeper notion is an unnecessary distraction for our research question!~~
+2. Messages are sequences of symbols drawn from the alphabet. There are two approaches to this 
+   - The message is sequence is a string of 0 and 1.
+   - The sequence is a binary number
+3. The states for the game. This for me was the main quandary which I have now clarified. But let's explain. 
+
+
+In the [@Skyrms2010signals] discusses Lewis signaling games in many contexts many of which correspond to animal signals of the natural world. In the basic game we simply enumerate these N states corresponding to the numbers 1, 2, ..., N. 
+
+Lets suppose the states are the same as before certain states of nature which we enumerate using not as 1... N symbols but as strings drawn from an alphabet.
+
+It turns out that any integer in 1... N can be represented using different bases. if we only have $k<n$ symbols in the alphabet we can represent the states using some base k. The numbers will be longer (more digits) but this is a superficial difference.
+
+At one extreme we can represent the states using a two symbol alphabet 0 and 1. In this case the states are represented as binary numbers.  This is because we can encode any number from 1 to N using a binary sequence of length $k = \lceil log_2(N) \rceil$. In fact we are just using the binary representation of the enumeration of the state. 
+
+<!-- TODO add a lemma for this result -->
+
+Any algorithm that works for solving the basic Lewis signaling game will work for this case as well and we are done. Q.E.D.
+
+So we have essentially solved the most trivial case of the Complex Lewis Signaling Game
+by showing that for any finite number of states we can represent them using a binary sequence. 
+
+Now this trivial solution is not so interesting but it does demonstrate that there is a solution exists for the Complex Lewis Signaling Game. Moving forward we will consider more complex states that yield complex languages and we can can say that at least if these objects can be enumerated we can represent them using binary sequences.
+
+The next question is given some structures for the state can our agents learn to find efficient languages to communicate them. However since there so many possible constructs we would never be able to cover them all and each one would require a different approach. 
+
+So we might look at some specific cases and see if our algorithms can exploit the structure to find a separating equilibria faster.
+
+#### Complex States
+
+But in [@Skyrms2010signals] we want to consider how more complex languages can evolve. Such languages might have a morphology, a grammar or syntax, and perhaps distributional semantics, it vocabulary might even follow a Zipfian distribution or a power law distribution. These however are not going to arise in this trivial solution to the Complex Lewis Signaling Game. Because all the agents are learning is a mapping from states to binary sequences. This is just a permutation of states to sequences. And a permutation is for all intents and purposes a lookup table or dictionary. And this is a very boring dictionary - nothing in any entry appears in any other entry.
+
+What we want is to allow us to consider games where the states are not just numbers. 
+
+1. The state of the world could be an image or a map with with locations marked with resources and threats.
+2. The state of the world might be the current board position in a game of chess or go.
+3. The state of the world might be the last few outcomes in a prisoners dilemma game we have been playing with another agent.
+4. The state can be the coordinates of motion for a  moon lander or a mars helicopter. i.e. they could be real valued vectors with continuous values and error bounds.
+
+If we try to generalize we can see that the states may be digitized and converted into some mathematical entity. 
+
+So by a game with complex states we now mean the Sender can observe the world and convert it into some mathematical entity and convert it into a sequence of symbols drawn from a fixed alphabet. And the receiver can observe the sequence of symbols and convert it back into the mathematical entity.
+
+Here we have already run into a problem. Let's say we are working with the map and the first part of the state is just a point in $\mathbb{R}$ i.e. the x coordinate. There are uncountable many points on the real line. Georg Cantor proved that there is no bijection between $\mathbb{R}$ and $\mathbb{N}$. So we cannot enumerate the states using binary sequences. If we sacrifice some precision we can discretize the real line using floating point numbers we can do better. But the point is that there is are fundamental limits to what we can do.
+
+Moving on I will take a more pragmatic approach. I consider the agents to be the the kind we use in RL. These agents can work in a number of settings and can handle continuous states using ideas like tile coding, binning and function approximation. the states should be the kind of states the RL agents can interacts with. These are usually finite states or states that can be discretized. However I plan to show a strong result regarding handling of arbitrary states.
+
+What is next:
+
+1. Looking at a language growth. i.e. Given some infinite set of states can our agents handle them?
+2. Over coming risk and uncertainty in the game.
+3. Binary Sets and Hierarchies
+4. Exploiting Symmetry
+
+We shall see perhaps that for some family of constructs there may be many possible languages that can be used to communicate them. It may be more pragmatic to try to understand from first principles how perhaps we might coordinate on an equilibrium that yields high rewards for the game, that is faster to learn and that is robust to noise and errors in transmission and that can generalize to unseen states.
+
+This however creates another type of problem. Suppose there are languages $L_1, L_2, ..., L_m$ each being better than the other in some sense. How might the agents decide which language to pick. Enumeration based language would require $sum N^2$ trials to learn for N states. Some schemes might have radically different binary sequences to work with so that learning by trial and error might become intractable even if there are just a few possible languages.
+
+There are two parts to this question:
+
+- The first we should realize that the sender is the agent that will always have more information about the states and that he is the one that must decide on the messages that determining the language. For this reason we should assign to each agent a parameter $\theta$ that encodes the index of Language $L_i\mathcal{L}$ that they are using. This makes the game fit within the framework of Bayesian games introducded in [@harsanyi1967games].
+- Since we are dealing with incomplete information  In the bayesian  formulation of Game theory we acknowledge that there may be different beliefs about the state of the world among the agents.
+
+
+An easy to solve Example:
+
+Let's say in the Game the state is based on drawing binary vectors of length k with k growing according to a Hoppe urn scheme or a CRP. As the game progresses there are more and more states that can be drawn but the alphabet remains fixed. The agents need to use an aggregation rule to combine the state into a sequence.
+
+To help them we may allow them to track the number of times they have seen a state once they have learned to communicate it. This allows them to use a frequency based encoding scheme like Huffman coding to compress the states into shorter sequences.
+Suppose the sequences use two signals 0 and 1 - zero has no risk but 1 has a small risk of attracting a predator. The agents will then may utilize a simple theory of mind or even a greedy rule to decide between using 0 or 1.
+
+
+say both agents know about the following states messages
+
+messages and risk
+
+message | risk ordinal
+------- | --------------
+0 0 0   | 0
+0 0 1   | 1
+0 1 0   | 2
+1 0 0   | 3
+0 1 1   | 4
+1 0 1   | 5
+1 1 0   | 6 
+1 1 1   | 7
+
+This scheme is based on two ideas that the risk is additive and that sending a risky signal later is preferable to sending it earlier in the sequence. This is called salience and creates a natural ordering of the states based on risk. So that by adding a small risk to all signals agents get to induce a natural ordering of the messages. 
+
+Now lets also suppose each state has a different frequency of occurrence. We can model this using a draw from a Dirichlet distribution with $k=2^3-1=7$.
+
+
+The frequencies here correspond to the number of times each state has been observed.  Though what we care about is the ranking of the states by frequency. Three such possibilities can be seen in the table bellow.
+we can see from the three examples in the table that they are 
+
+
+state | $f_1$| $f_2$| $f_3$ 
+----- | ----------
+0 0 0 | 0| 1| 2
+1 0 0 | 1| 2| 3
+0 1 0 | 2| 3| 4
+0 0 1 | 3| 4| 5
+1 1 0 | 4| 5| 6
+1 0 1 | 5| 6| 7
+1 0 1 | 6| 7| 0
+1 1 1 | 7| 0| 1
+
+It can be seen that these are just permutations of the ranking in f1. 
+So we know that there are 8 states and 8! = 40,320 possible rankings of the states by frequency. 
+
+Planning and Curriculum
+
+
+This is where the problem setting of perfect information and risky signaling saliency comes in.
+
+If both the sender and receiver know the distribution of states and the risk of each message then they can immediately communicate the state by
+constructing the following table
+
+state | $f_1$ | message
+------|---|------------
+0 0 0 | 0 | 0 0 0
+1 0 0 | 1 | 0 0 1
+0 1 0 | 2 | 0 1 0
+0 0 1 | 3 | 1 0 0
+1 1 0 | 4 | 0 1 1
+1 0 1 | 5 | 1 0 1
+1 0 1 | 6 | 1 1 0
+1 1 1 | 7 | 1 1 1
+
+Lets state some caveats:
+
+1. Here we assume that there are no ties in the frequency of states. In reality there may be ties and we can break them randomly.  I.e. the sender will pick one state from the tied states and assign it to the least risky message and so on which will not reduce the saliency of the encoding the overall encoding.
+2. The frequencies do not neccessarily correspond to the actual probabilities in the Dirichlet distribution. However there is a long term correspondence between the two. And even if there are ties in the Dirichlet distribution the frequencies will almost always not be tied. More formaly though there frequencies can be used to derive an nonparametrical distribution for the states. With sufficent samples the empirical distribution will converge to the true distribution with an error that is bounded by the [DKW](https://en.wikipedia.org/wiki/Dvoretzky%E2%80%93Kiefer%E2%80%93Wolfowitz_inequality) inequality.
+
+
+In this example the planning happen naturally - since the sender knows the frequency of states it can assign the most frequent states to the least risky messages and so on. The receiver only needs to know the ranking of the states by frequency. As I have shown before this is a a slow way to get coordination.
+
+
+if the setting of perfect information and risky signaling saliency is sufficient to pick one language assignment from the 40,320 possible assignments. 
+
+If the sender could set the curriculum it would start with the most frequent states and assign them to the least risky messages.
+
+
+
+
+
+
+ They are drawn
+ are drawn from a Dirichlet distribution with concentration parameter $\alpha = 0.5$.
+Now agents equipped with a simple theory of mind can reason about the risk to themselves as well as the distribution of states. The main hurdle to coordination is that they don't know in practice the distribution of states. If they did known the distribution of states they would be able to assign the most frequent states to the least risky messages and so on. 
+
+Not though that what matters here is not the actual distribution but the the ranking of the states by frequency. There are 8 state so there are 8! = 40320 possible rankings.
+
+
+
+On the other hand trying by trial and error they can learn a signaling system system 
+
+
+
+
+
+
+
+
+
+this is are the 8 possible states ordered by risk. They encode three bits of information. The agent needs to assign one sequence to each state. However there are only three actual substates i.e. there are only three probabilites that govern the freequency of states and the third is actually determined by the first two.
+this is are the 8 possible states ordered by risk. They encode three bits of information. The agent needs to assign one sequence to each state. However there are only three actual substates i.e. there are only three probabilites that govern the freequency of states and the third is actually determined by the first two. 
+
+Since both the sender and reciever know this they can arrive at a 'salient' encoding much faster than agents operating in fully symmetric ignorance.
+
+For example if they 
+
+
+
+
+
+
+In this case the agents don't need to plan or construct a curriculum. All they need is a aggregation rule that allows them to communicate them to combine N states and figure an alphabet for a single symbol that can communicate the N states.
+
+We might also equip the agents with a 

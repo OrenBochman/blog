@@ -14,8 +14,147 @@
 <title>Oren Bochman&#39;s Blog</title>
 <link>https://orenbochman.github.io/</link>
 </image>
-<generator>quarto-1.8.24</generator>
-<lastBuildDate>Wed, 01 Oct 2025 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.8.25</generator>
+<lastBuildDate>Thu, 09 Oct 2025 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Stochastic gradient Descent – a Deep Dive</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/2025-10-09-SGD/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Action Items:</p>
+<ol type="1">
+<li>Generate a deepdive with notebooklm for the different papers.</li>
+<li>Reproduce the paper as an exploratory shiny app</li>
+<li>Extend this for MCMC algs</li>
+<li>Code a Kalman filter optimizer</li>
+<li>Code a Bayesian smoother optimizer</li>
+<li>Consider these in the NPB framework an optimiser that keeps track of first second and third order terms for top hessian dimensions, rather than knowing the full hessian we only keep track of a few dimensions use them to do local quadratic approximation for fastest learning but ergodic exploration when we get stuck in a local minima. Another idea is trust regions - oscillations teach us about regions where SGD get stuck but will get unstack once it can wiggle up far enough.</li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>TLDR
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ever since I saw Hinton’s description of Stochastic Gradient Descent (SGD) , RMSProp, Momentum and problems like units getting saturated and “falling off the manifold” in his <a href="https://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf">Neural Networks for Machine Learning course</a> I have been fascinated by optimization algorithms. I became obsessed with diving deeper into the math behind these algorithms and how to make them better.</p>
+<p>Similar and related issues keep coming up in training RL agents, and in when working with advanced probabilistic models within the Bayesian paradigm, which have complex loss surfaces and that need different mechanisms to optimize their parameters.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Common problems with SGD are:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Getting stuck in local minima - stochasticity can helps the alg hop out of local minima but it isn’t principled - it might hop out of the global minima if the path is too steep.</li>
+<li>Slow convergence - when the loss surface cross section is circular learning is fast but when if it is elliptical with some dimensions having high curvature whenever sgd tries to step into those dimensions it will overshoot and likely oscillate back and forth missing the direction of the actual gradient.</li>
+<li>Sensitivity to hyperparameters like learning rate, batch size, momentum. Ideally we should be able to adapt these on the fly so that they don’t matter as much.</li>
+<li>Exploding or vanishing gradients - when gradients are too large they can cause numerical instability and when they are too small they can slow down learning. This lead to
+<ul>
+<li>the proliferation of normalization techniques like batch norm, layer norm, weight norm</li>
+<li>moving from saturating activation functions like Sigmoid and Tanh preferring activation based on ReLU, like Leaky ReLU, GeLU and away from saturating functions like sigmoid and tanh.</li>
+<li>use of architectures like ResNets that provide skip connections to help gradients flow better.</li>
+<li>use of LSTM and GRU in RNNs to help with long term dependencies and guard against vanishing gradients.</li>
+</ul></li>
+<li>Catastrophic forgetting - this is a phenomenon where a model forgets previously learned information upon learning new information. This is especially problematic in continual learning scenarios where the model needs to learn from a stream of data over time. One solution is to train multiple epochs on the same data but this is slow and inefficient.</li>
+<li>Loss of plasticity - this refers to the model’s inability to adapt to new information or changes in the environment. This may happen due to massive overfitting in deep learning and might be mitigated by regularization techniques like dropout, weight decay, data augmentation and mixup. Other ideas like early stopping that allows one to recover to an earlier point in training when the model was more plastic. Finally here ensambling via bagging and boosting can lead to smaller less overfitting and better plasticity with many smaller models that are expert in different parts of the input space and some form of gating mechanism to pick the best model for each input.</li>
+</ol>
+</div>
+</div>
+<p>Many mechanism try to address these issues like: Batch normalization, layer normalization, adaptive learning rates, learning rate schedules, learning rate per layer, momentum, second order methods, learning rate warmup, gradient clipping, weight decay. Regularization techniques like dropout, data augmentation and mixup also help with optimization. Second order methods like K-FAC and natural gradients also try to address some of these issues by collecting more information about the loss surface curvature and using that to estimate the best direction to move in parameter space and the step size.</p>
+<p>However beside trying to learn faster the mechanism that slows down learning also serves SGD to step out of local minima and hop out to other regions of the loss surface that might have better local minima….</p>
+<p>One might imagine one mechanism to quickly explore a local region (perhaps using a kalman filter and second order information) and then another mechanism like bayesian search to explore other regions of the loss landscape ergodiccally.</p>
+<p>In fact taking a more bayesian perspective we might get even more benefits from this approach by having an ensamble that made from a mixture of local minima. This would leverage the fact that we find a number of local minima and better yet if we can pick minima that provide diverse predictions. In this case we might do even better by using a mixture of experts approach where we have a gating network that picks the best expert for each input.</p>
+<section id="insights" class="level2">
+<h2 class="anchored" data-anchor-id="insights">Insights</h2>
+</section>
+<section id="deeper-view" class="level2">
+<h2 class="anchored" data-anchor-id="deeper-view">Deeper view</h2>
+<ol type="1">
+<li><p>The most important aspect of this work is the methodology used to analyze the behavior of SGD and its variants. And the visualizations that lets us see the dynamics of SGD in action.</p></li>
+<li><p>When curvature <img src="https://latex.codecogs.com/png.latex?S%20%3E%202%20/%20%5Cmu"> or the learning rate in the optimizer diverges until it reaches a region for which the step size becomes smaller than the curvature.</p></li>
+<li><p>If we track the “sharpness” to identify the top Hessian eigenvalue dimension over time, we should be able to use this with a Bayesian filtering and smoothing to find a much better trajectory.</p></li>
+<li><p>The edge of stability is reached due to the loss, bringing us closer to the bottom of the loss canyon. Without adjusting our step size, we will eventually enter a region where the landscape is too narrow and start bouncing upwards. The loss increases, and the landscape becomes wider. (We might be in a new canyon.) And so we keep dropping down, hitting some new narrow region. The issue, though, seems to be restricted to one dimension, as in SGD, we only look at a minibatch, so we only take a step in (with a few dimensions)</p></li>
+<li><p>So one thinks that if we could actually take a step towards the middle of the canyon rather than hopping up and down on the edge of stability, we would get to the local minima faster.</p></li>
+<li><p>In fact, second-order methods can approximate the gradient and find the correct direction.</p></li>
+<li><p>AFAIK, <strong>Batch norm</strong> let’s us take different step sizes in different dimensions….</p></li>
+<li><p>It seems that there is nothing about the top unstable Hessian dimensions that isn’t very special - as we continue gradient descent, we will hug the landscape more closely and encounter, there will be more and more dimensions for which <img src="https://latex.codecogs.com/png.latex?S%20%3E%202%20/%20%5Cmu">, leading the optimizer to diverge.</p></li>
+<li><p>Rich Sutton has an old paper with an deep learning algorithm that he calls Incremental Delta-Bar-Delta or (IDBD)</p></li>
+</ol>
+</section>
+<section id="resources" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="resources">Resources:</h2>
+<p>Without going into too much details here are a few resources I found useful to understand SGD and its variants better:</p>
+<ul>
+<li><p><span class="citation" data-cites="cohen2025understandingoptimizationdeeplearning">(J. M. Cohen et al. 2025)</span> <a href="https://centralflows.github.io/">Understanding optimization in deep learning with central flows</a> <a href="https://arxiv.org/abs/2410.24206">paper</a></p></li>
+<li><p><span class="citation" data-cites="cohen2021gradient">(J. Cohen et al. 2021)</span> <a href="https://arxiv.org/abs/2103.00065">Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability</a></p></li>
+<li><p><span class="citation" data-cites="jastrzebski2020breakeven">(Jastrzebski et al. 2020)</span> <a href="https://centralflows.github.io/">The Break-Even Point on Optimization Trajectories of Deep Neural Networks</a> <a href="https://arxiv.org/abs/2410.24206">paper</a></p></li>
+<li><p><span class="citation" data-cites="ye2022geometry">(Ye 2022)</span> <a href="https://link.springer.com/book/10.1007/978-981-19-5861-8">Geometry of Deep Learning</a></p></li>
+<li><p><span class="citation" data-cites="andreyev2025edgestochasticstabilityrevisiting">(Andreyev and Beneventano 2025)</span> <a href="https://arxiv.org/abs/2412.20553">Edge of Stochastic Stability: Revisiting the Edge of Stability for SGD</a></p></li>
+<li><p><span class="citation" data-cites="damian2023selfstabilizationimplicitbiasgradient">(Damian, Nichani, and Lee 2023)</span> <a href="https://arxiv.org/abs/2209.15594">Self-Stabilization: The Implicit Bias of Gradient Descent at the Edge of Stability</a></p></li>
+</ul>
+
+
+<div class="no-row-height column-margin column-container"><div id="ref-cohen2025understandingoptimizationdeeplearning" class="csl-entry">
+Cohen, Jeremy M., Alex Damian, Ameet Talwalkar, J. Zico Kolter, and Jason D. Lee. 2025. <span>“Understanding Optimization in Deep Learning with Central Flows.”</span> <a href="https://arxiv.org/abs/2410.24206">https://arxiv.org/abs/2410.24206</a>.
+</div><div id="ref-cohen2021gradient" class="csl-entry">
+Cohen, Jeremy, Simran Kaur, Yuanzhi Li, J. Zico Kolter, and Ameet Talwalkar. 2021. <span>“Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability.”</span> <em>CoRR</em> abs/2103.00065. <a href="https://arxiv.org/abs/2103.00065">https://arxiv.org/abs/2103.00065</a>.
+</div><div id="ref-jastrzebski2020breakeven" class="csl-entry">
+Jastrzebski, Stanislaw, Maciej Szymczak, Stanislav Fort, Devansh Arpit, Jacek Tabor, Kyunghyun Cho, and Krzysztof Geras. 2020. <span>“The Break-Even Point on Optimization Trajectories of Deep Neural Networks.”</span> <em>arXiv Preprint arXiv:2002.09572</em>.
+</div><div id="ref-ye2022geometry" class="csl-entry">
+Ye, Jong Chul. 2022. <em>Geometry of Deep Learning</em>. Springer.
+</div><div id="ref-andreyev2025edgestochasticstabilityrevisiting" class="csl-entry">
+Andreyev, Arseniy, and Pierfrancesco Beneventano. 2025. <span>“Edge of Stochastic Stability: Revisiting the Edge of Stability for SGD.”</span> <a href="https://arxiv.org/abs/2412.20553">https://arxiv.org/abs/2412.20553</a>.
+</div><div id="ref-damian2023selfstabilizationimplicitbiasgradient" class="csl-entry">
+Damian, Alex, Eshaan Nichani, and Jason D. Lee. 2023. <span>“Self-Stabilization: The Implicit Bias of Gradient Descent at the Edge of Stability.”</span> <a href="https://arxiv.org/abs/2209.15594">https://arxiv.org/abs/2209.15594</a>.
+</div></div>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {Stochastic Gradient {Descent} -\/- a {Deep} {Dive}},
+  date = {2025-10-09},
+  url = {https://orenbochman.github.io/posts/2025/2025-10-09-SGD/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2025. <span>“Stochastic Gradient Descent -- a Deep
+Dive.”</span> October 9, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-10-09-SGD/">https://orenbochman.github.io/posts/2025/2025-10-09-SGD/</a>.
+</div></div></section></div> ]]></description>
+  <category>deep learning</category>
+  <category>optimization</category>
+  <category>sgd</category>
+  <guid>https://orenbochman.github.io/posts/2025/2025-10-09-SGD/</guid>
+  <pubDate>Thu, 09 Oct 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
 <item>
   <title>Updates to the github action</title>
   <dc:creator>Oren Bochman</dc:creator>
@@ -677,7 +816,7 @@ Bochman, Oren. 2025. <span>“Vibe Coding GPT5 Edition.”</span> September
 <item>
   <title>FlexAttention: A Flexible Approach to Attention Mechanisms</title>
   <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2025/2025-09-20_FlexAttention/</link>
+  <link>https://orenbochman.github.io/posts/2025/2025-09-19=MOA/</link>
   <description><![CDATA[ 
 
 
@@ -744,26 +883,224 @@ Bochman, Oren. 2025. <span>“Vibe Coding GPT5 Edition.”</span> September
 <li><strong>N-level featues</strong> While we said the heads should be competitive we recognize that many problems are multilevel and that we may need to build features based on features learned by other heads.</li>
 <li>Here the ideas from Mixture of Recursion come in - ideally we want to control the hierarchy of heads and the features they learn.</li>
 </ul>
+<section id="resources" class="level2">
+<h2 class="anchored" data-anchor-id="resources">Resources</h2>
+<p><a href="https://pytorch.org/blog/flexattention/">FlexAttention: The Flexibility of PyTorch with the Performance of FlashAttention</a></p>
 
 
+</section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
   author = {Bochman, Oren},
   title = {FlexAttention: {A} {Flexible} {Approach} to {Attention}
     {Mechanisms}},
   date = {2025-09-20},
-  url = {https://orenbochman.github.io/posts/2025/2025-09-20_FlexAttention/},
+  url = {https://orenbochman.github.io/posts/2025/2025-09-19=MOA/},
   langid = {en}
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2025. <span>“FlexAttention: A Flexible Approach to
-Attention Mechanisms.”</span> September 20, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-09-20_FlexAttention/">https://orenbochman.github.io/posts/2025/2025-09-20_FlexAttention/</a>.
+Attention Mechanisms.”</span> September 20, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-09-19=MOA/">https://orenbochman.github.io/posts/2025/2025-09-19=MOA/</a>.
 </div></div></section></div> ]]></description>
   <category>AI</category>
   <category>Tools</category>
   <category>Techniques</category>
   <category>Bag of Tricks</category>
-  <guid>https://orenbochman.github.io/posts/2025/2025-09-20_FlexAttention/</guid>
+  <guid>https://orenbochman.github.io/posts/2025/2025-09-19=MOA/</guid>
+  <pubDate>Sat, 20 Sep 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>FlexAttention: A Flexible Approach to Attention Mechanisms</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/2025-09-19=MOR/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+
+<div class="no-row-height column-margin column-container"><div id="Vid-flex-01" class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/UUIKnca31Ao" title="FlexAttention: PyTorch Compiler Series" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Explanation of FlexAttention by the team that developed it.</p>
+</div></div><p>This is a quick note about FlexAttention. I always thought Attention as a design pattern for neural networks. But I saw that this idea took on many forms as many different attention mechanisms were developed in the wake of the transformer revolution in Deep Learning.</p>
+<p>One problem which I felt kept attention mechanisms from being a design pattern is that it is too coupled to the rest of the implementation. This is both a practical and conceptual problem. Design patterns work best when they are modular and can be combined in different ways. So far I could see just two ways - in an RNN or in a transformer.</p>
+<p>I wanted the power of attention mechanisms in other models too like probabilistic programming and hierarchical bayesian models. And also as something that can be used in a more modular way.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>TL;DR - FlexAttention: A Flexible Approach to Attention Mechanisms
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We see a number of moving parts in the attention mechanism design.</p>
+<ul>
+<li>First is the choice of attention mechanism.</li>
+<li>Secondly we need to handle subtleties like masking and padding to get these to work.</li>
+<li>We may want to add a weighting mechanism to tokens based on the distance between context and current token.</li>
+<li>We may want to use capping introduced to limit the logits in Model like <em>Grok-1</em> and <em>Gemma 2</em> from exploding.</li>
+</ul>
+<p>When <a href="https://arxiv.org/abs/2205.14135">FlashAttention</a> came out I saw that there was a big push to make attention faster and aware of the hardware it runs on.</p>
+<p>So we need design with all these moving parts and optimize for different hardware.</p>
+<p>This is a level of complexity that should be relegated to libraries compilers and handled by AI Engineers not poor data scientists who are trying to make models work with the data.</p>
+<p>Here at last is a flexible implementation of it for PyTorch. That allows data scientists to mix and match attention mechanisms to their needs.</p>
+</div>
+</div>
+
+<div class="no-row-height column-margin column-container"><div id="vid-flex-02" class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/kCc8FmEb1nY" title="Let" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Explanation of How Chat GPT 3 and 4 work.</p>
+</div></div><p>Viewing <a href="https://www.youtube.com/@andrejkarpathy">Andrej Karpathy’s</a> Videos e.g.&nbsp;<a href="https://www.youtube.com/watch?v=kCc8FmEb1nY">Let’s build GPT: from scratch, in code, spelled out.</a> I came to realize that many of the big name papers in Deep Learning and architectures amount to one or two lines of code in our favorite framework. And that even if we write it from scratch again we are down to adding in a small function or two.</p>
+<p>This gave me hope that reading these famous papers with the goal of actually implementing them boils down to a manageable task.</p>
+<hr>
+<p>One paper that caught my attention was the Mixture of Recursion. Reading about it, I saw that one of the improvements they hoped to implement was FlexAttention. And they also talked about document masking. I wan’t sure what was that? It turns out that we may be working with many documents and we want to restrict attention to look at just tokens from the same document.</p>
+<p>I really spent a lot of time on attention mechanism. I think that in many ways these are the core part of the Transformer architecture and to some degree even for the earlier RNNs which had it.</p>
+<p>In fact attention is something that would probably be useful in other ML and statistical models.</p>
+<p>Flex attention aims to provide a drop in replacement for the attention mechanism in Transformers. It is based on the idea that we can use a mixture of different attention mechanisms, each with its own strengths and weaknesses, to improve the overall performance of the model.</p>
+<p>We can use it to quickly try out different attention mechanisms and see which one works best for our specific task.</p>
+<p>This qualifies it for the “bag of tricks” as it is a small addition to our code that can have a big impact on performance.</p>
+<p>It also serves to summarize in practical terms many ideas about attention mechanisms in one place.</p>
+<hr>
+<p>While I can’t deep dive into FlexAttention here. The first video does a great job of explaining it. We get an api to define the different moving parts and FlexAttention then combines them efficiently in a way that is optimized for the hardware we are using.</p>
+<p>Here is a third</p>
+<hr>
+<p>I do want to provide a quick overview of what I want to use it for so I can come back to it later.</p>
+<ul>
+<li>I came on an early paper where there was just the one attention head and all that it did was count so that the output sequence had coverage of the input sequence. <span class="citation" data-cites="CN">(<strong>CN?</strong>)</span></li>
+<li>I always thought that we should be able to give a model a few examples of what we consider it should pay attention to and let it train a head on that.</li>
+<li>Stating this in from a more general bayesian view of thing I want the attention heads to learn certain features. To do this we should be able to equip them with some priors. This would bootstrap the learning process by defining a divide and conquer strategy.</li>
+<li><strong>competitive heads</strong> Heads should be competitive. They should try to avoid features covered by other heads. This idea can be formalized using game theory and there are some similar ideas in papers by hinton from before there was attention. He talks about it in his course and the main thrust of it was that there are ideas to make experts compete and specialize or to work as a group by correcting each other. I think we are talking about bagging vs boosting in more modern terms. He suggests that that the second approach leads to problems - some agents can be poor and then the rest work extra hard to accommodate them. Trying to track the actual paper showed that he looked into this for a long time and there are many related papers on this topic. This work is of extra interest here as we can use these architectures (mixtures of experts) with attention heads and more generally using bayesian ideas to combine heads and exploit parallelism.</li>
+<li>We should have the option of having some heads to look at the “residual” i.e.&nbsp;find features not covered by other heads.</li>
+<li>We should also have the option to do this in an automated fashion and see what the heads are learning. This would not only be be a form of unsupervised learning but a very powerful EDA tool.</li>
+<li><strong>N-level featues</strong> While we said the heads should be competitive we recognize that many problems are multilevel and that we may need to build features based on features learned by other heads.</li>
+<li>Here the ideas from Mixture of Recursion come in - ideally we want to control the hierarchy of heads and the features they learn.</li>
+</ul>
+<section id="resources" class="level2">
+<h2 class="anchored" data-anchor-id="resources">Resources</h2>
+<p><a href="https://pytorch.org/blog/flexattention/">FlexAttention: The Flexibility of PyTorch with the Performance of FlashAttention</a></p>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {FlexAttention: {A} {Flexible} {Approach} to {Attention}
+    {Mechanisms}},
+  date = {2025-09-20},
+  url = {https://orenbochman.github.io/posts/2025/2025-09-19=MOR/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2025. <span>“FlexAttention: A Flexible Approach to
+Attention Mechanisms.”</span> September 20, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-09-19=MOR/">https://orenbochman.github.io/posts/2025/2025-09-19=MOR/</a>.
+</div></div></section></div> ]]></description>
+  <category>AI</category>
+  <category>Tools</category>
+  <category>Techniques</category>
+  <category>Bag of Tricks</category>
+  <guid>https://orenbochman.github.io/posts/2025/2025-09-19=MOR/</guid>
+  <pubDate>Sat, 20 Sep 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>FlexAttention: A Flexible Approach to Attention Mechanisms</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2025/2025-09-20-FlexAttention/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+
+<div class="no-row-height column-margin column-container"><div id="Vid-flex-01" class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/UUIKnca31Ao" title="FlexAttention: PyTorch Compiler Series" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Explanation of FlexAttention by the team that developed it.</p>
+</div></div><p>This is a quick note about FlexAttention. I always thought Attention as a design pattern for neural networks. But I saw that this idea took on many forms as many different attention mechanisms were developed in the wake of the transformer revolution in Deep Learning.</p>
+<p>One problem which I felt kept attention mechanisms from being a design pattern is that it is too coupled to the rest of the implementation. This is both a practical and conceptual problem. Design patterns work best when they are modular and can be combined in different ways. So far I could see just two ways - in an RNN or in a transformer.</p>
+<p>I wanted the power of attention mechanisms in other models too like probabilistic programming and hierarchical bayesian models. And also as something that can be used in a more modular way.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>TL;DR - FlexAttention: A Flexible Approach to Attention Mechanisms
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We see a number of moving parts in the attention mechanism design.</p>
+<ul>
+<li>First is the choice of attention mechanism.</li>
+<li>Secondly we need to handle subtleties like masking and padding to get these to work.</li>
+<li>We may want to add a weighting mechanism to tokens based on the distance between context and current token.</li>
+<li>We may want to use capping introduced to limit the logits in Model like <em>Grok-1</em> and <em>Gemma 2</em> from exploding.</li>
+</ul>
+<p>When <a href="https://arxiv.org/abs/2205.14135">FlashAttention</a> came out I saw that there was a big push to make attention faster and aware of the hardware it runs on.</p>
+<p>So we need design with all these moving parts and optimize for different hardware.</p>
+<p>This is a level of complexity that should be relegated to libraries compilers and handled by AI Engineers not poor data scientists who are trying to make models work with the data.</p>
+<p>Here at last is a flexible implementation of it for PyTorch. That allows data scientists to mix and match attention mechanisms to their needs.</p>
+</div>
+</div>
+
+<div class="no-row-height column-margin column-container"><div id="vid-flex-02" class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/kCc8FmEb1nY" title="Let" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Explanation of How Chat GPT 3 and 4 work.</p>
+</div></div><p>Viewing <a href="https://www.youtube.com/@andrejkarpathy">Andrej Karpathy’s</a> Videos e.g.&nbsp;<a href="https://www.youtube.com/watch?v=kCc8FmEb1nY">Let’s build GPT: from scratch, in code, spelled out.</a> I came to realize that many of the big name papers in Deep Learning and architectures amount to one or two lines of code in our favorite framework. And that even if we write it from scratch again we are down to adding in a small function or two.</p>
+<p>This gave me hope that reading these famous papers with the goal of actually implementing them boils down to a manageable task.</p>
+<hr>
+<p>One paper that caught my attention was the Mixture of Recursion. Reading about it, I saw that one of the improvements they hoped to implement was FlexAttention. And they also talked about document masking. I wan’t sure what was that? It turns out that we may be working with many documents and we want to restrict attention to look at just tokens from the same document.</p>
+<p>I really spent a lot of time on attention mechanism. I think that in many ways these are the core part of the Transformer architecture and to some degree even for the earlier RNNs which had it.</p>
+<p>In fact attention is something that would probably be useful in other ML and statistical models.</p>
+<p>Flex attention aims to provide a drop in replacement for the attention mechanism in Transformers. It is based on the idea that we can use a mixture of different attention mechanisms, each with its own strengths and weaknesses, to improve the overall performance of the model.</p>
+<p>We can use it to quickly try out different attention mechanisms and see which one works best for our specific task.</p>
+<p>This qualifies it for the “bag of tricks” as it is a small addition to our code that can have a big impact on performance.</p>
+<p>It also serves to summarize in practical terms many ideas about attention mechanisms in one place.</p>
+<hr>
+<p>While I can’t deep dive into FlexAttention here. The first video does a great job of explaining it. We get an api to define the different moving parts and FlexAttention then combines them efficiently in a way that is optimized for the hardware we are using.</p>
+<p>Here is a third</p>
+<hr>
+<p>I do want to provide a quick overview of what I want to use it for so I can come back to it later.</p>
+<ul>
+<li>I came on an early paper where there was just the one attention head and all that it did was count so that the output sequence had coverage of the input sequence. <span class="citation" data-cites="CN">(<strong>CN?</strong>)</span></li>
+<li>I always thought that we should be able to give a model a few examples of what we consider it should pay attention to and let it train a head on that.</li>
+<li>Stating this in from a more general bayesian view of thing I want the attention heads to learn certain features. To do this we should be able to equip them with some priors. This would bootstrap the learning process by defining a divide and conquer strategy.</li>
+<li><strong>competitive heads</strong> Heads should be competitive. They should try to avoid features covered by other heads. This idea can be formalized using game theory and there are some similar ideas in papers by hinton from before there was attention. He talks about it in his course and the main thrust of it was that there are ideas to make experts compete and specialize or to work as a group by correcting each other. I think we are talking about bagging vs boosting in more modern terms. He suggests that that the second approach leads to problems - some agents can be poor and then the rest work extra hard to accommodate them. Trying to track the actual paper showed that he looked into this for a long time and there are many related papers on this topic. This work is of extra interest here as we can use these architectures (mixtures of experts) with attention heads and more generally using bayesian ideas to combine heads and exploit parallelism.</li>
+<li>We should have the option of having some heads to look at the “residual” i.e.&nbsp;find features not covered by other heads.</li>
+<li>We should also have the option to do this in an automated fashion and see what the heads are learning. This would not only be be a form of unsupervised learning but a very powerful EDA tool.</li>
+<li><strong>N-level featues</strong> While we said the heads should be competitive we recognize that many problems are multilevel and that we may need to build features based on features learned by other heads.</li>
+<li>Here the ideas from Mixture of Recursion come in - ideally we want to control the hierarchy of heads and the features they learn.</li>
+</ul>
+<section id="resources" class="level2">
+<h2 class="anchored" data-anchor-id="resources">Resources</h2>
+<p><a href="https://pytorch.org/blog/flexattention/">FlexAttention: The Flexibility of PyTorch with the Performance of FlashAttention</a></p>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {FlexAttention: {A} {Flexible} {Approach} to {Attention}
+    {Mechanisms}},
+  date = {2025-09-20},
+  url = {https://orenbochman.github.io/posts/2025/2025-09-20-FlexAttention/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2025. <span>“FlexAttention: A Flexible Approach to
+Attention Mechanisms.”</span> September 20, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-09-20-FlexAttention/">https://orenbochman.github.io/posts/2025/2025-09-20-FlexAttention/</a>.
+</div></div></section></div> ]]></description>
+  <category>AI</category>
+  <category>Tools</category>
+  <category>Techniques</category>
+  <category>Bag of Tricks</category>
+  <guid>https://orenbochman.github.io/posts/2025/2025-09-20-FlexAttention/</guid>
   <pubDate>Sat, 20 Sep 2025 00:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
@@ -1260,6 +1597,7 @@ Palestinian Genocide.”</span> September 7, 2025. <a href="https://orenbochman.
 <ul>
 <li>One problem with tools is that they have this long tail and after a while you may forget them.</li>
 <li>Another problem is they can become outdated and better tools come along. At what point should we switch.</li>
+<li>This is a quick summary. Ideally many of these can be moved to full blown articles.</li>
 </ul>
 </div>
 </div>
@@ -1268,9 +1606,33 @@ Palestinian Genocide.”</span> September 7, 2025. <a href="https://orenbochman.
 <dd>
 commercial tool for extracting articles from web pages.
 </dd>
+<dt><a href="https://faker.readthedocs.io/en/master/">Faker</a> <span class="badge rounded-pill text-bg-primary">Data Generation</span> <span class="badge rounded-pill text-bg-secondary">Python</span> <span class="badge rounded-pill text-bg-success">FOSS</span></dt>
+<dd>
+A Python library for generating fake data such as names, addresses, and phone numbers.
+</dd>
+<dt>Augmentation</dt>
+<dd>
+Data augmentation is a technique used to increase the diversity of a dataset by applying various transformations to the existing data. This can include techniques such as rotation, flipping, scaling, and cropping for images, or synonym replacement, random insertion, and back-translation for text data. The goal of data augmentation is to improve the generalization of machine learning models by providing them with more varied training examples.
+</dd>
+<dt>Data Widening</dt>
+<dd>
+Data widening is a technique used to increase the number of features in a dataset by transforming existing features or creating new ones. This can include techniques such as one-hot encoding, polynomial feature expansion, and feature crossing. The goal of data widening is to provide machine learning models with more information to learn from, which can improve their performance on tasks such as classification and regression.
+</dd>
+<dt>Record Reconciling</dt>
+<dd>
+Reconciliation is the process of matching your dataset with that of an external source. Also known as record linkage, or data matching, it is an overall process that often involves other tasks such as entity resolution, data field matching (property matching) and duplicate record detection. Datasets for comparison might be produced by libraries, archives, museums, academic organizations, scientific institutions, non-profits, or interest groups
+</dd>
 </dl>
-<p><a href="https://scrapy.org/">Scrapy</a> <span class="badge rounded-pill text-bg-primary">Web Scraping</span> <span class="badge rounded-pill text-bg-secondary">Python</span> <span class="badge rounded-pill text-bg-success">FOSS</span> : is an open-source and collaborative web crawling framework for Python.</p>
+<p>Note: the indian bufet process seems to be a model that could be useful to support record reconciliation for a wikidata type of project where there are potentially unbounded number of many records and features</p>
 <dl>
+<dt><a href="https://openrefine.org/blog/2025/06/10/OpenRefine-2025-Barcamp">OpenRefine</a> <span class="badge rounded-pill text-bg-success">FOSS</span></dt>
+<dd>
+A FOSS tool for working with messy data: cleaning it; transforming it from one format into another; and extending it with web services and external data. Including reconciliation.
+</dd>
+<dt><a href="https://scrapy.org/">Scrapy</a> <span class="badge rounded-pill text-bg-primary">Web Scraping</span> <span class="badge rounded-pill text-bg-secondary">Python</span> <span class="badge rounded-pill text-bg-success">FOSS</span></dt>
+<dd>
+is an open-source and collaborative web crawling framework for Python.
+</dd>
 <dt><a href="https://code.google.com/archive/p/word2vec/">word2vec</a> <span class="badge rounded-pill text-bg-primary">Embeddings</span> <span class="badge rounded-pill text-bg-secondary">Python</span> <span class="badge rounded-pill text-bg-success">FOSS</span></dt>
 <dd>
 A group of related models that are used to produce word embeddings.
@@ -1283,13 +1645,24 @@ A library for efficient learning of word representations and sentence classifica
 <dd>
 A library for efficient learning of word representations and sentence classification.
 </dd>
+<dt><a href="https://spacy.io/">spacy</a> <span class="badge rounded-pill text-bg-primary">NLP</span> <span class="badge rounded-pill text-bg-info">Python</span> <span class="badge rounded-pill text-bg-success">FOSS</span></dt>
+<dd>
+A package for NLP in Python.
+</dd>
 </dl>
-<p><a href="https://spacy.io/">spacy</a> / <span class="badge rounded-pill text-bg-primary">NLP</span> / <span class="badge rounded-pill text-bg-info">Python</span> / <span class="badge rounded-pill text-bg-success">FOSS</span> : A package for NLP in Python.</p>
-<p><a href="https://prodi.gy/">Prodi.gy</a> / <span class="badge rounded-pill text-bg-primary">NLP</span> / <span class="badge rounded-pill text-bg-info">Data Annotation</span> / <span class="badge rounded-pill text-bg-secondary">Python</span> / <span class="badge rounded-pill text-bg-warning">Commercial</span> : A modern annotation tool for creating training data for machine learning models.</p>
+<p><a href="https://prodi.gy/">Prodi.gy</a> <span class="badge rounded-pill text-bg-primary">NLP</span> <span class="badge rounded-pill text-bg-info">Data Annotation</span> <span class="badge rounded-pill text-bg-secondary">Python</span> <span class="badge rounded-pill text-bg-warning">Commercial</span> : A modern annotation tool for creating training data for machine learning models.</p>
 <dl>
 <dt><a href="https://spark.apache.org/docs/latest/api/python/getting_started/quickstart.html">PySpark</a> <span class="badge rounded-pill text-bg-primary">Big Data</span> <span class="badge rounded-pill text-bg-secondary">Python</span> <span class="badge rounded-pill text-bg-info">FOSS</span></dt>
 <dd>
 is an open-source distributed computing system based on <strong>Map-Reduce</strong> paradigm.
+</dd>
+<dt>Data Version Control (DVC)</dt>
+<dd>
+is an open-source version control system for machine learning projects. It helps data scientists and machine learning engineers manage and track changes to datasets, models, and code in a collaborative environment. DVC integrates with Git, allowing users to version control large files and datasets efficiently. It also provides features for reproducibility, experiment tracking, and pipeline management, making it easier to share and collaborate on machine learning projects.
+</dd>
+<dt>Weights &amp; Biases</dt>
+<dd>
+is a platform for experiment tracking, model management, and collaboration in machine learning projects. It provides tools for logging and visualizing experiments, comparing model performance, and sharing results with team members. Weights &amp; Biases integrates with popular machine learning frameworks and libraries, making it easier for data scientists and machine learning engineers to manage their workflows and collaborate effectively.
 </dd>
 <dt><a href="https://dataheroes.ai/">Data Heroes</a></dt>
 <dd>
@@ -1340,6 +1713,60 @@ Deepchecks is a library for testing and validating machine learning models.
 </dd>
 </dl>
 <!-- TODO add agentic, rag, and local lls, apis -->
+<dl>
+<dt>Mixture of Experts</dt>
+<dd>
+is a technique in machine learning where multiple models (experts) are trained to specialize in different parts of the input space. During inference, a gating mechanism decides which expert(s) to use for a given input, allowing the model to leverage the strengths of each expert for better overall performance.
+</dd>
+<dt>Bagging and Boosting</dt>
+<dd>
+are ensemble learning techniques used to improve the performance of machine learning models by combining multiple weak learners into a stronger one. Bagging (Bootstrap Aggregating) involves training multiple models on different subsets of the data and averaging their predictions, while Boosting sequentially trains models, with each new model focusing on correcting the errors of the previous ones.
+</dd>
+<dt>GAN</dt>
+<dd>
+are adversarial networks that consist of two neural networks, a generator and a discriminator, that are trained simultaneously through a process of competition. The generator creates fake data samples, while the discriminator evaluates them against real data samples, providing feedback to the generator to improve its output. This is essentially a generate and test with a feedback from real data.
+</dd>
+<dt>VAE</dt>
+<dd>
+are generative models that learn to encode input data into a lower-dimensional latent space and then decode it back to reconstruct the original data. They consist of an encoder network that maps the input to a latent representation and a decoder network that reconstructs the input from this representation. VAEs are trained using a combination of reconstruction loss and a regularization term that encourages the latent space to follow a specific distribution, typically a Gaussian.
+</dd>
+<dt>Data Fusion</dt>
+<dd>
+is the process of integrating data from multiple sources to create a unified and consistent dataset. This involves combining data with different formats, structures, and semantics, often requiring techniques such as data cleaning, transformation, and alignment to ensure compatibility and coherence. The goal of data fusion is to enhance the quality and completeness of the information available for analysis and decision-making.
+</dd>
+<dt>SLAM</dt>
+<dd>
+Simultaneous Localization and Mapping (SLAM) is a computational problem in robotics and computer vision where a device or robot must build a map of an unknown environment while simultaneously keeping track of its own location within that environment. SLAM algorithms use sensor data (e.g., from cameras, LiDAR, or IMUs) to estimate the robot’s position and orientation while incrementally constructing a map of the surroundings. This is particularly useful for autonomous navigation in dynamic and unstructured environments.
+</dd>
+<dt>Kalman Filter</dt>
+<dd>
+is an algorithm that uses a series of measurements observed over time, containing statistical noise and other inaccuracies, and produces estimates of unknown variables that tend to be more precise than those based on a single measurement alone. It operates recursively, updating estimates as new data becomes available, and is widely used in applications such as navigation, tracking, and control systems.
+</dd>
+<dt>Dynamic Linear Models (DLMs) <span class="badge rounded-pill text-bg-primary">R</span> <span class="badge rounded-pill text-bg-secondary">Time Series</span> <span class="badge rounded-pill text-bg-success">Bayesian</span></dt>
+<dd>
+is a class of statistical models used for time series analysis that allow for the modeling of time-varying relationships between variables. DLMs consist of two main components: a state equation that describes how the underlying state of the system evolves over time, and an observation equation that relates the observed data to the underlying state. DLMs can incorporate various types of dynamics, such as trends, seasonality, and cycles, and can be estimated using techniques like the Kalman filter. They are particularly useful for forecasting and smoothing time series data.
+</dd>
+<dt>Snowflake</dt>
+<dd>
+is a cloud-based data warehousing platform that provides scalable and flexible storage and computing capabilities for big data analytics. It allows users to store and analyze large volumes of structured and semi-structured data using SQL and other programming languages. Snowflake’s architecture separates storage and compute, enabling users to scale resources independently based on their needs. It also offers features such as data sharing, data cloning, and time travel, making it a popular choice for modern data warehousing and analytics.
+</dd>
+<dt>EDA</dt>
+<dd>
+Exploratory Data Analysis (EDA) is an approach to analyzing datasets to summarize their main characteristics, often using visual methods. It involves techniques such as plotting distributions, identifying patterns, detecting outliers, and examining relationships between variables. EDA helps data scientists understand the data’s structure, quality, and underlying trends, guiding further analysis and modeling efforts. Common tools for EDA include histograms, scatter plots, box plots, and correlation matrices.
+</dd>
+<dt>Extract, Transform, Load (ETL)</dt>
+<dd>
+ETL stands for Extract, Transform, Load. It is a data integration process that involves extracting data from various sources, transforming it into a suitable format or structure for analysis, and then loading it into a target database or data warehouse. ETL processes are commonly used in data warehousing and business intelligence to consolidate data from multiple systems, ensuring data quality and consistency for reporting and analysis. Talend, Apache NiFi, Apache Airflow, Pentaho, DLT
+</dd>
+<dt><a href="https://www.talend.com/">Talend</a> <span class="badge rounded-pill text-bg-primary">ETL</span> <span class="badge rounded-pill text-bg-secondary">Data Integration</span> <span class="badge rounded-pill text-bg-success">FOSS</span></dt>
+<dd>
+Talend is an open-source data integration platform that provides tools for ETL (Extract, Transform, Load) processes, data quality, and data management. It offers a graphical interface for designing data workflows and supports a wide range of data sources and formats. Talend enables users to automate data integration tasks, ensuring efficient and reliable data processing for analytics and business intelligence.
+</dd>
+<dt><a href="https://github.com/delta-io/delta">DLT</a> <span class="badge rounded-pill text-bg-primary">ETL</span> <span class="badge rounded-pill text-bg-secondary">Data Pipelines</span> <span class="badge rounded-pill text-bg-success">FOSS</span></dt>
+<dd>
+is a python library that provides a framework for building and managing data pipelines. It is designed to simplify the process of creating, scheduling, and monitoring data workflows, allowing users to focus on the logic of their data processing tasks rather than the underlying infrastructure. DLT supports various data sources and formats, making it a versatile tool for data engineering and ETL processes.
+</dd>
+</dl>
 
 
 
@@ -24261,732 +24688,6 @@ Understanding.”</span> March 31, 2025. <a href="https://orenbochman.github.io/
   <guid>https://orenbochman.github.io/reviews/2013/Intuitive-physics/</guid>
   <pubDate>Mon, 31 Mar 2025 00:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/images/lit-review-cover.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Learning Shape Priors for Single-View 3D Completion and Reconstruction</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2018/ShapeHD/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-
-<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://orenbochman.github.io/images/lit-review-cover.jpg" class="nolightbox img-fluid figure-img"></p>
-<figcaption>cover</figcaption>
-</figure>
-</div><div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="mindmap.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="mindmap"><img src="https://orenbochman.github.io/reviews/2018/ShapeHD/mindmap.png" class="img-fluid figure-img" alt="mindmap"></a></p>
-<figcaption>mindmap</figcaption>
-</figure>
-</div><div id="vid-01" class="">
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/TFyAEHk5asY" title="Computational Models of Cognition: Part 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
-<p>Josh Tenenbaum, MIT BMM Summer Course 2018 Computational Models of Cognition: Part 1</p>
-</div><div id="vid-02" class="">
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/lD2tkuRm8fc" title="Computational Models of Cognition: Part 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
-<p>Josh Tenenbaum, MIT BMM Summer Course 2018 Computational Models of Cognition: Part 2</p>
-</div><div id="vid-03" class="">
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/VPT73em9Nuc" title="Computational Models of Cognition: Part 3" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
-<p>Josh Tenenbaum, MIT BMM Summer Course 2018 Computational Models of Cognition: Part 3</p>
-</div></div>
-<!-- VIDEOS GO HERE -->
-
-
-
-<!-- A QUOTE by someone more famous than the author of the paper for context, add highlighting for emphasis, verse is a nice touch!  -->
-<blockquote class="blockquote">
-<p>“The ideal market completely disregards those spikes—but a realistic model cannot.” <mark>Mandelbrot highlights the inadequacy of models ignoring extreme price movements, emphasizing the need for a framework that can accommodate them.</mark></p>
-</blockquote>
-<!-- LEDE personal context why I reviewed this source -->
-<p>For many years now I’ve been considering how to take Bayesian modeling and inference to the next level. One of the perennial question for me has been how to define a prior and a distribution over something more complex than a list of number.</p>
-<p>When stuck I would often turn to Urn Models and try to build a prior from that. However, since I become interested in Complex signaling systems I have been looking for more and more challenging problems like - boolean functions, trees, recursive functions, trees, graphs and even type of neural networks. Unfortunately, the courses I took on Bayesian modeling and inference did not cover these kind of problems.</p>
-<p>However once I came across some talks by Jeshua Tenenbaum I realized that he and his group have been compiling and extending the kind of models I had been at odds to define. This paper is one of the papers he mentions in the BMM Summer Course of 2018 in his summer school on Mind</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>TL;DR - Too Long; Didn’t Read about ShapeHD <!-- Short Catchy title -->
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="../../../images/in_the_nut_shell_coach_retouched.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="ShapeHD in a nutshell"><img src="https://orenbochman.github.io/images/in_the_nut_shell_coach_retouched.jpg" class="img-fluid figure-img" alt="ShapeHD in a nutshell"></a></p>
-<figcaption>ShapeHD in a nutshell</figcaption>
-</figure>
-</div>
-<ol type="1">
-<li><strong>The research question</strong>
-<ul>
-<li><strong>How can we effectively learn and integrate shape priors into a deep learning framework to overcome the inherent ambiguity in single-view 3D shape completion and reconstruction, particularly the issue that multiple plausible 3D shapes can explain a single 2D observation, in order to generate high-quality, detailed, and realistic 3D models?</strong></li>
-</ul></li>
-<li><strong>What are the main findings?</strong>
-<ul>
-<li><strong>Adversarially learned shape priors as a naturalness loss effectively handle ambiguity and generate realistic shapes.</strong></li>
-</ul></li>
-<li><strong>In historical context why was this important?</strong>
-<ul>
-<li>ShapeHD was important because it addressed the overlooked ambiguity of multiple plausible 3D shapes for a single view, a limitation of previous deep learning methods that produced blurry results. It innovatively used adversarially learned shape priors to generate realistic and detailed shapes, shifting from strict ground truth replication to learning the distribution of natural shapes. Its efficiency also marked progress towards practical applications.</li>
-</ul></li>
-</ol>
-</div>
-</div>
-<p>Here is a lighthearted Deep Dive into the paper:</p>
-<audio controls="1">
-<source src="podcast.mp3" data-external="1" type="audio/mpeg">
-
-</audio>
-<section id="abstract" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="abstract">Abstract</h3>
-<div class="page-columns page-full"><blockquote class="blockquote">
-<p>The problem of single-view 3D shape completion or reconstruction is challenging, because among the many possible shapes that explain an observation, most are implausible and do not correspond to natural objects. Recent research in the field has tackled this problem by exploiting the expressiveness of deep convolutional networks. In fact, there is another level of ambiguity that is often overlooked: among plausible shapes, there are still multiple shapes that fit the 2D image equally well; i.e., the ground truth shape is non-deterministic given a single-view input. Existing fully supervised approaches fail to address this issue, and often produce blurry mean shapes with smooth surfaces but no fine details. In this paper, we propose ShapeHD, pushing the limit of single-view shape completion and reconstruction by integrating deep generative models with adversarially learned shape priors. The learned priors serve as a regularizer, penalizing the model only if its output is unrealistic, not if it deviates from the ground truth. Our design thus overcomes both levels of ambiguity aforementioned. Experiments demonstrate that ShapeHD outperforms state of the art by a large margin in both shape completion and shape reconstruction on multiple real datasets.</p>
-<p>— <span class="citation" data-cites="wu2018learning">(Wu et al. 2018)</span></p>
-</blockquote><div class="no-row-height column-margin column-container"><div id="ref-wu2018learning" class="csl-entry">
-Wu, Jiajun, Chengkai Zhang, Xiuming Zhang, Zhoutong Zhang, William T Freeman, and Joshua B Tenenbaum. 2018. <span>“Learning Shape Priors for Single-View 3d Completion and Reconstruction.”</span> In <em>Proceedings of the European Conference on Computer Vision (ECCV)</em>, 646–62.
-</div></div></div>
-</section>
-<section id="glossary" class="level2">
-<h2 class="anchored" data-anchor-id="glossary">Glossary</h2>
-<p>This paper uses lots of big terms so let’s break them down so we can understand them better</p>
-<dl>
-<dt>Single-View 3D Completion</dt>
-<dd>
-The task of predicting the complete 3D shape of an object given only a partial observation from a single viewpoint (e.g., a depth image).
-</dd>
-<dt>Single-View 3D Reconstruction</dt>
-<dd>
-The task of inferring the 3D shape of an object from a single 2D image (e.g., an RGB image).
-</dd>
-<dt>Shape Priors</dt>
-<dd>
-Prior knowledge or assumptions about the likely shapes of objects, often learned from data. In ShapeHD, these are learned through an adversarial process to represent the distribution of realistic 3D shapes.
-</dd>
-<dt>Deep Generative Models</dt>
-<dd>
-Neural network models that learn the underlying probability distribution of a dataset, allowing them to generate new samples that resemble the training data (e.g., Generative Adversarial Networks (GANs)).
-</dd>
-<dt>Adversarial Learning</dt>
-<dd>
-A training paradigm where two neural networks (a generator and a discriminator) compete against each other. The generator tries to produce realistic data, while the discriminator tries to distinguish between real and generated data.
-</dd>
-<dt>Voxel</dt>
-<dd>
-A volumetric pixel, representing a value on a regular grid in 3D space. Often used to represent 3D shapes in deep learning.
-</dd>
-<dt>2.5D Sketch</dt>
-<dd>
-An intermediate representation of a scene or object that captures some 3D information (like depth and surface normals) but is still view-dependent, typically represented as 2D images.
-</dd>
-<dt>ShapeNet</dt>
-<dd>
-A large-scale database of 3D CAD models categorized into semantic classes, commonly used for training and evaluating 3D shape analysis algorithms.
-</dd>
-<dt>Naturalness Loss</dt>
-<dd>
-A loss function in ShapeHD, derived from the adversarial discriminator, that penalizes generated 3D shapes that are deemed unrealistic or not belonging to the learned distribution of natural shapes.
-</dd>
-<dt>Wasserstein GAN (WGAN)</dt>
-<dd>
-A variant of the Generative Adversarial Network that uses a different loss function (Wasserstein distance) and gradient penalty to improve training stability and address issues like mode collapse.
-</dd>
-<dt>Intersection over Union (IoU)</dt>
-<dd>
-A common evaluation metric for tasks like object detection and segmentation, measuring the overlap between the predicted and ground truth regions (or volumes in 3D).
-</dd>
-<dt>Chamfer Distance (CD)</dt>
-<dd>
-A metric used to measure the distance between two point sets (or shapes represented as point samples). It calculates the average nearest neighbor distance between the points in the two sets.
-</dd>
-<dt>Encoder-Decoder Structure</dt>
-<dd>
-A common neural network architecture where an encoder network maps the input to a lower-dimensional representation (latent vector), and a decoder network reconstructs the output from this latent vector.
-</dd>
-</dl>
-<p>ResNet: Residual Network, a type of deep convolutional neural network architecture that uses “skip connections” to help train very deep networks effectively.</p>
-<dl>
-<dt>Transposed Convolutional Layers</dt>
-<dd>
-Also known as deconvolutional layers or fractionally strided convolutions, these layers perform the inverse operation of a standard convolution, often used in the decoder part of generative models to upsample feature maps.
-</dd>
-<dt>Binary Cross-Entropy Loss</dt>
-<dd>
-A loss function commonly used in binary classification tasks, measuring the difference between predicted probabilities and binary target labels (e.g., for voxel occupancy).
-</dd>
-<dt>Gradient Penalty</dt>
-<dd>
-A regularization term added to the WGAN loss to enforce a Lipschitz constraint on the discriminator, further stabilizing training.
-</dd>
-<dt>Ablation Study</dt>
-<dd>
-An experiment where parts of a model or training process are removed or modified to assess their contribution to the overall performance.
-</dd>
-</dl>
-</section>
-<section id="outline" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="outline">Outline</h2>
-
-<div class="no-row-height column-margin column-container"><div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig01.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;1: Our model completes or reconstructs the object’s full 3D shape with fine details from a single depth or RGB image. In this figure, we show two examples, each consisting of an input image, two views of its ground truth shape, and two views of our results. Our reconstructions are of high quality with fine details, and are preferred by humans 41% and 35% of the time in behavioral studies, respectively. Our model takes a single feed-forward pass without any post-processing during testing, and is thus highly efficient (< 100 ms) and practically useful."><img src="https://orenbochman.github.io/reviews/2018/ShapeHD/fig01.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Our model completes or reconstructs the object’s full 3D shape with fine details from a single depth or RGB image. In this figure, we show two examples, each consisting of an input image, two views of its ground truth shape, and two views of our results. Our reconstructions are of high quality with fine details, and are preferred by humans 41% and 35% of the time in behavioral studies, respectively. Our model takes a single feed-forward pass without any post-processing during testing, and is thus highly efficient (&lt; 100 ms) and practically useful.
-</figcaption>
-</figure>
-</div><div id="fig-2" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig02.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;2: Two levels of ambiguity in single-view 3D shape perception. For each 2D observation (a), there exist many possible 3D shapes that explain this observation equally well (b, c), but only a small fraction of them correspond to real, daily shapes (c). Methods that exploit deep networks for recognition reduce, to a certain extent, ambiguity on this level. By using an adversarially learned naturalness model, our ShapeHD aims to model ambiguity on the next level: even among the realistic shapes, there are still multiple shapes explaining the observation well (c)"><img src="https://orenbochman.github.io/reviews/2018/ShapeHD/fig02.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Two levels of ambiguity in single-view 3D shape perception. For each 2D observation (a), there exist many possible 3D shapes that explain this observation equally well (b, c), but only a small fraction of them correspond to real, daily shapes (c). Methods that exploit deep networks for recognition reduce, to a certain extent, ambiguity on this level. By using an adversarially learned naturalness model, our ShapeHD aims to model ambiguity on the next level: even among the realistic shapes, there are still multiple shapes explaining the observation well (c)
-</figcaption>
-</figure>
-</div><div id="fig-3" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig03.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;3: For single-view shape reconstruction, ShapeHD contains three components: (I) a 2.5D sketch estimator that predicts depth, surface normal and silhouette images from a single image; (II) a 3D shape completion module that regresses 3D shapes from silhouette-masked depth and surface normal images; (III) an adversarially pretrained convolutional net that serves as the naturalness loss function. While fine-tuning the 3D shape completion net, we use two losses:a supervised loss on the output shape, and a naturalness loss offered by the pretrained discriminator"><img src="https://orenbochman.github.io/reviews/2018/ShapeHD/fig03.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: For single-view shape reconstruction, ShapeHD contains three components: (I) a 2.5D sketch estimator that predicts depth, surface normal and silhouette images from a single image; (II) a 3D shape completion module that regresses 3D shapes from silhouette-masked depth and surface normal images; (III) an adversarially pretrained convolutional net that serves as the naturalness loss function. While fine-tuning the 3D shape completion net, we use two losses:a supervised loss on the output shape, and a naturalness loss offered by the pretrained discriminator
-</figcaption>
-</figure>
-</div><div id="fig-4" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig04.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;4: Results on 3D shape completion from single-view depth. From left to right: input depth maps, shapes reconstructed by ShapeHD in the canonical view and a novel view, and ground truth shapes in the canonical view. Assisted by the adversarially learned naturalness losses, ShapeHD recovers highly accurate 3D shapes with fine details. Sometimes the reconstructed shape deviates from the ground truth, but can be viewed as another plausible explanation of the input (e.g., the airplane on the left, third row)"><img src="https://orenbochman.github.io/reviews/2018/ShapeHD/fig04.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: Results on 3D shape completion from single-view depth. From left to right: input depth maps, shapes reconstructed by ShapeHD in the canonical view and a novel view, and ground truth shapes in the canonical view. Assisted by the adversarially learned naturalness losses, ShapeHD recovers highly accurate 3D shapes with fine details. Sometimes the reconstructed shape deviates from the ground truth, but can be viewed as another plausible explanation of the input (e.g., the airplane on the left, third row)
-</figcaption>
-</figure>
-</div><div id="fig-5" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig05.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;5: Our results on 3D shape completion, compared with the state of the art, 3D-EPN [8], and our model but without naturalness losses. Our results contain more details than 3D-EPN. We observe that the adversarially trained naturalness losses help fix errors, add details (e.g., the plane wings in row 3, car seats in row 6, and chair arms in row 8), and smooth planar surfaces (e.g., the sofa back in row 7)"><img src="https://orenbochman.github.io/reviews/2018/ShapeHD/fig05.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: Our results on 3D shape completion, compared with the state of the art, 3D-EPN [8], and our model but without naturalness losses. Our results contain more details than 3D-EPN. We observe that the adversarially trained naturalness losses help fix errors, add details (e.g., the plane wings in row 3, car seats in row 6, and chair arms in row 8), and smooth planar surfaces (e.g., the sofa back in row 7)
-</figcaption>
-</figure>
-</div><div id="fig-6" class="quarto-float quarto-figure quarto-figure-center anchored" data-group="figures">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="./fig06.png" class="lightbox" data-gallery="figures" title="Figure&nbsp;6: Results of 3D shape completion on depth data from a physical scanner. Our model is able to reconstruct the shape well from just a single view. From left to right: input depth, two views of our result, and a color image of the object"><img src="https://orenbochman.github.io/reviews/2018/ShapeHD/fig06.png" class="img-fluid figure-img" width="250"></a>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;6: Results of 3D shape completion on depth data from a physical scanner. Our model is able to reconstruct the shape well from just a single view. From left to right: input depth, two views of our result, and a color image of the object
-</figcaption>
-</figure>
-</div></div>
-
-
-
-
-<ul>
-<li>1 Introduction
-<ul>
-<li>Introduces the challenge of single-view 3D shape completion and reconstruction, highlighting the ambiguity of the task.</li>
-<li>Notes the limitations of existing deep learning methods in capturing the full range of plausible shapes.</li>
-<li>Briefly mentions the use of adversarially learned shape priors in ShapeHD to address this ambiguity.</li>
-</ul></li>
-<li>2 Related Work
-<ul>
-<li>Discusses traditional and recent methods for 3D shape completion, including those using deep learning.</li>
-<li>Reviews single-image 3D reconstruction techniques, including those based on voxels, point clouds, and 2.5D sketches.</li>
-<li>Covers the use of perceptual losses and adversarial learning in computer vision, particularly in the context of 3D shape synthesis and reconstruction.</li>
-</ul></li>
-<li>3 Approach
-<ul>
-<li>Presents the three components of ShapeHD: a 2.5D sketch estimator, a 3D shape estimator, and a deep naturalness model.</li>
-<li>Describes the architecture and training process of the 2.5D sketch estimation network.</li>
-<li>Explains the encoder-decoder structure and supervised loss used in the 3D shape completion network.</li>
-</ul></li>
-<li>3.1 Shape Naturalness Network
-<ul>
-<li>Explains the role of the shape naturalness network in addressing the ambiguity of single-view reconstruction.</li>
-<li>Describes the adversarial training process of the naturalness network using a 3D generative adversarial network (GAN).</li>
-<li>Presents the Wasserstein GAN loss with a gradient penalty used to stabilize GAN training.</li>
-</ul></li>
-<li>3.2 Training Paradigm
-<ul>
-<li>Outlines the two-stage training process of ShapeHD, including pre-training and fine-tuning.</li>
-<li>Discusses the separate training of the 2.5D sketch estimator, 3D shape estimator, and naturalness network.</li>
-<li>Explains the fine-tuning process of the completion network using both voxel loss and naturalness losses.</li>
-</ul></li>
-<li>4 Single-View Shape Completion
-<ul>
-<li>Focuses on the application of ShapeHD to 3D shape completion from single depth images.</li>
-</ul></li>
-<li>4.1 Setup
-<ul>
-<li>Describes the data preparation process using ShapeNet Core55 objects, including rendering depth and surface normal images.</li>
-<li>Mentions the baselines used for comparison, specifically 3D-EPN.</li>
-<li>Lists the quantitative metrics used for evaluation: Intersection over Union (IoU) and Chamfer Distance (CD).</li>
-</ul></li>
-<li>4.2 Results on ShapeNet
-<ul>
-<li>Presents qualitative results of ShapeHD on ShapeNet, highlighting its ability to recover fine details and handle occlusions.</li>
-<li>Discusses an ablation study comparing ShapeHD with and without naturalness loss, demonstrating the benefits of the latter.</li>
-<li>Provides quantitative results showing ShapeHD’s superior performance over 3D-EPN in both IoU and CD.</li>
-</ul></li>
-<li>4.3 Results on Real Depth Scans
-<ul>
-<li>Shows results of ShapeHD on real depth scans captured using a Structure sensor.</li>
-<li>Highlights the flexibility of ShapeHD in handling real-world data without requiring camera parameters.</li>
-</ul></li>
-<li>5 3D Shape Reconstruction
-<ul>
-<li>Evaluates ShapeHD on 3D shape reconstruction from single color images.</li>
-</ul></li>
-<li>5.1 Setup
-<ul>
-<li>Describes the rendering process for RGB images, including the use of various backgrounds for realism.</li>
-<li>Lists the baselines used for comparison, including 3D-R2N2, PSGN, DRC, OGN, and AtlasNet.</li>
-<li>Mentions the use of Chamfer Distance (CD) as the primary evaluation metric.</li>
-</ul></li>
-<li>5.2 Results
-<ul>
-<li>Presents qualitative and quantitative results of ShapeHD on ShapeNet, demonstrating its ability to reconstruct detailed shapes.</li>
-<li>Discusses the generalization ability of ShapeHD on novel object categories, showing its superior performance over DRC.</li>
-<li>Shows results on real datasets (PASCAL 3D+ and Pix3D), highlighting ShapeHD’s ability to handle real-world images.</li>
-<li>Includes a user study comparing ShapeHD with OGN, indicating a preference for ShapeHD’s reconstructions.</li>
-</ul></li>
-<li>6 Analyses
-<ul>
-<li>Provides insights into the learned representations and behavior of ShapeHD.</li>
-<li>Visualizes the network’s learned object and part detectors, demonstrating its ability to attend to meaningful shape features.</li>
-<li>Analyzes the effect of naturalness loss over time, showing how it contributes to the emergence of fine details.</li>
-<li>Discusses common failure modes of ShapeHD, such as difficulties with deformable parts and thin structures.</li>
-</ul></li>
-<li>7 Conclusion
-<ul>
-<li>Summarizes the key contributions of the paper, emphasizing the use of learned shape priors to address ambiguity.</li>
-<li>Highlights the state-of-the-art performance of ShapeHD in 3D shape completion and reconstruction.</li>
-<li>Suggests future research directions in 3D shape modeling, particularly in understanding and modeling ambiguity.</li>
-</ul></li>
-</ul>
-</section>
-<section id="reflections" class="level2">
-<h2 class="anchored" data-anchor-id="reflections">Reflections <!-- Criticism & Own Thoughts  --></h2>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sagittis posuere ligula sit amet lacinia. Duis dignissim pellentesque magna, rhoncus congue sapien finibus mollis. Ut eu sem laoreet, vehicula ipsum in, convallis erat. Vestibulum magna sem, blandit pulvinar augue sit amet, auctor malesuada sapien. Nullam faucibus leo eget eros hendrerit, non laoreet ipsum lacinia. Curabitur cursus diam elit, non tempus ante volutpat a. Quisque hendrerit blandit purus non fringilla. Integer sit amet elit viverra ante dapibus semper. Vestibulum viverra rutrum enim, at luctus enim posuere eu. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
-<p>Nunc ac dignissim magna. Vestibulum vitae egestas elit. Proin feugiat leo quis ante condimentum, eu ornare mauris feugiat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris cursus laoreet ex, dignissim bibendum est posuere iaculis. Suspendisse et maximus elit. In fringilla gravida ornare. Aenean id lectus pulvinar, sagittis felis nec, rutrum risus. Nam vel neque eu arcu blandit fringilla et in quam. Aliquam luctus est sit amet vestibulum eleifend. Phasellus elementum sagittis molestie. Proin tempor lorem arcu, at condimentum purus volutpat eu. Fusce et pellentesque ligula. Pellentesque id tellus at erat luctus fringilla. Suspendisse potenti.</p>
-</section>
-<section id="the-paper" class="level2">
-<h2 class="anchored" data-anchor-id="the-paper">The paper</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="./paper.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="paper"><embed src="./paper.pdf" class="col-page" width="800" height="1000"></a></p>
-<figcaption>paper</figcaption>
-</figure>
-</div>
-
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {Learning {Shape} {Priors} for {Single-View} {3D} {Completion}
-    and {Reconstruction}},
-  date = {2025-03-29},
-  url = {https://orenbochman.github.io/reviews/2018/ShapeHD/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“Learning Shape Priors for Single-View 3D
-Completion and Reconstruction.”</span> March 29, 2025. <a href="https://orenbochman.github.io/reviews/2018/ShapeHD/">https://orenbochman.github.io/reviews/2018/ShapeHD/</a>.
-</div></div></section></div> ]]></description>
-  <category>review</category>
-  <category>podcast</category>
-  <guid>https://orenbochman.github.io/reviews/2018/ShapeHD/</guid>
-  <pubDate>Sat, 29 Mar 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/images/lit-review-cover.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>🤝 Costly Signaling and Cooperation</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2000/costly-signaling-and-cooperation/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-
-<!-- 
-- TODO:
-  - [x] folder-name
-  - [x] date
-  - [x] title / subtitle
-  - [ ] description
-  - [x] categories
-  - [x] keywords
-  - [x] paper - download rename
-  - [x] abstract
-  - [x] citation
-  - [x] outline
-  - [x] glossary
-  - [x] podcast
-  - [x] Lede paragraph
-  - [ ] tl;dr
-  - [ ] figures
-  - [x] reflections
-  - [ ] video - locate/remove
-  - [ ] quote
-  - [x] remove draft
--->
-<!-- VIDEOS GO HERE 
-
-::: {.column-margin #fig-subtasks}
-
-
-Talk at Waterloo.AI by Martha White on Developing Reinforcement Learning Agents that Learn Many Subtasks. She makes the case for the life long problem setting and discusses recent research on learning multiple tasks (options and GVFs) in parallel.
-:::
-
--->
-<!-- A QUOTE by someone more famous than the author of the paper for context, add highlighting for emphasis, verse is a nice touch! 
-
-> "The ideal market completely disregards those spikes—but a realistic model cannot." [Mandelbrot highlights the inadequacy of models ignoring extreme price movements, emphasizing the need for a framework that can accommodate them.]{.mark}
-
--->
-<!-- LEDE personal context why I reviewed this source -->
-<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://orenbochman.github.io/images/lit-review-cover.jpg" class="nolightbox img-fluid figure-img"></p>
-<figcaption>cover</figcaption>
-</figure>
-</div></div><p>I tried to make sense of costly signaling when I was writing up the relevant section of many paths to signaling.</p>
-<p>This academic paper proposes that cooperation among unrelated individuals can evolve through costly signaling, where providing group benefits honestly signals an individual’s quality, leading to advantageous alliances. The authors present a game-theoretic model demonstrating that this signaling can be evolutionarily stable even without repeated interactions or group selection</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>TL;DR - Too Long; Didn’t Read about Costly Signaling
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="../../../images/in_the_nut_shell_coach_retouched.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Costly signaling in a nutshell"><img src="https://orenbochman.github.io/images/in_the_nut_shell_coach_retouched.jpg" class="img-fluid figure-img" alt="Costly signaling in a nutshell"></a></p>
-<figcaption>Costly signaling in a nutshell</figcaption>
-</figure>
-</div>
-<p>In this paper the authors ask how can cooperation among unrelated members of a social group evolve and be maintained, particularly in situations where traditional explanations like reciprocity are unlikely to apply</p>
-<p>In essence, the paper seeks to provide a game-theoretic model based on costly signaling theory to explain the evolution of cooperation among unrelated individuals, particularly in contexts resembling public goods games where defection would otherwise be the dominant strategy</p>
-</div>
-</div>
-<p>Here is a lighthearted Deep Dive into the paper:</p>
-<audio controls="1">
-<source src="podcast.mp3" data-external="1" type="audio/mpeg">
-
-</audio>
-<section id="abstract" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="abstract">Abstract</h3>
-<div class="page-columns page-full"><blockquote class="blockquote">
-<p>We propose an explanation of cooperation among unrelated members of a social group, in which providing group benefits evolves because it constitutes an honest signal of the member’s quality as a mate, coalition partner or competitor, and therefore results in advantageous alliances for those signaling in this manner. Our model is framed as an n-player game that involves no repeated or assortative interactions, and assumes a payoff structure that would conform to an n-player public goods game in which non-cooperation would be a dominant strategy if there were no signaling benefits. We show that honest signaling of underlying quality by providing a public good to group members can be evolutionarily stable. We also show that this behavior is capable of proliferating in a population in which it is initially rare. Our model applies to a range of cooperative interactions, including providing individually consumable resources, participating in group raiding or defense, and punishing free-riding or other violations of social norms. Our signaling model is distinctive in applying to group rather than dyadic interactions and in determining endogenously the fraction of the group that signals high quality in equilibrium. <!--ABSTRACT HERE--></p>
-<p>— <span class="citation" data-cites="smith2000costly">(Smith, Bowles, and Gintis 2000)</span> <!--CITATION HERE--></p>
-</blockquote><div class="no-row-height column-margin column-container"><div id="ref-smith2000costly" class="csl-entry">
-Smith, Eric, Samuel Bowles, and Herbert Gintis. 2000. <span>“Costly Signaling and Cooperation.”</span> <em>Santa Fe WP</em>.
-</div></div></div>
-</section>
-<section id="glossary" class="level2">
-<h2 class="anchored" data-anchor-id="glossary">Glossary</h2>
-<p>This book/paper uses lots of big terms so let’s break them down so we can understand them better</p>
-<dl>
-<dt>Costly Signaling</dt>
-<dd>
-A theoretical framework suggesting that individuals can reliably signal their underlying quality by engaging in behaviors that are more costly for lower-quality individuals to perform.
-</dd>
-<dt>Cooperation</dt>
-<dd>
-Behavior by two or more individuals that leads to mutual benefit. In the context of the paper, it often refers to providing a benefit to the group.
-</dd>
-<dt>Public Goods Game</dt>
-<dd>
-A type of game in which individuals can contribute to a common pool that benefits everyone, but individual contributions are costly, leading to the incentive to free-ride.
-</dd>
-<dt>Signaler</dt>
-<dd>
-An individual who performs a costly action (the signal) to convey information about their quality.
-</dd>
-<dt>Partner</dt>
-<dd>
-An individual who observes the signal and uses this information to make decisions about forming alliances or other social interactions with the signaler.
-</dd>
-<dt>Quality</dt>
-<dd>
-An underlying attribute of an individual (e.g., health, strength, skill) that is difficult to observe directly but affects their value as a mate, ally, or competitor.
-</dd>
-<dt>Honest Signal</dt>
-<dd>
-A signal that reliably indicates the signaler’s true quality because it is too costly for low-quality individuals to fake.
-</dd>
-<dt>Free-riding</dt>
-<dd>
-Benefiting from a public good without contributing to its provision.
-</dd>
-<dt>Evolutionarily Stable Strategy (ESS)</dt>
-<dd>
-A strategy that, if adopted by a population, cannot be invaded by any rare alternative strategy.
-</dd>
-<dt>Nash Equilibrium</dt>
-<dd>
-A state in a game where no player can improve their payoff by unilaterally changing their strategy, given the strategies of the other players.
-</dd>
-<dt>Replicator Dynamic</dt>
-<dd>
-A model of evolutionary change where the frequency of a strategy in a population increases if its payoff is higher than the average payoff of the population.
-</dd>
-<dt>Basin of Attraction</dt>
-<dd>
-The set of initial conditions (e.g., frequencies of strategies) that will eventually lead to a particular stable equilibrium under a dynamic process.
-</dd>
-<dt>Broadcast Efficiency</dt>
-<dd>
-The extent to which a signal is observable by a wide audience of potential partners.
-</dd>
-<dt>Multilevel Selection</dt>
-<dd>
-A form of natural selection that operates on multiple levels of organization, such as genes, individuals, and groups.
-</dd>
-<dt>Dominant Strategy</dt>
-<dd>
-A strategy that yields the highest payoff for a player regardless of the strategies chosen by other players.
-</dd>
-<dt>Payoff Matrix</dt>
-<dd>
-A table that shows the payoffs to each player in a game for every possible combination of strategies.
-</dd>
-</dl>
-</section>
-<section id="outline" class="level2">
-<h2 class="anchored" data-anchor-id="outline">Outline</h2>
-<ul>
-<li>Introduction
-<ul>
-<li>Describes how cooperation among unrelated individuals has generally been explained by some form of conditional reciprocity, but notes an increased interest in alternative mechanisms such as multi-level selection and mutualism.</li>
-<li>Introduces a game-theoretic model of the evolution of cooperation based on costly signaling theory.</li>
-<li>Notes the model applies to a range of social interactions including food sharing, group raiding/defense, and punishing free-riding.</li>
-<li>Highlights how the model is distinctive in applying to group rather than dyadic interactions and in determining endogenously the fraction of the group that signals high quality in equilibrium.</li>
-</ul></li>
-<li>A Model of Costly Signaling
-<ul>
-<li>Presents a game in which group members can signal their quality by providing a benefit to the group.</li>
-<li>Describes the conditions for an honest signaling equilibrium where high quality types signal and low quality types do not.</li>
-<li>Discusses how the equilibrium conditions depend upon the frequency of high quality types in the group.</li>
-</ul></li>
-<li>Dynamics
-<ul>
-<li>Introduces a replicator dynamic to model how the fraction of honest signalers and partners who respond to the signal changes over time.</li>
-<li>Describes how the replicator equations demonstrate that the honest signaling equilibrium is stable and how adding plausible assumptions increases the basin of attraction of the signaling equilibrium.</li>
-</ul></li>
-<li>Why Signal by Providing Benefits to Others?
-<ul>
-<li>Notes how, in the model, the existence of a costly signaling equilibrium does not depend on the character of the benefit provided to the group.</li>
-<li>Highlights three reasons why prosocial signaling may be favored:
-<ul>
-<li>Prosocial traits may enhance the signaler’s value to a potential ally.</li>
-<li>Prosocial signaling may increase broadcast efficiency.</li>
-<li>Groups with a high level of prosocial costly signaling may have more fit members.</li>
-</ul></li>
-</ul></li>
-<li>The Evolution of Signaling
-<ul>
-<li>Describes two ways in which signaling could proliferate:
-<ul>
-<li>Stochastic events.</li>
-<li>Periodic changes in the environment.</li>
-</ul></li>
-<li>Discusses how intergroup competition may contribute to the evolutionary success of signaling.</li>
-<li>Presents a dynamic model to explain how the frequency of high-quality types in the population can be maintained despite their higher fitness in the signaling equilibrium.</li>
-</ul></li>
-<li>Conclusion
-<ul>
-<li>Summarizes how the model shows that a class of signals that contribute to group benefits may proliferate in a population and be evolutionarily stable.</li>
-<li>Notes how costly signaling may provide a mechanism for the evolution of cooperative and other group beneficial practices independent of other mechanisms.</li>
-<li>Mentions other factors such as repeated interactions, positive assortment, and multilevel selection may reinforce this evolutionary process.</li>
-</ul></li>
-</ul>
-</section>
-<section id="reflections" class="level2">
-<h2 class="anchored" data-anchor-id="reflections">Reflections</h2>
-<!-- Beyond the outline -->
-<p>Costly signaling arises naturally in two well known contexts, <a href="https://en.wikipedia.org/wiki/Amotz_Zahavi">Zehavi’s</a> <a href="https://en.wikipedia.org/wiki/Handicap_principle">handicap principle</a> and <a href="https://en.wikipedia.org/wiki/Michael%20Spence's">Michael_Spence</a> <a href="https://en.wikipedia.org/wiki/Signaling_game#Education_game">Education game</a> signaling games.</p>
-<p>In both of these games the cost of a signal is (apparently) prohibitive for imposters to fake. Good ideas in principle. But in the case of the infamous peacock tail, the individual is born with the capacity for a tail, that don’t have much of a choice in the matter except to die. In the case of the education game, the cost of education seems prohibitive until all good jobs require a degree and then having a degree is no longer is a signal of quality. In china recently, economic downturn have led to a glut of graduates and a shortage of jobs, and reportedly students are delaying their entry to the unemployment market by staying in school for another degree.</p>
-<p>I quickly realized that costly signaling is a dubious mechanism for creating voracity. But it seems to create a type of run away arms race that can become a social dilemma. For the costs of signaling to be prohibitive the benefits accrued by deception must remain low.</p>
-<p>One place where costly signaling makes sense is email-spam. If signaling has no cost this would lead any agent that can benefit by signals to do so. This drowns out the other signals. This suggests a social costs of cheap talk. If there is a penalty for sending spam, the spammer would only send spam where the expected benefits outweigh the costs. If the expected benefit is usd 1/1,000,000 we could charge 1 cent per email and the spammer would not send such an spam email. However if they could get sufficiently high payoffs they might choose to still send spam. They may even send these to a targeted group of people who are more likely to respond to the spam.</p>
-<p>Using a sufficiently high cost will reduce spam, but it will make sending email costly for everyone. This is a problem.</p>
-<p>A better solution is if you can sue someone for spamming. If there is a law and service for doing this spammers will be more likely to be caught and the cost of spamming will be higher, but the cost of sending email will not be higher for everyone.</p>
-<p>So there main point is that costly signaling requires a mechanism for punishing spammers – this is conceptually simple but requires significant work to implement. I.e. there is a role for social punishment in the evolution of costly signaling and this role should be self-financing for the punisher.</p>
-<p>The paper suggests that punishers get reputations for punishing and that this reputation is a signal of quality. This is a feedback mechanism.</p>
-<!--
-
-## The model
-
-I doubt that the authors could have made thier model less clear. The more I look at this paper also, the more I feel it is a trivial results. The settings in which signaling arises in one interaction is one which incentives are clearly aligned.
-Signaling is easy in a cooperative setting. Does signaling create cooperation or make it easier?  The model's requirements seem to be rather restrictive and we can probably get stronger results with a more general model...
-
-Alliances are defined as dyadic but seem to be many to many so they might be better viewed as coalitions. 
-
-
-
-The model involves:
-
-- A group of $n$ members, each with a personal quality that can be either high or low. 
-- The probability of an individual being of high quality is $p$, and the probability of being of low quality is $q = 1 - p$. 
-- Individuals know their own quality but not that of others.
-
-**Signaling Action and Cost:**
-
-- Each member can choose to provide a benefit to the group at a personal cost. 
-- The cost for a high-quality individual to signal is $c > 0$, and the cost for a low-quality individual is $c' > c > 0$.
-
-**Alliance Formation and Benefit:**
-
-Each period, each member can be designated as a 'Partner' who may form an alliance with one of the other $n-1$ group members (the 'Signaler'). 
-A Partner derives a benefit $h > 0$ from allying with a high-quality individual and a benefit $l < h$ from allying with a low-quality individual, with a payoff of zero if no ally is chosen. 
-A Signaler receives a payoff $s > 0$ from each Partner who chooses to ally with them.
-
-**Honest Signaling Equilibrium Condition:**
-
-For an honest signaling equilibrium to exist, where high-quality individuals signal and low-quality individuals do not (Signaler strategy $sn$), and Partners choose randomly from those who signaled (Partner strategy $ar$), the following conditions must hold:
-
-$pc' > s > pc$
-
-and
-
-$h > l$
-
-**Replicator Dynamics:**
-
-The change in the frequency of honest signalers ($\alpha$) and 'accept if signaler signals' partners ($\beta$) can be modeled by the following replicator equations:
-
-$$
-\dot{\alpha} = \alpha(1 - \alpha)(\beta s - pc) \qquad
-$$ 
-
-$$
-\dot{\beta} = \beta(1 - \beta)(h - l)q (if \alpha > 0) \qquad
-$$ 
-
-$$
-\dot{\beta} = -\beta(1 - \beta)(hp + lq) (if \alpha = 0) \qquad
-$$ 
-
-**Revised Model with Alliance Failure and Signal Processing Cost:**
-
-Introducing a probability of alliance failure $1 - \gamma$ and a cost $\nu c$ for processing signals, the probability that an 'ar' type forms an alliance is:
-$\delta(\alpha) = 1 - (1 - \gamma)^{\alpha p(n-1)}$
-
-The revised replicator equations are:
-
-$$
-\dot{\alpha} = \alpha(1 - \alpha)(\beta s / \alpha - pc) \qquad
-$$ 
-
-$$
-\dot{\beta} = \beta(1 - \beta)(\delta(\alpha)(h - l)q - \nu c) \qquad
-$$ 
-with $\dot{\alpha} = 0$ when $\alpha = 0$.
-
-The internal equilibrium for this system is given by:
-$\alpha_o = \delta^{-1}(\frac{\nu c}{(h - l)q})$ (7)
-$\beta_o = \frac{\alpha_o c p}{s}$ (8)
-
-**Evolution of the Frequency of High-Quality Types:**
-
-The change in the frequency of high-quality types ($p$) is given by the differential equation:
-$\dot{p} = pq(s/p - c) - zp + wq$ (10)
-which simplifies to:
-$\dot{p} = cp^2 - (c + s + w + z)p + s + w$ (11)
-where $z$ is the proportion of offspring from high-quality parents that are low quality, and $w$ is the proportion of offspring from low-quality parents that are high quality.
-
-The stable equilibrium frequency of high-quality types ($p^*$) is:
-$p^* = \frac{c + s + w + z - \sqrt{(c + s + w + z)^2 - 4c(s + w)}}{2c}$
-
-These equations and conditions define the core elements of the costly signaling model for cooperation as presented in the sources. The model demonstrates how costly signals, in the form of providing group benefits, can lead to stable cooperation even in the absence of reciprocity or assortative interactions.
-
--->
-</section>
-<section id="the-paper" class="level2">
-<h2 class="anchored" data-anchor-id="the-paper">The paper</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="./paper.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="paper"><embed src="./paper.pdf" class="col-page" width="800" height="1000"></a></p>
-<figcaption>paper</figcaption>
-</figure>
-</div>
-
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {🤝 {Costly} {Signaling} and {Cooperation}},
-  date = {2025-03-24},
-  url = {https://orenbochman.github.io/reviews/2000/costly-signaling-and-cooperation/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“🤝 Costly Signaling and Cooperation.”</span>
-March 24, 2025. <a href="https://orenbochman.github.io/reviews/2000/costly-signaling-and-cooperation/">https://orenbochman.github.io/reviews/2000/costly-signaling-and-cooperation/</a>.
-</div></div></section></div> ]]></description>
-  <category>review</category>
-  <category>signaling</category>
-  <category>cooperation</category>
-  <category>economics</category>
-  <category>podcast</category>
-  <guid>https://orenbochman.github.io/reviews/2000/costly-signaling-and-cooperation/</guid>
-  <pubDate>Mon, 24 Mar 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/images/lit-review-cover.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Smaller, Weaker, Yet Better: Training LLM Reasoners via Compute-Optimal Sampling</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2024/smaller-weaker-yet-better/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-<p>in <span class="citation" data-cites="bansal2024smallerweakerbettertraining">(Bansal et al. 2024)</span> the authors consider the trade-offs between generating synthetic data using a stronger but more expensive (SE) model versus a weaker but cheaper (WC) model. They evaluate the generated data across three key metrics: coverage, diversity, and false positive rate, and show that the data from WC models may have higher coverage and diversity, but also exhibit higher false positive rates. They then finetune LMs on data from SE and WC models in different settings: knowledge distillation, self-improvement, and a novel weak-to-strong improvement setup where a weaker LM teaches reasoning to a stronger LM. Their findings reveal that models finetuned on WC-generated data consistently outperform those trained on SE-generated data across multiple benchmarks and multiple choices of WC and SE models. These results challenge the prevailing practice of relying on SE models for synthetic data generation, suggesting that WC may be the compute-optimal approach for training advanced LM reasoners.</p>
-<div class="no-row-height column-margin column-container"><div id="ref-bansal2024smallerweakerbettertraining" class="csl-entry">
-Bansal, Hritik, Arian Hosseini, Rishabh Agarwal, Vinh Q. Tran, and Mehran Kazemi. 2024. <span>“Smaller, Weaker, yet Better: Training LLM Reasoners via Compute-Optimal Sampling.”</span> <a href="https://arxiv.org/abs/2408.16737">https://arxiv.org/abs/2408.16737</a>.
-</div></div><p>Training on high-quality synthetic data from strong language models (LMs) is a common strategy to improve the reasoning performance of LMs. In this work, we revisit whether this strategy is compute-optimal under a fixed inference budget (e.g., FLOPs). To do so, we investigate the trade-offs between generating synthetic data using a stronger but more expensive (SE) model versus a weaker but cheaper (WC) model. We evaluate the generated data across three key metrics: coverage, diversity, and false positive rate, and show that the data from WC models may have higher coverage and diversity, but also exhibit higher false positive rates. We then finetune LMs on data from SE and WC models in different settings: knowledge distillation, self-improvement, and a novel weak-to-strong improvement setup where a weaker LM teaches reasoning to a stronger LM. Our findings reveal that models finetuned on WC-generated data consistently outperform those trained on SE-generated data across multiple benchmarks and multiple choices of WC and SE models. These results challenge the prevailing practice of relying on SE models for synthetic data generation, suggesting that WC may be the compute-optimal approach for training advanced LM reasoners.</p>
-
-
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {Smaller, {Weaker,} {Yet} {Better:} {Training} {LLM}
-    {Reasoners} via {Compute-Optimal} {Sampling}},
-  date = {2025-03-20},
-  url = {https://orenbochman.github.io/reviews/2024/smaller-weaker-yet-better/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“Smaller, Weaker, Yet Better: Training LLM
-Reasoners via Compute-Optimal Sampling.”</span> March 20, 2025. <a href="https://orenbochman.github.io/reviews/2024/smaller-weaker-yet-better/">https://orenbochman.github.io/reviews/2024/smaller-weaker-yet-better/</a>.
-</div></div></section></div> ]]></description>
-  <guid>https://orenbochman.github.io/reviews/2024/smaller-weaker-yet-better/</guid>
-  <pubDate>Thu, 20 Mar 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/reviews/2024/smaller-weaker-yet-better/cover.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

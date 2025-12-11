@@ -1,0 +1,118 @@
+---
+title: "Designing a Fast, Offline-Capable Reverse Geocoder in Python: An Open Source Alternative to Big Geo APIs"
+subtitle: "PyData Global 2025 Recap"
+date: 2025-12-09
+categories: ["PyData", "Geospatial", "Reverse Geocoding", "Python", "Open Source"]
+keywords: ["PyData", "Geospatial", "Reverse Geocoding", "Python", "Open Source"]
+description: "A hands-on walkthrough of building a fast, offline-capable reverse geocoder in Python using open-source tools like cKDTree, shapely, and geopandas."
+image: pydata_logo.png
+---
+
+![pydata global](pydata_logo.png){.column-margin}
+
+::: {.callout-tip}
+## Lecture Overview
+
+While commercial reverse geocoding APIs, such as Google Maps or Mapbox, are effective, they are also costly, have rate limitations, and are not appropriate for offline or privacy-sensitive settings.
+
+Using available datasets and Python modules like cKDTree, shapely, and geopandas, we will demonstrate how to create a quick, scalable, offline-capable reverse geocoding system in Python in this session.
+:::
+
+Reverse geocoding — converting coordinates into readable place names — is a core building block of applications in logistics, mapping, mobility, and location intelligence. Yet developers are often locked into commercial APIs that are expensive, rate-limited, and unsuitable for offline or privacy-first use cases.
+
+In this talk, we’ll walk through the architecture and implementation of a fast reverse geocoding engine built entirely in Python using open-source tooling. You’ll see how spatial data (such as OpenStreetMap shapefiles) can be indexed efficiently using scipy's cKDTree, queried with millisecond latency, and integrated into real-world systems.
+
+We’ll explore performance trade-offs, data preprocessing techniques, and methods for dealing with ambiguous or noisy GPS data. The session includes benchmarks and a live walkthrough of the code powering the reverse geocoder — which is lightweight enough to run on a laptop or edge device.
+
+Attendees will leave with a clear understanding of how to build and adapt this system for their own needs — and gain insight into how geospatial systems work behind the scenes.
+
+
+::: {.callout-tip}
+## What You'll Learn:
+
+You will learn how to:
+
+- Convert geographic shapefiles into effective spatial indices
+- Perform location lookups in milliseconds using tree search and vector mathematics
+- Handle edge cases like unclear borders, cities with identical names, and GPS noise
+- Improve performance and memory usage through multiprocessing
+- The system is fully open source and has been production-tested in a high-throughput environment. Whether you are developing applications for edge inference, mapping, or logistics, this talk will help you take control of your geospatial infrastructure without depending on costly commercial APIs.
+
+:::
+
+:::: {.callout-tip}
+## Speakers: 
+
+### Sooraj Sivadasan
+
+Product Engineer at @ Strollby
+
+
+- Contact:
+    - [🌸 Personal Website](https://soorajts.vercel.app/)
+    - [𝐗](https://x.com/@_soorajsivadas_)
+    - [Medium](https://medium.com/@jenwei0312)
+    - [💼 LinkedIn profile](in/sooraj-t-s-58b9001a9)
+:::
+
+[workshop repo](https://github.com/SOORAJTS2001/pydata-retro-geo)
+
+
+## Outline
+
+![](slide01.png)
+
+![](slide02.png)
+
+![](slide03.png)
+
+The kDTree was the data structure of my choice, due to their spatially oriented structure (You could see that in the slide 3)
+
+![](slide04.png)
+
+![](slide05.png)
+
+![](slide06.png)
+
+![](slide07.png)
+
+![](slide08.png)
+
+![](slide09.png)
+
+![](slide10.png)
+
+![](slide11.png)
+
+![](slide12.png)
+
+![](slide13.png)
+
+![](slide14.png)
+
+Demonstration of making a kDTree from scratch is shown inside jupyter-notebook/building_kdtree.ipynb file
+
+But if you look closely, this method has a big drawback of accuracy, since the coordinates we build these are boundary independent, places close to boundary region would give wrong address 
+
+To solve this, the closest neighbours should be verified by their boundary
+
+But here is another issue, you can't store all the boundaries in the world inside a single python library, due to its sheer size
+
+Thankfully I came across geoboundaries.org, they provide high quality data fully free and open source, as a cherry in the top, they provide  simplified boundaries in geojson format.
+
+I decided to store regions from ADM1-ADM3 which are essentialy States, Counties and Cities/Town.
+Instead of storing raw json or parquet for every region (around 140,000 files), I decided to store WKB(Well Known Binary) boundary coordinates and shapeId into a local sqlite file, and they would be converted on the fly of computation 
+
+By doing all this, I was able to store the boundary data in sqlite file with a size of  100MB 
+
+I have given a comparison between other libraries and mine inside jupyter-notebook/comparison.ipynb file and benchmark in the 10th slide
+
+Feel free to ask about any doubts or suggestions you have, I have attached my contacts at the end of slides
+
+---
+
+## Reflections
+
+I think that building a reverse geocoder from scratch was a great learning experience. I got to know about various spatial data structures, spatial indexing techniques and geospatial libraries in python.
+
+Also it can be used as a backbone for more sophisticated projects for advertising, logistics, mapping etc.

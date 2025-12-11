@@ -1,0 +1,351 @@
+---
+title: "The Lifecycle of a Jupyter Environment - From Exploration to Production-Grade Pipelines"
+subtitle: "PyData Global 2025 Recap"
+date: 2025-12-09
+categories: ["PyData", "Jupyter", "Data Science", "Machine Learning", "ETL", "RAPIDS", "Papermill", "nbconvert", "Snowflake"]
+tags: ["PyData", "Jupyter", "Data Science", "Machine Learning", "ETL", "RAPIDS", "Papermill", "nbconvert", "Snowflake"]
+description: "A comprehensive overview of transitioning Jupyter notebooks from exploratory tools to production-grade pipelines, covering best practices, tools, and real-world challenges."
+image: pydata_logo.png
+---
+
+![pydata global](pydata_logo.png){.column-margin}
+
+
+::: callout-tip
+## Lecture Overview
+
+Most data science projects start with a simple notebook—a spark of curiosity, some exploration, and a handful of promising results. But what happens when that experiment needs to grow up and go into production?
+
+This talk follows the story of a single machine learning exploration that matures into a full-fledged ETL pipeline. We’ll walk through the practical steps and real-world challenges that come up when moving from a Jupyter notebook to something robust enough for daily use.
+:::
+
+
+::: callout-tip
+## What You'll Learn:
+
+-   **Set clear objectives** and document the process from the beginning
+-   **Break messy notebook logic** into modular, reusable components
+-   **Choose the right tools** (Papermill, nbconvert, shell scripts) based on your workflow—not just the hype
+-   **Track environments and dependencies** to make sure your project runs tomorrow the way it did today
+-   **Handle data integrity**, schema changes, and even evolving labels as your datasets shift over time
+-   And as a bonus: **bring your results to life** with interactive visualizations using tools like [PyScript](https://pyscript.net/), [Voila](https://github.com/voila-dashboards/voila), and [Panel](https://panel.holoviz.org/) + [HoloViz](https://holoviz.org/)
+:::
+
+
+::: {.callout-tip}
+## Speakers:
+
+### Dawn Wages
+
+Bio c.f. [slides below]{#sec-about}
+:::
+
+## Outline
+
+[slide deck](https://www.dawnwages.info/pydata-boston-2025/)
+
+![life cycle of a jupyter notebook](slide01.png)
+
+### About Dawn Wages {#sec-about}
+
+![Who is Dawn Wages?](slide02.png)
+
+Bio!
+
+![Who is Dawn Wages?](slide03.png)
+
+QR Ad for for Conda podcasts
+
+![Who is Dawn Wages?](slide04.png)
+
+QR Ad for for Python Packaging survey
+
+
+![Agenda - Setting objectives](slide05.png)
+
+
+-   (3 mins) Intro
+    -   I've been supporting various groups in their developer experience since 2020 after being a freelance Python consultant. I've worked on many many dozens of projects, unblocking users picking the right tools for the task at hand.
+    -   It works on my machine
+    -   [What we're building today: ML pipeline ➰ with 🌊RAPIDS $\to$ Snowflake ❄️]{.marked}
+    -   We're going to watch a real project grow up
+
+![Setting objectives - Domain problems and scope](slide06.png)
+
+-   Before you start coding you should have a team discussion to set objectives.
+-   Specify the problem domain and the project's scope
+-   Brainstorm before coding
+
+![Setting objectives 1](slide07.png)
+
+-   Kickoff meeting to discuss the above with stakeholders
+-   Dependency matrix
+-   [RACI](https://en.wikipedia.org/wiki/Responsibility_assignment_matrix) is **responsibility assignment matrix for cross departmental projects**
+    -   Responsible - stakeholders are involved in the planning, execution, and completion of the task.
+    -   Acountable - stakeholders are held to be individually and ultimately responsible for the success or failure of the task
+    -   Consulted - Consulted stakeholders are sought for their opinions on a task;
+    -   Informed - Informed stakeholders are updated as the project progresses.
+
+![Setting objectives 2](slide08.png)
+
+-   Dependency matrix
+-   RACI (Responsible Acountable Consulted &Informed)
+
+![Why it matters?](slide09.png)
+
+::: {.callout-caution collapse="true"}
+## Softskills
+
+-   [Softskills](https://en.wikipedia.org/wiki/Soft_skills)
+
+|   |   |   |
+|---|---|---|
+| Communication. | Creative thinking| Teamwork|
+| Leadership | Delegation| Adaptability|
+| Problem-solving| Emotional intelligence| Conflict Resolution|
+| Networking | Time Management|  Emotional Intelligence    |
+| Professional Writing | Critical Thinking|  Digital Literacy|
+| Work Ethic | Intercultural fluency | Professional attitude |
+
+> "Fail to plan = Plan to Fail" (my 5cnts)
+:::
+
+- Speaker is Writing a domain driven design - Good luck!
+
+![Agenda - Modular Notbooks](slide10.png)
+
+Next we cover Modular Notebook use.
+
+-   (3 mins) Exploration - starting as a single messy notebook, sample data set.
+    -   Why RAPIDS? GPU
+        -   Large data sets
+        -   GPU availability - remote machine, local GPU
+        -   Workflows that work well with GPU
+    -   Load Data cuDF / pandas
+    -   Quick EDA and data visualization
+    -   Train cuML / scikit-learn model
+    -   No-code change philosophy
+
+![Modular Notebooks](slide11.png)
+
+```python
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+```
+
+- [10 minutes to pandas](https://pandas.pydata.org/docs/user_guide/10min.html)
+- [Pandas Cookbook](https://pandas.pydata.org/docs/user_guide/cookbook.html#cookbook)
+
+::: {.callout-tip}
+## TOOL TIP - RAPIDS
+
+- [RAPIDS](https://rapids.ai/) is "GPU Accelerated Data Science"
+- Built on top of Nvidia CUDA and Apache Arrow 
+- Uses familier APIs but powered by GPU libraries. 
+    - Pandas api for CUDF
+    - SCIKIT-LEARN api for CUML 
+    - Polars api for CUDF
+    - NetworkX api for CUGRAPH
+- Vector search with CUVS
+- Zero Code Changes (i.e. just change your imports) to get  and 5x to 500x speedups.
+- FOSS [repo](https://github.com/rapidsai)
+- [Install guide](https://docs.rapids.ai/install/)
+- [Getting Started Guide](https://docs.rapids.ai/user-guide)
+:::
+
+```python
+import cudf
+import cupy as cp
+import dask_cudf
+import pandas as pd
+from cuml.model_selection import train_test_split
+from cuml.datasets.classification import make_classification
+from cuml.datasets import make_blobs
+from cuml.ensemble import RandomForestClassifier
+from cuml.cluster.dbscan import DBSCAN
+from cuml.manifold.umap import UMAP
+from cuml.metrics import accuracy_score
+from cuml.metrics import trustworthiness
+from cuml.metrics.cluster import adjusted_rand_score
+from cuml.datasets import make_regression
+from cuml.linear_model import LinearRegression
+```
+
+
+![ETL & Feature Engineering](slide12.png)
+
+- ML require Exctact Transform Load
+- Takes raw data into the data store
+- Feature Engineering
+
+![Builder Pattern](slide13.png)
+
+-   I like this slide and I like the builder pattern.
+-   It shows how to break down a complex process into manageable steps.
+
+![SKLEARN](slide14.png)
+
+- Sklearn Base modules 
+    - scale more effectively 🙏
+    - find problematic code more easily 🤬😵‍💫🤦‍♂️
+    - have a more enjoyable developer experience 🤕
+        - 😟😞😫 work with apocrypha bugs🤒 that don't get fixed and learn about them from the gravepine or the hardway
+        - 😒😏🤨 read about undocumented parameters and algs by a bibtex reference name instead of a citation!
+        - 🧗🧱🧊 import tons of external libs for algs that haven't made the cut!
+-   We can use sklearn pipelines to chain together multiple steps in a machine learning workflow.
+-   This makes it easy to reuse and modify our code.
+- c.f. the ML bibles by Aurélien Géron [@geron2019hands] or [@geron2025hands]
+
+![Training & Evaluation](slide15.png)
+
+-   api
+    -   Methods:
+        -   `train_model()`
+        -   `save_model()`
+        -   `evaluate()`
+        -   `plot_curve()`
+    -   Objects:
+        -   `ModelTrainer` class
+        -   `ModelEvaluator` class
+        -   `HyperparameterTuner` class
+
+![Train & Evaluate](slide16.png)
+
+![Environment Deployment](slide17.png)
+
+- snowflake ❄️
+- aws sagemaker
+- azure 
+
+![Light Notebooks](slide18.png)
+
+- moving from the spagetti code to light notebook with a more sophisticated project structre:
+- notebook for 
+    - ETL + feature engineering
+    - train 
+    - validate
+- migrate reusable code to .py  scripts or modules.
+- app or config
+- yaml file (for what and how to access it?)
+
+![Agenda - Choosing the right tools](slide19.png)
+
+
+
+![Choosing the right tools - Old school v.s. New School](slide20.png)
+
+- Env managemnt
+    - conda
+    - anaconda
+    - [pixi](https://pixi.sh/latest/)
+    - jupyter - ["how do I explore data interactively"]{.mark}
+- Lifecycle managent 
+    - mlflow - ["how do I track my experiment"]{.mark} or 
+    - weight and biases 
+    - papermill - ["how do I automate my Notebook"]{.mark}
+- Viz
+    - holoviz
+    - bokeh
+    - `<py>` pyscript (runs in the browser)
+- Cloud & Compute
+    - amazon bedrock (hyperscaler)
+    - snowflake ❄️ ["how do I store & query my big data?"]{.mark}
+    - Rapids ["how do I make ML go brrr... with a GPU"]{.mark}
+
+::: {.callout-tip}
+## tool tip Pixi
+
+| | |
+|-|-----|
+|![pixi](pixi.png)|[Pixi](https://pixi.sh/latest/) is a fast, modern, and reproducible package management tool for developers of all backgrounds.|
+:::
+
+![tools breakdown](slide21.png)
+
+![papermill](slide22.png)
+
+```bash
+pip install papermill
+```
+
+parametrise your notebook
+
+![Papermill - install](slide23.png)
+
+![Papermill - usage](slide24.png)
+
+```python
+import papermill as pm
+
+pm.execute_notebook(
+   'path/to/input.ipynb',
+   'path/to/output.ipynb',
+   parameters = dict(alpha=0.6, ratio=0.1)
+)
+```
+
+![Papermill & mlflow](slide25.png)
+
+![Choosing the right tools](slide27.png)
+
+![Choosing the right tools](slide27.png)
+
+![Agenda - Reproducible Environments](slide28.png)
+
+-   (7 mins) **Make it repeatable** - Start with simple tried and true tools, explore where tools like [Papermill](https://papermill.readthedocs.io/en/latest/) help with flexibility and reproducibility
+    -   common pain points: operating cadence, specialized scenarios, manual execution is error prone
+    -   [shell scripts](https://en.wikipedia.org/wiki/Shell_script) versus [papermill](https://papermill.readthedocs.io/en/latest/)
+    -   reproducible environments
+    -   generate HTML reports
+    -   pass through parameters in your notebook
+
+
+
+![Reproducible Environments](slide29.png)
+
+![Consider your Hardware](slide30.png)
+
+![Binary Dependencies](slide31.png)
+
+![Agenda - Deploy Resilient Projects](slide32.png)
+
+-   (8 mins) Make it reliable - Modular code & testing
+    -   common pain points: data schema changes, debugging issues, testing & modularity
+    -   [nbconvert](https://nbconvert.readthedocs.io/en/latest/) + Python: turn your notebook into a script
+    -   turn a function into a module
+    -   dashboard with HoloViz / Panel, discuss choosing tools like Voila and PyScript
+
+![What does a resilient deploy pipeline include?](slide33.png)
+
+![Advanced Pipeline Management](slide34.png)
+
+-   (5 mins) Snowflake integration
+    -   common pain points: data volume, coordinate with other data systems, audits
+    -   picking the right tools: cost complexity tradeoff
+    -   RAPIDS preprocessing to Snowflake storage
+    -   self-service access for stakeholders
+
+![Goodbye and The python survey](slide35.png)
+
+-   (3 mins) Conclusion
+    -   Start simple
+    -   Add complexity when you feel specific pain
+
+## Further Reading
+
+-   Speaker Recommends:
+
+    -   Design data-intensive applications by Martin Kleppmann
+    -   Softeware architecture design patterns in Python by Parth Detroja, Neel Mehta, Aditya Agashe
+    -   Data engineering with Python by Paul Crickard
+
+## My Reflection
+
+
+- Main takeaways:
+    - look at RAPIDS ^[it has many great tools!]
+    - Use builder patter in ETL! ^[or don't Matt Harrison shows us how to chain ETL code like a pro!]
+    - PAPERMILL & MLflow can take notebooks to another level (think)
+    - Think about converting NB to production 
+        

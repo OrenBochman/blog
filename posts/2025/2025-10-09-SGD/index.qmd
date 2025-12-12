@@ -6,16 +6,16 @@ bibliography: bib.bib
 ---
 
 
-::: {.callout-tip}
+::: {.callout-tip }
 
 Action Items:
 
-1. Generate a deepdive with notebooklm for the different papers.
-1. Reproduce the paper as an exploratory  shiny app
-1. Extend this for MCMC algs 
-1. Code a Kalman filter optimizer 
-1. Code a Bayesian smoother optimizer 
-1. Consider these in the NPB framework an optimiser that keeps track of first second and third order terms for top hessian dimensions, rather than knowing the full hessian we only keep track of a few dimensions use them to do local quadratic approximation for fastest learning but ergodic exploration when we get stuck in a local minima. Another idea is trust regions - oscillations teach us about regions where SGD get stuck but will get unstack once it can wiggle up far enough.
+1. [] Generate a deepdive with notebooklm for the different papers.
+1. [] Reproduce the paper as an exploratory  shiny app
+1. [] Extend this for MCMC algs 
+1. [] Code a Kalman filter optimizer 
+1. [] Code a Bayesian smoother optimizer 
+1. [x] ReConsider these in the BNP framework an optimiser that keeps track of first second and third order terms for top hessian dimensions, rather than knowing the full hessian we only keep track of a few dimensions use them to do local quadratic approximation for fastest learning but ergodic exploration when we get stuck in a local minima. Another idea is trust regions - oscillations teach us about regions where SGD get stuck but will get unstack once it can wiggle up far enough.
 :::
 
 
@@ -39,7 +39,7 @@ Similar and related issues keep coming up in training RL agents, and in when wor
    - use of architectures like ResNets that provide skip connections to help gradients flow better.
    - use of LSTM and GRU in RNNs to help with long term dependencies and guard against vanishing gradients.
 1. Catastrophic forgetting - this is a phenomenon where a model forgets previously learned information upon learning new information. This is especially problematic in continual learning scenarios where the model needs to learn from a stream of data over time. One solution is to train multiple epochs on the same data but this is slow and inefficient.
-1. Loss of plasticity - this refers to the model's inability to adapt to new information or changes in the environment. This may happen due to massive overfitting in deep learning and might be mitigated by regularization techniques like dropout, weight decay, data augmentation and mixup. Other ideas like early stopping that allows one to recover to an earlier point in training when the model was more plastic. Finally here ensambling via bagging and boosting can lead to smaller less overfitting and better plasticity with many smaller models that are expert in different parts of the input space and some form of gating mechanism to pick the best model for each input.
+1. Loss of plasticity - this refers to the model's inability to adapt to new information or changes in the environment. This may happen due to massive overfitting in deep learning and might be mitigated by regularization techniques like dropout, weight decay, data augmentation and mixup. Other ideas like early stopping that allows one to recover to an earlier point in training when the model was more plastic. Finally here ensembling via bagging and boosting can lead to smaller less overfitting and better plasticity with many smaller models that are expert in different parts of the input space and some form of gating mechanism to pick the best model for each input.
 
 
 
@@ -86,6 +86,14 @@ In fact taking a more bayesian perspective we might get even more benefits from 
 
 1. Rich Sutton has an old paper with an deep learning algorithm that he calls Incremental Delta-Bar-Delta or (IDBD)
 
+
+
+
+## BNP optimizer:
+
+what one would like it a Bayesian Non parametric optimizer with a few properties:
+
+1. it keeps a "grid" with the most promising local minima it has found so far. I say a grid but in reality we are in a billion parameter space so we need to keep just a few locations in parameter space that are promising. We also don't really want to keep track of points that are too similar or too close to each other.  We also don't want to keep points that are down hill from each other unless we branched and want to back track to another branch.  This seems to be related to point processes in statistics and the idea of repulsive point processes. I.e. we may want to use a [determinantal point process](https://en.wikipedia.org/wiki/Determinantal_point_process) to keep track of the points in parameter space that are diverse and promising rather than just pick random or top N-points and use these for ensembling.
 
 
 ## Resources:

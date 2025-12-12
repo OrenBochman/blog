@@ -1,0 +1,47 @@
+---
+title: A generative model for OCR
+---
+
+Let's think of a simple model for doing OCR using a generate and test approaches. Generate and test is attractive as it can work unsupervised. Note that we could also use this approach for a task like Voice Recognition.
+
+**Generate:**
+
+The basic idea is to create a random page generator.
+We generate a vector of $\<glyph, font, position, size, style\>$
+Convert it to an image.
+
+**Test:**
+
+Pixel loss - The generator is then evaluated using a loss function that compares the pixels. 
+
+
+So this is a brute force random search and would be rather slow. There are many ways we might be able to do better.
+
+
+## MDP and RL
+
+1. We can convert it to an MDP by creating an action space that includes operations like "
+- add or remove glyph", 
+- move/rotate glyph", 
+- rotate"change font", "resize", etc. The state space would include the current configuration of the page.
+
+2. We can now associate the reward for each individual glyph in terms of its pixel match. encouraging the generator to produce more accurate representations over time. 
+
+
+3. We may want to avoid the model learning to draw images using ascii art or reconstruct pages using a white and black pixel glyphs. For the first we might want to decompose the page into regions that have no or just negative payoffs so that the agents learns to avoid those regions.
+
+4. We may handle the problem of typography using a font manifold. This might allow the agent learn the typography using a continuous representation of fonts, making it easier to interpolate between different styles and sizes and overcome unfamiliar fonts based on a restricted subset (perhaps from the Google Fonts project)
+
+5. We may use the feedback from pixels to decide a high level strategy for the generator to edit the current glyph or if to add a new one.
+
+We may find that the agent learns to find highly matching glyphs but that it takes a long time and that they are not in any order that can be read.  
+
+The agent can also learn to build blocks of text by grouping glyphs with the same style, size, and setting them as a coherent unit, where the spatial relationships between glyphs are based on some simple rule like monospace or a kerning parameter (I.e. we move knowledge to the font like distance and kerning) The rewards are then based on more compact representations of text blocks, encouraging the agent to focus on words and less on glyphs. We might even allow it to place glyphs on a path using some transformation. (But this is just extending the paradigm from a simple unit to more complex units at the generate step.)
+
+At the next level we may want to introduce a notion of a language model to help the agent pick the next glyph based on the context of the previous text or to revise existing glyphs based on the surrounding text.
+
+
+If we are getting good at this too we may want to 
+The models to generate a layout for partitioning the page and then using different schemes for each block. This can then handle standard pages, Chapter headings, two and three columns. Tables and so on.
+In fact we may want to allow the model to divide the page into partitions and then pick a generative model
+

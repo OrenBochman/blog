@@ -1,0 +1,179 @@
+---
+title: "Hebrew Smoothing Corpus for Morphology and Syntactic Agreement"
+date: 2025-09-15
+---
+
+
+Some lexical resources I've had for putting a (local) LLM to work on are
+1. Creating a Free and Open Lexicon based on Wiktionary and lexical Wikidata. (Including frequencies, collocations, and usage examples and translations.)
+2. Creating a named entity database again based on Wikidata and open databases of places, people, and organizations etc.
+3. Constructing a synthetic smoothing corpus which that can be used alongside a real corpus to assist language models deal with data sparsity in morphology and syntactic agreement for languages with rich morphology and low resources like Hebrew.
+4. Generative Tree Banks - I seems that if a tree bank is available for a language, it should be possible to use this structure to generate this sentence in a different language. While doing the translation usually involves some reordering, and restructuring, the tree structure should be a good guide to generating a syntactically correct sentence. We should in fact be able to extract from the tree many semantics  invariants that should be maintained in the translation. Coding this kind of translation is hard but using an LLM to do the translation may be rather simpler. Particularly if we leverage the recursive structure of the tree. By this I mean we could translate leafs, then sub trees then bigger sub trees. As we do this we get more context allowing us to discard more and more of the possible translations. As we progress we get to many solutions of supervised tasks. These can be used to bootstrap our tree-bank.
+5. **Generative Scripts** - These are essentially a generative version of template based text generation. 
+  - The difference is that we can use planning to create a story structure that covers a range of events and linguistic phenomena.
+  - One example are knight and knaves puzzles. 
+  - Another might be based on summaries of actual movies scripts. 
+  - A third might be based on a news story.
+  - Once we have the structure we can use it as a source of prompts to generate similar stories that which swap the gender of the Protagonist, Romance and thier nemesis. 
+    - Using this approach may allow us to create a gender neutral language model and possibly overcome other biases that are inherent in the training corpus. 
+    - another more pragmatic approach is to augment our corpus with many examples that correct for the bias we want to eliminate.
+    - The real issue is to understand that these are stories and that we want these to influence low level probabilities rather than higher level reasoning. (We may want to freeze the higher levels for this training?) Though to be honest no one really knows where the different capabilities of an LLM are located and I suspect that many capabilities are distributed throughout the model in multiuse neurons. Thus ideas requires some testing.
+    
+
+  1. We start with a text. Break it up by identifying the topics, events, and other entities. 
+  2. We extract a story structure into a tree or graph.
+  3. We then designate the structural components we want to keep steady and mark others as subject to change. 
+  4. We may want to develop a principled approach to find the biases in our corpus and balance them using such scripts.
+
+
+  
+6. **Non-parametric Wikipedia** - Wikipedia and wikidata are structured or semistructured, and can be queried for lists of facts. But even more useful is to build non-parametric models for these lists that capture thier distributions. Distribution for common sense and factual knowledge based on wikipedia dumps. Although I call this a nonparametric Wikipedia, we could take this approach with any large corpus with the caveat that we need to be much more careful about how we go about extracting facts. One low risk approch might be to use a large language model to extract facts relating to a topic. Another might be word list and collocations. 
+
+In this post though I want to focus on the third idea as the first two are more straightforward. However these resources would create a synergy. The names entity database might also come with two modules: One a sample sentence generator that can use an LLM to create example sentences with the named entities. The second is a transliteration module that can transliterate all such named entities that we know from wikidata into Hebrew script. In this case we might want not just a transliteration but an approximate string matcher that can be used to match phonetic variants of names in text and in voice. This would only be useful if we could also restrict the matcher to suitable contexts. I.e. we would want to condition the activation of the named entity matcher to cases we are stumped to finding a match in the lexicon or the language model is very uncertain about the next word. Better yet we may want to restrict to people strongly associated with the current topic (e.g. members of a parliament session, or players in a sports event etc.) For this we may want to extend the NE with contextual meta-data for use in language modeling.
+
+
+Why is this a smoothing corpus? Language models are constructed from probabilities of short sequences of words. When a long sequence of words is missing from the training corpus, the model has to back off to shorter sequences and assembles the required sequence by combining probabilities for shorter sequences. This assumes that the shorter sequences are independent and can be combined. In languages like Hebrew with rich morphology we might not even see most inflected forms of a word in a large corpus. I.e. we have nothing to back off to.
+One solution for other languages is to use sub-word units like byte pair encoding or word pieces. But these do not work well for Hebrew as the morphology is not concatenative and the sub-word units are not linguistically meaningful. Another solution is to include a big lexicon in the corpus when training, but hebrew lacks such a resource and again a lexicon would still leave out most inflected forms.
+
+
+
+One idea I call a smoothing corpus have had for putting a (local) LLM to work on, that would bootstrap hebrew NLP is to construct a **small** corpus which has:
+ 
+1. All the full form of every type of noun and verb lemma
+2. These forms in a context that illustrates the different types of agreement they participate in.
+3. Some examples that illustrate incorrect agreement.
+4. A few more sentences that illustrate non **atomic** agreement phenomena. In general there can be agreement between many parts of a sentence, but these might be hard to generalize from since there are so many combinations and words can take on many forms. So these sentences are supposed to bridge the gap between atomic agreement and full sentences but using unambiguous words and simple structures. Again we want the corpus to help a model pick up the basic phenomena quickly and easily and boost its ability to generalize on a very sparse large corpus.
+
+This would allow us to train a model that can learn both the morphology and the syntactic agreement phenomena in Hebrew. These are hard to learn well from a large corpus because of data sparsity. While a sophisticated model might overcome this it might really help to construct a small corpus that is  dense and balanced in these phenomena.
+
+This corpus should be planned so that it does not grow combinatorial and remains small compared to a larger corpus that would provide. A minimal corpus might allow us to quickly train a good model with the corpus and a wiktionary and or a wikipedia dump. 
+
+A small extension might be to also include in the corpus examples where the agreement is violated. This could help for tasks which use triplet loss or contrastive learning. It is our experience from RL that learning with errors can be much more effective than learning with only correct examples.
+
+The idea is to pick for each lemma some closely related words that can be used to illustrate the different types of agreement. Ideally, the words would be common, unambiguous, and form partitions so that each new lemma adds new contexts.
+
+
+This database would not be very useful for creating a Glove or word2vec or fastText embedding as the contexts would be very similar. But we could use it together with a large corpus to ensure the embedding model does not suffer from data sparsity for inflected forms or their agreement features.
+
+We could further expand this database to support additional sparse features and to capture more contexts. 
+
+Another idea is to create a tool for augmenting a corpus with many additional inflected forms of sentences. This might be prone to over generation so the output might need to be ranked for grammatical correctness.
+
+We could also include adjectives, pronouns, and quantifiers and small function words that trigger agreement.
+
+ (even if we customised the adjectives like in pons verb and noun tables)
+
+But it might be very good at capturing the full range of agreement phenomena in Hebrew.
+
+
+
+
+<style>
+.gend { color:#1f77b4; }      /* Gender (blue)        */
+.num  { color:#2ca02c; }      /* Number (green)       */
+.pers { color:#9467bd; }      /* Person (purple)      */
+.def  { color:#ff7f0e; }      /* Definiteness (orange)*/
+.cs   { color:#8c564b; }      /* Construct (brown)    */
+.coref{ color:#d62728; }      /* Pronoun–Antecedent (red) */
+.ncop { color:#17becf; }      /* Subject–Predicate (teal) */
+.quant{ color:#e377c2; }      /* Quantifier (pink)    */
+.morph{ font-variant-ligatures: none; }
+</style>
+
+**Legend:**  
+[Gender]{.gend} · [Number]{.num} · [Person]{.pers} · [Definiteness]{.def} · [Construct]{.cs} · [Pronoun–Antecedent]{.coref} · [Subject–Predicate]{.ncop} · [Quantifier]{.quant}  
+Null morpheme: [∅]{.morph}
+
+---
+
+
+### 1) Gender Agreement (מין)
+
+- **SG.M (stem + morph):** [yeled]{}[∅]{.gend .morph} [tov]{}[∅]{.gend .morph}  
+- **SG.M (Hebrew):** [ילד]{}[∅]{.gend .morph} [טוב]{}[∅]{.gend .morph}  
+  [∅]{.morph} = masculine singular has no overt gender suffix on noun or adjective.
+
+- **SG.F (stem + morph):** [y]{}[a]{.gend}[l]{}[∅]{.gend}[d]{}[a]{.gend .morph} [tov]{}[a]{.gend .morph}  
+- **SG.F (Hebrew):** [ילד]{}[ה]{.gend} [טוב]{}[ה]{.gend}
+
+---
+
+### 2) Number Agreement (מספר)
+
+- **SG (Hebrew):** [ילד]{}[∅]{.num .morph} [טוב]{}[∅]{.num .morph}  
+  [∅]{.morph} = singular has no overt number suffix.
+
+- **PL.M (Hebrew):** [ילד]{}[ים]{.num} [טוב]{}[ים]{.num}  
+  [-ים]{.num} = plural masculine on both noun and adjective.
+
+---
+
+### 3) Number & Gender Agreement (מספר, מין)
+
+- **PL.F (Hebrew):** [ילד]{}[ות]{.num} [טוב]{}[ות]{.num}  
+  Combined: [ילד]{}[ות]{.num} [טוב]{}[ות]{.num} → [ילדות]{}[∅]{.num .morph} [טובות]{}[∅]{.num .morph}  
+  [-ות]{.num} = plural feminine on both noun and adjective; note noun stem change.
+
+### 4) Person Agreement on the Verb (גוף)
+- Past of כ–ת–ב:  
+  1SG: כתב[תי]{.pers} · 2SG.M: כתב[ת]{.pers} · 3SG.M: כתב[∅]{.pers .morph}  
+  3PL: כתב[ו]{.pers}
+
+### 5) Definiteness Agreement (יידוע) in N + Adj
+- INDEF: ילד טוב  
+- DEF: [ה]{.def}ילד [ה]{.def}טוב  
+  (Both noun and adjective carry the definite article.)
+
+### 6) Construct State (סמיכות)
+- BASE: [בַּיִת]{.cs}  
+- CONSTRUCT: [בֵּית]{.cs} [הספר]{.cs} → “[בֵּית]{.cs} [הספר]{.cs}” (*the house of the school*)  
+  (First noun shifts to construct form; unit behaves as a single definite NP via the second noun.)
+
+### 7) Pronoun–Antecedent Agreement (כינויי גוף)
+- [שרה]{.coref} הלכה הביתה. [היא]{.coref} עייפה.  
+  (Pronoun agrees with antecedent in gender/number.)
+
+### 8) Subject–Predicate Agreement in Nominal Clauses
+- [יוסי]{.ncop} [מורֶה∅]{.ncop .morph} · [שרה]{.ncop} [מורָה]{.ncop}  
+  (Predicate noun/adjective matches the subject’s gender/number.)
+
+### 9) Quantifier Agreement (כמות)
+- [כָּל]{.quant} ה[ילד[ים]]{.num}  
+- [הרבה]{.quant} ילדו[ת]{.num}  
+  (Quantifier semantics + noun number interact; many quantifiers are invariable themselves.)
+
+---
+
+#### Compact “All-in-One” Example
+[ה]{.def}[ילד]{.gend} [ה]{.def}[טוב∅]{.gend .morph}  
+→ switch to plural definite: [ה]{.def}[ילד[ים]]{.num} [ה]{.def}[טוב[ים]]{.num}  
+→ feminine singular: [ה]{.def}[ילד[ה]]{.gend} [ה]{.def}[טוב[ה]]{.gend}
+
+
+
+
+<style>
+/* Agreement colors (unchanged) */
+.gend { color:#1f77b4; }   /* Gender (blue)  */
+.num  { color:#2ca02c; }   /* Number (green) */
+
+/* Null types (neutral, non-conflicting) */
+.nullm { color:#6b6b6b; font-style: italic; }                 /* null morpheme ∅ */
+.nullv { color:#6b6b6b; text-decoration: underline dotted; }  /* null vowel      */
+
+/* Optional: make morpheme boundaries legible */
+.morph{ font-variant-ligatures: none; }
+.small{ font-size:.95em; opacity:.9; }
+</style>
+
+### 1) Gender Agreement (מין)
+
+- **SG.M (stem + morph):** [yeled]{}[∅]{.gend .nullm .morph} [tov]{}[∅]{.gend .nullm .morph}  
+- **SG.M (Hebrew):** [ילד]{}[∅]{.gend .nullm .morph} [טוב]{}[∅]{.gend .nullm .morph}  
+  [∅]{.nullm .morph} = null **gender morpheme** (masc.sg. has no overt suffix).
+
+- **SG.F (stem + morph, with explicit null vowel slot):**  
+  [y]{}[a]{.gend .morph} [l]{}[∅]{.nullv .morph} [d]{}[a]{.gend .morph}  [tov]{}[a]{.gend .morph}  
+  <span class="small">Here, the noun is shown with a **null vowel** slot on <code>l</code> ([∅]{.nullv}) distinct from the **feminine morpheme** <code>a</code> ([a]{.gend}).</span>
+
+- **SG.F (Hebrew):** [ילד]{}[ה]{.gend .morph} [טוב]{}[ה]{.gend .morph}

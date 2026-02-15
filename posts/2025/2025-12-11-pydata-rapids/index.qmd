@@ -1,0 +1,171 @@
+---
+title: "GPU Python for the Real World: Practical Steps to GPU-Accelerated Python with RAPIDS"
+subtitle: "PyData Global 2025 Recap"
+date: 2025-12-12
+categories: [PyData]    
+keywords: [PyData, RAPIDS, GPU, Python, cuDF, cuML, Dask-cuDF, NVIDIA, GPU Acceleration, Data Science, Machine Learning]
+image: pydata_logo.png
+description: "A detailed recap of the PyData Global 2025 talk on GPU-accelerated Python using RAPIDS, covering key components, common pitfalls, and practical implementation tips."
+
+
+---
+
+![pydata global](pydata_logo.png){.column-margin}
+
+
+::: {.callout-tip}
+## Lecture Overview
+
+NVIDIA GPUs offer unmatched speed and efficiency for data processing and model training, significantly reducing the time and cost associated with these tasks. Using GPUs is even more tempting when you use zero-code-change plugins and libraries. You can use PyData libraries including pandas, polars and networkx without needing to rewrite your code to get the benefits of GPU acceleration. We can also mix in GPU native libraries like Numba, CuPy and pytorch to accelerate our workflows from end-to-end.
+
+However, integrating GPUs into our workflow can be a new challenge where we need to learn about installation, dependency management, and deployment in the Python ecosystem. When writing code, we also need to monitor performance, leverage hardware effectively, and debug when things go wrong
+
+This is where RAPIDS and its tooling ecosystem comes to the rescue. RAPIDS, is a collection of open source software libraries to execute end-to-end data pipelines on NVIDIA GPUs using familiar PyData APIs.
+:::
+
+In this tutorial we will cover:
+
+- Introduction to cuDF, cuML and more that showcases a simple example of data processing and model training on GPUs.
+- Answers to questions like: “Where do I get a GPU?”, “How do I run a container on a VM with a GPU?”, “How do I install GPU packages into an existing environment?”, as well as follow along examples to get a GPU up and running.
+- Troubleshooting and monitoring: Examples of performance analysis, diagnostics, and debugging.
+
+
+This is a hands-on tutorial, with multiple examples to get familiarized with the RAPIDS ecosystem. Participants should ideally have some experience using Python, pandas and sci-kit learn. We'll use cloud-based VMs, so familiarity with the cloud and resource creation is helpful but not required. No prior GPU knowledge is needed.
+<!-- 
+::: {.callout-tip}
+## What You'll Learn:
+
+- 🔍 A walkthrough of key components: attention, positional encoding, encoder/decoder stack
+- 🧠 Visual explanations of attention masks, shapes, and residuals
+- ⚠️ Common bugs and debugging strategies (like handling shape mismatches and masking errors)
+- ✅ Real-world implementation tips and tricks that demystify the architecture
+
+By the end of the talk, attendees will:
+
+- Understand the full forward pass of a transformer
+- Know how each component connects to the original paper
+- Feel more confident reading or writing custom model architectures
+:::
+
+
+::: {.callout-tip}
+## Prerequisites:
+
+- Basic Python and PyTorch
+- Some familiarity with neural networks (e.g., feedforward, softmax)
+- No need for prior experience in building models from scratch
+:::
+-->
+
+::: {.callout-important}
+## Tools and Frameworks:
+
+- [RAPIDS](https://rapids.ai/) ecosystem including cuDF, cuML, and Dask-cuDF
+:::
+:::: {.callout-tip}
+## Speakers: 
+
+### Jacob Tomlinson
+
+Jacob Tomlinson is a senior software engineer at NVIDIA. His work involves maintaining open source projects including RAPIDS and Dask. He also tinkers with kr8s in his spare time. He lives in Exeter, UK.
+
+## Naty Clementi
+
+Naty Clementi is a senior software engineer at [NVIDIA](https://www.nvidia.com/). She is a former academic with a Masters in Physics and PhD in Mechanical and Aerospace Engineering to her name. Her work involves contributing to [RAPIDS](https://rapids.ai/), and in the past she has also contributed and maintained other open source projects such as [Ibis](https://ibis-project.org/) and [Dask](https://www.dask.org/). She is an active member of [PyLadies](https://pyladies.com/) and an active volunteer and organizer of [Women and Gender Expansive Coders DC meetups](https://www.meetup.com/women-and-gender-expansive-coders-dc-wgxc-dc/).
+
+:::
+
+<!-- - [slide deck](https://github.com/hugobowne/AI-for-SWEs) -->
+
+## Outline
+
+we start with intoduction and tour of the https://rapids.ai/ web page
+
+then we do a quick demo on colab
+
+but most of the demo happens on the NVIDIA Brev platform
+
+both of these are based on this repo:
+
+- [demo repo](https://github.com/NVIDIA/accelerated-computing-hub/blob/main/tutorials/gpu-deployment/gpu-deployment-from-scratch.md)
+
+### Demo notebook
+
+- Deployment
+    - [NVIDIA Brev](https://brev.nvidia.com/)
+    - GPU Software Environment Fundamentals
+    - Python packages that use CUDA
+    - Monitoring/debugging tools
+    - Other platforms
+
+### Connecting to your VM
+
+Once your VM is deployed, follow the Brev access instructions provided for your instance. The connection instructions will vary depending on your operating system. For example, on macOS you would:
+
+- Install the brev CLI
+  - `brew install brevdev/homebrew-brev/brev`
+- Login to your account (copy from access page)
+  - `brev login --token ****`
+- Connect via SSH
+  - `brev ls to list your VMs`
+  - `brev shell <your vm name>` to connect via SSH`
+
+Exploring our GPU Software Environment
+
+```
+$ nvidia-smi
+```
+
+```
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.158.01             Driver Version: 570.158.01     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA L4                      On  |   00000000:00:03.0 Off |                    0 |
+| N/A   47C    P8             13W /   72W |       0MiB /  23034MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+```
+
+### Python Software environments
+
+
+## Reflections
+
+The demo is informative.
+
+They run `tmux` which lets you see how installation is done and while the workload is running you can see some system monitoring alongside the python console.
+
+This seems to be a missing capabilities when working with Cuda on my desktop and possibly when using a remote instance too!.
+
+---
+
+Monitoring and Debugging using TMUX
+
+Jacob suggest using  monitoring tools such as:
+
+- NVTOP [GPU % RX TX Memory] process list [GPU CPU memory loads etc]
+- SMI
+- Future lab nvdashbord
+- DCGM
+- nsys
+
+- Nsight
+- Jupter lab Nsight extension
+
+it shows that many operations are async or lazy.
+
+---
+
+Anyhow I can't wait to try RAPIDS on my own GPU machine.

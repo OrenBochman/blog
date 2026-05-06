@@ -1,0 +1,35 @@
+---
+title: "Mixture problems"
+date: 2026-03-07
+categories: [Mathematics]
+keywords: [Bayesian statistics, Mixture models, Probability, Statistics]
+image: mixture_problems.png
+---
+
+I took a course on Mixtures as part of the Bayesian statistics specialization on Coursera. As I move on to nonparametric methods I find it good background. 
+
+The two main approches we saw were the EM algorithm and Gibbs sampling. 
+
+The EM algorithm is a deterministic optimization method that iteratively estimates the parameters of the mixture model by maximizing the likelihood function. It consists of two steps: the Expectation step (E-step), where we compute the expected value of the latent variables given the current parameter estimates, and the Maximization step (M-step), where we update the parameter estimates to maximize the expected log-likelihood computed in the E-step.
+
+Gibbs sampling, on the other hand, is a stochastic Markov Chain Monte Carlo (MCMC) method that generates samples from the posterior distribution of the parameters by iteratively sampling from the conditional distributions of each parameter given the current values of the other parameters. This approach allows us to approximate the posterior distribution and make inferences about the parameters of the mixture model.
+
+In reality most bayesians avoid Mixture models and the reasons we not discussed in the course not the possible solutions. 
+
+The main shortcoming of mixture models outlined in the course is that 
+
+1. **Identifiability** can be an issue, as different parameter configurations can lead to the same likelihood, making it difficult to interpret the results and compare models. This is often referred to as the "label switching" problem, where the labels of the mixture components can be permuted without changing the likelihood.
+1. **Label switching** is a second issue can be addressed by imposing constraints on the parameters, such as ordering the means of the components or using a specific parameterization that breaks the symmetry. However, these constraints can introduce bias and may not always be appropriate for the data.
+1. The **unkown number of components** for the mixture model is often unknown.
+    - They can be determined through model selection techniques, which can be computationally intensive and may lead to overfitting if not done carefully. (This was discussed in the course)
+    - Another alternative is to use a hierarchical Bayesian model in which the number of components is treated as a random variable and inferred from the data. This can be done using reversible jump MCMC or other trans-dimensional sampling methods, which allow for model comparison and selection in a Bayesian framework. (This was not discussed in the course and while more elegant requires more sopisticated inference techniques than the Gibbs sampling we saw in the course).
+    - Alternatively one can turn to nonparametric methods, such as Reversible-jump Markov chain Monte Carlo (RJMCMC) and Dirichlet process mixture models (DPMMs). These models are more flexible and can automatically adjust the number of components based on the data, but it also requires more advanced inference techniques.
+
+However there are a couple of elephants in the room.
+    - The first is that the likelihood function of a mixture model can be unbounded, e.g. when considering a normal distribution which can lead to issues with parameter estimation and model selection. This is because the likelihood can become arbitrarily large as the parameters approach certain values, such as when one of the mixture components collapses to a single data point. This can lead to overfitting and poor generalization performance, making it difficult to interpret the results and compare models.
+    - The second is that both the EM algorithm tends to converge to local optima.
+    - The third is that both the MCMC methods tend to have a computational complexity that scales poorly with the number of data points. And for Mixture models this is exacerbated by extra growth in computational complexity due to each additional component. While MCMC has good asymptotic properties gurranteeing convergence to the true posterior distribution, in practice it can be computationally intractable for moderately datasets with just a few components.
+    - Faster and more modern techniques such as Hamiltonian Monte Carlo (HMC) or Variational Inference (VI) adress many of these issues but they fall short when it comes to Mixture models. HMC is not well-suited for discrete parameters, which are common in mixture models, and VI has a tendency to represent one mode of the posterior distribution, i.e. it likes to collapse to a single component, which gives both a poor location and a poor uncertainty estimate.
+    That is not to say there aren't some solutions to these problems but that mixtures are going to require far greater sophistication on the part of the practitioner and much more work to develop and implement than a model that does not use mixtures.
+    
+

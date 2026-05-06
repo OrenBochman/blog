@@ -14,8 +14,162 @@
 <title>Oren Bochman&#39;s Blog</title>
 <link>https://orenbochman.github.io/</link>
 </image>
-<generator>quarto-1.8.27</generator>
-<lastBuildDate>Sun, 15 Feb 2026 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.9.37</generator>
+<lastBuildDate>Sat, 07 Mar 2026 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Mixture problems</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2026/2026-03-07-mixture-problems/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<p>I took a course on Mixtures as part of the Bayesian statistics specialization on Coursera. As I move on to nonparametric methods I find it good background.</p>
+<p>The two main approches we saw were the EM algorithm and Gibbs sampling.</p>
+<p>The EM algorithm is a deterministic optimization method that iteratively estimates the parameters of the mixture model by maximizing the likelihood function. It consists of two steps: the Expectation step (E-step), where we compute the expected value of the latent variables given the current parameter estimates, and the Maximization step (M-step), where we update the parameter estimates to maximize the expected log-likelihood computed in the E-step.</p>
+<p>Gibbs sampling, on the other hand, is a stochastic Markov Chain Monte Carlo (MCMC) method that generates samples from the posterior distribution of the parameters by iteratively sampling from the conditional distributions of each parameter given the current values of the other parameters. This approach allows us to approximate the posterior distribution and make inferences about the parameters of the mixture model.</p>
+<p>In reality most bayesians avoid Mixture models and the reasons we not discussed in the course not the possible solutions.</p>
+<p>The main shortcoming of mixture models outlined in the course is that</p>
+<ol type="1">
+<li><strong>Identifiability</strong> can be an issue, as different parameter configurations can lead to the same likelihood, making it difficult to interpret the results and compare models. This is often referred to as the “label switching” problem, where the labels of the mixture components can be permuted without changing the likelihood.</li>
+<li><strong>Label switching</strong> is a second issue can be addressed by imposing constraints on the parameters, such as ordering the means of the components or using a specific parameterization that breaks the symmetry. However, these constraints can introduce bias and may not always be appropriate for the data.</li>
+<li>The <strong>unkown number of components</strong> for the mixture model is often unknown.
+<ul>
+<li>They can be determined through model selection techniques, which can be computationally intensive and may lead to overfitting if not done carefully. (This was discussed in the course)</li>
+<li>Another alternative is to use a hierarchical Bayesian model in which the number of components is treated as a random variable and inferred from the data. This can be done using reversible jump MCMC or other trans-dimensional sampling methods, which allow for model comparison and selection in a Bayesian framework. (This was not discussed in the course and while more elegant requires more sopisticated inference techniques than the Gibbs sampling we saw in the course).</li>
+<li>Alternatively one can turn to nonparametric methods, such as Reversible-jump Markov chain Monte Carlo (RJMCMC) and Dirichlet process mixture models (DPMMs). These models are more flexible and can automatically adjust the number of components based on the data, but it also requires more advanced inference techniques.</li>
+</ul></li>
+</ol>
+<p>However there are a couple of elephants in the room. - The first is that the likelihood function of a mixture model can be unbounded, e.g.&nbsp;when considering a normal distribution which can lead to issues with parameter estimation and model selection. This is because the likelihood can become arbitrarily large as the parameters approach certain values, such as when one of the mixture components collapses to a single data point. This can lead to overfitting and poor generalization performance, making it difficult to interpret the results and compare models. - The second is that both the EM algorithm tends to converge to local optima. - The third is that both the MCMC methods tend to have a computational complexity that scales poorly with the number of data points. And for Mixture models this is exacerbated by extra growth in computational complexity due to each additional component. While MCMC has good asymptotic properties gurranteeing convergence to the true posterior distribution, in practice it can be computationally intractable for moderately datasets with just a few components. - Faster and more modern techniques such as Hamiltonian Monte Carlo (HMC) or Variational Inference (VI) adress many of these issues but they fall short when it comes to Mixture models. HMC is not well-suited for discrete parameters, which are common in mixture models, and VI has a tendency to represent one mode of the posterior distribution, i.e.&nbsp;it likes to collapse to a single component, which gives both a poor location and a poor uncertainty estimate. That is not to say there aren’t some solutions to these problems but that mixtures are going to require far greater sophistication on the part of the practitioner and much more work to develop and implement than a model that does not use mixtures.</p>
+
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Mixture Problems},
+  date = {2026-03-07},
+  url = {https://orenbochman.github.io/posts/2026/2026-03-07-mixture-problems/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2026. <span>“Mixture Problems.”</span> March 7. <a href="https://orenbochman.github.io/posts/2026/2026-03-07-mixture-problems/">https://orenbochman.github.io/posts/2026/2026-03-07-mixture-problems/</a>.
+</div></div></section></div> ]]></description>
+  <category>Mathematics</category>
+  <guid>https://orenbochman.github.io/posts/2026/2026-03-07-mixture-problems/</guid>
+  <pubDate>Sat, 07 Mar 2026 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/posts/2026/2026-03-07-mixture-problems/mixture_problems.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Smoothing problems</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2026/2026-03-08-smoothing-problems/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<p>This is a follow up to the previous post in the same spirit of the post on Mixture problems. I’ve recently implemnted some switching models and was delighted to see how the model quickly outperformed the established model. However, I was surprised to find that while kalman filtering is ubiqutios, switching models are far from being so. This is a note at what is available and what are the challenges in smoothing for switching models.</p>
+<p>The Kalman filter and the DLA are two popular algorithms for baysian smoothing and filtering in state-space models, which are a class of probabilistic models that describe the evolution of a system over time.</p>
+<p>A third noteworthy algorithm in this space geared towards target tracking is the Interacting Multiple Model (IMM) algorithm, which is designed to handle systems that can switch between different modes of operation. The IMM algorithm combines multiple models, each representing a different mode of the system, and uses a probabilistic approach to determine which model is most likely to be active at any given time.</p>
+<p>Thus the IMM efficently performs smoothing and filtering for switching models, which are a type of state-space model that can switch between different modes of operation. The IMM algorithm is particularly useful for tracking targets that can exhibit different behaviors, such as a vehicle that can switch between different driving modes (e.g., cruising, accelerating, braking) or an aircraft that can switch between different flight modes (e.g., climbing, descending, cruising).</p>
+<p>However the variant used in targer tracking is primarily designed for filtering. That is it can quickly figure the most likely driving mode at each time step and quickly adapt to changes so as to provide a good estimate of the state of the system at that time step.</p>
+<p>It turns out that smoothing for switching models is much more difficult. Recall that smoothing is the problem of estimating the state of the system at a given time step, given all the observations up to that time step. In contrast to filtering, which only uses the observations up to the current time step, smoothing can use future observations to improve the estimate of the state at a given time step. For a regular state-space model, the Kalman smoother needs to recover a single state at each time step. But for a switching model, the bayesian smoother needs to store a likelyhood for each possible mode at each time step. This might not sound so bad but consider that these likelihoods can be path dependent. This means that in the worst case one must consider all possible permutation of modes across all time steps, which has combinatorial complexity and quickly becomes intractable as the number of time steps and modes increases.</p>
+<p>Even if we make a simplifying assumption that the likelihoods are not path dependent, perhaps even just Markovian, we still have a highly bifurcating tree of possible modes gooing backwards in time that we need to inform out future estimates. And even if the states are sparse<sup>1</sup> and sticky<sup>2</sup> we still have a large number of possible mode sequences to consider.</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;i.e.&nbsp;only a few states transition are possible from each states</p></div><div id="fn2"><p><sup>2</sup>&nbsp;other state transitions probabilities are domminated by self transition probabilities</p></div></div><p>Going forward we should be able to use the markov assumption to aggregate the likelihoods of the different modes at each time step. But I don’t see how we could avoid the combinatorial complexity of considering many histories going backwards in time… Well to be honest there <em>are a few ideas but I am skeptical about their viability</em>.</p>
+<p>&lt;!– using viterbi to identify what modes transition are unlikely. using a data structures that allows to efficently store a filtering and smoothing prior so that going back and forth becomes a conjugate update….</p>
+<p>Now it turns out that this is not a serious problem for target tracking because the emphasis is on filtering and the number of modes is typically small. But in other applications, such as econometrics or neuroscience, where the number of modes can be large and the emphasis is on smoothing, this can be a significant challenge.</p>
+<section id="approaches-to-smoothing-for-switching-models" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="approaches-to-smoothing-for-switching-models">Approaches to smoothing for switching models</h2>
+
+<div class="no-row-height column-margin column-container"><div id="vid-01-Tatiana-Kirsanova" class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/C--wlX8JgJE" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Tatiana Kirsanova - On Bayesian Filtering for Markov Regime Switching Models <a href="https://econrsa.org/download/36029/?tmstv=1722250275">slides</a></p>
+</div></div><p>In these cases, researchers have began to develop approches that reduce the complexity of smoothing for switching models to keep the model tractable. The main idea is to use a markov state model which does away with the path dependence by assuming that the transition probabilities between modes are Markovian, which allows for more efficient computation of the likelihoods and makes smoothing more tractable.</p>
+<p>This types of models are disscussed in <span class="citation" data-cites="fruhwirth2006finite">(Frühwirth-Schnatter 2006)</span> which is a great introduction to the topic.</p>
+<div class="no-row-height column-margin column-container"><div id="ref-fruhwirth2006finite" class="csl-entry">
+Frühwirth-Schnatter, Sylvia. 2006. <em>Finite Mixture and Markov Switching Models</em>. Springer Science &amp; Business Media.
+</div></div><p>Tatiana Kirsanova, in the lined video covers the connection and diffrences between the engineering and econometrics approaches. She discusses some ideas her groups has developed to make smoothing for switching models more tractable. c.f. “Filtering and Smoothing in State-Space Models with Multiple Regimes” (2026), with Nigar Hashimzade, Oleg Kirsanov and Junior Maih, Journal of Business and Economic Statistics, forthcoming….</p>
+<p>Another promising direction based on dynamic programming approach (allowing for nonlinearity, non-Gaussianity and degeneracy in the observation and/or state-transition equations) is presented in <a href="https://arxiv.org/abs/2008.11477">Bellman filtering and smoothing for state-space models</a> c.f.<span class="citation" data-cites="Lange_2024">(Lange 2024)</span>.</p>
+<div class="no-row-height column-margin column-container"><div id="ref-Lange_2024" class="csl-entry">
+Lange, Rutger-Jan. 2024. <span>“Bellman Filtering and Smoothing for State–Space Models.”</span> <em>Journal of Econometrics</em> 238 (2): 105632. <a href="https://doi.org/10.1016/j.jeconom.2023.105632">https://doi.org/10.1016/j.jeconom.2023.105632</a>.
+</div></div><p>The main approaches to smoothing for switching models are:</p>
+<p>The trick used in the IMM for filtering is to combine the likelihoods of the different modes at each time step, which allows it to efficiently compute the most likely mode at each time step without having to consider all possible mode sequences.</p>
+<p>This idea can be extended to smoothing by using a similar approach to combine the likelihoods of the different modes at each time step, but it requires additional assumptions about the structure of the model and the transition probabilities between modes. For example, one could assume that the transition probabilities between modes are Markovian, which allows for efficient computation of the likelihoods and makes smoothing more tractable.</p>
+<ol type="1">
+<li><p><strong>Approximate inference methods</strong>: These methods use approximations to the true posterior distribution to reduce the computational complexity of smoothing for switching models. Examples include variational inference, which approximates the posterior distribution with a simpler distribution, and particle filtering, which uses a set of particles to represent the posterior distribution and updates them over time.</p></li>
+<li><p><strong>Model simplification</strong>: This approach involves simplifying the model by reducing the number of modes or by imposing constraints on the model parameters. For example, one could assume that the transition probabilities between modes are sparse, which can reduce the number of possible mode sequences and make smoothing more tractable.</p></li>
+</ol>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Smoothing for switching models is a challenging problem due to the combinatorial complexity of considering all possible mode sequences. However, by using approximate inference methods or simplifying the model, it is possible to make smoothing for switching models more tractable and applicable to a wider range of problems.</p>
+
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Smoothing Problems},
+  date = {2026-03-07},
+  url = {https://orenbochman.github.io/posts/2026/2026-03-08-smoothing-problems/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2026. <span>“Smoothing Problems.”</span> March 7. <a href="https://orenbochman.github.io/posts/2026/2026-03-08-smoothing-problems/">https://orenbochman.github.io/posts/2026/2026-03-08-smoothing-problems/</a>.
+</div></div></section></div> ]]></description>
+  <category>Mathematics</category>
+  <guid>https://orenbochman.github.io/posts/2026/2026-03-08-smoothing-problems/</guid>
+  <pubDate>Sat, 07 Mar 2026 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/posts/2026/2026-03-08-smoothing-problems/mixture_problems.png" medium="image" type="image/png"/>
+</item>
+<item>
+  <title>Beng brave</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2026/2026-03-06-being-brave/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<p>One morning I woke up and discovered that my counrtry has been plunged into a state of war. The very fact that we were back to war under less than a year gave the lie by both Donald Trump and Benjamin Netanyahu, that the previous war with its terrible cost had set back the clock of the Iranian war machine in any meaningful way.</p>
+<p>A day or two after war broke out a reporter pointed out that the newly appointed defense minister, had pressureed the even newer chief of staff, head of forein intelligence and head of military intelligence to avoid briefing the public about the civilian risks of the war.</p>
+<p>Another day in reporteers pointed out that the finanace minister had not planned for the war in the budget which has so far not been approved by the parliament and without a war.</p>
+<p>Another minster pointed out that the war was planned later in the year but was moved up. It not clear if this was because of the protest in Iran and the its crackdown with a death toll of over 30000 people or because of the political expediency of a war given our domestic political situation.</p>
+<p>My view is that almost every election in the last 20 years has been juxtoposed by either a small war or a large wave of terrorism. This is not a coincidence but a pattern and both have the natural effect of driving voters further right, suppressing scruitiny and playing into the incumbent’s hands. These insight are clearly not lost on Benjamin Netanyaho who has used this startegem to foil his oppents ability to form a government while he was interm prime minister.</p>
+<p>However not all of these wars pose the same levels of risk (to Israel and to the other involved parties.) Iran, has demonstrated the ability though proxies and directly to cause both causlities, massive property dameges, and to disrupt our economies.</p>
+<p>Yet when these are viewed in the lens of risk management - of suppressing the exisential nuclear threat, or destorying thier long range rocket program the economical costs seem to be justified. Unfortunately it turns out that the leaders and the army have not been fortright with the public about these risks and the projected cost and the country has not yet licked the wounds of the previous war(s).</p>
+<p>This is all a prelude to a more personal meditation on the importance of being brave in such times. Everyday we are sent by sirens into bomb shelters. Even as the siren song fades we hear numerous rocket launched follwed bt explosions of varing magnitude. Some are distant and others close enough to shake the ground and rattle the steel doors and windows of the shelter. The old and frail neighbours are terrified and the children are scared. The reality is that almost all of the missiles are intercepted by the counter measures. Yet there even the handful of missiles that get through do terrible damage and spread fear and panic.</p>
+<p>A comedian joked on TV during deseart strom when Iraq shot scud missles at Israel that he was told that the chance of getting hit by a missile is about the same as winning the lottery, but he pointed out that the lottery happen only once a day while we our lottery is up to 20 times a day now that the hesbollah has joined the fray. My home town got the fourth most allerts in the country.</p>
+<p>So I thought about it these explosions and I realised this. I was in much worse situations in my life, not once or twice either. But this war is not my decision, it was the decision of one or two people and no one else has any say about it.</p>
+<p>All one can do is repond to the siren and early warning systems and be almost certain that all will go well. As long as people follow the instructions and avoid unnecessary risks, they can pretty much put the fear far from their minds.</p>
+<p>People do have choice about how they handle the new realty of war. If they like to listening to the explosions, spreading videos of the damage and the casualties, guess where each fragment fell and all the roumors they are will be more and more stressed and anxious. Even the statements by the leaders are full of lies and propaganda and deceptions.</p>
+
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Beng Brave},
+  date = {2026-03-06},
+  url = {https://orenbochman.github.io/posts/2026/2026-03-06-being-brave/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2026. <span>“Beng Brave.”</span> March 6. <a href="https://orenbochman.github.io/posts/2026/2026-03-06-being-brave/">https://orenbochman.github.io/posts/2026/2026-03-06-being-brave/</a>.
+</div></div></section></div> ]]></description>
+  <category>Mathematics</category>
+  <guid>https://orenbochman.github.io/posts/2026/2026-03-06-being-brave/</guid>
+  <pubDate>Fri, 06 Mar 2026 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/posts/2026/2026-03-06-being-brave/mixture_problems.png" medium="image" type="image/png"/>
+</item>
 <item>
   <title>CI - Libs for Python</title>
   <dc:creator>Oren Bochman</dc:creator>
@@ -86,8 +240,8 @@ Figure&nbsp;3
   langid = {en}
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2026. <span>“CI - Libs for Python.”</span> February 15,
-2026. <a href="https://orenbochman.github.io/posts/2026/2026-02-15-CI-Tools/">https://orenbochman.github.io/posts/2026/2026-02-15-CI-Tools/</a>.
+Bochman, Oren. 2026. <span>“CI - Libs for Python.”</span> February 15.
+<a href="https://orenbochman.github.io/posts/2026/2026-02-15-CI-Tools/">https://orenbochman.github.io/posts/2026/2026-02-15-CI-Tools/</a>.
 </div></div></section></div> ]]></description>
   <category>causal inference</category>
   <category>machine learning</category>
@@ -153,7 +307,7 @@ Bochman, Oren. 2026. <span>“CI - Libs for Python.”</span> February 15,
 <p><a href="https://github.com/atticusg/InterchangeInterventions">Interchange Interventions on GH</a></p>
 <p>papers:</p>
 <ul>
-<li><p><span class="citation" data-cites="geiger2020neural">Geiger, Richardson, and Potts (2020)</span> <a href="https://arxiv.org/pdf/2004.14623">Neural natural language inference models partially embed theories of lexical entailment and negation</a>Neural natural language inference models partially embed theories of lexical entailment and negation</p></li>
+<li><p><span class="citation" data-cites="geiger2020neural">Geiger et al. (2020)</span> <a href="https://arxiv.org/pdf/2004.14623">Neural natural language inference models partially embed theories of lexical entailment and negation</a>Neural natural language inference models partially embed theories of lexical entailment and negation</p></li>
 <li><p><span class="citation" data-cites="geiger2021causal">Geiger et al. (2021)</span> <a href="https://proceedings.neurips.cc/paper_files/paper/2021/file/4f5c422f4d49a5a807eda27434231040-Paper.pdf">Causal abstractions of neural networks</a>Causal abstractions of neural networks</p></li>
 </ul>
 <div class="no-row-height column-margin column-container"><div id="ref-geiger2020neural" class="csl-entry">
@@ -188,9 +342,9 @@ Geiger, Atticus, Hanson Lu, Thomas Icard, and Christopher Potts. 2021. <span>“
 <div class="no-row-height column-margin column-container"><div class="">
 <p><img src="https://orenbochman.github.io/posts/2026/2026-02-14-CI-Ness/II20.png" class="img-fluid" alt="interchange intervention"> Interchange intervention training c.f. <span class="citation" data-cites="pmlr-v162-geiger22a">Geiger et al. (2022)</span> and <span class="citation" data-cites="wu2022causalproxymodelsconceptbased">Wu et al. (2022)</span></p>
 <div id="ref-pmlr-v162-geiger22a" class="csl-entry">
-Geiger, Atticus, Zhengxuan Wu, Hanson Lu, Josh Rozner, Elisa Kreiss, Thomas Icard, Noah Goodman, and Christopher Potts. 2022. <span>“Inducing Causal Structure for Interpretable Neural Networks.”</span> In <em>Proceedings of the 39th International Conference on Machine Learning</em>, edited by Kamalika Chaudhuri, Stefanie Jegelka, Le Song, Csaba Szepesvari, Gang Niu, and Sivan Sabato, 162:7324–38. Proceedings of Machine Learning Research. PMLR. <a href="https://proceedings.mlr.press/v162/geiger22a.html">https://proceedings.mlr.press/v162/geiger22a.html</a>.
+Geiger, Atticus, Zhengxuan Wu, Hanson Lu, et al. 2022. <span>“Inducing Causal Structure for Interpretable Neural Networks.”</span> In <em>Proceedings of the 39th International Conference on Machine Learning</em>, edited by Kamalika Chaudhuri, Stefanie Jegelka, Le Song, Csaba Szepesvari, Gang Niu, and Sivan Sabato, vol. 162. Proceedings of Machine Learning Research. PMLR. <a href="https://proceedings.mlr.press/v162/geiger22a.html">https://proceedings.mlr.press/v162/geiger22a.html</a>.
 </div><div id="ref-wu2022causalproxymodelsconceptbased" class="csl-entry">
-Wu, Zhengxuan, Karel D’Oosterlinck, Atticus Geiger, Amir Zur, and Christopher Potts. 2022. <span>“Causal Proxy Models for Concept-Based Model Explanations.”</span> <a href="https://arxiv.org/abs/2209.14279">https://arxiv.org/abs/2209.14279</a>.
+Wu, Zhengxuan, Karel D’Oosterlinck, Atticus Geiger, Amir Zur, and Christopher Potts. 2022. <em>Causal Proxy Models for Concept-Based Model Explanations</em>. <a href="https://arxiv.org/abs/2209.14279">https://arxiv.org/abs/2209.14279</a>.
 </div></div></div><p>In this case we are taking the idea to the training phase. where we are using the gradient update step of learning based on this hypothesis we tested. The idea is we start on the left and we use it to update the network so that it has the structure we want. We then test the hypothesis again and we keep doing this until we have a network that has the structure we want.</p>
 <p>In the talk though he shows how they used this on batch of 4 mnist images to get much more training from the same dataset. (The top lest digit decides which of the other 3 digits is the label)</p>
 <p>summary:</p>
@@ -382,7 +536,7 @@ font-style: inherit;">"</span>)</span></code></pre></div></div>
 <h2 class="anchored" data-anchor-id="towards-causal-inference-with-latent-variable-models-and-programs">Towards causal inference with latent variable models and programs</h2>
 <p><span class="citation" data-cites="mohammadtaheri2022docalculusenablesestimationcausal">Mohammad-Taheri et al. (2022)</span></p>
 <div class="no-row-height column-margin column-container"><div id="ref-mohammadtaheri2022docalculusenablesestimationcausal" class="csl-entry">
-Mohammad-Taheri, Sara, Jeremy Zucker, Charles Tapley Hoyt, Karen Sachs, Vartika Tewari, Robert Ness, and and Olga Vitek. 2022. <span>“Do-Calculus Enables Estimation of Causal Effects in Partially Observed Biomolecular Pathways.”</span> <a href="https://arxiv.org/abs/2102.06626">https://arxiv.org/abs/2102.06626</a>.
+Mohammad-Taheri, Sara, Jeremy Zucker, Charles Tapley Hoyt, et al. 2022. <em>Do-Calculus Enables Estimation of Causal Effects in Partially Observed Biomolecular Pathways</em>. <a href="https://arxiv.org/abs/2102.06626">https://arxiv.org/abs/2102.06626</a>.
 </div></div><p><a href="https://arxiv.org/abs/2102.06626">Do-calculus enables estimation of causal effects in partially observed biomolecular pathways</a></p>
 
 <div class="no-row-height column-margin column-container"><div class="">
@@ -496,7 +650,7 @@ Mohammad-Taheri, Sara, Jeremy Zucker, Charles Tapley Hoyt, Karen Sachs, Vartika 
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2026. <span>“Robert Ness on LLMs &amp; CI.”</span>
-February 14, 2026. <a href="https://orenbochman.github.io/posts/2026/2026-02-14-CI-Ness/">https://orenbochman.github.io/posts/2026/2026-02-14-CI-Ness/</a>.
+February 14. <a href="https://orenbochman.github.io/posts/2026/2026-02-14-CI-Ness/">https://orenbochman.github.io/posts/2026/2026-02-14-CI-Ness/</a>.
 </div></div></section></div> ]]></description>
   <category>causal inference</category>
   <category>machine learning</category>
@@ -609,7 +763,7 @@ February 14, 2026. <a href="https://orenbochman.github.io/posts/2026/2026-02-14-
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2026. <span>“The Art of Discipline: Mastering
-Self-Control for a Fulfilling Life.”</span> January 21, 2026. <a href="https://orenbochman.github.io/posts/2026/2026-01-21-Discipline/">https://orenbochman.github.io/posts/2026/2026-01-21-Discipline/</a>.
+Self-Control for a Fulfilling Life.”</span> January 21. <a href="https://orenbochman.github.io/posts/2026/2026-01-21-Discipline/">https://orenbochman.github.io/posts/2026/2026-01-21-Discipline/</a>.
 </div></div></section></div> ]]></description>
   <category>Personal Development</category>
   <category>Self-Improvement</category>
@@ -684,7 +838,7 @@ Self-Control for a Fulfilling Life.”</span> January 21, 2026. <a href="https:/
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2026. <span>“KV Cache Efficiency &amp; Context Platform
-Engineering.”</span> January 19, 2026. <a href="https://orenbochman.github.io/posts/2026/2026-01-19-kv-cache-efficiency/">https://orenbochman.github.io/posts/2026/2026-01-19-kv-cache-efficiency/</a>.
+Engineering.”</span> January 19. <a href="https://orenbochman.github.io/posts/2026/2026-01-19-kv-cache-efficiency/">https://orenbochman.github.io/posts/2026/2026-01-19-kv-cache-efficiency/</a>.
 </div></div></section></div> ]]></description>
   <category>ML-Ops</category>
   <category>meetup</category>
@@ -831,7 +985,7 @@ Engineering.”</span> January 19, 2026. <a href="https://orenbochman.github.io/
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2026. <span>“NVIDIA Nsight Systems GPU Profiling.”</span>
-January 19, 2026. <a href="https://orenbochman.github.io/posts/2026/2026-01-20-NVIDIA-Nsight-Systems-GPU-profiling/">https://orenbochman.github.io/posts/2026/2026-01-20-NVIDIA-Nsight-Systems-GPU-profiling/</a>.
+January 19. <a href="https://orenbochman.github.io/posts/2026/2026-01-20-NVIDIA-Nsight-Systems-GPU-profiling/">https://orenbochman.github.io/posts/2026/2026-01-20-NVIDIA-Nsight-Systems-GPU-profiling/</a>.
 </div></div></section></div> ]]></description>
   <category>ML-Ops</category>
   <category>meetup</category>
@@ -906,7 +1060,7 @@ January 19, 2026. <a href="https://orenbochman.github.io/posts/2026/2026-01-20-N
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2026. <span>“RL Agents Last All Summer Long.”</span>
-January 14, 2026. <a href="https://orenbochman.github.io/posts/2026/2026-01-10-rl-agent-last-all-summer-long/">https://orenbochman.github.io/posts/2026/2026-01-10-rl-agent-last-all-summer-long/</a>.
+January 14. <a href="https://orenbochman.github.io/posts/2026/2026-01-10-rl-agent-last-all-summer-long/">https://orenbochman.github.io/posts/2026/2026-01-10-rl-agent-last-all-summer-long/</a>.
 </div></div></section></div> ]]></description>
   <category>ai</category>
   <category>agents</category>
@@ -976,8 +1130,7 @@ Many times mediocre people want to talk about their mediocre projects and it can
   langid = {en}
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2026. <span>“Rise of the Agents.”</span> January 14,
-2026. <a href="https://orenbochman.github.io/posts/2026/2026-01-14-rise-of-the-agents/">https://orenbochman.github.io/posts/2026/2026-01-14-rise-of-the-agents/</a>.
+Bochman, Oren. 2026. <span>“Rise of the Agents.”</span> January 14. <a href="https://orenbochman.github.io/posts/2026/2026-01-14-rise-of-the-agents/">https://orenbochman.github.io/posts/2026/2026-01-14-rise-of-the-agents/</a>.
 </div></div></section></div> ]]></description>
   <category>agents</category>
   <category>ai</category>
@@ -1104,6 +1257,7 @@ Bochman, Oren. 2026. <span>“Rise of the Agents.”</span> January 14,
 <h3 class="anchored" data-anchor-id="relationships-between-the-modes-of-convergence">Relationships Between the Modes of Convergence</h3>
 <p>The three modes of convergence are related in the following way:</p>
 <p>Almost sure convergence <img src="https://latex.codecogs.com/png.latex?%5Cimplies"> convergence in probability <img src="https://latex.codecogs.com/png.latex?%5Cimplies"> convergence in distribution.</p>
+<hr>
 
 
 </section>
@@ -1118,7 +1272,7 @@ Bochman, Oren. 2026. <span>“Rise of the Agents.”</span> January 14,
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2026. <span>“Three Modes of Convergence of Random
-Variables.”</span> January 9, 2026. <a href="https://orenbochman.github.io/posts/2026/2026-01-09-convergence-of-RVs/">https://orenbochman.github.io/posts/2026/2026-01-09-convergence-of-RVs/</a>.
+Variables.”</span> January 9. <a href="https://orenbochman.github.io/posts/2026/2026-01-09-convergence-of-RVs/">https://orenbochman.github.io/posts/2026/2026-01-09-convergence-of-RVs/</a>.
 </div></div></section></div> ]]></description>
   <category>probability</category>
   <category>random-variables</category>
@@ -1539,7 +1693,7 @@ A network where links are measured on a numerical scale (e.g., frequency of cont
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>A ^^partially ordered semigroup^^ is an algebraic structure consisting of a set of distinct relations, a composition operation (concatenation), and a partial ordering (&lt;). It represents the “relational structure” of a network by encoding the specific interrelations and paths between different types of social ties.</p>
+<p>A <sup></sup>partially ordered semigroup<sup></sup> is an algebraic structure consisting of a set of distinct relations, a composition operation (concatenation), and a partial ordering (&lt;). It represents the “relational structure” of a network by encoding the specific interrelations and paths between different types of social ties.</p>
 </div>
 </div>
 <div id="exr-08" class="theorem exercise">
@@ -1615,13 +1769,124 @@ Figure&nbsp;1: Slides
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2026. <span>“Algebraic Models for Social
-Networks.”</span> January 4, 2026. <a href="https://orenbochman.github.io/reviews/1993/Algebraic-Models-for-Social-Networks/">https://orenbochman.github.io/reviews/1993/Algebraic-Models-for-Social-Networks/</a>.
+Networks.”</span> January 4. <a href="https://orenbochman.github.io/reviews/1993/Algebraic-Models-for-Social-Networks/">https://orenbochman.github.io/reviews/1993/Algebraic-Models-for-Social-Networks/</a>.
 </div></div></section></div> ]]></description>
   <category>Mathematics</category>
   <category>Social Networks</category>
   <category>Algebra</category>
   <guid>https://orenbochman.github.io/reviews/1993/Algebraic-Models-for-Social-Networks/</guid>
   <pubDate>Sun, 04 Jan 2026 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Agentic Buzz</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2026/2026-01-03-agentic-buzz/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="agentic-buzz-illustration.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="The buzz about agents, poltergeists and genies"><img src="https://orenbochman.github.io/posts/2026/2026-01-03-agentic-buzz/agentic-buzz-illustration.jpg" class="img-fluid figure-img" alt="The buzz about agents, poltergeists and genies"></a></p>
+<figcaption>The buzz about agents, poltergeists and genies</figcaption>
+</figure>
+</div>
+<ul class="task-list">
+<li><label><input type="checkbox">The is so much buzz and buzzwords surrounding AI agents - this is my guide for sorting it out the fluff from the substance.</label></li>
+<li><label><input type="checkbox">Here I want to track what people are most excited about so I can join in the fun</label></li>
+<li><label><input type="checkbox" checked="">Should become a blogpost</label></li>
+<li><label><input type="checkbox">Add a hype meter.</label></li>
+<li><label><input type="checkbox" checked="">Has been updated on May 6th</label></li>
+</ul>
+<ol type="1">
+<li><em>LLMs</em> power agentic projects. Last year we talked about “Tool using LLMs” before that “Chain of thought or Reasoning LLMs”, and the years before that we it was “Chatbots”. LLMs are sometimes superhumanly bright but when it comes to consistency and we look at thier performance over multiple interactions they frequently do very poorly. In the age of agents we call them poltergeists and genies. A <em>genie</em> should fulfill our wishes. A <em>poltergeist</em> is the agent’s other face that explains why we should do the coding, or why it shouldn’t follow the instructions. <mark>The first lesson of agentic coding is how to get the genie and not the hallucinating poltergeist</mark></li>
+<li><em>Human in the loop</em> - this is a project where the org/coder/etc are too scared to let the make decisions on thier behalf. A very sensible approach which does not scale. <strong>Not Production</strong></li>
+<li><strong>Agentic Production Projects</strong> - 80% of companies are doing agentic projects, but only 5% have brought them to production. Level. Every meetup discuses the 5%. Everyone is talking about thier production projects. But it is all buzz and no production.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="agentic-buzz-tokens.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="tokens, magic lamps, and autopilot mode"><img src="https://orenbochman.github.io/posts/2026/2026-01-03-agentic-buzz/agentic-buzz-tokens.png" class="img-fluid figure-img" alt="tokens, magic lamps, and autopilot mode"></a></p>
+<figcaption>tokens, magic lamps, and autopilot mode</figcaption>
+</figure>
+</div>
+<ol start="4" type="1">
+<li><strong>Harness</strong> - this is a loop for keeping the Genie on the task and the poltergeists at bay. Some people call it the Genies Lamp. If we are folkish about the loop the agent can eat all out token budgets.</li>
+<li><em>Token</em> - the currency of the realm. We have to pay for work by the token. And if you think tokens are just encoded words - there are tokens for pictures, videos, audio, and even code. [The lamps you get from the LLM vendors are setup to to stop after only a few tokens and ask for more instructions, so that eventually the sorcerer’s apprentice will put all the broomstick on autopilot only to see them eating all the tokens for the month.] Also lots of tokens fill the context window.</li>
+<li><strong>Context Window</strong> - the amount of tokens that can be used in a single interaction with the LLM. This is a hard limit and it is important to keep track of how many tokens are being used in the prompt, the response, and any additional context that is being used. If you exceed the context window, you will get an error and your agent will not be able to complete its task.</li>
+<li><strong>Guard rails</strong> (think GH actions to run before commits and or command line or tool invocation also after calling an LLM)</li>
+<li><strong>Specs</strong> - organizing project interaction via markdown spec documents that can be shared with agents</li>
+<li><strong>Checklists</strong> - agents love checklists and they are also a powerful paradigm for mission and workflow consitancy</li>
+<li><strong>VS Code Custom agent</strong> - “The built-in agents provide general-purpose configurations for chat in VS Code. For a more tailored chat experience, you can create your own custom agents.” c.f. https://code.visualstudio.com/docs/copilot/customization/custom-agents</li>
+<li>VS Code Background agent - run with a local branch - should be checked wrt pull requests</li>
+<li>VS Code Cloud agent - think git hub actions - agents that can be run on GH. Can run longer slower - [Tasks should have high success probability.] [Q. how do we monitor progress/cost/outcomes] ? c.f. https://code.visualstudio.com/docs/copilot/agents/cloud-agents</li>
+<li>Vs Code Planning agent</li>
+<li>Copilot Coding agents cf https://docs.github.com/en/copilot/how-tos/use-copilot-agents/manage-agents</li>
+<li>agent skills - c.f. https://code.visualstudio.com/docs/copilot/customization/agent-skills</li>
+<li>MCP - and training for tool use!</li>
+<li>Procreate - python library used to verify json complies with spec</li>
+<li>Playwright - to automate the browser.</li>
+<li>LangSmith - to trace and monitor agent performance</li>
+<li>LangGraph - to visualize agent interactions and workflows</li>
+<li>LangChain - to build agent workflows</li>
+<li>Mixture of Experts and other voting schemes</li>
+<li>Custom workflows - this can mean a couple of thins
+<ol type="1">
+<li>originally a github action.</li>
+<li>an agent running in the cloud using a github action</li>
+</ol></li>
+<li>Perf Monitoring GPU and up - KV cache optimization</li>
+<li>tracing</li>
+<li>Hooks (e.g.&nbsp;commit + gen comments for rollback)</li>
+<li>Steering -
+<ol type="1">
+<li>instructions given to a (long running) agent that can be used to steer it back on track if it goes off the rails. This is a bit like the “guard rails” above but is more about course correction than prevention.</li>
+<li>Also steering can be used in chat to provide additional context after the initial prompt but before it completes its response.</li>
+</ol></li>
+<li>Detect Hallucinations - a big topic since there are apparently a number of reasons why hallucinations happen:
+<ul>
+<li>Two abstractions
+<ul>
+<li>define hallucination as a random answer that is not based on the prompt/history/training data</li>
+<li>Most Transformers are either explicitly state based models or equivalent to state based models. Hallucinations can be defined as entering a “defective” regime. The main issue being that once we enter the defective regime we are unlikely to get back to the “normal” regime.</li>
+<li>Probabilities are represented as log likelihoods and these numbers get smaller the longer the prompt/history. The smaller they are the more negative they become.
+<ul>
+<li>The “happy path” in QA is when everything works fine. Say the response is 500 words and each word has a probability of .99. The log likelihood for the response is 500*log(.99) = -5. This is a massive log likelihood.</li>
+<li>The “unhappy path” might be when the best answer has small probabilities… 500<em>log(.0001) = 500</em> -9.21 = -4605. If the answer is “very likely” i.e.&nbsp;all the words a probability of being generated in the response AKA as the “happy path” in QA, then the log likelihood will be tiny. If there are some contradictions in the prompt/history/memory the log likelihood can overflow and we can enter a “defective” regime where we are likely to get random answers.</li>
+</ul></li>
+</ul></li>
+<li>Poisoned tokens - we know that certain tokens can <code>jailbreak</code> the model and cause it to produce random answers. These are artefact of the tokenization and are likely to be highly unlikely to arise in normal testing of the model unless the “lookup table” is reversed engineered and the “poisoned tokens” are identified and included in the prompt. This is just one of many ideas used to jailbreak a model, and any of these can lead to hallucinations, so just fixing the tokenizer isn’t the fix for this class of hallucinations.</li>
+<li>“May the odds be ever in your favor” FAIL - the probability for the right answer is lower than the other answers.
+<ul>
+<li>small e.g.&nbsp;POS fail due to <img src="https://latex.codecogs.com/png.latex?p(N%7Cman)%20%3E%3E%20p(V%7Cman)"> in “the old man the boat”</li>
+<li>big e.g.&nbsp;Bias against Robert Moses,</li>
+</ul></li>
+<li>personality drift c.f. <a href="https://www.anthropic.com/research/assistant-axis">paper</a> <a href="https://www.youtube.com/watch?v=eGpIXJ0C4ds">YT video</a></li>
+<li>probabilistic contradictions - lets suppose that the LLM is smart enough that having a contradiction in the prompt/history results in a high chance of hallucination (random) answer. Unfortunately LLM represent probabilities as Log Likelihoods and these numbers get smaller the longer the prompt/history. If the answer is very likely for all words in the response AKA as the “happy path” in QA, then the log likelihood will be tiny. If there are some contradictions in the prompt/history/memory the log likelihood can underflow</li>
+<li>“out of distribution (the model never learned the answer)”</li>
+<li>“attention defect” - your answer requires the attention mechanism to attend to many locations that are too far apart to effectively return a signal. Hard to come up with examples. Attention is pretty amazing at learning relations. GRU and Transformers are pretty amazing at operating over a long context. However, all the stuff above can mess them up and even if one is on the happy path.</li>
+</ul></li>
+<li>[chat participant api] - a vs code extension that allows you to create a “chat participant” that can be used in the chat window. This is a bit like a custom agent but is more focused on providing a specific interface for interacting with the model in the chat window. For example, you could create a “chat participant” that provides a specific set of commands or functions that can be used in the chat window. This could be used to create a more interactive and engaging chat experience.</li>
+<li>Shadow AI - use of gen ai at work that is not monitored or controlled by the organization.</li>
+</ol>
+
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Agentic {Buzz}},
+  date = {2026-01-03},
+  url = {https://orenbochman.github.io/posts/2026/2026-01-03-agentic-buzz/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2026. <span>“Agentic Buzz.”</span> January 3. <a href="https://orenbochman.github.io/posts/2026/2026-01-03-agentic-buzz/">https://orenbochman.github.io/posts/2026/2026-01-03-agentic-buzz/</a>.
+</div></div></section></div> ]]></description>
+  <guid>https://orenbochman.github.io/posts/2026/2026-01-03-agentic-buzz/</guid>
+  <pubDate>Sat, 03 Jan 2026 00:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 <item>
   <title>Convoluted Intuitions</title>
@@ -1675,8 +1940,7 @@ Networks.”</span> January 4, 2026. <a href="https://orenbochman.github.io/revi
   langid = {en}
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2026. <span>“Convoluted Intuitions.”</span> January 3,
-2026. <a href="https://orenbochman.github.io/posts/2026/2026-01-03-convolutions-and-fft/">https://orenbochman.github.io/posts/2026/2026-01-03-convolutions-and-fft/</a>.
+Bochman, Oren. 2026. <span>“Convoluted Intuitions.”</span> January 3. <a href="https://orenbochman.github.io/posts/2026/2026-01-03-convolutions-and-fft/">https://orenbochman.github.io/posts/2026/2026-01-03-convolutions-and-fft/</a>.
 </div></div></section></div> ]]></description>
   <category>math</category>
   <category>probability</category>
@@ -1731,8 +1995,7 @@ Bochman, Oren. 2026. <span>“Convoluted Intuitions.”</span> January 3,
   langid = {en}
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2026. <span>“Laws of Large Numbers.”</span> January 2,
-2026. <a href="https://orenbochman.github.io/posts/2026/2026-01-02-laws-of-large-numbers/">https://orenbochman.github.io/posts/2026/2026-01-02-laws-of-large-numbers/</a>.
+Bochman, Oren. 2026. <span>“Laws of Large Numbers.”</span> January 2. <a href="https://orenbochman.github.io/posts/2026/2026-01-02-laws-of-large-numbers/">https://orenbochman.github.io/posts/2026/2026-01-02-laws-of-large-numbers/</a>.
 </div></div></section></div> ]]></description>
   <guid>https://orenbochman.github.io/posts/2026/2026-01-02-laws-of-large-numbers/</guid>
   <pubDate>Fri, 02 Jan 2026 00:00:00 GMT</pubDate>
@@ -1778,7 +2041,7 @@ Bochman, Oren. 2026. <span>“Laws of Large Numbers.”</span> January 2,
   langid = {en}
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2026. <span>“Sick.”</span> January 1, 2026. <a href="https://orenbochman.github.io/posts/2026/2026-01-01-sick/">https://orenbochman.github.io/posts/2026/2026-01-01-sick/</a>.
+Bochman, Oren. 2026. <span>“Sick.”</span> January 1. <a href="https://orenbochman.github.io/posts/2026/2026-01-01-sick/">https://orenbochman.github.io/posts/2026/2026-01-01-sick/</a>.
 </div></div></section></div> ]]></description>
   <category>Personal</category>
   <guid>https://orenbochman.github.io/posts/2026/2026-01-01-sick/</guid>
@@ -1815,7 +2078,7 @@ Bochman, Oren. 2026. <span>“Sick.”</span> January 1, 2026. <a href="https://
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2025. <span>“Anthropic’s Claude: Advancing AI with Safety
-and Scalability.”</span> December 14, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-12-14-Anthropic/">https://orenbochman.github.io/posts/2025/2025-12-14-Anthropic/</a>.
+and Scalability.”</span> December 14. <a href="https://orenbochman.github.io/posts/2025/2025-12-14-Anthropic/">https://orenbochman.github.io/posts/2025/2025-12-14-Anthropic/</a>.
 </div></div></section></div> ]]></description>
   <category>PyData</category>
   <category>AI</category>
@@ -2000,7 +2263,7 @@ and Scalability.”</span> December 14, 2025. <a href="https://orenbochman.githu
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2025. <span>“Beyond Just Prediction: Causal Thinking in
-Machine Learning.”</span> December 12, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-causal-thinking-in-machine-learning/">https://orenbochman.github.io/posts/2025/2025-12-11-pydata-causal-thinking-in-machine-learning/</a>.
+Machine Learning.”</span> December 12. <a href="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-causal-thinking-in-machine-learning/">https://orenbochman.github.io/posts/2025/2025-12-11-pydata-causal-thinking-in-machine-learning/</a>.
 </div></div></section></div> ]]></description>
   <category>PyData</category>
   <category>Causal Inference</category>
@@ -2141,7 +2404,7 @@ font-style: inherit;">-c</span> bodo</span></code></pre></div></div>
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2025. <span>“Bodo DataFrames: A Fast and Scalable
-HPC-Based Drop-in Replacement for Pandas.”</span> December 12, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-bodo-dataframes/">https://orenbochman.github.io/posts/2025/2025-12-11-pydata-bodo-dataframes/</a>.
+HPC-Based Drop-in Replacement for Pandas.”</span> December 12. <a href="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-bodo-dataframes/">https://orenbochman.github.io/posts/2025/2025-12-11-pydata-bodo-dataframes/</a>.
 </div></div></section></div> ]]></description>
   <category>PyData</category>
   <guid>https://orenbochman.github.io/posts/2025/2025-12-11-pydata-bodo-dataframes/</guid>
@@ -2252,7 +2515,7 @@ HPC-Based Drop-in Replacement for Pandas.”</span> December 12, 2025. <a href="
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
 Bochman, Oren. 2025. <span>“Building a Lightweight Feature Store for
-Electricity Grid Forecasts with Polars.”</span> December 12, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-lightweight-feat-store/">https://orenbochman.github.io/posts/2025/2025-12-11-pydata-lightweight-feat-store/</a>.
+Electricity Grid Forecasts with Polars.”</span> December 12. <a href="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-lightweight-feat-store/">https://orenbochman.github.io/posts/2025/2025-12-11-pydata-lightweight-feat-store/</a>.
 </div></div></section></div> ]]></description>
   <category>PyData</category>
   <category>Feature Store</category>
@@ -2261,704 +2524,6 @@ Electricity Grid Forecasts with Polars.”</span> December 12, 2025. <a href="ht
   <guid>https://orenbochman.github.io/posts/2025/2025-12-11-pydata-lightweight-feat-store/</guid>
   <pubDate>Fri, 12 Dec 2025 00:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-lightweight-feat-store/pydata_logo.png" medium="image" type="image/png" height="144" width="144"/>
-</item>
-<item>
-  <title>Combining Zarr, HDF5, and TIFF into a single data format</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-
-<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="pydata_logo.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="pydata global"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/pydata_logo.png" class="img-fluid figure-img" alt="pydata global"></a></p>
-<figcaption>pydata global</figcaption>
-</figure>
-</div></div><div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Lecture Overview
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>TIFF, HDF5, and Zarr represent a few choices to store large n-dimensional arrays which represent scientific and machine learning data. Trade-offs have to be considered when selecting one of these formats. While TIFF files are recognized by many applications particularly for imaging, they are limited in the number of dimensions, two, traditionally, or three in the case of GeoTIFF. HDF5 was created to support hierarchical scientific data with arrays up to 32 dimensions, but are mainly readable by scientific applications. Neither TIFF nor HDF5 were designed with the cloud in mind. Meanwhile, Zarr reimagined HDF5 in the era of cloud computing and key-value object stores. In retrospect, these disparate formats have many similarities. I will demonstrate how to take advantage of these similarities to combine the formats and make data accessible to a wide range of local and cloud-based application without duplicating the data itself.</p>
-</div>
-</div>
-<p>Choosing a standard format for high dimensional (N &gt;= 2) array data is challenging in that one must consider trade-offs between compatible software packages, cloud optimization, and complexity, yet the need for such data has increased with recent advances in machine learning and volumetric imaging in the earth and biological sciences. The 927th installment of the XKCD comic series illustrates how standards proliferate: the existence of many prior and imperfect standards portends the creation of yet another standard to supplant the ones that came before often without considering similarities or compatability with prior standard formats. For n-dimensional data, TIFF, HDF5, and Zarr are now common formats in use across various fields and scientific domains. While TIFF and HDF5 were designed decades ago with flexible metadata structures, cloud optimization of these formats have helped to consolidate metadata in these formats and narrow the differences with the cloud-native file format Zarr. While Zarr has traditionally used individual keys for each compressed chunk, version 3 of the format introduces a sharding codec allowing multiple chunks to exist in the same file under a single key. The consolidation of chunks is reminiscent of tiles in TIFF files or chunked datasets in HDF5. Essentially each of these file formats have the capability to describe the location and sizes of individual blocks of data contained within. By taking advantage of metadata consolidation to achieve modularity, we can tailor and combine these formats to point to the same data blocks, avoiding duplication. The result is a hybrid file format that is simultaneously a TIFF, HDF5, and Zarr v3 shard. Readers of any of these formats can be used to read the same data blocks contained within this format.</p>
-<p>To illustrate the concept of a combined Zarr, HDF5, and TIFF format, I have created an example Jupyter notebook demonstrating a small Python library that can write data in this hybrid format. I then show how data can be read using libtiff, h5py, or tensorstore, manipulated by h5py, and then have the changes read using the same libraries.</p>
-<!--
-
-
-::: {.callout-tip}
-## What You'll Learn:
-
-- 🔍 A walkthrough of key components: attention, positional encoding, encoder/decoder stack
-- 🧠 Visual explanations of attention masks, shapes, and residuals
-- ⚠️ Common bugs and debugging strategies (like handling shape mismatches and masking errors)
-- ✅ Real-world implementation tips and tricks that demystify the architecture
-
-By the end of the talk, attendees will:
-
-- Understand the full forward pass of a transformer
-- Know how each component connects to the original paper
-- Feel more confident reading or writing custom model architectures
-:::
-
-
-::: {.callout-tip}
-## Prerequisites:
-
-- Basic Python and PyTorch
-- Some familiarity with neural networks (e.g., feedforward, softmax)
-- No need for prior experience in building models from scratch
-:::
-
-::: {.callout-important}
-## Tools and Frameworks:
-
-We will introduce you to certain modern frameworks in the workshop but the emphasis be on first principles and using vanilla Python and LLM calls to build AI-powered systems.
-:::
--->
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Speakers:
-</div>
-</div>
-<section id="mark-kittisopikul-ph.d." class="level3 callout-body-container callout-body">
-<h3 class="anchored" data-anchor-id="mark-kittisopikul-ph.d.">Mark Kittisopikul, Ph.D.</h3>
-<p>Mark Kittisopikul is a Software Engineer III at the Janelia Research Campus of the Howard Hughes Medical Institute.</p>
-<p>He specialize in working with data from light microscopy drawing upon my experience as a postdoctoral cell biologist.</p>
-</section>
-</div>
-<ul>
-<li><a href="https://github.com/mkitti/simple_image_formats">talk repo</a></li>
-<li><a href="https://github.com/hugobowne/AI-for-SWEs">slide deck</a></li>
-</ul>
-<section id="outline" class="level2">
-<h2 class="anchored" data-anchor-id="outline">Outline</h2>
-<p><a href="slide01.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide01.png" class="img-fluid"></a></p>
-<p><a href="slide02.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide02.png" class="img-fluid"></a></p>
-<p><a href="slide03.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide03.png" class="img-fluid"></a></p>
-<p><a href="slide04.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide04.png" class="img-fluid"></a></p>
-<p><a href="slide05.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide05.png" class="img-fluid"></a></p>
-<p><a href="slide06.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide06.png" class="img-fluid"></a></p>
-<p><a href="slide07.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide07.png" class="img-fluid"></a></p>
-<p><a href="slide08.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide08.png" class="img-fluid"></a></p>
-<p><a href="slide09.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide09.png" class="img-fluid"></a></p>
-<p><a href="slide10.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide10.png" class="img-fluid"></a></p>
-<p><a href="slide11.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide11.png" class="img-fluid"></a></p>
-<p><a href="slide12.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide12.png" class="img-fluid"></a></p>
-<p><a href="slide13.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide13.png" class="img-fluid"></a></p>
-<p><a href="slide14.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/slide14.png" class="img-fluid"></a></p>
-</section>
-<section id="reflections" class="level2">
-<h2 class="anchored" data-anchor-id="reflections">Reflections</h2>
-<p>Fascinating that all three formats can be combined to point to the same data blocks. This opens up new possibilities for data sharing and interoperability across different software ecosystems. The ability to read and manipulate the same data using different libraries without duplication is a significant advantage, especially in collaborative environments where different teams may have preferences for specific formats.</p>
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {Combining {Zarr,} {HDF5,} and {TIFF} into a Single Data
-    Format},
-  date = {2025-12-12},
-  url = {https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“Combining Zarr, HDF5, and TIFF into a Single
-Data Format.”</span> December 12, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/">https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/</a>.
-</div></div></section></div> ]]></description>
-  <category>PyData</category>
-  <guid>https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/</guid>
-  <pubDate>Fri, 12 Dec 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/pydata_logo.png" medium="image" type="image/png" height="144" width="144"/>
-</item>
-<item>
-  <title>GPU Accelerated Zarr</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-
-<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="pydata_logo.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="pydata global"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/pydata_logo.png" class="img-fluid figure-img" alt="pydata global"></a></p>
-<figcaption>pydata global</figcaption>
-</figure>
-</div></div><div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Lecture Overview
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The zarr-python 3.0 release includes native support for device buffers, enabling Zarr workloads to run on compute accelerators like NVIDIA GPUs. This enables you to get more work done faster.</p>
-<p>This talk is primarily intended for people who are at least somewhat familiar with Zarr and are curious about accelerating their n-dimensional array workload with GPUs. That said, we will start with a brief introduction to Zarr and why you might want to consider it as a storage format for the n-dimensional arrays (commonly seen in geospatial, microscopy, or genomics domains, among others). We’ll see what factors affect performance and how to maximize throughput for your data analysis or deep learning pipeline. Finally, we’ll preview the future improvements to GPU-accelerated Zarr and the packages building on top of it, like xarray and cubed.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>What You’ll Learn:
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>After attending this talk, you’ll have the knowledge needed to determine if using zarr-python’s support for device buffers can help accelerate your workload.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Prerequisites:
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>This talk is targeted at users who have at least heard of zarr, but we will give a brief introduction of the basics. The primary purpose is to spread knowledge about zarr-python’s recently added support for device (GPU) buffers and arrays, and how it can be used to speed up your array-based workload.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Tools and Frameworks:
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>We will introduce you to certain modern frameworks in the workshop but the emphasis be on first principles and using vanilla Python and LLM calls to build AI-powered systems.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Speakers:
-</div>
-</div>
-<section id="tom-augspurger" class="level3 callout-body-container callout-body">
-<h3 class="anchored" data-anchor-id="tom-augspurger">Tom Augspurger</h3>
-<p>Tom Augspurger is a software engineer at NVIDIA working on GPU-accelerated ETL tools as part of the RAPIDS team. He has helped maintain several libraries in the scientific python and geospatial stacks.</p>
-<!-- use these or others 🌸 🤗 💼 -->
-<ul>
-<li>Contact:
-<ul>
-<li><a href="https://tomaugspurger.net/">Personal Website</a></li>
-</ul></li>
-</ul>
-</section>
-</div>
-<ul>
-<li><a href="https://github.com/TomAugspurger/cuda-streams-sample">talk repo</a></li>
-<li><a href="https://tomaugspurger.net/posts/gpu-accelerated-zarr/">blog post</a></li>
-</ul>
-<section id="outline" class="level2">
-<h2 class="anchored" data-anchor-id="outline">Outline</h2>
-<ul>
-<li>Introduction
-<ul>
-<li>Brief overview of zarr (cloud-native format for storing chunked, n-dimensional arrays)</li>
-<li>Brief example of how easy it is to use zarr-python’s native support for device arrays</li>
-</ul></li>
-<li>Overview of GPU-accelerated Zarr workloads
-<ul>
-<li>We’ll some high-level examples of how Zarr fits into larger workloads (e.g.&nbsp;analyzing climate simulations, as part of a deep learning pipeline)</li>
-<li>We’ll discuss the key factors to think about when trying to maximize performance</li>
-</ul></li>
-<li>Overview of how it works
-<ul>
-<li>Show zarr’s configuration options for selecting between host and device buffers</li>
-<li>An overview of the Zarr codec pipeline</li>
-<li>Show how on-device decompression can be used, to accelerate decompression if that’s a bottleneck in your workload</li>
-<li>Benchmarks showing the speedup users can expect to see from GPU acceleration</li>
-</ul></li>
-<li>Preview of future work
-<ul>
-<li>Zarr-python currently only uses a single GPU, and doesn’t use any features like CUDA Streams. https://github.com/zarr-developers/zarr-python/issues/3271 tracks possible improvements for exposing additional parallelism.</li>
-<li>We’ll look at a prototype of how CUDA streams enable asynchronous host-to-device memory copies, enabling you to start computing on one chunk of data while another chunk is being copied to the device.</li>
-</ul></li>
-</ul>
-<hr>
-<p><a href="slide01.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide01.png" class="img-fluid"></a></p>
-<p><a href="slide02.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide02.png" class="img-fluid"></a></p>
-<p><a href="slide03.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide03.png" class="img-fluid"></a></p>
-<p><a href="slide04.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide04.png" class="img-fluid"></a></p>
-<p><a href="slide05.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide05.png" class="img-fluid"></a></p>
-<p><a href="slide06.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide06.png" class="img-fluid"></a></p>
-<p><a href="slide07.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide07.png" class="img-fluid"></a></p>
-<p><a href="slide08.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide08.png" class="img-fluid"></a></p>
-<p><a href="slide09.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide09.png" class="img-fluid"></a></p>
-<p><a href="slide10.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide10.png" class="img-fluid"></a></p>
-<p><a href="slide11.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide11.png" class="img-fluid"></a></p>
-<p><a href="slide12.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide12.png" class="img-fluid"></a></p>
-<p><a href="slide13.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide13.png" class="img-fluid"></a></p>
-<p><a href="slide14.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide14.png" class="img-fluid"></a></p>
-<p><a href="slide15.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide15.png" class="img-fluid"></a></p>
-<p><a href="slide16.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide16.png" class="img-fluid"></a></p>
-<p><a href="slide17.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide17.png" class="img-fluid"></a></p>
-<p><a href="slide18.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide18.png" class="img-fluid"></a></p>
-<p><a href="slide19.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide19.png" class="img-fluid"></a></p>
-<p><a href="slide20.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide20.png" class="img-fluid"></a></p>
-<p><a href="slide21.png" class="lightbox" data-gallery="quarto-lightbox-gallery-22"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide21.png" class="img-fluid"></a></p>
-<p><a href="slide22.png" class="lightbox" data-gallery="quarto-lightbox-gallery-23"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide22.png" class="img-fluid"></a></p>
-<p><a href="slide23.png" class="lightbox" data-gallery="quarto-lightbox-gallery-24"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide23.png" class="img-fluid"></a></p>
-<p><a href="slide24.png" class="lightbox" data-gallery="quarto-lightbox-gallery-25"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide24.png" class="img-fluid"></a></p>
-<p><a href="slide25.png" class="lightbox" data-gallery="quarto-lightbox-gallery-26"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide25.png" class="img-fluid"></a></p>
-<p><a href="slide26.png" class="lightbox" data-gallery="quarto-lightbox-gallery-27"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide26.png" class="img-fluid"></a></p>
-<p><a href="slide27.png" class="lightbox" data-gallery="quarto-lightbox-gallery-28"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide27.png" class="img-fluid"></a></p>
-<p><a href="slide28.png" class="lightbox" data-gallery="quarto-lightbox-gallery-29"><img src="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/slide28.png" class="img-fluid"></a></p>
-</section>
-<section id="reflections" class="level2">
-<h2 class="anchored" data-anchor-id="reflections">Reflections</h2>
-<p>The main point is that Zarr now supports GPU device buffers, enabling accelerated workloads on NVIDIA GPUs. The talk covers the basics of Zarr, performance factors, and future improvements.</p>
-<p>I did not really know about Zarr before this talk, so it was a great introduction to the format and its benefits for n-dimensional array storage. The explanation of how GPU acceleration works with Zarr was clear and informative.</p>
-<p>A quick breakdown is that n-dimensional arrays are common abstraction, similar to NumPy arrays but designed for larger datasets that don’t fit in memory. Zarr allows chunked storage of these arrays. Sharding allows putting chunks into different files to facilitate parallel access. Sharding is familiar from formats like HDF5 and TIFF but also from Lucene’s index files where search indices can then be searched in parallel and the results merged and ranked.</p>
-<p>Tom does a great job of breaking down complex concepts into digestible pieces. The visual aids and step-by-step explanations really help in understanding how transformers work under the hood.</p>
-<p>I particularly appreciated the focus on common pitfalls and debugging strategies, as these are often overlooked in more theoretical presentations.</p>
-<hr>
-<p>Note: while I reproduced the slide decks this talk is highly technical and challenging to understand and summarize in the first viewing.</p>
-<p>The best way to dive deeper is to check out the blog post where Tom has a great writeup with code examples: https://tomaugspurger.net/posts/gpu-accelerated-zarr/</p>
-<p>I hope to revisit and review this talk again in the near future after I have had more time to digest the material and find a suitable project to apply these concepts.</p>
-<p>I think a that large scale geo-temporal model of demand might be a good fit for Zarr and GPU acceleration.</p>
-<p>Note: that <a href="https://github.com/Blosc/c-blosc2">blosc_2</a> is a fast compression codec that works well with GPU acceleration and can be used with zarr-python. <!-- add link to pydata global talk on blosc_2 --></p>
-</section>
-<section id="resources" class="level2">
-<h2 class="anchored" data-anchor-id="resources">Resources</h2>
-<section id="packages-and-documentation" class="level3">
-<h3 class="anchored" data-anchor-id="packages-and-documentation">Packages and Documentation:</h3>
-<ul>
-<li><a href="https://zarr.readthedocs.io/en/stable/">Zarr-Python¶</a></li>
-<li><a href="https://icechunk.io/en/stable/">Icechunk Package</a></li>
-<li><a href="https://xarray.pydata.org/en/stable/">Xarray</a></li>
-<li>Quick start guide: <a href="https://zarr.readthedocs.io/en/stable/quick-start/">Getting Started with Zarr on GPUs</a></li>
-<li><a href="https://virtualizarr.readthedocs.io/en/stable/">Virtualizarr</a> - Zarr on Virtual Devices</li>
-</ul>
-</section>
-<section id="blog-posts-presentations" class="level3">
-<h3 class="anchored" data-anchor-id="blog-posts-presentations">Blog Posts &amp; Presentations:</h3>
-<ul>
-<li><p><a href="https://earthmover.io/blog/i-o-maxing-tensors-in-the-cloud">I/O-Maxing Tensors in the Cloud</a></p></li>
-<li><p><a href="https://earthmover.io/blog/building-the-future-of-scientific-data-at-the-zarr-summit">Building the Future of Scientific Data at the Zarr Summit</a></p></li>
-<li><p><a href="https://zarr.dev/zarr-summit-2025/">Zarr Summit 2025</a></p></li>
-<li><p><a href="https://docs.google.com/presentation/d/1sAyXHHG_xX7ZR8Uw2JxRaddTd3iN46VH5_RgHgMzd_A/edit?slide=id.p#slide=id.p">The Beauty of Zarr</a> an introduction by Sanket Verma</p></li>
-</ul>
-
-
-</section>
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {GPU {Accelerated} {Zarr}},
-  date = {2025-12-12},
-  url = {https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“GPU Accelerated Zarr.”</span> December 12,
-2025. <a href="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/">https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/</a>.
-</div></div></section></div> ]]></description>
-  <category>PyData</category>
-  <guid>https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/</guid>
-  <pubDate>Fri, 12 Dec 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/posts/2025/2025-12-09-pydata-gpu-acc-zarr/pydata_logo.png" medium="image" type="image/png" height="144" width="144"/>
-</item>
-<item>
-  <title>GPU Python for the Real World: Practical Steps to GPU-Accelerated Python with RAPIDS</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2025/2025-12-11-pydata-rapids/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-
-<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="pydata_logo.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="pydata global"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-rapids/pydata_logo.png" class="img-fluid figure-img" alt="pydata global"></a></p>
-<figcaption>pydata global</figcaption>
-</figure>
-</div></div><div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Lecture Overview
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>NVIDIA GPUs offer unmatched speed and efficiency for data processing and model training, significantly reducing the time and cost associated with these tasks. Using GPUs is even more tempting when you use zero-code-change plugins and libraries. You can use PyData libraries including pandas, polars and networkx without needing to rewrite your code to get the benefits of GPU acceleration. We can also mix in GPU native libraries like Numba, CuPy and pytorch to accelerate our workflows from end-to-end.</p>
-<p>However, integrating GPUs into our workflow can be a new challenge where we need to learn about installation, dependency management, and deployment in the Python ecosystem. When writing code, we also need to monitor performance, leverage hardware effectively, and debug when things go wrong</p>
-<p>This is where RAPIDS and its tooling ecosystem comes to the rescue. RAPIDS, is a collection of open source software libraries to execute end-to-end data pipelines on NVIDIA GPUs using familiar PyData APIs.</p>
-</div>
-</div>
-<p>In this tutorial we will cover:</p>
-<ul>
-<li>Introduction to cuDF, cuML and more that showcases a simple example of data processing and model training on GPUs.</li>
-<li>Answers to questions like: “Where do I get a GPU?”, “How do I run a container on a VM with a GPU?”, “How do I install GPU packages into an existing environment?”, as well as follow along examples to get a GPU up and running.</li>
-<li>Troubleshooting and monitoring: Examples of performance analysis, diagnostics, and debugging.</li>
-</ul>
-<p>This is a hands-on tutorial, with multiple examples to get familiarized with the RAPIDS ecosystem. Participants should ideally have some experience using Python, pandas and sci-kit learn. We’ll use cloud-based VMs, so familiarity with the cloud and resource creation is helpful but not required. No prior GPU knowledge is needed. <!-- 
-::: {.callout-tip}
-## What You'll Learn:
-
-- 🔍 A walkthrough of key components: attention, positional encoding, encoder/decoder stack
-- 🧠 Visual explanations of attention masks, shapes, and residuals
-- ⚠️ Common bugs and debugging strategies (like handling shape mismatches and masking errors)
-- ✅ Real-world implementation tips and tricks that demystify the architecture
-
-By the end of the talk, attendees will:
-
-- Understand the full forward pass of a transformer
-- Know how each component connects to the original paper
-- Feel more confident reading or writing custom model architectures
-:::
-
-
-::: {.callout-tip}
-## Prerequisites:
-
-- Basic Python and PyTorch
-- Some familiarity with neural networks (e.g., feedforward, softmax)
-- No need for prior experience in building models from scratch
-:::
---></p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Tools and Frameworks:
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li><a href="https://rapids.ai/">RAPIDS</a> ecosystem including cuDF, cuML, and Dask-cuDF</li>
-</ul>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Speakers:
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="jacob-tomlinson" class="level3">
-<h3 class="anchored" data-anchor-id="jacob-tomlinson">Jacob Tomlinson</h3>
-<p>Jacob Tomlinson is a senior software engineer at NVIDIA. His work involves maintaining open source projects including RAPIDS and Dask. He also tinkers with kr8s in his spare time. He lives in Exeter, UK.</p>
-</section>
-<section id="naty-clementi" class="level2">
-<h2 class="anchored" data-anchor-id="naty-clementi">Naty Clementi</h2>
-<p>Naty Clementi is a senior software engineer at <a href="https://www.nvidia.com/">NVIDIA</a>. She is a former academic with a Masters in Physics and PhD in Mechanical and Aerospace Engineering to her name. Her work involves contributing to <a href="https://rapids.ai/">RAPIDS</a>, and in the past she has also contributed and maintained other open source projects such as <a href="https://ibis-project.org/">Ibis</a> and <a href="https://www.dask.org/">Dask</a>. She is an active member of <a href="https://pyladies.com/">PyLadies</a> and an active volunteer and organizer of <a href="https://www.meetup.com/women-and-gender-expansive-coders-dc-wgxc-dc/">Women and Gender Expansive Coders DC meetups</a>.</p>
-</section>
-</div>
-</div>
-<!-- - [slide deck](https://github.com/hugobowne/AI-for-SWEs) -->
-<section id="outline" class="level2">
-<h2 class="anchored" data-anchor-id="outline">Outline</h2>
-<p>we start with intoduction and tour of the https://rapids.ai/ web page</p>
-<p>then we do a quick demo on colab</p>
-<p>but most of the demo happens on the NVIDIA Brev platform</p>
-<p>both of these are based on this repo:</p>
-<ul>
-<li><a href="https://github.com/NVIDIA/accelerated-computing-hub/blob/main/tutorials/gpu-deployment/gpu-deployment-from-scratch.md">demo repo</a></li>
-</ul>
-<section id="demo-notebook" class="level3">
-<h3 class="anchored" data-anchor-id="demo-notebook">Demo notebook</h3>
-<ul>
-<li>Deployment
-<ul>
-<li><a href="https://brev.nvidia.com/">NVIDIA Brev</a></li>
-<li>GPU Software Environment Fundamentals</li>
-<li>Python packages that use CUDA</li>
-<li>Monitoring/debugging tools</li>
-<li>Other platforms</li>
-</ul></li>
-</ul>
-</section>
-<section id="connecting-to-your-vm" class="level3">
-<h3 class="anchored" data-anchor-id="connecting-to-your-vm">Connecting to your VM</h3>
-<p>Once your VM is deployed, follow the Brev access instructions provided for your instance. The connection instructions will vary depending on your operating system. For example, on macOS you would:</p>
-<ul>
-<li>Install the brev CLI
-<ul>
-<li><code>brew install brevdev/homebrew-brev/brev</code></li>
-</ul></li>
-<li>Login to your account (copy from access page)
-<ul>
-<li><code>brev login --token ****</code></li>
-</ul></li>
-<li>Connect via SSH
-<ul>
-<li><code>brev ls to list your VMs</code></li>
-<li><code>brev shell &lt;your vm name&gt;</code> to connect via SSH`</li>
-</ul></li>
-</ul>
-<p>Exploring our GPU Software Environment</p>
-<pre><code>$ nvidia-smi</code></pre>
-<pre><code>+-----------------------------------------------------------------------------------------+
-| NVIDIA-SMI 570.158.01             Driver Version: 570.158.01     CUDA Version: 12.8     |
-|-----------------------------------------+------------------------+----------------------+
-| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
-|                                         |                        |               MIG M. |
-|=========================================+========================+======================|
-|   0  NVIDIA L4                      On  |   00000000:00:03.0 Off |                    0 |
-| N/A   47C    P8             13W /   72W |       0MiB /  23034MiB |      0%      Default |
-|                                         |                        |                  N/A |
-+-----------------------------------------+------------------------+----------------------+
-
-+-----------------------------------------------------------------------------------------+
-| Processes:                                                                              |
-|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
-|        ID   ID                                                               Usage      |
-|=========================================================================================|
-|  No running processes found                                                             |
-+-----------------------------------------------------------------------------------------+</code></pre>
-</section>
-<section id="python-software-environments" class="level3">
-<h3 class="anchored" data-anchor-id="python-software-environments">Python Software environments</h3>
-</section>
-</section>
-<section id="reflections" class="level2">
-<h2 class="anchored" data-anchor-id="reflections">Reflections</h2>
-<p>The demo is informative.</p>
-<p>They run <code>tmux</code> which lets you see how installation is done and while the workload is running you can see some system monitoring alongside the python console.</p>
-<p>This seems to be a missing capabilities when working with Cuda on my desktop and possibly when using a remote instance too!.</p>
-<hr>
-<p>Monitoring and Debugging using TMUX</p>
-<p>Jacob suggest using monitoring tools such as:</p>
-<ul>
-<li><p>NVTOP [GPU % RX TX Memory] process list [GPU CPU memory loads etc]</p></li>
-<li><p>SMI</p></li>
-<li><p>Future lab nvdashbord</p></li>
-<li><p>DCGM</p></li>
-<li><p>nsys</p></li>
-<li><p>Nsight</p></li>
-<li><p>Jupter lab Nsight extension</p></li>
-</ul>
-<p>it shows that many operations are async or lazy.</p>
-<hr>
-<p>Anyhow I can’t wait to try RAPIDS on my own GPU machine.</p>
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {GPU {Python} for the {Real} {World:} {Practical} {Steps} to
-    {GPU-Accelerated} {Python} with {RAPIDS}},
-  date = {2025-12-12},
-  url = {https://orenbochman.github.io/posts/2025/2025-12-11-pydata-rapids/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“GPU Python for the Real World: Practical
-Steps to GPU-Accelerated Python with RAPIDS.”</span> December 12, 2025.
-<a href="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-rapids/">https://orenbochman.github.io/posts/2025/2025-12-11-pydata-rapids/</a>.
-</div></div></section></div> ]]></description>
-  <category>PyData</category>
-  <guid>https://orenbochman.github.io/posts/2025/2025-12-11-pydata-rapids/</guid>
-  <pubDate>Fri, 12 Dec 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-rapids/pydata_logo.png" medium="image" type="image/png" height="144" width="144"/>
-</item>
-<item>
-  <title>Garbage In, Lawsuit Out: Building Compliant and Reproducible ML Pipelines</title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-
-
-<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="pydata_logo.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="pydata global"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/pydata_logo.png" class="img-fluid figure-img" alt="pydata global"></a></p>
-<figcaption>pydata global</figcaption>
-</figure>
-</div></div><div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Lecture Overview
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Your model might pass all the benchmarks—but can it survive a subpoena? In the race to ship AI, most teams are building workflows that look great in dashboards but fall apart under legal, regulatory, or ethical pressure. Because the real liability doesn’t live in your model weights—it’s buried in your data.</p>
-</div>
-</div>
-<p>This session is a reality check for anyone shipping machine learning in production. We’ll walk through the dark corners of modern ML pipelines: mutable datasets with no history, mystery data sources with missing labels, and a forgotten column of PII that’s just been shipped to production. Then we’ll show how to fix it—without turning your data team into compliance officers.</p>
-<p>You’ll learn how to embed reproducibility, traceability, and policy enforcement into your pipeline without slowing it to a crawl: track every dataset change, version every experiment, validate against policy gates, and generate audit trails that actually mean something. Whether you’re dealing with GDPR, HIPAA, or just not wanting to get roasted by internal audit, this talk gives you the blueprint for ML you can defend in court—and still ship on time.</p>
-<!--
-
-::: {.callout-tip}
-## What You'll Learn:
-
-- 🔍 A walkthrough of key components: attention, positional encoding, encoder/decoder stack
-- 🧠 Visual explanations of attention masks, shapes, and residuals
-- ⚠️ Common bugs and debugging strategies (like handling shape mismatches and masking errors)
-- ✅ Real-world implementation tips and tricks that demystify the architecture
-
-By the end of the talk, attendees will:
-
-- Understand the full forward pass of a transformer
-- Know how each component connects to the original paper
-- Feel more confident reading or writing custom model architectures
-:::
-
-
-::: {.callout-tip}
-## Prerequisites:
-
-- Basic Python and PyTorch
-- Some familiarity with neural networks (e.g., feedforward, softmax)
-- No need for prior experience in building models from scratch
-:::
-
-::: {.callout-important}
-## Tools and Frameworks:
-
-We will introduce you to certain modern frameworks in the workshop but the emphasis be on first principles and using vanilla Python and LLM calls to build AI-powered systems.
-:::
--->
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Speakers:
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="itai-gilo" class="level3">
-<h3 class="anchored" data-anchor-id="itai-gilo">Itai Gilo</h3>
-<p>Itai is a seasoned software engineer, passionate about clean code and design, and about simplifying what is complex. Doing what’s needed, whether it’s backend, full-stack, or mobile development, and enjoys creating well-crafted products.</p>
-<!-- use these or others 🌸 🤗 💼 
-- Contact:
-    - [ Personal Website](https://birdofparadise.ai/experience/)
-
-:::
-
-- [talk repo](https://github.com/hugobowne/AI-for-SWEs)
-- [slide deck](https://github.com/hugobowne/AI-for-SWEs)
-
--->
-</section>
-<section id="outline" class="level2">
-<h2 class="anchored" data-anchor-id="outline">Outline</h2>
-<p><a href="slide01.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide01.png" class="img-fluid"></a></p>
-<p><a href="slide02.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide02.png" class="img-fluid"></a></p>
-<p><a href="slide03.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide03.png" class="img-fluid"></a></p>
-<p><a href="slide04.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide04.png" class="img-fluid"></a></p>
-<p><a href="slide05.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide05.png" class="img-fluid"></a></p>
-<p><a href="slide06.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide06.png" class="img-fluid"></a></p>
-<p><a href="slide07.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide07.png" class="img-fluid"></a></p>
-<p><a href="slide08.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide08.png" class="img-fluid"></a></p>
-<p><a href="slide09.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide09.png" class="img-fluid"></a></p>
-<p><a href="slide10.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide10.png" class="img-fluid"></a></p>
-<p><a href="slide11.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide11.png" class="img-fluid"></a></p>
-<p><a href="slide12.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide12.png" class="img-fluid"></a></p>
-<p><a href="slide13.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide13.png" class="img-fluid"></a></p>
-<p><a href="slide14.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide14.png" class="img-fluid"></a></p>
-<p><a href="slide15.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide15.png" class="img-fluid"></a></p>
-<p><a href="slide16.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide16.png" class="img-fluid"></a></p>
-<p><a href="slide17.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide17.png" class="img-fluid"></a></p>
-<p><a href="slide18.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide18.png" class="img-fluid"></a></p>
-<p><a href="slide19.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide19.png" class="img-fluid"></a></p>
-<p><a href="slide20.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide20.png" class="img-fluid"></a></p>
-<p><a href="slide21.png" class="lightbox" data-gallery="quarto-lightbox-gallery-22"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide21.png" class="img-fluid"></a></p>
-<p><a href="slide22.png" class="lightbox" data-gallery="quarto-lightbox-gallery-23"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide22.png" class="img-fluid"></a></p>
-<p><a href="slide23.png" class="lightbox" data-gallery="quarto-lightbox-gallery-24"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide23.png" class="img-fluid"></a></p>
-<p><a href="slide24.png" class="lightbox" data-gallery="quarto-lightbox-gallery-25"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide24.png" class="img-fluid"></a></p>
-<p><a href="slide25.png" class="lightbox" data-gallery="quarto-lightbox-gallery-26"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide25.png" class="img-fluid"></a></p>
-<p><a href="slide26.png" class="lightbox" data-gallery="quarto-lightbox-gallery-27"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide26.png" class="img-fluid"></a></p>
-<p><a href="slide27.png" class="lightbox" data-gallery="quarto-lightbox-gallery-28"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide27.png" class="img-fluid"></a></p>
-<p><a href="slide28.png" class="lightbox" data-gallery="quarto-lightbox-gallery-29"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide28.png" class="img-fluid"></a></p>
-<p><a href="slide29.png" class="lightbox" data-gallery="quarto-lightbox-gallery-30"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide29.png" class="img-fluid"></a></p>
-<p><a href="slide30.png" class="lightbox" data-gallery="quarto-lightbox-gallery-31"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide30.png" class="img-fluid"></a></p>
-<p><a href="slide31.png" class="lightbox" data-gallery="quarto-lightbox-gallery-32"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide31.png" class="img-fluid"></a></p>
-<p><a href="slide32.png" class="lightbox" data-gallery="quarto-lightbox-gallery-33"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide32.png" class="img-fluid"></a></p>
-<p><a href="slide33.png" class="lightbox" data-gallery="quarto-lightbox-gallery-34"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide33.png" class="img-fluid"></a></p>
-<p><a href="slide34.png" class="lightbox" data-gallery="quarto-lightbox-gallery-35"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide34.png" class="img-fluid"></a></p>
-<p><a href="slide35.png" class="lightbox" data-gallery="quarto-lightbox-gallery-36"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide35.png" class="img-fluid"></a></p>
-<p><a href="slide36.png" class="lightbox" data-gallery="quarto-lightbox-gallery-37"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide36.png" class="img-fluid"></a></p>
-<p><a href="slide37.png" class="lightbox" data-gallery="quarto-lightbox-gallery-38"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide37.png" class="img-fluid"></a></p>
-<p><a href="slide38.png" class="lightbox" data-gallery="quarto-lightbox-gallery-39"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide38.png" class="img-fluid"></a></p>
-<p><a href="slide39.png" class="lightbox" data-gallery="quarto-lightbox-gallery-40"><img src="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/slide39.png" class="img-fluid"></a></p>
-</section>
-<section id="reflections" class="level2">
-<h2 class="anchored" data-anchor-id="reflections">Reflections</h2>
-<p>This is not the first time I see the concept of data version cotrol c.f. <a href="https://dvc.org/">DVC</a> and <a href="https://www.pachyderm.com/">Pachyderm</a>.</p>
-<p>However here we see a more comprehensive approach that includes not only data versioning but also experiment tracking, policy validation, and audit trail generation. This holistic view is crucial for building robust ML pipelines that can withstand legal and regulatory scrutiny.</p>
-
-
-</section>
-</div>
-</div>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
-  author = {Bochman, Oren},
-  title = {Garbage {In,} {Lawsuit} {Out:} {Building} {Compliant} and
-    {Reproducible} {ML} {Pipelines}},
-  date = {2025-12-12},
-  url = {https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/},
-  langid = {en}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas">
-Bochman, Oren. 2025. <span>“Garbage In, Lawsuit Out: Building Compliant
-and Reproducible ML Pipelines.”</span> December 12, 2025. <a href="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/">https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/</a>.
-</div></div></section></div> ]]></description>
-  <category>PyData</category>
-  <category>Machine Learning</category>
-  <category>Data Engineering</category>
-  <category>Compliance</category>
-  <guid>https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/</guid>
-  <pubDate>Fri, 12 Dec 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/pydata_logo.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 </channel>
 </rss>

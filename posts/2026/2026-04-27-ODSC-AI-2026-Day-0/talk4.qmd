@@ -1,0 +1,86 @@
+---
+title: A Practical Introduction to Agentic AI
+date: 2026-04-27
+keywords: [Agents, Harness Engineering, Context Engineering, Generative AI, Workshop]
+categories: [ODSC, workshop]
+description: A workshop on building agentic AI applications from scratch, covering tool use, task decomposition, self-correction, conditional routing, and human-in-the-loop review.
+---
+
+## A Practical Introduction to Agentic AI
+
+::: {.column-margin}
+{{< video https://vimeo.com/1189362168 >}} 
+:::
+
+- Sudip Shrestha, Lead AI Engineer at ASI Government
+  - [linkedin](https://www.linkedin.com/in/sudipshrestha/) 
+  - [website](https://www.asigovernment.com/)
+  - [slides](https://docs.google.com/presentation/d/1cDMH5PURp5C3IHHQ40MkEW__qPwcVseu/edit?slide=id.p1#slide=id.p1)
+  - [ASI Government](https://www.linkedin.com/company/asi-government/)
+
+::: {.callout-note collapse="false"}
+### Notes
+
+* **Main objective:** Build a working agentic artificial intelligence application from scratch in Google Colab, ending with a simple Gradio demo app.
+* **Core distinction: chatbot vs. agent**
+  * A chatbot mainly responds to prompts.
+  * An agent can decide, act, call tools, loop through steps, and move a workflow forward without constant human prompting.
+  * The underlying large language model may be the same; the difference is the workflow, tools, state, and control logic wrapped around it.
+* **Why agentic AI is becoming practical now**
+  * Tool calling has become more reliable.
+  * Frameworks such as LangGraph, CrewAI, AutoGen, and OpenAI’s SDK have matured.
+  * There is growing demand for applications that do more than produce text: they execute tasks, revise outputs, and integrate with systems.
+* **Key agentic AI capabilities discussed**
+  * Tool use through Python functions or APIs.
+  * Task decomposition into steps.
+  * Self-correction through critique and revision.
+  * Conditional routing based on intermediate results.
+  * Human-in-the-loop review when autonomy is risky.
+  * Observability and tracing for debugging.
+* **Important limitations and risks**
+  * Agents can become expensive or slow if they loop too much.
+  * Loops need maximum iteration caps.
+  * Results are nondeterministic, so evaluation must be systematic rather than based on one successful run.
+  * Tool descriptions and docstrings matter because the model uses them to decide which tool to call.
+  * Security requires least-privilege access, authentication, and careful API control.
+  * Debugging is harder because the model, tools, prompts, and graph logic all interact.
+* **LangGraph concepts introduced**
+  * **State:** shared memory passed through the graph.
+  * **Nodes:** Python functions that read and update the state.
+  * **Edges:** fixed transitions between nodes.
+  * **Conditional edges:** decision functions that choose the next step at runtime.
+  * **Loop caps:** safeguards that prevent infinite or costly cycles.
+* **Most important technical idea**
+  * Conditional edges turn a fixed pipeline into an agentic workflow.
+  * Example: a `should_revise` function checks a score; if the score is high enough, the workflow stops, otherwise it routes back to revision.
+* **Hands-on build structure**
+  * **Part 1:** Start with a plain large language model call, then add tool calling.
+  * **Part 2:** Build a LangGraph stateful self-correcting agent.
+  * **Part 3:** Wrap the system in a Gradio interface and store results in SQLite.
+* **Tool-calling example**
+  * Shrestha demonstrates simple Python tools such as `add` and `multiply`.
+  * These functions are wrapped so the model can decide when to call them.
+  * The docstring acts like prompt engineering inside code: it tells the model when and how to use the tool.
+* **Self-correcting LinkedIn post agent**
+  * The agent takes a topic and drafts a LinkedIn post.
+  * An evaluator scores the post out of 10.
+  * If the score is below the threshold, the agent revises the draft.
+  * If the score passes the threshold, the workflow ends.
+  * The process stores the topic, score, revision count, and feedback.
+* **Structured output**
+  * [Pydantic](https://pydantic-docs.helpmanual.io/) is used to force model outputs into a predictable schema.
+  * This makes evaluation and routing more reliable because the graph can depend on fields such as `score` and `feedback`.
+* **Application layer**
+  * [Gradio](https://gradio.app/) is used for a lightweight demo interface.
+  * [SQLite](https://www.sqlite.org/) stores generated posts and metadata.
+  * Shrestha notes that Gradio and Streamlit are useful for demos, while production apps may need frameworks such as [Next.js](https://nextjs.org/).
+* **Production considerations**
+  * Choose models according to task complexity, cost, and modality.
+  * Use stronger models only when the task justifies the cost.
+  * Keep evaluation criteria specific; vague rubrics lead to unreliable outputs.
+  * Multiple specialized agents can collaborate, but each should have a narrow role.
+* **Final takeaway**
+  * Agentic AI is not just “a better chatbot.”
+  * It is a workflow architecture where a language model uses tools, maintains state, evaluates its own work, and conditionally decides what to do next.
+:::
+

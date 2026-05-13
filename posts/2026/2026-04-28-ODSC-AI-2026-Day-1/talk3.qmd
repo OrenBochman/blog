@@ -1,0 +1,39 @@
+---
+title: vLLM with the Transformers Modelling Backend
+date: 2026-04-28
+keywords: [vLLM, Transformers, HuggingFace, Model Deployment, Tutorial]
+categories: [ODSC]
+description:  A deep dive into Harry Mellor's talk on vLLM with the Transformers Modelling Backend, exploring the integration of vLLM with HuggingFace Transformers for efficient model deployment.
+---
+## vLLM with the Transformers Modelling Backend  {#sec-vllm-with-the-transformers-modelling-backend}
+
+::: {.column-margin}
+{{< video https://vimeo.com/1187953811 >}}
+:::
+
+- vLLM with the Transformers Modelling Backend 
+- [Harry Mellor](https://www.linkedin.com/in/harrymellor/) 
+- HuggingFace
+- [tutorial](https://github.com/hmellor/vllm-transformers-modelling-backend-tutorial)
+
+::: {.callout-note collapse="false"}
+### Notes
+
+- Tools:
+    - Transformers
+    - torchtitan
+    - Axolotl
+    - TRL
+    - Unsloth
+1. [Transformers](https://github.com/hmellor/vllm-transformers-modelling-backend-tutorial/blob/main/notebooks/lesson_1_transformers.ipynb) - covers `transformes serve`, `from_pretrained` and `generate_batch`
+2. [vLLM](https://github.com/hmellor/vllm-transformers-modelling-backend-tutorial/blob/main/notebooks/lesson_2_vllm.ipynb) - covers `llm serve` and the `LLM` class.
+3. [transformers backend](https://github.com/hmellor/vllm-transformers-modelling-backend-tutorial/blob/main/notebooks/lesson_3_transformers_backend.ipynb) how vLLm can run a transformers model implementation without reimplementing it from scratch.
+    - c.f. [Building a compatible model backend for inference](https://huggingface.co/docs/transformers/en/community_integrations/transformers_as_backend)
+4. [Bring your own transformers model](https://github.com/hmellor/vllm-transformers-modelling-backend-tutorial/blob/main/notebooks/lesson_4_bring_your_model.ipynb) to vLLM
+    - When making a model compatible with the Transformers backend, watch out for:
+        - **Missing **kwargs at any level** — The most common issue. If OlmoeModel.forward accepted **kwargs but OlmoeDecoderLayer.forward didn't, attention_instances would be silently dropped.
+        - **Custom attention** not using ALL_ATTENTION_FUNCTIONS — Models that compute attention inline can't be dispatched to vLLM's kernels. The model must use the standard dispatch pattern.
+        - **Incorrect TP plans** — Misspecifying "colwise" vs "rowwise" will produce wrong results silently. Remember: projections that increase dimension (Q, K, V, gate, up) are typically "colwise", and projections that decrease dimension (O, down) are "rowwise".
+        - **Non-standard attention mask handling** — Models that manipulate attention weights directly (e.g., adding positional bias to attention scores after softmax) may not be expressible through the standard attention interface.
+:::
+

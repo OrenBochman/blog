@@ -1,0 +1,116 @@
+---
+title: Introduction to the Agent2Agent (A2A) Protocol
+date: 2026-04-27
+keywords: [Agents, Agent-to-Agent Protocol, A2A, Multi-Agent Systems, Interoperability, Workshop]
+categories: [ODSC, workshop]
+description: A workshop introducing the Agent-to-Agent (A2A) protocol, which enables interoperability and communication between independent AI agents across different frameworks and implementations.
+---
+
+## Introduction to the Agent2Agent (A2A) Protocol {#sec-a2a} 
+
+::: {.column-margin}
+{{< video https://vimeo.com/1189339425 >}} 
+::: 
+
+- Holt Skinner
+  - [LinkedIn](https://www.linkedin.com/in/holt/)
+  - [Videos](https://goo.gle/holt-videos)
+  - [Slides](https://drive.google.com/file/d/1YsoXP-kPvVFE4UczYyVvXopLHHL7DMMR/view)
+  - Google Cloud
+
+::: {.callout-note collapse="false"}
+### Notes
+
+* **Main idea**
+  * Modern AI applications are moving from simple chatbots toward agentic systems that reason, plan, call tools, and manage multi-step workflows.
+  * [The A2A protocol provides a standardized way for independent agents to discover, communicate, delegate, and collaborate, regardless of the framework or model used to build them.]{.marked}
+* **Why A2A is needed**
+  * Agent frameworks such as LangGraph, LangChain, Google Agent Development Kit, Microsoft Agent Framework, CrewAI, and others are not automatically interoperable.
+  * A2A acts as a shared communication layer so agents built by different teams, companies, or frameworks can still cooperate.
+  * The protocol keeps agents **opaque**: implementation details do not need to be exposed, only the external communication contract.
+* **Governance and ecosystem**
+  * Google introduced A2A in 2025 and later donated it to the Linux Foundation.
+  * IBM’s Agent Communication Protocol was merged into A2A.
+  * The protocol is open source, community-governed, and maintained through a technical steering committee.
+  * The speaker emphasizes using the official documentation site, because unofficial or misleading A2A sites exist.
+* **A2A versus Model Context Protocol**
+  * **Model Context Protocol (MCP)** connects agents to tools and APIs.
+  * **Agent-to-Agent (A2A)** connects agents to peer agents.
+  * MCP is usually used for deterministic tool execution; A2A is used for dynamic, non-deterministic collaboration between agentic systems.
+  * In sophisticated systems, both protocols may appear together: agents coordinate via A2A while using MCP to perform their own tool calls.
+* **Why not treat agents as tools**
+  * Tools usually expose a narrow, schema-defined function.
+  * Agents are open-ended problem solvers that can handle ambiguity, multi-step reasoning, and delegation.
+  * Treating an agent merely as a tool can reduce its expressive and operational capacity.
+* **Related protocols built around A2A**
+  * **[Agent Payments Protocol](https://a2a-protocol.org/latest/):** secure payment authorization between agents.
+  * **[Universal Commerce Protocol](https://developers.google.com/merchant/ucp):** standardized AI shopping workflows from discovery to checkout.
+  * **[Agent2UI](https://a2ui.org/):** lets agents render structured user interfaces such as buttons and forms, rather than only text.
+* **How A2A works**
+  * Each A2A agent publishes an **agent card**, a JSON description similar in spirit to `robots.txt` or an OpenAPI specification.
+  * The agent card is available at `.well-known/agent-card.json`.
+  * It describes the agent’s name, capabilities, skills, supported protocols, endpoint, and communication methods.
+  * Agents can communicate using standard web technologies such as HTTP, JSON-RPC, gRPC, and REST-style JSON.
+* **Interaction modes**
+  * **Synchronous:** for quick request-response interactions.
+  * **Asynchronous:** creates a task ID, allowing the client to poll for completion.
+  * **Streaming:** sends partial updates or artifacts as work progresses.
+  * **Push notifications:** uses callbacks or webhooks when task completion time is unknown.
+* **Core protocol objects**
+  * Messages contain roles and parts, including text, files, multimodal data, or structured data.
+  * Tasks track work status, such as submitted, working, completed, or input required.
+  * Artifacts contain returned outputs from completed tasks.
+  * Skills describe what the remote agent is capable of doing.
+* **Available tooling**
+  * The A2A ecosystem includes software development kits for Python, TypeScript/Node.js, Java, Go, C#/.NET, and Rust.
+  * A technology compatibility kit helps developers test whether their agents correctly implement the protocol.
+* **Hands-on system built in the walkthrough**
+  * The speaker builds a healthcare concierge multi-agent system.
+  * The system includes several agents implemented with different frameworks but connected through A2A:
+    * An insurance policy coverage agent.
+    * A health research agent.
+    * A healthcare provider lookup agent.
+    * A top-level healthcare concierge or manager agent.
+* **Insurance coverage agent**
+  * Uses a health insurance policy document as input.
+  * Answers questions such as the cost of mental health therapy.
+  * Uses a system prompt instructing the model to answer from the provided document and say “I don’t know” when the answer is unavailable.
+  * Is wrapped as an A2A server with an agent card describing its role and skill.
+* **Health research agent**
+  * Built with Google Agent Development Kit.
+  * Uses Google Search as a research tool.
+  * Demonstrates that some frameworks can generate A2A-compatible servers and agent cards with relatively little boilerplate.
+  * Returns general mental-health access guidance, such as crisis help, provider selection, cost management, and treatment options.
+* **Healthcare provider agent**
+  * Uses a fake provider database for the demo.
+  * Exposes a provider-search function through MCP.
+  * Connects that MCP tool to a LangChain/LangGraph agent.
+  * Wraps the resulting agent as an A2A-compatible service.
+  * Demonstrates that the same A2A client can communicate with agents implemented in different frameworks.
+* **Sequential and manager-agent architectures**
+  * The speaker distinguishes between different multi-agent designs:
+    * Sequential workflows, where output from one agent feeds another.
+    * Manager or concierge workflows, where one agent decides which specialist agents to call.
+  * The healthcare concierge agent uses the descriptions and skills in each agent card to decide which sub-agent should handle each part of a user query.
+* **Full concierge demo**
+  * The user query asks how to get mental health therapy in Austin, which providers are nearby, and what insurance covers.
+  * The concierge agent delegates to provider and insurance agents, and attempts to use the research agent.
+  * Some model calls fail because of throttling or resource exhaustion, but the top-level agent still produces a useful answer from the successful sub-agent outputs.
+  * This is presented as an example of graceful degradation in a multi-agent system.
+* **Operational lessons**
+  * Building production-grade agent systems is harder than the hype suggests.
+  * The speaker notes that many organizations are interested in agents, but relatively few have deployed them in production.
+  * Even a relatively simple multi-agent demo requires substantial integration work, careful descriptions, local servers, ports, clients, cards, and error handling.
+* **Error handling and auditability**
+  * A2A includes protocol-level mechanisms for reporting errors.
+  * Whether those errors are exposed usefully depends on the framework’s implementation.
+  * The speaker notes that not all frameworks necessarily implement every A2A error pathway correctly.
+* **Prompt-injection mitigation**
+  * Different frameworks provide different protections.
+  * The speaker mentions Google Cloud Model Armor as one available option in the Gemini Enterprise Agent Platform ecosystem.
+  * Other defenses include data loss prevention, sensitive-data detection, classification checks, virus scanning, careful prompt design, and explicit mitigation workflows.
+* **Overall takeaway**
+  * A2A is positioned as the interoperability layer for multi-agent systems.
+  * It does not replace MCP, agent frameworks, models, storage, or deployment infrastructure.
+  * Its role is to let independently built agents discover each other, describe their capabilities, exchange tasks, return artifacts, and collaborate across framework boundaries.
+:::

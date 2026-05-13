@@ -3426,9 +3426,11 @@ Bochman, Oren. 2026. <span>“ODSC AI 2026 - Day 2.”</span> April 29. <a href=
 <li>Ryan Lopopolo
 <ul>
 <li><a href="https://www.linkedin.com/in/ryanlopopolo/">LinkedIn</a></li>
+<li><a href="https://github.com/lopopolo">GitHub</a></li>
+<li><a href="">slides</a></li>
 </ul></li>
 </ul>
-<div class="callout callout-style-default callout-note callout-empty-content callout-titled">
+<div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -3440,7 +3442,153 @@ Bochman, Oren. 2026. <span>“ODSC AI 2026 - Day 2.”</span> April 29. <a href=
 </div>
 <div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-
+<ul>
+<li><p><strong>Topic:</strong> Harness engineering for deploying coding agents at scale in real software codebases.</p></li>
+<li><p><strong>Core thesis:</strong> Modern coding agents can produce substantial software end-to-end, but their effectiveness depends less on raw model capability and more on the surrounding engineering harness: context, feedback loops, tests, documentation, review workflows, and operational constraints.</p></li>
+<li><p><strong>Speaker’s experiment:</strong></p>
+<ul>
+<li>Over roughly six months in 2025, the speaker’s team used coding agents to build an internal productivity agent.</li>
+<li>The product reached beta with about 200 internal users.</li>
+<li>The team aimed to have agents produce essentially all code, with minimal direct human editing.</li>
+<li>Human engineers shifted from writing code to designing, staffing, guiding, and validating the “code factory.”</li>
+</ul></li>
+<li><p><strong>Why traditional software workflows change:</strong></p>
+<ul>
+<li>If code generation becomes cheap, teams no longer need to optimize primarily around human coding throughput.</li>
+<li>Human attention becomes the scarce resource.</li>
+<li>Agent context and attention are also scarce: broader tasks dilute agent performance.</li>
+<li>Work should therefore be decomposed into tightly scoped agent sessions.</li>
+</ul></li>
+<li><p><strong>Main bottlenecks:</strong></p>
+<ul>
+<li><strong>Human attention:</strong> humans should not repeatedly provide the same synchronous feedback.</li>
+<li><strong>Model context:</strong> agents need the right information at the right time, not every possible instruction upfront.</li>
+<li><strong>Model attention:</strong> the more unrelated context an agent sees, the less reliable it becomes.</li>
+</ul></li>
+<li><p><strong>Harness engineering:</strong></p>
+<ul>
+<li>Harness engineering means designing systems that deliver the right context to agents at the right stage of work.</li>
+<li>Code review comments are treated as evidence of missing context: if a human repeatedly comments on an issue, that requirement should be encoded into the harness.</li>
+<li>The goal is to move feedback earlier in the process so the agent avoids predictable mistakes before review.</li>
+</ul></li>
+<li><p><strong>Context as the central mechanism:</strong></p>
+<ul>
+<li>Agents receive context from prompts, <code>agents.md</code>, repository structure, documentation, tests, linters, tool outputs, and reviews.</li>
+<li>Non-functional requirements should be written down explicitly: reliability, performance, typography, architecture, testing expectations, security, and code style.</li>
+<li>Since agents start “fresh” on every task, they do not accumulate tacit team knowledge the way humans do through onboarding and repeated review.</li>
+</ul></li>
+<li><p><strong>The codebase is part of the prompt:</strong></p>
+<ul>
+<li>Agents inspect nearby files and imitate local patterns.</li>
+<li>Homogeneous repository structure helps agents generalize from one file or module to another.</li>
+<li>Good existing code improves future agent output because it becomes useful in-context evidence.</li>
+</ul></li>
+<li><p><strong>Use <code>agents.md</code> as a map, not a manual:</strong></p>
+<ul>
+<li>A short <code>agents.md</code> with pointers to deeper documentation worked better than a huge file containing everything.</li>
+<li>The speaker contrasts a roughly 300-line map-like file with a 3,000-line overloaded file.</li>
+<li>The agent should be told where to look depending on task type, such as frontend architecture, numerical analysis, reliability, or performance.</li>
+</ul></li>
+<li><p><strong>Front-of-process techniques:</strong></p>
+<ul>
+<li><p>Provide compact, discoverable documentation for agent personas and engineering expectations.</p></li>
+<li><p>Maintain documents such as:</p>
+<ul>
+<li>how to write reliable production code,</li>
+<li>how to write performant TypeScript,</li>
+<li>how to structure frontend architecture,</li>
+<li>how to use internal libraries,</li>
+<li>how to validate user journeys.</li>
+</ul></li>
+<li><p>Encode common operational lessons, such as requiring network calls to have timeouts and retries.</p></li>
+</ul></li>
+<li><p><strong>Middle-of-process techniques:</strong></p>
+<ul>
+<li>Use fast tests, builds, and linters so agents can hill-climb toward correct solutions.</li>
+<li>Linters should check not only syntax but also repository structure, package boundaries, configuration consistency, and architectural rules.</li>
+<li>High-quality linter failure messages should explain the remediation in human-readable prose.</li>
+<li>These tool outputs become just-in-time prompts for the agent.</li>
+</ul></li>
+<li><p><strong>Repository architecture for agents:</strong></p>
+<ul>
+<li>The team used many small package boundaries in a monorepo to help agents reason locally.</li>
+<li>The speaker mentions around 500 local NPM packages.</li>
+<li>The architecture was intentionally over-partitioned, even without deploying true microservices.</li>
+<li>This allowed agents and humans to restrict the relevant context for a change.</li>
+</ul></li>
+<li><p><strong>Static constraints and schema discipline:</strong></p>
+<ul>
+<li>The team used tools such as Zod and Pydantic to validate data at boundaries.</li>
+<li>They tried to eliminate unknown, untyped, or overly loose internal data structures.</li>
+<li>This reduced the agent tendency to generate redundant validation or dead code deep inside the system.</li>
+</ul></li>
+<li><p><strong>End-of-process techniques:</strong></p>
+<ul>
+<li><p>Treat agents like teammates rather than tools that must be watched continuously.</p></li>
+<li><p>Require a “proof of work” from agents:</p>
+<ul>
+<li>tests run,</li>
+<li>quality assurance plan,</li>
+<li>logs inspected,</li>
+<li>screenshots or videos,</li>
+<li>evidence that the ticket requirements were met.</li>
+</ul></li>
+<li><p>Agents were taught to attach media and validation artifacts to pull requests.</p></li>
+</ul></li>
+<li><p><strong>Review agents:</strong></p>
+<ul>
+<li>The team distilled patterns from hundreds of human-reviewed pull requests.</li>
+<li>Reviewer agents were created to catch common mistakes before the human reviewer.</li>
+<li>Review personas included reliability, security, performance, frontend architecture, modularity, and quality assurance.</li>
+<li>These reviewers used the same guardrail documents given to implementation agents.</li>
+</ul></li>
+<li><p><strong>Important reviewer-agent design choice:</strong></p>
+<ul>
+<li>Review agents must be biased toward merging, not endlessly blocking.</li>
+<li>Without that bias, reviewer agents can continuously “heckle” implementation agents and prevent convergence.</li>
+<li>The review job was framed as identifying sufficiently important issues, such as P2-and-above concerns.</li>
+</ul></li>
+<li><p><strong>Shift-left feedback loop:</strong></p>
+<ul>
+<li>The speaker’s recurring theme is to move review feedback, production feedback, and operational feedback earlier into the agent workflow.</li>
+<li>Repeated human interventions should become documentation, skills, tests, or linters.</li>
+<li>Every human correction is a candidate for automation or prompt injection.</li>
+</ul></li>
+<li><p><strong>Team productivity effect:</strong></p>
+<ul>
+<li>The team moved from roughly 3.5 pull requests per day to 5–10 pull requests per day.</li>
+<li>The limiting factor became how much parallel agent work the team could schedule, not how much code humans could personally write.</li>
+<li>Each new engineer improved the shared harness by adding their own view of “what good looks like.”</li>
+</ul></li>
+<li><p><strong>Handling production failures:</strong></p>
+<ul>
+<li>The team initially lacked normal production observability because humans were not directly doing the work.</li>
+<li>They used agents to build observability tooling as code.</li>
+<li>Dashboards and alerts were defined in JSON and YAML.</li>
+<li>Agents could inspect metrics, logs, and dashboards, then propose missing instrumentation or alerting.</li>
+<li>The speaker notes that they still used humans for release branches and smoke testing; continuous deployment was not fully automated.</li>
+</ul></li>
+<li><p><strong>Agent personas in practice:</strong></p>
+<ul>
+<li><p>Personas were coarse-grained and horizontal across the software development lifecycle.</p></li>
+<li><p>Examples:</p>
+<ul>
+<li>reliability reviewer,</li>
+<li>security reviewer,</li>
+<li>performance reviewer,</li>
+<li>frontend architecture reviewer,</li>
+<li>package layering reviewer,</li>
+<li>quality assurance reviewer.</li>
+</ul></li>
+<li><p>Each persona was given a small set of relevant documents and asked to evaluate a diff from that role.</p></li>
+</ul></li>
+<li><p><strong>Key takeaway:</strong></p>
+<ul>
+<li>Code is becoming cheap, but attention, context, and validation remain expensive.</li>
+<li>The highest-leverage work is to build harnesses that encode team judgment into documents, tests, linters, review agents, and fast feedback loops.</li>
+<li>The role of the human engineer shifts from producing code to designing systems that let agents produce acceptable code reliably.</li>
+</ul></li>
+</ul>
 </div>
 </div>
 </div>
@@ -4018,16 +4166,6 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 1.”</span> April 28. <a hre
 <li><a href="https://docs.google.com/presentation/d/1onY5e2wFiiExIPm1X16bJ23F3Zv9fwph">slides</a></li>
 <li><a href="https://github.com/rajshah4/harness-engineering">workshop</a></li>
 </ul>
-</section>
-<section id="introduction-to-the-math-behind-transformers-and-llms" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="introduction-to-the-math-behind-transformers-and-llms">Introduction to the Math Behind Transformers and LLMs</h2>
-
-<div class="no-row-height column-margin column-container"><div class="">
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://player.vimeo.com/video/1189380199" frameborder="0" title="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen=""></iframe></div>
-</div></div><ul>
-<li>David Hoyle,</li>
-<li>dunnhumby</li>
-</ul>
 <div class="callout callout-style-default callout-note callout-empty-content callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -4045,13 +4183,17 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 1.”</span> April 28. <a hre
 </div>
 </div>
 </section>
-<section id="introduction-to-machine-learning-from-theory-to-application" class="level2 page-columns page-full">
-<h2 class="anchored" data-anchor-id="introduction-to-machine-learning-from-theory-to-application">Introduction to Machine Learning: From Theory to Application</h2>
+<section id="introduction-to-the-math-behind-transformers-and-llms" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="introduction-to-the-math-behind-transformers-and-llms">Introduction to the Math Behind Transformers and LLMs</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://player.vimeo.com/video/1189372130" frameborder="0" title="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen=""></iframe></div>
-</div></div><p>Michael Galarnyk Georgia Institute of Technology</p>
-<div class="callout callout-style-default callout-note callout-empty-content callout-titled">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://player.vimeo.com/video/1189380199" frameborder="0" title="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen=""></iframe></div>
+</div></div><ul>
+<li>David Hoyle,</li>
+<li>dunnhumby</li>
+<li><a href="https://docs.google.com/presentation/d/1w9VVtjgXcCSlTK2UNa4BQ6FUJDXIRhE2/edit?usp=sharing&amp;ouid=107678147228131583519&amp;rtpof=true&amp;sd=true">slides</a></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -4063,7 +4205,313 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 1.”</span> April 28. <a hre
 </div>
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
+<ul>
+<li><p><strong>Purpose of the talk</strong></p>
+<ul>
+<li>David Hall explains the mathematics behind transformers and large language models in an accessible way.</li>
+<li>The goal is not to train a full large language model, build chatbots, or teach prompting, but to reduce fear of the mathematical structure behind these systems.</li>
+<li>The central modeling task is <strong>next-word prediction</strong>: given a partial sequence of words, predict the most likely next word.</li>
+</ul></li>
+<li><p><strong>Next-word prediction as the core idea</strong></p>
+<ul>
+<li>A language model begins with a context, such as “The cat sat on the…”</li>
+<li>It predicts the next word, appends that word to the sequence, and then repeats the process.</li>
+<li>This recursive procedure can generate longer completions, poems, answers, or dialogue.</li>
+<li>Systems such as ChatGPT and Claude can be understood, at a high level, as sophisticated next-token prediction systems.</li>
+</ul></li>
+<li><p><strong>Naive Markov model baseline</strong></p>
+<ul>
+<li><p>The speaker introduces a first-order Markov model using the phrase: “The more you know, the more you realize you don’t know.”</p></li>
+<li><p>A Markov model predicts the next word using only the immediately preceding word.</p></li>
+<li><p>Its transition probabilities can be represented as a matrix.</p></li>
+<li><p>The model exposes two major problems:</p>
+<ul>
+<li>It ignores most of the previous context.</li>
+<li>It becomes impractical with large vocabularies because the transition matrix grows explosively.</li>
+</ul></li>
+<li><p>It can also generate nonsensical sentences, illustrating why probabilistic language generation needs better structure.</p></li>
+</ul></li>
+<li><p><strong>Why embeddings are needed</strong></p>
+<ul>
+<li>One-hot representations are too large and sparse for realistic vocabularies.</li>
+<li>Large language models instead map tokens into lower-dimensional <strong>embedding vectors</strong>.</li>
+<li>These vectors numerically encode semantic relationships between words.</li>
+<li>Word2vec examples show that embeddings support meaningful operations, such as similarity comparison and analogy-like vector arithmetic.</li>
+<li>The speaker demonstrates cosine similarity and examples such as comparing related words or testing vector analogies.</li>
+</ul></li>
+<li><p><strong>Main intuition of transformers</strong></p>
+<ul>
+<li>Transformers map tokens to embedding vectors, then transform those vectors so they become <strong>context-aware</strong>.</li>
+<li>A word’s final vector should not merely represent the word itself; it should also encode relevant information from surrounding or preceding tokens.</li>
+<li>Once context-aware vectors are obtained, a relatively standard classifier can predict the next token.</li>
+</ul></li>
+<li><p><strong>Attention mechanism</strong></p>
+<ul>
+<li>Attention constructs a new vector for each token by taking a weighted combination of other token vectors.</li>
+<li>The weights indicate how much each token should “pay attention” to other tokens.</li>
+<li>Instead of averaging the original embeddings directly, the model first applies learned linear transformations to produce value vectors.</li>
+</ul></li>
+<li><p><strong>Self-attention</strong></p>
+<ul>
+<li>Self-attention computes attention weights from the tokens themselves.</li>
+<li>Tokens are transformed into <strong>query</strong> and <strong>key</strong> vectors.</li>
+<li>The similarity between a query and a key, usually via an inner product, determines how much attention one token pays to another.</li>
+<li>A softmax function converts these similarity scores into normalized attention weights.</li>
+<li>Learned matrices produce the query, key, and value vectors.</li>
+</ul></li>
+<li><p><strong>Masking</strong></p>
+<ul>
+<li>For next-token prediction, the model must not look ahead at future tokens.</li>
+<li>Masking prevents later tokens from influencing the representation of earlier positions.</li>
+<li>This is done by forcing unwanted attention scores to effectively become zero after softmax.</li>
+<li>Decoder-style language models use masking so that each position only attends to previous tokens.</li>
+</ul></li>
+<li><p><strong>Multi-headed attention</strong></p>
+<ul>
+<li>A single attention mechanism may not capture all relevant relationships between tokens.</li>
+<li>Multi-headed attention uses several attention heads in parallel.</li>
+<li>Different heads can specialize in different kinds of relationships or different parts of the embedding space.</li>
+<li>Their outputs are combined, often by concatenation, to form a richer context-aware representation.</li>
+</ul></li>
+<li><p><strong>Transformer block structure</strong></p>
+<ul>
+<li><p>A transformer block contains:</p>
+<ul>
+<li>Multi-headed self-attention.</li>
+<li>A neural network layer for nonlinear mixing of information.</li>
+<li>Normalization layers for stable training.</li>
+<li>Residual connections to preserve and stabilize information flow.</li>
+</ul></li>
+<li><p>These blocks transform input embeddings into context-aware embeddings suitable for prediction.</p></li>
+</ul></li>
+<li><p><strong>Predicting the next word</strong></p>
+<ul>
+<li>The model takes the final context-aware embedding vector in the sequence.</li>
+<li>A softmax classifier maps that vector to a probability distribution over the vocabulary.</li>
+<li>The next token can be chosen as the most probable word or sampled from the distribution for more variation.</li>
+<li>The process repeats by appending the selected token and predicting again.</li>
+</ul></li>
+<li><p><strong>Training objective</strong></p>
+<ul>
+<li>The model learns its parameters from large text corpora.</li>
+<li>Training minimizes <strong>cross-entropy loss</strong>, which compares predicted token probabilities to the observed next token.</li>
+<li>Since the correct observed word has probability one and all alternatives have probability zero, this becomes equivalent to maximizing the likelihood of the training data.</li>
+<li>Large models need very large datasets because they contain many parameters.</li>
+</ul></li>
+<li><p><strong>Positional information</strong></p>
+<ul>
+<li>Basic self-attention alone does not know word order.</li>
+<li>If tokens are rearranged, attention based only on token identities may not distinguish the new order properly.</li>
+<li>Transformers therefore add positional information to embeddings.</li>
+<li>Positional encodings allow the model to represent not only which words occur, but where they occur in the sequence.</li>
+</ul></li>
+<li><p><strong>Types of transformer models</strong></p>
+<ul>
+<li><p><strong>Decoder-only models</strong></p>
+<ul>
+<li>Map context-aware vectors to predicted next tokens.</li>
+<li>Used in systems such as ChatGPT and Claude.</li>
+<li>Best suited for generative language modeling.</li>
+</ul></li>
+<li><p><strong>Encoder-only models</strong></p>
+<ul>
+<li>Map full token sequences into context-aware vectors without next-token generation.</li>
+<li>Useful for representation tasks.</li>
+</ul></li>
+<li><p><strong>Encoder-decoder models</strong></p>
+<ul>
+<li>Use an encoder to represent an input sequence and a decoder to generate an output sequence.</li>
+<li>Useful for tasks such as machine translation.</li>
+</ul></li>
+</ul></li>
+<li><p><strong>Code example</strong></p>
+<ul>
+<li>The speaker briefly shows how transformer operations can be implemented in PyTorch.</li>
+<li>Key operations include matrix multiplication for query-key similarity, scaling by the square root of the vector dimension, masking, softmax, and multiplying attention weights by value vectors.</li>
+<li>The point is that once high-level tensor operations are available, the mathematical structure of a transformer can be expressed compactly in code.</li>
+</ul></li>
+<li><p><strong>Questions and answers</strong></p>
+<ul>
+<li>A Markov model cannot generate words outside its fixed vocabulary.</li>
+<li>Transformer models also predict only from a fixed vocabulary, but modern vocabularies are large enough to cover most practical cases.</li>
+<li>Infrequent or domain-specific words can be handled better through domain-specific fine-tuning.</li>
+<li>Older or smaller embedding datasets may produce weaker similarity results than modern embeddings.</li>
+<li>The main structural difference between encoder and decoder blocks is masking: decoders mask future tokens, while encoders generally do not.</li>
+</ul></li>
+<li><p><strong>Overall takeaway</strong></p>
+<ul>
+<li><p>A large language model can be understood as a system that:</p>
+<ul>
+<li>Converts tokens into vectors.</li>
+<li>Uses attention to make those vectors context-aware.</li>
+<li>Uses a classifier to predict the next token.</li>
+<li>Repeats this process to generate text.</li>
+</ul></li>
+<li><p>The mathematics is built from familiar components: vectors, matrices, inner products, softmax, probability, and loss minimization.</p></li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="introduction-to-machine-learning-from-theory-to-application" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="introduction-to-machine-learning-from-theory-to-application">Introduction to Machine Learning: From Theory to Application</h2>
 
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://player.vimeo.com/video/1189372130" frameborder="0" title="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen=""></iframe></div>
+</div></div><ul>
+<li>Michael Galarnyk
+<ul>
+<li>https://mgalarnyk.github.io/</li>
+</ul></li>
+<li>Georgia Institute of Technology</li>
+<li><a href="https://github.com/mGalarnyk/MLModelsScikit-Learn/tree/main/powerpoints">GitHub</a></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Notes
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li><p><strong>Topic: Introduction to machine learning with scikit-learn</strong></p>
+<ul>
+<li>The talk introduces machine learning from both theory and practical application.</li>
+<li>The speaker uses a GitHub repository with slides and notebooks so participants can follow along.</li>
+<li>The focus is on basic-to-intermediate machine learning concepts, especially as they apply to Python and <a href="https://scikit-learn.org/">scikit-learn</a>.</li>
+</ul></li>
+<li><p><strong>Prerequisites and setup</strong></p>
+<ul>
+<li>Participants are expected to know basic Python: strings, numbers, conditionals, loops, lists, tuples, and dictionaries.</li>
+<li>Some familiarity with <em>linear regression</em> is helpful.</li>
+<li>The speaker recommends using Anaconda or Google Colab to manage Python environments and dependencies.</li>
+<li>Core libraries discussed include <a href="https://numpy.org/">NumPy</a>, Pandas, <a href="https://matplotlib.org/">Matplotlib</a>, and scikit-learn.</li>
+</ul></li>
+<li><p><strong>Why fundamentals still matter in the age of large language models</strong></p>
+<ul>
+<li>Even though large language models can generate code, users still need enough understanding to debug mistakes.</li>
+<li>Models are better at generating text and code than at generating precise diagrams or visual explanations.</li>
+<li>A model may confidently provide incorrect output, so users need enough theory to evaluate whether the result is valid.</li>
+<li>Popular libraries such as scikit-learn are easier for artificial intelligence tools to assist with because they have abundant examples, documentation, and community usage.</li>
+</ul></li>
+<li><p><strong>Basic machine learning concepts</strong></p>
+<ul>
+<li>Machine learning is presented as giving computers the ability to learn from data without being explicitly programmed.</li>
+<li>The talk distinguishes between:
+<ul>
+<li><strong>Features</strong>: the input variables used to make predictions.</li>
+<li><strong>Target</strong>: the value or class the model tries to predict.</li>
+<li><strong>Regression</strong>: predicting continuous values, such as home prices.</li>
+<li><strong>Classification</strong>: predicting categories, such as flower species.</li>
+</ul></li>
+<li>The Iris dataset is used as an example of a small classification dataset.</li>
+</ul></li>
+<li><p><strong>Working with notebooks and debugging</strong></p>
+<ul>
+<li>The speaker emphasizes running <a href="https://jupyter.org/">Jupyter notebooks</a> sequentially from top to bottom.</li>
+<li>A common error discussed is using a variable before it has been defined.</li>
+<li>Users are encouraged to inspect variable types, array shapes, and intermediate outputs.</li>
+<li>Errors are divided into:
+<ul>
+<li><strong>Coding errors</strong>, such as missing variables or malformed data.</li>
+<li><strong>Understanding errors</strong>, such as applying a regression model to a classification problem.</li>
+</ul></li>
+</ul></li>
+<li><p><strong>Data preparation</strong></p>
+<ul>
+<li>The talk covers loading data into <a href="https://pandas.pydata.org/">Pandas</a> and identifying feature matrices and target vectors.</li>
+<li>Missing values are discussed, including simple removal as a practical shortcut.</li>
+<li>The speaker notes that missingness itself can sometimes be predictive and may be converted into a feature.</li>
+</ul></li>
+<li><p><strong>Linear regression</strong></p>
+<ul>
+<li>Linear regression is introduced through the slope-intercept form, <img src="https://latex.codecogs.com/png.latex?y%20=%20mx%20+%20b">.</li>
+<li>The speaker explains the role of an intercept and how adding parameters can improve model fit.</li>
+<li><img src="https://latex.codecogs.com/png.latex?R%5E2"> is introduced as a basic performance metric, where higher values generally indicate better fit.</li>
+<li>Visualizing the regression line is emphasized as important for communicating results to stakeholders.</li>
+</ul></li>
+<li><p><strong>Train-test split and overfitting</strong></p>
+<ul>
+<li>The speaker explains why data should be split into training and testing sets.</li>
+<li>The model learns from the training set and is evaluated on unseen test data.</li>
+<li>Testing on the same data used for training rewards overly complex models that memorize the dataset.</li>
+<li>The common 75/25 train-test split is discussed, though modern systems may use much larger training proportions.</li>
+<li><code>random_state</code> is used to make random splits reproducible.</li>
+</ul></li>
+<li><p><strong>Decision trees</strong></p>
+<ul>
+<li>Decision trees are introduced as interpretable models that make predictions by asking a sequence of questions.</li>
+<li>For a housing-price example, the tree may split mainly on square footage if that feature is most predictive.</li>
+<li>The speaker stresses that giving a model many features does not guarantee it will use all of them.</li>
+<li>Tree depth is discussed as a hyperparameter controlling how many questions the tree may ask.</li>
+</ul></li>
+<li><p><strong>Model interpretability</strong></p>
+<ul>
+<li>Interpretability is especially important in high-stakes domains such as healthcare and finance.</li>
+<li>Users need to understand not only whether a model predicts correctly, but how it reaches its predictions.</li>
+<li>Understanding model logic helps identify likely error patterns and evaluate whether the model is using appropriate signals.</li>
+</ul></li>
+<li><p><strong>Hyperparameter tuning</strong></p>
+<ul>
+<li>Hyperparameters are settings chosen before or during training, such as maximum tree depth.</li>
+<li>The speaker demonstrates trying multiple values and comparing performance.</li>
+<li>The goal is not to maximize training performance but to find settings that generalize well to validation or test data.</li>
+<li>Repeatedly tuning on the same test set can leak test-set knowledge into the model-selection process.</li>
+</ul></li>
+<li><p><strong>Bias-variance tradeoff</strong></p>
+<ul>
+<li>High-bias models, such as simple linear regression, may underfit by imposing too simple a structure.</li>
+<li>High-variance models, such as overly deep trees, may overfit by memorizing the training data.</li>
+<li>Traditional machine learning often seeks a middle ground between underfitting and overfitting.</li>
+<li>The speaker notes that modern deep learning complicates the classical picture because very large models can sometimes improve again at massive scale.</li>
+</ul></li>
+<li><p><strong>Random forests</strong></p>
+<ul>
+<li>Random forests are introduced as ensembles of decision trees.</li>
+<li>They reduce overfitting by combining many trees trained on varied samples and feature subsets.</li>
+<li>The speaker explains bagging and the use of random feature subsets to prevent every tree from relying on the same dominant feature.</li>
+<li>Random forests are described as combining many “specialists” into a stronger aggregate predictor.</li>
+</ul></li>
+<li><p><strong>Local versus cloud computation</strong></p>
+<ul>
+<li>Running models locally can reduce latency and simplify data transfer to the machine or GPU.</li>
+<li>Local execution may be limited by compute, memory, and hardware constraints.</li>
+<li>Cloud tools such as Google Colab reduce setup friction but depend on external services and policies.</li>
+<li>The speaker briefly discusses parallel and distributed computing as ways to speed up model training and inference.</li>
+</ul></li>
+<li><p><strong>Privacy and personally identifiable information</strong></p>
+<ul>
+<li>A participant asks about protecting personally identifiable information when using cloud or artificial intelligence tools.</li>
+<li>The speaker frames this as an active and unresolved issue.</li>
+<li>One mitigation strategy mentioned is limiting tool access so models can query only the minimum information needed.</li>
+</ul></li>
+<li><p><strong>Using artificial intelligence tools effectively</strong></p>
+<ul>
+<li>The speaker recommends giving models specific context, code, errors, and goals rather than vague requests.</li>
+<li>A better prompt explains what was attempted, what failed, and what the desired outcome is.</li>
+<li>Screenshots and exact error messages can help models debug code.</li>
+<li>Users should still understand the code well enough to judge whether the model’s fix is correct.</li>
+</ul></li>
+<li><p><strong>Recommended next steps</strong></p>
+<ul>
+<li>Continue practicing with notebooks and small datasets.</li>
+<li>Learn how to diagnose errors, inspect data, and evaluate models.</li>
+<li>Read reliable books and documentation rather than relying only on large language models.</li>
+<li>Suggested resources include hands-on machine learning books, Christopher Bishop’s work, and books by Sebastian Raschka.</li>
+</ul></li>
+<li><p><strong>Main takeaway</strong></p>
+<ul>
+<li>The talk argues that machine learning fundamentals remain essential, even when artificial intelligence tools can generate code.</li>
+<li>Effective users need to understand the data, the model, the evaluation procedure, and the limits of automation.</li>
+<li>The practical goal is not just to run a model, but to know whether it is appropriate, interpretable, reliable, and useful.</li>
+</ul></li>
+</ul>
 </div>
 </div>
 </div>
@@ -4077,6 +4525,111 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 1.”</span> April 28. <a hre
 <li>Shrestha, PhD,</li>
 <li>ASI Government</li>
 </ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Notes
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li><p><strong>Workshop topic:</strong> “Beyond Chatbot: A Practical Introduction to Agentic AI,” led by Sudeep Shrestha from ASI Government.</p></li>
+<li><p><strong>Main objective:</strong> Build a working agentic artificial intelligence application from scratch in Google Colab, ending with a simple Gradio demo app.</p></li>
+<li><p><strong>Core distinction: chatbot vs.&nbsp;agent</strong></p>
+<ul>
+<li>A chatbot mainly responds to prompts.</li>
+<li>An agent can decide, act, call tools, loop through steps, and move a workflow forward without constant human prompting.</li>
+<li>The underlying large language model may be the same; the difference is the workflow, tools, state, and control logic wrapped around it.</li>
+</ul></li>
+<li><p><strong>Why agentic AI is becoming practical now</strong></p>
+<ul>
+<li>Tool calling has become more reliable.</li>
+<li>Frameworks such as LangGraph, CrewAI, AutoGen, and OpenAI’s SDK have matured.</li>
+<li>There is growing demand for applications that do more than produce text: they execute tasks, revise outputs, and integrate with systems.</li>
+</ul></li>
+<li><p><strong>Key agentic AI capabilities discussed</strong></p>
+<ul>
+<li>Tool use through Python functions or APIs.</li>
+<li>Task decomposition into steps.</li>
+<li>Self-correction through critique and revision.</li>
+<li>Conditional routing based on intermediate results.</li>
+<li>Human-in-the-loop review when autonomy is risky.</li>
+<li>Observability and tracing for debugging.</li>
+</ul></li>
+<li><p><strong>Important limitations and risks</strong></p>
+<ul>
+<li>Agents can become expensive or slow if they loop too much.</li>
+<li>Loops need maximum iteration caps.</li>
+<li>Results are nondeterministic, so evaluation must be systematic rather than based on one successful run.</li>
+<li>Tool descriptions and docstrings matter because the model uses them to decide which tool to call.</li>
+<li>Security requires least-privilege access, authentication, and careful API control.</li>
+<li>Debugging is harder because the model, tools, prompts, and graph logic all interact.</li>
+</ul></li>
+<li><p><strong>LangGraph concepts introduced</strong></p>
+<ul>
+<li><strong>State:</strong> shared memory passed through the graph.</li>
+<li><strong>Nodes:</strong> Python functions that read and update the state.</li>
+<li><strong>Edges:</strong> fixed transitions between nodes.</li>
+<li><strong>Conditional edges:</strong> decision functions that choose the next step at runtime.</li>
+<li><strong>Loop caps:</strong> safeguards that prevent infinite or costly cycles.</li>
+</ul></li>
+<li><p><strong>Most important technical idea</strong></p>
+<ul>
+<li>Conditional edges turn a fixed pipeline into an agentic workflow.</li>
+<li>Example: a <code>should_revise</code> function checks a score; if the score is high enough, the workflow stops, otherwise it routes back to revision.</li>
+</ul></li>
+<li><p><strong>Hands-on build structure</strong></p>
+<ul>
+<li><strong>Part 1:</strong> Start with a plain large language model call, then add tool calling.</li>
+<li><strong>Part 2:</strong> Build a LangGraph stateful self-correcting agent.</li>
+<li><strong>Part 3:</strong> Wrap the system in a Gradio interface and store results in SQLite.</li>
+</ul></li>
+<li><p><strong>Tool-calling example</strong></p>
+<ul>
+<li>The speaker demonstrates simple Python tools such as <code>add</code> and <code>multiply</code>.</li>
+<li>These functions are wrapped so the model can decide when to call them.</li>
+<li>The docstring acts like prompt engineering inside code: it tells the model when and how to use the tool.</li>
+</ul></li>
+<li><p><strong>Self-correcting LinkedIn post agent</strong></p>
+<ul>
+<li>The agent takes a topic and drafts a LinkedIn post.</li>
+<li>An evaluator scores the post out of 10.</li>
+<li>If the score is below the threshold, the agent revises the draft.</li>
+<li>If the score passes the threshold, the workflow ends.</li>
+<li>The process stores the topic, score, revision count, and feedback.</li>
+</ul></li>
+<li><p><strong>Structured output</strong></p>
+<ul>
+<li><a href="https://pydantic-docs.helpmanual.io/">Pydantic</a> is used to force model outputs into a predictable schema.</li>
+<li>This makes evaluation and routing more reliable because the graph can depend on fields such as <code>score</code> and <code>feedback</code>.</li>
+</ul></li>
+<li><p><strong>Application layer</strong></p>
+<ul>
+<li><a href="https://gradio.app/">Gradio</a> is used for a lightweight demo interface.</li>
+<li><a href="https://www.sqlite.org/">SQLite</a> stores generated posts and metadata.</li>
+<li>The speaker notes that Gradio and Streamlit are useful for demos, while production apps may need frameworks such as <a href="https://nextjs.org/">Next.js</a>.</li>
+</ul></li>
+<li><p><strong>Production considerations</strong></p>
+<ul>
+<li>Choose models according to task complexity, cost, and modality.</li>
+<li>Use stronger models only when the task justifies the cost.</li>
+<li>Keep evaluation criteria specific; vague rubrics lead to unreliable outputs.</li>
+<li>Multiple specialized agents can collaborate, but each should have a narrow role.</li>
+</ul></li>
+<li><p><strong>Final takeaway</strong></p>
+<ul>
+<li>Agentic AI is not just “a better chatbot.”</li>
+<li>It is a workflow architecture where a language model uses tools, maintains state, evaluates its own work, and conditionally decides what to do next.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
 </section>
 <section id="introduction-to-the-agent2agent-a2a-protocol" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="introduction-to-the-agent2agent-a2a-protocol">Introduction to the Agent2Agent (A2A) Protocol</h2>
@@ -4088,7 +4641,7 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 1.”</span> April 28. <a hre
 <li>Google Cloud</li>
 </ul>
 <div class="callout callout-style-default callout-note callout-empty-content callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -4097,7 +4650,7 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 1.”</span> April 28. <a hre
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 
 </div>
@@ -4111,7 +4664,7 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 1.”</span> April 28. <a hre
 <div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://player.vimeo.com/video/1189363500" frameborder="0" title="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen=""></iframe></div>
 </div></div><p>Olivia Buzek, IBM <a href="https://obuzek.github.io/ai-agents-workshop/slides/#/title">slides</a></p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -4120,7 +4673,7 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 1.”</span> April 28. <a hre
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
 <li><p>The talk explains how to build <strong>responsible AI agents</strong>, especially when agents operate on sensitive or high-stakes data.</p>

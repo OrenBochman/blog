@@ -1,10 +1,10 @@
 ---
 title: ODSC - AI 2026 - Day 0
 date: 2026-04-27
+keywords: [ODSC, AI, Agents, Harness Engineering, Agentic Patterns, Pydantic, Gradio, SQLite, Linear Regression, Classification, Decision Trees, Random Forests, Train-Test Split, Bias-Variance Tradeoff]
 ---
 
-These are workshops and sessions that were not on the main track. 
-
+These are workshops and sessions that took place before the start of the main track. 
 
 ## Engineering the Harness: A Practical Workshop on Context Engineering for Generative AI
 
@@ -14,13 +14,16 @@ These are workshops and sessions that were not on the main track.
 I couldn't find a recording of this workshop from the conference but here is a recording of a similar workshop that Rajiv Shah has provided on YouTube.
 :::
 
-
 - Rajiv Shah
     - [linkedin](https://www.linkedin.com/in/rajistics/) 
 - [slides](https://docs.google.com/presentation/d/1onY5e2wFiiExIPm1X16bJ23F3Zv9fwph) 
 - [workshop](https://github.com/rajshah4/harness-engineering)
 
 
+::: {.callout-note collapse="true"}
+### Notes
+
+:::
 
 ## Introduction to the Math Behind Transformers and LLMs 
 
@@ -30,10 +33,147 @@ I couldn't find a recording of this workshop from the conference but here is a r
 
 - David Hoyle,
 - dunnhumby
+- [slides](https://docs.google.com/presentation/d/1w9VVtjgXcCSlTK2UNa4BQ6FUJDXIRhE2/edit?usp=sharing&ouid=107678147228131583519&rtpof=true&sd=true)
 
 ::: {.callout-note collapse="true"}
 ### Notes
 
+* **Purpose of the talk**
+
+  * David Hall explains the mathematics behind transformers and large language models in an accessible way.
+  * The goal is not to train a full large language model, build chatbots, or teach prompting, but to reduce fear of the mathematical structure behind these systems.
+  * The central modeling task is **next-word prediction**: given a partial sequence of words, predict the most likely next word.
+
+* **Next-word prediction as the core idea**
+
+  * A language model begins with a context, such as “The cat sat on the…”
+  * It predicts the next word, appends that word to the sequence, and then repeats the process.
+  * This recursive procedure can generate longer completions, poems, answers, or dialogue.
+  * Systems such as ChatGPT and Claude can be understood, at a high level, as sophisticated next-token prediction systems.
+
+* **Naive Markov model baseline**
+
+  * The speaker introduces a first-order Markov model using the phrase: “The more you know, the more you realize you don’t know.”
+  * A Markov model predicts the next word using only the immediately preceding word.
+  * Its transition probabilities can be represented as a matrix.
+  * The model exposes two major problems:
+
+    * It ignores most of the previous context.
+    * It becomes impractical with large vocabularies because the transition matrix grows explosively.
+  * It can also generate nonsensical sentences, illustrating why probabilistic language generation needs better structure.
+
+* **Why embeddings are needed**
+
+  * One-hot representations are too large and sparse for realistic vocabularies.
+  * Large language models instead map tokens into lower-dimensional **embedding vectors**.
+  * These vectors numerically encode semantic relationships between words.
+  * Word2vec examples show that embeddings support meaningful operations, such as similarity comparison and analogy-like vector arithmetic.
+  * The speaker demonstrates cosine similarity and examples such as comparing related words or testing vector analogies.
+
+* **Main intuition of transformers**
+
+  * Transformers map tokens to embedding vectors, then transform those vectors so they become **context-aware**.
+  * A word’s final vector should not merely represent the word itself; it should also encode relevant information from surrounding or preceding tokens.
+  * Once context-aware vectors are obtained, a relatively standard classifier can predict the next token.
+
+* **Attention mechanism**
+
+  * Attention constructs a new vector for each token by taking a weighted combination of other token vectors.
+  * The weights indicate how much each token should “pay attention” to other tokens.
+  * Instead of averaging the original embeddings directly, the model first applies learned linear transformations to produce value vectors.
+
+* **Self-attention**
+
+  * Self-attention computes attention weights from the tokens themselves.
+  * Tokens are transformed into **query** and **key** vectors.
+  * The similarity between a query and a key, usually via an inner product, determines how much attention one token pays to another.
+  * A softmax function converts these similarity scores into normalized attention weights.
+  * Learned matrices produce the query, key, and value vectors.
+
+* **Masking**
+
+  * For next-token prediction, the model must not look ahead at future tokens.
+  * Masking prevents later tokens from influencing the representation of earlier positions.
+  * This is done by forcing unwanted attention scores to effectively become zero after softmax.
+  * Decoder-style language models use masking so that each position only attends to previous tokens.
+
+* **Multi-headed attention**
+
+  * A single attention mechanism may not capture all relevant relationships between tokens.
+  * Multi-headed attention uses several attention heads in parallel.
+  * Different heads can specialize in different kinds of relationships or different parts of the embedding space.
+  * Their outputs are combined, often by concatenation, to form a richer context-aware representation.
+
+* **Transformer block structure**
+
+  * A transformer block contains:
+
+    * Multi-headed self-attention.
+    * A neural network layer for nonlinear mixing of information.
+    * Normalization layers for stable training.
+    * Residual connections to preserve and stabilize information flow.
+  * These blocks transform input embeddings into context-aware embeddings suitable for prediction.
+
+* **Predicting the next word**
+
+  * The model takes the final context-aware embedding vector in the sequence.
+  * A softmax classifier maps that vector to a probability distribution over the vocabulary.
+  * The next token can be chosen as the most probable word or sampled from the distribution for more variation.
+  * The process repeats by appending the selected token and predicting again.
+
+* **Training objective**
+
+  * The model learns its parameters from large text corpora.
+  * Training minimizes **cross-entropy loss**, which compares predicted token probabilities to the observed next token.
+  * Since the correct observed word has probability one and all alternatives have probability zero, this becomes equivalent to maximizing the likelihood of the training data.
+  * Large models need very large datasets because they contain many parameters.
+
+* **Positional information**
+
+  * Basic self-attention alone does not know word order.
+  * If tokens are rearranged, attention based only on token identities may not distinguish the new order properly.
+  * Transformers therefore add positional information to embeddings.
+  * Positional encodings allow the model to represent not only which words occur, but where they occur in the sequence.
+
+* **Types of transformer models**
+
+  * **Decoder-only models**
+
+    * Map context-aware vectors to predicted next tokens.
+    * Used in systems such as ChatGPT and Claude.
+    * Best suited for generative language modeling.
+  * **Encoder-only models**
+
+    * Map full token sequences into context-aware vectors without next-token generation.
+    * Useful for representation tasks.
+  * **Encoder-decoder models**
+
+    * Use an encoder to represent an input sequence and a decoder to generate an output sequence.
+    * Useful for tasks such as machine translation.
+
+* **Code example**
+
+  * The speaker briefly shows how transformer operations can be implemented in PyTorch.
+  * Key operations include matrix multiplication for query-key similarity, scaling by the square root of the vector dimension, masking, softmax, and multiplying attention weights by value vectors.
+  * The point is that once high-level tensor operations are available, the mathematical structure of a transformer can be expressed compactly in code.
+
+* **Questions and answers**
+
+  * A Markov model cannot generate words outside its fixed vocabulary.
+  * Transformer models also predict only from a fixed vocabulary, but modern vocabularies are large enough to cover most practical cases.
+  * Infrequent or domain-specific words can be handled better through domain-specific fine-tuning.
+  * Older or smaller embedding datasets may produce weaker similarity results than modern embeddings.
+  * The main structural difference between encoder and decoder blocks is masking: decoders mask future tokens, while encoders generally do not.
+
+* **Overall takeaway**
+
+  * A large language model can be understood as a system that:
+
+    * Converts tokens into vectors.
+    * Uses attention to make those vectors context-aware.
+    * Uses a classifier to predict the next token.
+    * Repeats this process to generate text.
+  * The mathematics is built from familiar components: vectors, matrices, inner products, softmax, probability, and loss minimization.
 :::
 
 
@@ -43,11 +183,112 @@ I couldn't find a recording of this workshop from the conference but here is a r
 {{< video https://vimeo.com/1189372130 >}} 
 :::
 
- Michael Galarnyk
- Georgia Institute of Technology
+- Michael Galarnyk
+  - https://mgalarnyk.github.io/
+- Georgia Institute of Technology
+- [GitHub](https://github.com/mGalarnyk/MLModelsScikit-Learn/tree/main/powerpoints)
 
 ::: {.callout-note collapse="true"}
 ### Notes
+
+* **Topic: Introduction to machine learning with scikit-learn**
+
+  * The talk introduces machine learning from both theory and practical application.
+  * The speaker uses a GitHub repository with slides and notebooks so participants can follow along.
+  * The focus is on basic-to-intermediate machine learning concepts, especially as they apply to Python and [scikit-learn](https://scikit-learn.org/).
+* **Prerequisites and setup**
+  * Participants are expected to know basic Python: strings, numbers, conditionals, loops, lists, tuples, and dictionaries.
+  * Some familiarity with *linear regression* is helpful.
+  * The speaker recommends using Anaconda or Google Colab to manage Python environments and dependencies.
+  * Core libraries discussed include [NumPy](https://numpy.org/), Pandas, [Matplotlib](https://matplotlib.org/), and scikit-learn.
+* **Why fundamentals still matter in the age of large language models**
+  * Even though large language models can generate code, users still need enough understanding to debug mistakes.
+  * Models are better at generating text and code than at generating precise diagrams or visual explanations.
+  * A model may confidently provide incorrect output, so users need enough theory to evaluate whether the result is valid.
+  * Popular libraries such as scikit-learn are easier for artificial intelligence tools to assist with because they have abundant examples, documentation, and community usage.
+* **Basic machine learning concepts**
+  * Machine learning is presented as giving computers the ability to learn from data without being explicitly programmed.
+  * The talk distinguishes between:
+    * **Features**: the input variables used to make predictions.
+    * **Target**: the value or class the model tries to predict.
+    * **Regression**: predicting continuous values, such as home prices.
+    * **Classification**: predicting categories, such as flower species.
+  * The Iris dataset is used as an example of a small classification dataset.
+
+* **Working with notebooks and debugging**
+
+  * The speaker emphasizes running [Jupyter notebooks](https://jupyter.org/) sequentially from top to bottom.
+  * A common error discussed is using a variable before it has been defined.
+  * Users are encouraged to inspect variable types, array shapes, and intermediate outputs.
+  * Errors are divided into:
+    * **Coding errors**, such as missing variables or malformed data.
+    * **Understanding errors**, such as applying a regression model to a classification problem.
+* **Data preparation**
+  * The talk covers loading data into [Pandas](https://pandas.pydata.org/) and identifying feature matrices and target vectors.
+  * Missing values are discussed, including simple removal as a practical shortcut.
+  * The speaker notes that missingness itself can sometimes be predictive and may be converted into a feature.
+* **Linear regression**
+  * Linear regression is introduced through the slope-intercept form, $y = mx + b$.
+  * The speaker explains the role of an intercept and how adding parameters can improve model fit.
+  * $R^2$ is introduced as a basic performance metric, where higher values generally indicate better fit.
+  * Visualizing the regression line is emphasized as important for communicating results to stakeholders.
+* **Train-test split and overfitting**
+  * The speaker explains why data should be split into training and testing sets.
+  * The model learns from the training set and is evaluated on unseen test data.
+  * Testing on the same data used for training rewards overly complex models that memorize the dataset.
+  * The common 75/25 train-test split is discussed, though modern systems may use much larger training proportions.
+  * `random_state` is used to make random splits reproducible.
+* **Decision trees**
+  * Decision trees are introduced as interpretable models that make predictions by asking a sequence of questions.
+  * For a housing-price example, the tree may split mainly on square footage if that feature is most predictive.
+  * The speaker stresses that giving a model many features does not guarantee it will use all of them.
+  * Tree depth is discussed as a hyperparameter controlling how many questions the tree may ask.
+* **Model interpretability**
+  * Interpretability is especially important in high-stakes domains such as healthcare and finance.
+  * Users need to understand not only whether a model predicts correctly, but how it reaches its predictions.
+  * Understanding model logic helps identify likely error patterns and evaluate whether the model is using appropriate signals.
+* **Hyperparameter tuning**
+  * Hyperparameters are settings chosen before or during training, such as maximum tree depth.
+  * The speaker demonstrates trying multiple values and comparing performance.
+  * The goal is not to maximize training performance but to find settings that generalize well to validation or test data.
+  * Repeatedly tuning on the same test set can leak test-set knowledge into the model-selection process.
+* **Bias-variance tradeoff**
+  * High-bias models, such as simple linear regression, may underfit by imposing too simple a structure.
+  * High-variance models, such as overly deep trees, may overfit by memorizing the training data.
+  * Traditional machine learning often seeks a middle ground between underfitting and overfitting.
+  * The speaker notes that modern deep learning complicates the classical picture because very large models can sometimes improve again at massive scale.
+* **Random forests**
+  * Random forests are introduced as ensembles of decision trees.
+  * They reduce overfitting by combining many trees trained on varied samples and feature subsets.
+  * The speaker explains bagging and the use of random feature subsets to prevent every tree from relying on the same dominant feature.
+  * Random forests are described as combining many “specialists” into a stronger aggregate predictor.
+* **Local versus cloud computation**
+  * Running models locally can reduce latency and simplify data transfer to the machine or GPU.
+  * Local execution may be limited by compute, memory, and hardware constraints.
+  * Cloud tools such as Google Colab reduce setup friction but depend on external services and policies.
+  * The speaker briefly discusses parallel and distributed computing as ways to speed up model training and inference.
+* **Privacy and personally identifiable information**
+  * A participant asks about protecting personally identifiable information when using cloud or artificial intelligence tools.
+  * The speaker frames this as an active and unresolved issue.
+  * One mitigation strategy mentioned is limiting tool access so models can query only the minimum information needed.
+* **Using artificial intelligence tools effectively**
+  * The speaker recommends giving models specific context, code, errors, and goals rather than vague requests.
+  * A better prompt explains what was attempted, what failed, and what the desired outcome is.
+  * Screenshots and exact error messages can help models debug code.
+  * Users should still understand the code well enough to judge whether the model’s fix is correct.
+
+* **Recommended next steps**
+
+  * Continue practicing with notebooks and small datasets.
+  * Learn how to diagnose errors, inspect data, and evaluate models.
+  * Read reliable books and documentation rather than relying only on large language models.
+  * Suggested resources include hands-on machine learning books, Christopher Bishop’s work, and books by Sebastian Raschka.
+
+* **Main takeaway**
+
+  * The talk argues that machine learning fundamentals remain essential, even when artificial intelligence tools can generate code.
+  * Effective users need to understand the data, the model, the evaluation procedure, and the limits of automation.
+  * The practical goal is not just to run a model, but to know whether it is appropriate, interpretable, reliable, and useful.
 
 :::
 
@@ -62,6 +303,92 @@ I couldn't find a recording of this workshop from the conference but here is a r
 - ASI Government
 
 
+::: {.callout-note collapse="true"}
+### Notes
+
+* **Workshop topic:** “Beyond Chatbot: A Practical Introduction to Agentic AI,” led by Sudeep Shrestha from ASI Government.
+
+* **Main objective:** Build a working agentic artificial intelligence application from scratch in Google Colab, ending with a simple Gradio demo app.
+
+* **Core distinction: chatbot vs. agent**
+
+  * A chatbot mainly responds to prompts.
+  * An agent can decide, act, call tools, loop through steps, and move a workflow forward without constant human prompting.
+  * The underlying large language model may be the same; the difference is the workflow, tools, state, and control logic wrapped around it.
+
+* **Why agentic AI is becoming practical now**
+
+  * Tool calling has become more reliable.
+  * Frameworks such as LangGraph, CrewAI, AutoGen, and OpenAI’s SDK have matured.
+  * There is growing demand for applications that do more than produce text: they execute tasks, revise outputs, and integrate with systems.
+
+* **Key agentic AI capabilities discussed**
+
+  * Tool use through Python functions or APIs.
+  * Task decomposition into steps.
+  * Self-correction through critique and revision.
+  * Conditional routing based on intermediate results.
+  * Human-in-the-loop review when autonomy is risky.
+  * Observability and tracing for debugging.
+
+* **Important limitations and risks**
+
+  * Agents can become expensive or slow if they loop too much.
+  * Loops need maximum iteration caps.
+  * Results are nondeterministic, so evaluation must be systematic rather than based on one successful run.
+  * Tool descriptions and docstrings matter because the model uses them to decide which tool to call.
+  * Security requires least-privilege access, authentication, and careful API control.
+  * Debugging is harder because the model, tools, prompts, and graph logic all interact.
+
+* **LangGraph concepts introduced**
+
+  * **State:** shared memory passed through the graph.
+  * **Nodes:** Python functions that read and update the state.
+  * **Edges:** fixed transitions between nodes.
+  * **Conditional edges:** decision functions that choose the next step at runtime.
+  * **Loop caps:** safeguards that prevent infinite or costly cycles.
+
+* **Most important technical idea**
+
+  * Conditional edges turn a fixed pipeline into an agentic workflow.
+  * Example: a `should_revise` function checks a score; if the score is high enough, the workflow stops, otherwise it routes back to revision.
+
+* **Hands-on build structure**
+
+  * **Part 1:** Start with a plain large language model call, then add tool calling.
+  * **Part 2:** Build a LangGraph stateful self-correcting agent.
+  * **Part 3:** Wrap the system in a Gradio interface and store results in SQLite.
+
+* **Tool-calling example**
+
+  * The speaker demonstrates simple Python tools such as `add` and `multiply`.
+  * These functions are wrapped so the model can decide when to call them.
+  * The docstring acts like prompt engineering inside code: it tells the model when and how to use the tool.
+
+* **Self-correcting LinkedIn post agent**
+
+  * The agent takes a topic and drafts a LinkedIn post.
+  * An evaluator scores the post out of 10.
+  * If the score is below the threshold, the agent revises the draft.
+  * If the score passes the threshold, the workflow ends.
+  * The process stores the topic, score, revision count, and feedback.
+
+* **Structured output**
+  * [Pydantic](https://pydantic-docs.helpmanual.io/) is used to force model outputs into a predictable schema.
+  * This makes evaluation and routing more reliable because the graph can depend on fields such as `score` and `feedback`.
+* **Application layer**
+  * [Gradio](https://gradio.app/) is used for a lightweight demo interface.
+  * [SQLite](https://www.sqlite.org/) stores generated posts and metadata.
+  * The speaker notes that Gradio and Streamlit are useful for demos, while production apps may need frameworks such as [Next.js](https://nextjs.org/).
+* **Production considerations**
+  * Choose models according to task complexity, cost, and modality.
+  * Use stronger models only when the task justifies the cost.
+  * Keep evaluation criteria specific; vague rubrics lead to unreliable outputs.
+  * Multiple specialized agents can collaborate, but each should have a narrow role.
+* **Final takeaway**
+  * Agentic AI is not just “a better chatbot.”
+  * It is a workflow architecture where a language model uses tools, maintains state, evaluates its own work, and conditionally decides what to do next.
+:::
 
 ## Introduction to the Agent2Agent (A2A) Protocol 
 

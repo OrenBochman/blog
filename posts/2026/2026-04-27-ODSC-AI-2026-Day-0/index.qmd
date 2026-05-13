@@ -84,15 +84,112 @@ I couldn't find a recording of this workshop from the conference but here is a r
 ## Building Responsible AI Agents with Open Source
 
 ::: {.column-margin}
-{{< video https://vimeo.com/1189339425 >}} 
+{{< video https://vimeo.com/1189363500 >}} 
 :::
 
 Olivia Buzek,
 IBM
-
+[slides](https://obuzek.github.io/ai-agents-workshop/slides/#/title)
 
 
 ::: {.callout-note collapse="true"}
 ### Notes
+
+* The talk explains how to build **responsible AI agents**, especially when agents operate on sensitive or high-stakes data.
+
+  * An agent is framed as a loop of **prompt + tools + data + reasoning + repetition**.
+  * The core pattern is the **ReAct loop**: observe, plan, act, then repeat.
+
+* The speaker argues that custom agents are still worth building when:
+
+  * The workflow is repeated often.
+  * The data is sensitive.
+  * The workflow must be shared across a team.
+  * Reliability, efficiency, and auditability matter.
+
+* A major theme is that agents should **augment human expertise**, not replace it.
+
+  * The speaker warns against systems that automate routine decisions while leaving only rare exceptions to humans, because this can erode judgment.
+  * The agent should preserve human agency, critical thinking, and domain expertise.
+
+* The main case study is a simulated **electronic health record (EHR)** inbox.
+
+  * Doctors receive many patient messages, lab updates, and administrative requests.
+  * The goal is to reduce cognitive load without letting the agent practice medicine.
+  * The agent should summarize, extract, classify, organize, and surface information.
+  * It should not draft medical advice or replace clinical judgment.
+
+* The interface deliberately avoids a general-purpose chat box.
+
+  * The speaker criticizes “sparkle button” AI features that simply open a broad chat interface.
+  * Instead, the agent is embedded into a familiar EHR-style user interface.
+  * Patient concerns are extracted and shown as structured items linked back to messages and records.
+
+* Lab 1 builds a basic clinical inbox agent.
+
+  * It uses LangGraph and a simple ReAct-style agent loop.
+  * Tools allow the agent to retrieve patient records and messages.
+  * The agent produces structured “patient concern” outputs.
+  * The speaker emphasizes **structured outputs** over asking the model to “return JSON,” because constrained decoding is more reliable and easier to integrate with deterministic software.
+
+* The first implementation works but exposes serious risks.
+
+  * The agent may pull an entire patient record into context.
+  * That means protected health information and personally identifiable information can enter model traces, logs, or tool contexts.
+  * There are no strong access controls.
+  * Generated concerns are unstable: rerunning the agent may produce a different concern list.
+  * There are no hallucination, completeness, or task-boundary checks.
+  * A careless memory system could mix information across patients.
+
+* Lab 2 adds observability with Langfuse.
+
+  * Observability is needed because traditional monitoring does not show whether the agent made good reasoning or tool-use decisions.
+  * Langfuse traces show prompts, tool calls, latency, costs, and model behavior.
+  * The traces reveal a key problem: observability itself can leak protected health information.
+
+* The speaker introduces masking for sensitive data.
+
+  * Microsoft Presidio is used for named-entity-based masking of personally identifiable information and protected health information.
+  * Masking helps, but the speaker stresses that it is not sufficient by itself.
+  * Even redacted traces may need strict access control.
+  * Masked traces may be useful for synthetic data generation, evaluation datasets, and debugging.
+
+* Lab 3 improves safety and grounding.
+
+  * The agent is changed so it no longer retrieves the whole patient record by default.
+  * Instead, it gets narrower tools: demographics, medications, conditions, labs, and messages.
+  * This makes the agent search for relevant evidence rather than dumping all data into context.
+  * Retrieval-augmented generation is discussed as an alternative, but it still risks injecting sensitive data.
+
+* The system adds hallucination and task checks.
+
+  * Claims made by the agent are extracted and checked for grounding in the record.
+  * A critic loop evaluates whether generated concerns are supported and on task.
+  * Failed outputs can be sent back for revision.
+  * IBM Granite Guardian is shown as a smaller, local model option for groundedness and harm checks.
+
+* The speaker distinguishes between different evaluation roles.
+
+  * A large language model as judge can check claims, but it costs tokens and requests.
+  * A smaller local model may be cheaper and more independent.
+  * The model choice matters greatly because different models behave differently inside the same agentic workflow.
+
+* Lab 4 addresses persistence and access control.
+
+  * Agent outputs are treated as derived protected health information.
+  * Therefore, they should inherit the same security policy as the underlying patient data.
+  * The speaker recommends structured storage, such as Postgres with row-level security.
+  * Access should be denied by default and granted only according to patient, provider, and concern-level permissions.
+
+* The final system introduces more stable concern management.
+
+  * Instead of regenerating a fresh concern list every time, the agent checks prior concerns.
+  * It can revise, discard, or create concerns based on new information.
+  * This makes the agent’s outputs more useful as part of an ongoing clinical workflow.
+
+* The overall lesson is that production agents are not just prompts and tools.
+
+  * They require observability, evaluation, access control, structured outputs, persistence, grounding, and human-centered design.
+  * In sensitive domains, the central engineering problem is not “how to make an agent,” but how to make one that is constrained, auditable, privacy-preserving, and genuinely useful.
 
 :::

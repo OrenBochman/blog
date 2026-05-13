@@ -1687,7 +1687,6 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 3.”</span> April 30. <a hre
 <li><a href="https://docs.google.com/presentation/d/1onY5e2wFiiExIPm1X16bJ23F3Zv9fwph">slides</a></li>
 <li><a href="https://github.com/rajshah4/harness-engineering">workshop</a></li>
 </ul>
-<hr>
 
 
 </section>
@@ -4109,9 +4108,9 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 1.”</span> April 28. <a hre
 <h2 class="anchored" data-anchor-id="building-responsible-ai-agents-with-open-source">Building Responsible AI Agents with Open Source</h2>
 
 <div class="no-row-height column-margin column-container"><div class="">
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://player.vimeo.com/video/1189339425" frameborder="0" title="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen=""></iframe></div>
-</div></div><p>Olivia Buzek, IBM</p>
-<div class="callout callout-style-default callout-note callout-empty-content callout-titled">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://player.vimeo.com/video/1189363500" frameborder="0" title="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen=""></iframe></div>
+</div></div><p>Olivia Buzek, IBM <a href="https://obuzek.github.io/ai-agents-workshop/slides/#/title">slides</a></p>
+<div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
@@ -4123,7 +4122,105 @@ Bochman, Oren. 2026. <span>“ODSC - AI 2026 - Day 1.”</span> April 28. <a hre
 </div>
 <div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-
+<ul>
+<li><p>The talk explains how to build <strong>responsible AI agents</strong>, especially when agents operate on sensitive or high-stakes data.</p>
+<ul>
+<li>An agent is framed as a loop of <strong>prompt + tools + data + reasoning + repetition</strong>.</li>
+<li>The core pattern is the <strong>ReAct loop</strong>: observe, plan, act, then repeat.</li>
+</ul></li>
+<li><p>The speaker argues that custom agents are still worth building when:</p>
+<ul>
+<li>The workflow is repeated often.</li>
+<li>The data is sensitive.</li>
+<li>The workflow must be shared across a team.</li>
+<li>Reliability, efficiency, and auditability matter.</li>
+</ul></li>
+<li><p>A major theme is that agents should <strong>augment human expertise</strong>, not replace it.</p>
+<ul>
+<li>The speaker warns against systems that automate routine decisions while leaving only rare exceptions to humans, because this can erode judgment.</li>
+<li>The agent should preserve human agency, critical thinking, and domain expertise.</li>
+</ul></li>
+<li><p>The main case study is a simulated <strong>electronic health record (EHR)</strong> inbox.</p>
+<ul>
+<li>Doctors receive many patient messages, lab updates, and administrative requests.</li>
+<li>The goal is to reduce cognitive load without letting the agent practice medicine.</li>
+<li>The agent should summarize, extract, classify, organize, and surface information.</li>
+<li>It should not draft medical advice or replace clinical judgment.</li>
+</ul></li>
+<li><p>The interface deliberately avoids a general-purpose chat box.</p>
+<ul>
+<li>The speaker criticizes “sparkle button” AI features that simply open a broad chat interface.</li>
+<li>Instead, the agent is embedded into a familiar EHR-style user interface.</li>
+<li>Patient concerns are extracted and shown as structured items linked back to messages and records.</li>
+</ul></li>
+<li><p>Lab 1 builds a basic clinical inbox agent.</p>
+<ul>
+<li>It uses LangGraph and a simple ReAct-style agent loop.</li>
+<li>Tools allow the agent to retrieve patient records and messages.</li>
+<li>The agent produces structured “patient concern” outputs.</li>
+<li>The speaker emphasizes <strong>structured outputs</strong> over asking the model to “return JSON,” because constrained decoding is more reliable and easier to integrate with deterministic software.</li>
+</ul></li>
+<li><p>The first implementation works but exposes serious risks.</p>
+<ul>
+<li>The agent may pull an entire patient record into context.</li>
+<li>That means protected health information and personally identifiable information can enter model traces, logs, or tool contexts.</li>
+<li>There are no strong access controls.</li>
+<li>Generated concerns are unstable: rerunning the agent may produce a different concern list.</li>
+<li>There are no hallucination, completeness, or task-boundary checks.</li>
+<li>A careless memory system could mix information across patients.</li>
+</ul></li>
+<li><p>Lab 2 adds observability with Langfuse.</p>
+<ul>
+<li>Observability is needed because traditional monitoring does not show whether the agent made good reasoning or tool-use decisions.</li>
+<li>Langfuse traces show prompts, tool calls, latency, costs, and model behavior.</li>
+<li>The traces reveal a key problem: observability itself can leak protected health information.</li>
+</ul></li>
+<li><p>The speaker introduces masking for sensitive data.</p>
+<ul>
+<li>Microsoft Presidio is used for named-entity-based masking of personally identifiable information and protected health information.</li>
+<li>Masking helps, but the speaker stresses that it is not sufficient by itself.</li>
+<li>Even redacted traces may need strict access control.</li>
+<li>Masked traces may be useful for synthetic data generation, evaluation datasets, and debugging.</li>
+</ul></li>
+<li><p>Lab 3 improves safety and grounding.</p>
+<ul>
+<li>The agent is changed so it no longer retrieves the whole patient record by default.</li>
+<li>Instead, it gets narrower tools: demographics, medications, conditions, labs, and messages.</li>
+<li>This makes the agent search for relevant evidence rather than dumping all data into context.</li>
+<li>Retrieval-augmented generation is discussed as an alternative, but it still risks injecting sensitive data.</li>
+</ul></li>
+<li><p>The system adds hallucination and task checks.</p>
+<ul>
+<li>Claims made by the agent are extracted and checked for grounding in the record.</li>
+<li>A critic loop evaluates whether generated concerns are supported and on task.</li>
+<li>Failed outputs can be sent back for revision.</li>
+<li>IBM Granite Guardian is shown as a smaller, local model option for groundedness and harm checks.</li>
+</ul></li>
+<li><p>The speaker distinguishes between different evaluation roles.</p>
+<ul>
+<li>A large language model as judge can check claims, but it costs tokens and requests.</li>
+<li>A smaller local model may be cheaper and more independent.</li>
+<li>The model choice matters greatly because different models behave differently inside the same agentic workflow.</li>
+</ul></li>
+<li><p>Lab 4 addresses persistence and access control.</p>
+<ul>
+<li>Agent outputs are treated as derived protected health information.</li>
+<li>Therefore, they should inherit the same security policy as the underlying patient data.</li>
+<li>The speaker recommends structured storage, such as Postgres with row-level security.</li>
+<li>Access should be denied by default and granted only according to patient, provider, and concern-level permissions.</li>
+</ul></li>
+<li><p>The final system introduces more stable concern management.</p>
+<ul>
+<li>Instead of regenerating a fresh concern list every time, the agent checks prior concerns.</li>
+<li>It can revise, discard, or create concerns based on new information.</li>
+<li>This makes the agent’s outputs more useful as part of an ongoing clinical workflow.</li>
+</ul></li>
+<li><p>The overall lesson is that production agents are not just prompts and tools.</p>
+<ul>
+<li>They require observability, evaluation, access control, structured outputs, persistence, grounding, and human-centered design.</li>
+<li>In sensitive domains, the central engineering problem is not “how to make an agent,” but how to make one that is constrained, auditable, privacy-preserving, and genuinely useful.</li>
+</ul></li>
+</ul>
 </div>
 </div>
 </div>

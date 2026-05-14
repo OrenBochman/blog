@@ -1,8 +1,10 @@
 ---
 date: 2024-03-31
-title: "Mesa Lessons"
+title: "Mesa"
+subtitle: "Lessons from implementing Sugarscape in Mesa"
+description: "In this post I share some of the lessons I learned from implementing Sugarscape in Mesa. I cover the design decisions I made and how they helped me to overcome some of the challenges I faced."
 image: /images/cover.png
-categories: [reinforcement learning, mesa, agent-based modeling, sugarscape]
+categories: [MESA, agent based modeling, sugarscape]
 ---
 
 Implementing Sugarscape has some interesting lessons.
@@ -290,37 +292,37 @@ The motion rule:
 
 ## Pheromone Signaling:
 
-if agents can signal using a pheromene trail they could lay a path from higher levels of resources to a nest....
-(there might be unique pheromones for each resource or a more complex signal using combination of multiple pheromenes to encode each resource)
+if agents can signal using a pheromone trail they could lay a path from higher levels of resources to a nest....
+(there might be unique pheromones for each resource or a more complex signal using combination of multiple pheromones to encode each resource)
 a weak diffusion rule would create a gradient to lead to the agent or to the resource.
 
 
 ## The SugarScape Trade rule issues
 
 1. the rule is unfair.
-  - While the Edgeworth box has pareto-efficent solutions where indifference 
+  - While the Edgeworth box has pareto-efficient solutions where indifference 
     curves are at a tangent and therefore the MRS which corresponding to prices 
     for trade are in agreement. Also there is only one such point for each pair 
     of curves if they have a common point. Also there is one point where both 
     utilities are highest. This seems to be the best trade to consider.
 
     The trade algorithms uses points where the two curves intersect not tangents. 
-    However each indiffence curve probably intersect with all the other traders 
+    However each indifference curve probably intersect with all the other traders 
     curves. Some may have more curves in the box (their utility levels are packed 
     closer) Others less. Without some mechanism to sort these out we cant be 
-    certain that bragaining steps are sensible. The problem is that agents are
-    not realy indiffernt to all the combinatino of sugar and spice - at least 
+    certain that bargaining steps are sensible. The problem is that agents are
+    not really indifferent to all the combination of sugar and spice - at least 
     in the sense that under a certain amount of sugar or spice they will be wealthy
     on paper but likely starve in the next time step. The algorithm leads to
     more on diagonal solutions but what if I am very sugar rich. I may trade 1/N of 
-    my excess sufar with each nighbour for one unit of spice. 
-    But one unit of spice from each may mean they have less then thier metabolism 
-    and they will starve before they can makr a trade or harvest ay spice.
+    my excess sugar with each neighbor for one unit of spice. 
+    But one unit of spice from each may mean they have less then their metabolism 
+    and they will starve before they can make a trade or harvest ay spice.
     
-    One agent may have more viable cuves than the other. idealy we should be 
-    picking two curves with similar utiltiy levels.... The intersection points
-    can represent radicaly different pricing levels, particularly for an agent 
-    with a highly imballnced endowment. The pareto point leads to a point where
+    One agent may have more viable curves than the other. Ideally we should be 
+    picking two curves with similar utility levels.... The intersection points
+    can represent radically different pricing levels, particularly for an agent 
+    with a highly imbalanced endowment. The pareto point leads to a point where
     both MRS are equal and the resulting endowments are better.
 
     But we don't really consider which points on the current curve to use. Each
@@ -329,40 +331,40 @@ a weak diffusion rule would create a gradient to lead to the agent or to the res
     but we seem to be picking the one which is furthest - most likely to be 
     the worst for them - possibly starving them.
     
-    So on this issue we should pick a point on the indiffeerence curve that at 
-    a utility level that at least won't starve out trade partner or ourseves.
+    So on this issue we should pick a point on the indifference curve that at 
+    a utility level that at least won't starve out trade partner or ourselves.
     
-    This mean clipping the indiffernce curves at the metabolic minimum. 
+    This mean clipping the indifference curves at the metabolic minimum. 
 
-  - there is no mony and trades are in integral units and detrmine the trade amount
+  - there is no money and trades are in integral units and determine the trade amount
   - the trade amount are unfair because the prices are unfair and because one side
     is pegged to 1. 
     
   - All this is moot if the alg can reach the same pareto optimal solution by 
   small steps. But I think that its unlikely. In the trade because the steps 
-  are integral and one side is pegged to one there are roundoff errors. With 
+  are integral and one side is pegged to one there are round off errors. With 
   every trade some value is lost (on one or both sides).
      - after each both sides are reevaluated reducing the price as well and the
      price drops so that the more needy agent will less willing or able to make
      all the trades it needs to make to get the the pareto point. And they may
      now be approximating different pareto point.
      
- - Both agents agent who participite in trade could be better off if allowed to pick  
-   their preffered trade partner. 
+ - Both agents agent who participate in trade could be better off if allowed to pick  
+   their preferred trade partner. 
  - perhaps in view of this agents should be allowed to refuse unless they get a better
    deal. This suggest looking at stable marriage alg. where prior to trade the are 
-   serveral rounds in each neighbourhood for matching traders.
-2. trade is inefficent.
+   several rounds in each neighborhood for matching traders.
+2. trade is inefficient.
   - trade always use 1 unit for one of the agents.
   - to trade 3 for 3 3 trades are needed.
-3. trade increases utulity but can make an agent worse off.
+3. trade increases utility but can make an agent worse off.
   - after a trade a fertile agent can become wealthier but infertile if they are 
-    reduced below a multiple of thier endowment.
+    reduced below a multiple of their endowment.
   - after a trade an agent can be wealthier in utility but not in survivability so
-    they may have an extra unit of sugar they don't need but not enogh spice so they
+    they may have an extra unit of sugar they don't need but not enough spice so they
     might starve.
-4. agents that have participate in tradetraded will generaly 
-4. a smarter agent who can pick his trade partners and thier order can do them some
+4. agents that have participate in trade traded will generally 
+4. a smarter agent who can pick his trade partners and their order can do them some
    damage
 
 
@@ -370,21 +372,21 @@ a weak diffusion rule would create a gradient to lead to the agent or to the res
 
 ## Better trade rules:
 
-A fundumental question is this:
+A fundamental question is this:
 
-If localy markets are hertogenious and weakly ineracting can we be sure of the 
-globall market reaching an reaching an equilibrium between supply and demand?
-It there are many possible equilibiria how long to reach one and if not what
+If locally markets are heterogeneous and weakly interacting can we be sure of the 
+globally market reaching an reaching an equilibrium between supply and demand?
+It there are many possible equilibria how long to reach one and if not what
 other can we say for the long term, i.e. is there a local and global steady
 state where supply and demand meet or can we have other outcomes like periodic,
-chaotic, and random states globably.
+chaotic, and random states globally.
 
 - How long until will prices reflect the equilibrium of global supply and demand ?
 - If the market is out of equilibrium does it mean that an agent with a good 
 estimate of the true equilibrium price can trade or use arbitrage to benefit from
 this state?
 
-- Is the trade rule realy inefficnet ? 
+- Is the trade rule really inefficient ? 
 - Can a better trade rules
   - let prices reach equilibrium prices
   - increase trade amounts
@@ -393,41 +395,41 @@ this state?
 
 - What is in the way of equilibrium formation ?
    - is it lack of information
-   - inability or inefficency of making tades accross market boundries
+   - inability or inefficiency of making trades across market boundaries
    - not enough trades within markets for them to reach equilibria?
       - will it help if there are multiple rounds of trades for all agents.
 
-The down side of a inefficent trade rule is that it may lead to less efficent market.
-The market in SC can be viewd as localy fragmented or if there are enough agents it
+The down side of an inefficient trade rule is that it may lead to less efficient market.
+The market in SC can be viewed as locally fragmented or if there are enough agents it
 may be a collection of weakly interacting markets. 
 
 Intuitively
 
-Agents with lower vision tend to persist at the local market edges and beocome inefficent conduits of trade in the trade network instead of finding strategic locations where they
+Agents with lower vision tend to persist at the local market edges and become inefficient conduits of trade in the trade network instead of finding strategic locations where they
 could maximize the benefit of arbitrage between local markets. 
 
 
 ### Arbitraders 
 
-We can explore this by letting some agents who are less efficent harvesters have a 
+We can explore this by letting some agents who are less efficient harvesters have a 
 movement rule that lets them seek out such locations with maximal arbitrage option.
 If there landscape is made of K blobs of different resources there may be 
 greater need for such traders, and As more regions 
 
-### Supertraders
+### Super-traders
 
-We can setup a supertrader that is basicalt a supermarket in each neighbourhood.
-These agents with better vision that dont have a metablism cost or harvesting step.
+We can setup a super-trader that is basically a supermarket in each neighborhood.
+These agents with better vision that don't have a metabolism cost or harvesting step.
 
-They can see each other and trade with each other allowing for greater efficency in
+They can see each other and trade with each other allowing for greater efficiency in
 the market. 
 
-WE can rerun markets with or without supertraders and with supertraders with more 
-vision. Thier wealth distribution could be a way to track the lost benefits due 
+We can rerun markets with or without super-traders and with super-traders with more 
+vision. Their wealth distribution could be a way to track the lost benefits due 
 to vision fragmentation.
 
 
-### Edgworth box with pareto-efficent trades maximising utility objective
+### Edgeworth box with pareto-efficient trades maximizing utility objective
 
 0. neighbours := agents in field of visions
 1. for each neighbour in neighbours:
@@ -435,34 +437,34 @@ to vision fragmentation.
   b. store the pareto-optimal solution that maximises both agents' utilities and is viable for both agents
   c. do the trade with the highest gain in utility to me.
   e. remove agent from neighbours
-  d. my prefrences have changed so return to 1
+  d. my preferences have changed so return to 1
   
-### Edgworth box with pareto-efficent trades for survivability objective
+### Edgeworth box with pareto-efficient trades for survivability objective
 
-we want to restric solutions to trades that increase the survivability
-this is like a quantum contraint on the utility.
+we want to restrict solutions to trades that increase the survivability
+this is like a quantum constraint on the utility.
 
 1. are the any solutions ?
 2. what is the best solution - and what is the closest option.
 
-### Edgworth box with pareto-efficent trades for hybrid objective
+### Edgeworth box with pareto-efficient trades for hybrid objective
 
 1. we want a multiterm utility for
   1. survivability of n rounds Quant(U(M))
   2. reproduction endowments for up to 4 offsprings U(E)
-  3. trades for U(M) that do not reduce the above two utility componenets 
+  3. trades for U(M) that do not reduce the above two utility components 
   4. side trades that reduce pollutions ?
   
-the tricky part here is to define an hybrid utlities and solve its edgworth box
+the tricky part here is to define an hybrid utilities and solve its edgeworth box
 as we add more rules we arrive at more complex utilities.
 
-So we may need to rethink a simlpler way to find accaptable trades....
+So we may need to rethink a simpler way to find acceptable trades....
 
 ## Gale-Shapley Trade partner allocation
 
-A second idea - based on Gale–Shapley algorithm for Stable marriage within neighborhoods
+A second idea - based on [Gale–Shapley](https://en.wikipedia.org/wiki/Gale%E2%80%93Shapley_algorithm) algorithm for Stable marriage within neighborhoods
 
-1. Each agent should find their preferred trades within thier FOV.
+1. Each agent should find their preferred trades within their FOV.
 
 ## Median approximate solution to the stable trade partner lattice simplex
 
@@ -476,8 +478,8 @@ and trade alg in which optimal trades emerge in the the median point on the
 trader's marriage simplex.
 
 For this variant for ABM we want to impose two restrictions on marriages:
-1. offers made are restricted by miopia to the agents FOV.
-2. offers received are restricted localy to the agents Max_Vision FOV.  
+1. offers made are restricted by myopia to the agents FOV.
+2. offers received are restricted locally to the agents Max_Vision FOV.  
 
 we should iterate over all agents once to so all 
 
@@ -505,7 +507,7 @@ an share owner of this company.
 1. The partnership has no Metabolism so it will need a different utility function - (this can be ml based based on info from agents).
 1. members of a company may use an information utility to deploy to locations that maximize information....
 
-1. will agents have shares in multiple companies. (perhaps conflict of interest can force agent to be a silent partner in the coorporation)
+1. will agents have shares in multiple companies. (perhaps conflict of interest can force agent to be a silent partner in the cooperations they are not active in)
 1. can agents get rewards for bringing in trades
 1. can agents get loans from companies
 1. will comparative advantage let certain agent gain control of such companies

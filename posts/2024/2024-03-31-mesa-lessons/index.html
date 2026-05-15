@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
+<meta name="description" content="In this post I share some of the lessons I learned from implementing Sugarscape in Mesa. I cover the design decisions I made and how they helped me to overcome some of the challenges I faced.">
 
-<title>Mesa Lessons – Oren Bochman’s Blog</title>
+<title>Mesa – Oren Bochman’s Blog</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -173,8 +174,8 @@ cookieconsent.run({
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 
-<meta name="twitter:title" content="Mesa Lessons – Oren Bochman’s Blog">
-<meta name="twitter:description" content="Personal website, portfolio and blog">
+<meta name="twitter:title" content="Mesa – Oren Bochman’s Blog">
+<meta name="twitter:description" content="In this post I share some of the lessons I learned from implementing Sugarscape in Mesa. I cover the design decisions I made and how they helped me to overcome some of the challenges I faced.">
 <meta name="twitter:image" content="https://orenbochman.github.io//images/cover.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
@@ -424,7 +425,7 @@ cookieconsent.run({
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2024/2024-10-10-marco-baoni-composionality/index.html">2024</a></li><li class="breadcrumb-item"><a href="../../../posts/2024/2024-03-31-mesa-lessons/index.html">Mesa Lessons</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2024/2024-10-10-marco-baoni-composionality/index.html">2024</a></li><li class="breadcrumb-item"><a href="../../../posts/2024/2024-03-31-mesa-lessons/index.html">Mesa</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -433,12 +434,17 @@ cookieconsent.run({
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2024/2024-10-10-marco-baoni-composionality/index.html">2024</a></li><li class="breadcrumb-item"><a href="../../../posts/2024/2024-03-31-mesa-lessons/index.html">Mesa Lessons</a></li></ol></nav>
-      <h1 class="title">Mesa Lessons</h1>
-                                <div class="quarto-categories">
-                <div class="quarto-category">reinforcement learning</div>
+    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2024/2024-10-10-marco-baoni-composionality/index.html">2024</a></li><li class="breadcrumb-item"><a href="../../../posts/2024/2024-03-31-mesa-lessons/index.html">Mesa</a></li></ol></nav>
+      <h1 class="title">Mesa</h1>
+            <p class="subtitle lead">Lessons from implementing Sugarscape in Mesa</p>
+                  <div>
+        <div class="description">
+          In this post I share some of the lessons I learned from implementing Sugarscape in Mesa. I cover the design decisions I made and how they helped me to overcome some of the challenges I faced.
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">mesa</div>
-                <div class="quarto-category">agent-based modeling</div>
+                <div class="quarto-category">agent based modeling</div>
                 <div class="quarto-category">sugarscape</div>
               </div>
                   </div>
@@ -464,7 +470,7 @@ cookieconsent.run({
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">Thursday, May 14, 2026</p>
+        <p class="date-modified">Friday, May 15, 2026</p>
       </div>
     </div>
       
@@ -1102,32 +1108,38 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-27" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/2023-05-10-migration-notes/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Great Migration</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/2023-04-22-mcmc-algs/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">MCMC algorithms</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/2023-12-20-autogluon/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2023/12-20-autogluon/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">AutoGluon Cheetsheets</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/2023-04-11-quarto-loves-psudocode/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2023/04-11-quarto-loves-psudocode/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Quarto loves pseudocode</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/03-08-responsible-AI/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Responsible AI Mitigations and Tracker</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/05-10-migration-notes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Great Migration</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/04-22-mcmc-algs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCMC algorithms</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false">
- <span class="menu-text">2023 02 01 Ds from Scratch</span></a>
+ <span class="menu-text">02 01 Ds from Scratch</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -1135,8 +1147,8 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-28" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/2023-02-01-ds-from-scratch/ols-regression-from-scratch.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">OLS regression From Scratch</span></a>
+  <a href="../../../posts/2023/02-01-ds-from-scratch/ols-regression-from-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OLS regression</span></a>
   </div>
 </li>
       </ul>
@@ -1144,7 +1156,7 @@ cookieconsent.run({
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false">
- <span class="menu-text">2023 02 20 Ts Nonlinear</span></a>
+ <span class="menu-text">02 20 Ts Nonlinear</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -1155,7 +1167,7 @@ cookieconsent.run({
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false">
- <span class="menu-text">2023 02 28 NLP.IL Booking.com</span></a>
+ <span class="menu-text">02 28 NLP.IL Booking.com</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -1163,13 +1175,13 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-30" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/2023-02-28-NLP.IL-Booking.com/NLP-IL-Booking Text2Topic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Text2topic Leverage reviews data for multi-label topics classification in Booking.com</span></a>
+  <a href="../../../posts/2023/02-28-NLP.IL-Booking.com/NLP-IL-Booking Text2Topic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text2topic - Leverage reviews data for multi-label topics classification in Booking.com</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/2023-02-28-NLP.IL-Booking.com/NLP-IL-Booking Validating NLP.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2023/02-28-NLP.IL-Booking.com/NLP-IL-Booking Validating NLP.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Validating NLP data and models</span></a>
   </div>
 </li>
@@ -1178,7 +1190,7 @@ cookieconsent.run({
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false">
- <span class="menu-text">2023 03 01 Braindump</span></a>
+ <span class="menu-text">03 01 Braindump</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -1189,7 +1201,7 @@ cookieconsent.run({
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-32" role="navigation" aria-expanded="false">
- <span class="menu-text">2023 03 01 Spark Emr</span></a>
+ <span class="menu-text">03 01 Spark Emr</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-32" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -1200,26 +1212,15 @@ cookieconsent.run({
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-33" role="navigation" aria-expanded="false">
- <span class="menu-text">2023 03 08 Responsible AI</span></a>
+ <span class="menu-text">06 01 Spark</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-33" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-33" class="collapse list-unstyled sidebar-section depth4 ">  
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false">
- <span class="menu-text">2023 06 01 Spark</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-34" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/2023-06-01-spark/spark-progress.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2023/06-01-spark/spark-progress.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Spark Tips</span></a>
   </div>
 </li>
@@ -1227,8 +1228,25 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-35" role="navigation" aria-expanded="false">
- <span class="menu-text">2023 06 01 Synthesis and Stabilization</span></a>
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false">
+ <span class="menu-text">06 01 Synthesis and Stabilization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-34" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/06-01-synthesis-and-stabilization/2023-06-01-Synthesis-and-Stabilization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Summary: Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../posts/2023/01-11-nlp-il-meetup/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NLP IL F2F Meetup at Intuit</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-35" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -1236,8 +1254,26 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-35" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/2023-06-01-Synthesis-and-Stabilization/2023-06-01-Synthesis-and-Stabilization.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Summary: Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization</span></a>
+  <a href="../../../posts/2023/01-11-nlp-il-meetup/talk0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NLP IL F2F Meetup at Intuit</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/01-11-nlp-il-meetup/talk1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SCROLLS - Standardized CompaRison Over Long Language Sequences</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/01-11-nlp-il-meetup/talk2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Efficient Long-Text Understanding with Short-Text Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/01-11-nlp-il-meetup/talk3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">An Overview of Modern Speech Recognition</span></a>
   </div>
 </li>
       </ul>
@@ -1458,8 +1494,14 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-21-bayesian-agents/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian Agent</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-03-31-mesa-lessons/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Mesa Lessons</span></a>
+ <span class="menu-text">Mesa</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1865,6 +1907,12 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-julia-ode-solvers/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why Julia’s GPU-Accelerated ODE Solvers are 20x-100x Faster than Jax and PyTorch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-12-11-pydata-lightweight-feat-store/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Building a Lightweight Feature Store for Electricity Grid Forecasts with Polars</span></a>
   </div>
@@ -1926,7 +1974,7 @@ cookieconsent.run({
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-12-11-pydata-causal-thinking-in-machine-learning/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Beyond Just Prediction: Causal Thinking in Machine Learning</span></a>
+ <span class="menu-text">Beyond Just Prediction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -2010,7 +2058,7 @@ cookieconsent.run({
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Garbage In, Lawsuit Out: Building Compliant and Reproducible ML Pipelines</span></a>
+ <span class="menu-text">Garbage In, Lawsuit Out</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -2097,109 +2145,109 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-52" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-01-19-kv-cache-efficiency/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2026/01-19-kv-cache-efficiency/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KV Cache Efficiency &amp; Context Platform Engineering</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-29-ODSC-AI-2026-Day-2/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ODSC AI 2026 - Day 2</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-01-03-convolutions-and-fft/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Convoluted Intuitions</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-01-03-agentic-buzz/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Agentic Buzz</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-01-14-rise-of-the-agents/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Rise of the agents</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-01-09-convergence-of-RVs/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Three modes of convergence of random variables</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-31-ODSC-AI-2026-Day-4/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ODSC - AI 2026 - Workshops</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-03-06-being-brave/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Beng brave</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-01-01-sick/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Sick</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-02-14-CI-Ness/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Robert Ness on LLMs &amp; CI</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-03-08-smoothing-problems/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Smoothing problems</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-01-10-rl-agent-last-all-summer-long/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2026/01-10-rl-agent-last-all-summer-long/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">RL Agents Last All Summer Long</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-30-ODSC-AI-2026-Day-3/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ODSC - AI 2026 - Day 3</span></a>
+  <a href="../../../posts/2026/01-01-sick/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sick</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-01-21-Discipline/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2026/04-31-ODSC-AI-2026-Day-4/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC - AI 2026 - Workshops</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/03-08-smoothing-problems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Smoothing problems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/03-07-mixture-problems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mixture problems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-21-Discipline/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Art of Discipline: Mastering Self-Control for a Fulfilling Life</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-01-20-NVIDIA-Nsight-Systems-GPU-profiling/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">NVIDIA Nsight Systems GPU profiling</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-02-15-CI-Tools/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2026/02-15-CI-Tools/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">CI - Libs for Python</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-03-07-mixture-problems/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Mixture problems</span></a>
+  <a href="../../../posts/2026/03-06-being-brave/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Beng brave</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-29-ODSC-AI-2026-Day-2/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC AI 2026 - Day 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-14-rise-of-the-agents/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rise of the agents</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-09-convergence-of-RVs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Three modes of convergence of random variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/02-14-CI-Ness/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Robert Ness on LLMs &amp; CI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-03-convolutions-and-fft/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Convoluted Intuitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-03-agentic-buzz/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentic Buzz</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC - AI 2026 - Day 3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-20-nvidia-Nsight-GPU-profiling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">nvidia Nsight GPU profiling</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ODSC AI 2026</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-53" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -2208,93 +2256,45 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-53" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Tensor Logic</span></a>
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Engineering the Harness</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Deploying Multimodal AI at the Edge</span></a>
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to the Math Behind Transformers and LLMs</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk11.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Architectural Patterns</span></a>
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to Machine Learning</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk12.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Kyle Stratis</span></a>
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A Practical Introduction to Agentic AI</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk13.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Building FSI Agents with Claude</span></a>
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to the Agent2Agent (A2A) Protocol</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk14.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Meaningful Data Visualization in the Age of AI</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Practical Foundations for Organization-Wide AI Adoption</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">vLLM with the Transformers Modelling Backend</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Verifier–Compiler Loop</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">From Intelligent to Agentic Applications</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Operational Transformation of Data Architecture</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk7.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Harness Engineering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk8.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Real-Time Event-Time Consistent Analytics Pipelines</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-28-ODSC-AI-2026-Day-1/talk9.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Using Model Context Protocol with Python</span></a>
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building Responsible AI Agents</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../../posts/2026/2026-04-27-ODSC-AI-2026-Day-0/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ODSC AI 2026</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-54" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -2303,38 +2303,86 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-54" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-27-ODSC-AI-2026-Day-0/talk1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Engineering the Harness</span></a>
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tensor Logic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-27-ODSC-AI-2026-Day-0/talk2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Introduction to the Math Behind Transformers and LLMs</span></a>
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deploying Multimodal AI at the Edge</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-27-ODSC-AI-2026-Day-0/talk3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Introduction to Machine Learning</span></a>
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Architectural Patterns</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-27-ODSC-AI-2026-Day-0/talk4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">A Practical Introduction to Agentic AI</span></a>
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kyle Stratis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-27-ODSC-AI-2026-Day-0/talk5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Introduction to the Agent2Agent (A2A) Protocol</span></a>
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk13.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building FSI Agents with Claude</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/2026-04-27-ODSC-AI-2026-Day-0/talk6.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Building Responsible AI Agents</span></a>
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk14.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Meaningful Data Visualization in the Age of AI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Practical Foundations for Organization-Wide AI Adoption</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">vLLM with the Transformers Modelling Backend</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Verifier–Compiler Loop</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From Intelligent to Agentic Applications</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Operational Transformation of Data Architecture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Harness Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Real-Time Event-Time Consistent Analytics Pipelines</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using Model Context Protocol with Python</span></a>
   </div>
 </li>
       </ul>
@@ -2367,10 +2415,10 @@ cookieconsent.run({
   <li><a href="#better-trade-rules" id="toc-better-trade-rules" class="nav-link" data-scroll-target="#better-trade-rules">Better trade rules:</a>
   <ul class="collapse">
   <li><a href="#arbitraders" id="toc-arbitraders" class="nav-link" data-scroll-target="#arbitraders">Arbitraders</a></li>
-  <li><a href="#supertraders" id="toc-supertraders" class="nav-link" data-scroll-target="#supertraders">Supertraders</a></li>
-  <li><a href="#edgworth-box-with-pareto-efficent-trades-maximising-utility-objective" id="toc-edgworth-box-with-pareto-efficent-trades-maximising-utility-objective" class="nav-link" data-scroll-target="#edgworth-box-with-pareto-efficent-trades-maximising-utility-objective">Edgworth box with pareto-efficent trades maximising utility objective</a></li>
-  <li><a href="#edgworth-box-with-pareto-efficent-trades-for-survivability-objective" id="toc-edgworth-box-with-pareto-efficent-trades-for-survivability-objective" class="nav-link" data-scroll-target="#edgworth-box-with-pareto-efficent-trades-for-survivability-objective">Edgworth box with pareto-efficent trades for survivability objective</a></li>
-  <li><a href="#edgworth-box-with-pareto-efficent-trades-for-hybrid-objective" id="toc-edgworth-box-with-pareto-efficent-trades-for-hybrid-objective" class="nav-link" data-scroll-target="#edgworth-box-with-pareto-efficent-trades-for-hybrid-objective">Edgworth box with pareto-efficent trades for hybrid objective</a></li>
+  <li><a href="#super-traders" id="toc-super-traders" class="nav-link" data-scroll-target="#super-traders">Super-traders</a></li>
+  <li><a href="#edgeworth-box-with-pareto-efficient-trades-maximizing-utility-objective" id="toc-edgeworth-box-with-pareto-efficient-trades-maximizing-utility-objective" class="nav-link" data-scroll-target="#edgeworth-box-with-pareto-efficient-trades-maximizing-utility-objective">Edgeworth box with pareto-efficient trades maximizing utility objective</a></li>
+  <li><a href="#edgeworth-box-with-pareto-efficient-trades-for-survivability-objective" id="toc-edgeworth-box-with-pareto-efficient-trades-for-survivability-objective" class="nav-link" data-scroll-target="#edgeworth-box-with-pareto-efficient-trades-for-survivability-objective">Edgeworth box with pareto-efficient trades for survivability objective</a></li>
+  <li><a href="#edgeworth-box-with-pareto-efficient-trades-for-hybrid-objective" id="toc-edgeworth-box-with-pareto-efficient-trades-for-hybrid-objective" class="nav-link" data-scroll-target="#edgeworth-box-with-pareto-efficient-trades-for-hybrid-objective">Edgeworth box with pareto-efficient trades for hybrid objective</a></li>
   </ul></li>
   <li><a href="#gale-shapley-trade-partner-allocation" id="toc-gale-shapley-trade-partner-allocation" class="nav-link" data-scroll-target="#gale-shapley-trade-partner-allocation">Gale-Shapley Trade partner allocation</a></li>
   <li><a href="#median-approximate-solution-to-the-stable-trade-partner-lattice-simplex" id="toc-median-approximate-solution-to-the-stable-trade-partner-lattice-simplex" class="nav-link" data-scroll-target="#median-approximate-solution-to-the-stable-trade-partner-lattice-simplex">Median approximate solution to the stable trade partner lattice simplex</a></li>
@@ -2556,7 +2604,7 @@ cookieconsent.run({
 </section>
 <section id="pheromone-signaling" class="level2">
 <h2 class="anchored" data-anchor-id="pheromone-signaling">Pheromone Signaling:</h2>
-<p>if agents can signal using a pheromene trail they could lay a path from higher levels of resources to a nest…. (there might be unique pheromones for each resource or a more complex signal using combination of multiple pheromenes to encode each resource) a weak diffusion rule would create a gradient to lead to the agent or to the resource.</p>
+<p>if agents can signal using a pheromone trail they could lay a path from higher levels of resources to a nest…. (there might be unique pheromones for each resource or a more complex signal using combination of multiple pheromones to encode each resource) a weak diffusion rule would create a gradient to lead to the agent or to the resource.</p>
 </section>
 <section id="the-sugarscape-trade-rule-issues" class="level2">
 <h2 class="anchored" data-anchor-id="the-sugarscape-trade-rule-issues">The SugarScape Trade rule issues</h2>
@@ -2564,49 +2612,49 @@ cookieconsent.run({
 <li>the rule is unfair.</li>
 </ol>
 <ul>
-<li><p>While the Edgeworth box has pareto-efficent solutions where indifference curves are at a tangent and therefore the MRS which corresponding to prices for trade are in agreement. Also there is only one such point for each pair of curves if they have a common point. Also there is one point where both utilities are highest. This seems to be the best trade to consider.</p>
-<p>The trade algorithms uses points where the two curves intersect not tangents. However each indiffence curve probably intersect with all the other traders curves. Some may have more curves in the box (their utility levels are packed closer) Others less. Without some mechanism to sort these out we cant be certain that bragaining steps are sensible. The problem is that agents are not realy indiffernt to all the combinatino of sugar and spice - at least in the sense that under a certain amount of sugar or spice they will be wealthy on paper but likely starve in the next time step. The algorithm leads to more on diagonal solutions but what if I am very sugar rich. I may trade 1/N of my excess sufar with each nighbour for one unit of spice. But one unit of spice from each may mean they have less then thier metabolism and they will starve before they can makr a trade or harvest ay spice.</p>
-<p>One agent may have more viable cuves than the other. idealy we should be picking two curves with similar utiltiy levels…. The intersection points can represent radicaly different pricing levels, particularly for an agent with a highly imballnced endowment. The pareto point leads to a point where both MRS are equal and the resulting endowments are better.</p>
+<li><p>While the Edgeworth box has pareto-efficient solutions where indifference curves are at a tangent and therefore the MRS which corresponding to prices for trade are in agreement. Also there is only one such point for each pair of curves if they have a common point. Also there is one point where both utilities are highest. This seems to be the best trade to consider.</p>
+<p>The trade algorithms uses points where the two curves intersect not tangents. However each indifference curve probably intersect with all the other traders curves. Some may have more curves in the box (their utility levels are packed closer) Others less. Without some mechanism to sort these out we cant be certain that bargaining steps are sensible. The problem is that agents are not really indifferent to all the combination of sugar and spice - at least in the sense that under a certain amount of sugar or spice they will be wealthy on paper but likely starve in the next time step. The algorithm leads to more on diagonal solutions but what if I am very sugar rich. I may trade 1/N of my excess sugar with each neighbor for one unit of spice. But one unit of spice from each may mean they have less then their metabolism and they will starve before they can make a trade or harvest ay spice.</p>
+<p>One agent may have more viable curves than the other. Ideally we should be picking two curves with similar utility levels…. The intersection points can represent radically different pricing levels, particularly for an agent with a highly imbalanced endowment. The pareto point leads to a point where both MRS are equal and the resulting endowments are better.</p>
 <p>But we don’t really consider which points on the current curve to use. Each intersection corresponds to different utility level for our trading partner. It seem the intersection closest to the diagonal is best for our partner but we seem to be picking the one which is furthest - most likely to be the worst for them - possibly starving them.</p>
-<p>So on this issue we should pick a point on the indiffeerence curve that at a utility level that at least won’t starve out trade partner or ourseves.</p>
-<p>This mean clipping the indiffernce curves at the metabolic minimum.</p></li>
-<li><p>there is no mony and trades are in integral units and detrmine the trade amount</p></li>
+<p>So on this issue we should pick a point on the indifference curve that at a utility level that at least won’t starve out trade partner or ourselves.</p>
+<p>This mean clipping the indifference curves at the metabolic minimum.</p></li>
+<li><p>there is no money and trades are in integral units and determine the trade amount</p></li>
 <li><p>the trade amount are unfair because the prices are unfair and because one side is pegged to 1.</p></li>
-<li><p>All this is moot if the alg can reach the same pareto optimal solution by small steps. But I think that its unlikely. In the trade because the steps are integral and one side is pegged to one there are roundoff errors. With every trade some value is lost (on one or both sides).</p>
+<li><p>All this is moot if the alg can reach the same pareto optimal solution by small steps. But I think that its unlikely. In the trade because the steps are integral and one side is pegged to one there are round off errors. With every trade some value is lost (on one or both sides).</p>
 <ul>
 <li>after each both sides are reevaluated reducing the price as well and the price drops so that the more needy agent will less willing or able to make all the trades it needs to make to get the the pareto point. And they may now be approximating different pareto point.</li>
 </ul></li>
-<li><p>Both agents agent who participite in trade could be better off if allowed to pick<br>
-their preffered trade partner.</p></li>
-<li><p>perhaps in view of this agents should be allowed to refuse unless they get a better deal. This suggest looking at stable marriage alg. where prior to trade the are serveral rounds in each neighbourhood for matching traders.</p></li>
+<li><p>Both agents agent who participate in trade could be better off if allowed to pick<br>
+their preferred trade partner.</p></li>
+<li><p>perhaps in view of this agents should be allowed to refuse unless they get a better deal. This suggest looking at stable marriage alg. where prior to trade the are several rounds in each neighborhood for matching traders.</p></li>
 </ul>
 <ol start="2" type="1">
-<li>trade is inefficent.</li>
+<li>trade is inefficient.</li>
 </ol>
 <ul>
 <li>trade always use 1 unit for one of the agents.</li>
 <li>to trade 3 for 3 3 trades are needed.</li>
 </ul>
 <ol start="3" type="1">
-<li>trade increases utulity but can make an agent worse off.</li>
+<li>trade increases utility but can make an agent worse off.</li>
 </ol>
 <ul>
-<li>after a trade a fertile agent can become wealthier but infertile if they are reduced below a multiple of thier endowment.</li>
-<li>after a trade an agent can be wealthier in utility but not in survivability so they may have an extra unit of sugar they don’t need but not enogh spice so they might starve.</li>
+<li>after a trade a fertile agent can become wealthier but infertile if they are reduced below a multiple of their endowment.</li>
+<li>after a trade an agent can be wealthier in utility but not in survivability so they may have an extra unit of sugar they don’t need but not enough spice so they might starve.</li>
 </ul>
 <ol start="4" type="1">
-<li>agents that have participate in tradetraded will generaly</li>
-<li>a smarter agent who can pick his trade partners and thier order can do them some damage</li>
+<li>agents that have participate in trade traded will generally</li>
+<li>a smarter agent who can pick his trade partners and their order can do them some damage</li>
 </ol>
 </section>
 <section id="better-trade-rules" class="level2">
 <h2 class="anchored" data-anchor-id="better-trade-rules">Better trade rules:</h2>
-<p>A fundumental question is this:</p>
-<p>If localy markets are hertogenious and weakly ineracting can we be sure of the globall market reaching an reaching an equilibrium between supply and demand? It there are many possible equilibiria how long to reach one and if not what other can we say for the long term, i.e.&nbsp;is there a local and global steady state where supply and demand meet or can we have other outcomes like periodic, chaotic, and random states globably.</p>
+<p>A fundamental question is this:</p>
+<p>If locally markets are heterogeneous and weakly interacting can we be sure of the globally market reaching an reaching an equilibrium between supply and demand? It there are many possible equilibria how long to reach one and if not what other can we say for the long term, i.e.&nbsp;is there a local and global steady state where supply and demand meet or can we have other outcomes like periodic, chaotic, and random states globally.</p>
 <ul>
 <li><p>How long until will prices reflect the equilibrium of global supply and demand ?</p></li>
 <li><p>If the market is out of equilibrium does it mean that an agent with a good estimate of the true equilibrium price can trade or use arbitrage to benefit from this state?</p></li>
-<li><p>Is the trade rule realy inefficnet ?</p></li>
+<li><p>Is the trade rule really inefficient ?</p></li>
 <li><p>Can a better trade rules</p>
 <ul>
 <li>let prices reach equilibrium prices</li>
@@ -2617,28 +2665,28 @@ their preffered trade partner.</p></li>
 <li><p>What is in the way of equilibrium formation ?</p>
 <ul>
 <li>is it lack of information</li>
-<li>inability or inefficency of making tades accross market boundries</li>
+<li>inability or inefficiency of making trades across market boundaries</li>
 <li>not enough trades within markets for them to reach equilibria?
 <ul>
 <li>will it help if there are multiple rounds of trades for all agents.</li>
 </ul></li>
 </ul></li>
 </ul>
-<p>The down side of a inefficent trade rule is that it may lead to less efficent market. The market in SC can be viewd as localy fragmented or if there are enough agents it may be a collection of weakly interacting markets.</p>
+<p>The down side of an inefficient trade rule is that it may lead to less efficient market. The market in SC can be viewed as locally fragmented or if there are enough agents it may be a collection of weakly interacting markets.</p>
 <p>Intuitively</p>
-<p>Agents with lower vision tend to persist at the local market edges and beocome inefficent conduits of trade in the trade network instead of finding strategic locations where they could maximize the benefit of arbitrage between local markets.</p>
+<p>Agents with lower vision tend to persist at the local market edges and become inefficient conduits of trade in the trade network instead of finding strategic locations where they could maximize the benefit of arbitrage between local markets.</p>
 <section id="arbitraders" class="level3">
 <h3 class="anchored" data-anchor-id="arbitraders">Arbitraders</h3>
-<p>We can explore this by letting some agents who are less efficent harvesters have a movement rule that lets them seek out such locations with maximal arbitrage option. If there landscape is made of K blobs of different resources there may be greater need for such traders, and As more regions</p>
+<p>We can explore this by letting some agents who are less efficient harvesters have a movement rule that lets them seek out such locations with maximal arbitrage option. If there landscape is made of K blobs of different resources there may be greater need for such traders, and As more regions</p>
 </section>
-<section id="supertraders" class="level3">
-<h3 class="anchored" data-anchor-id="supertraders">Supertraders</h3>
-<p>We can setup a supertrader that is basicalt a supermarket in each neighbourhood. These agents with better vision that dont have a metablism cost or harvesting step.</p>
-<p>They can see each other and trade with each other allowing for greater efficency in the market.</p>
-<p>WE can rerun markets with or without supertraders and with supertraders with more vision. Thier wealth distribution could be a way to track the lost benefits due to vision fragmentation.</p>
+<section id="super-traders" class="level3">
+<h3 class="anchored" data-anchor-id="super-traders">Super-traders</h3>
+<p>We can setup a super-trader that is basically a supermarket in each neighborhood. These agents with better vision that don’t have a metabolism cost or harvesting step.</p>
+<p>They can see each other and trade with each other allowing for greater efficiency in the market.</p>
+<p>We can rerun markets with or without super-traders and with super-traders with more vision. Their wealth distribution could be a way to track the lost benefits due to vision fragmentation.</p>
 </section>
-<section id="edgworth-box-with-pareto-efficent-trades-maximising-utility-objective" class="level3">
-<h3 class="anchored" data-anchor-id="edgworth-box-with-pareto-efficent-trades-maximising-utility-objective">Edgworth box with pareto-efficent trades maximising utility objective</h3>
+<section id="edgeworth-box-with-pareto-efficient-trades-maximizing-utility-objective" class="level3">
+<h3 class="anchored" data-anchor-id="edgeworth-box-with-pareto-efficient-trades-maximizing-utility-objective">Edgeworth box with pareto-efficient trades maximizing utility objective</h3>
 <ol start="0" type="1">
 <li>neighbours := agents in field of visions</li>
 <li>for each neighbour in neighbours:</li>
@@ -2648,35 +2696,35 @@ their preffered trade partner.</p></li>
 <li>store the pareto-optimal solution that maximises both agents’ utilities and is viable for both agents</li>
 <li>do the trade with the highest gain in utility to me.</li>
 <li>remove agent from neighbours</li>
-<li>my prefrences have changed so return to 1</li>
+<li>my preferences have changed so return to 1</li>
 </ol>
 </section>
-<section id="edgworth-box-with-pareto-efficent-trades-for-survivability-objective" class="level3">
-<h3 class="anchored" data-anchor-id="edgworth-box-with-pareto-efficent-trades-for-survivability-objective">Edgworth box with pareto-efficent trades for survivability objective</h3>
-<p>we want to restric solutions to trades that increase the survivability this is like a quantum contraint on the utility.</p>
+<section id="edgeworth-box-with-pareto-efficient-trades-for-survivability-objective" class="level3">
+<h3 class="anchored" data-anchor-id="edgeworth-box-with-pareto-efficient-trades-for-survivability-objective">Edgeworth box with pareto-efficient trades for survivability objective</h3>
+<p>we want to restrict solutions to trades that increase the survivability this is like a quantum constraint on the utility.</p>
 <ol type="1">
 <li>are the any solutions ?</li>
 <li>what is the best solution - and what is the closest option.</li>
 </ol>
 </section>
-<section id="edgworth-box-with-pareto-efficent-trades-for-hybrid-objective" class="level3">
-<h3 class="anchored" data-anchor-id="edgworth-box-with-pareto-efficent-trades-for-hybrid-objective">Edgworth box with pareto-efficent trades for hybrid objective</h3>
+<section id="edgeworth-box-with-pareto-efficient-trades-for-hybrid-objective" class="level3">
+<h3 class="anchored" data-anchor-id="edgeworth-box-with-pareto-efficient-trades-for-hybrid-objective">Edgeworth box with pareto-efficient trades for hybrid objective</h3>
 <ol type="1">
 <li>we want a multiterm utility for</li>
 <li>survivability of n rounds Quant(U(M))</li>
 <li>reproduction endowments for up to 4 offsprings U(E)</li>
-<li>trades for U(M) that do not reduce the above two utility componenets</li>
+<li>trades for U(M) that do not reduce the above two utility components</li>
 <li>side trades that reduce pollutions ?</li>
 </ol>
-<p>the tricky part here is to define an hybrid utlities and solve its edgworth box as we add more rules we arrive at more complex utilities.</p>
-<p>So we may need to rethink a simlpler way to find accaptable trades….</p>
+<p>the tricky part here is to define an hybrid utilities and solve its edgeworth box as we add more rules we arrive at more complex utilities.</p>
+<p>So we may need to rethink a simpler way to find acceptable trades….</p>
 </section>
 </section>
 <section id="gale-shapley-trade-partner-allocation" class="level2">
 <h2 class="anchored" data-anchor-id="gale-shapley-trade-partner-allocation">Gale-Shapley Trade partner allocation</h2>
-<p>A second idea - based on Gale–Shapley algorithm for Stable marriage within neighborhoods</p>
+<p>A second idea - based on <a href="https://en.wikipedia.org/wiki/Gale%E2%80%93Shapley_algorithm">Gale–Shapley</a> algorithm for Stable marriage within neighborhoods</p>
 <ol type="1">
-<li>Each agent should find their preferred trades within thier FOV.</li>
+<li>Each agent should find their preferred trades within their FOV.</li>
 </ol>
 </section>
 <section id="median-approximate-solution-to-the-stable-trade-partner-lattice-simplex" class="level2">
@@ -2684,7 +2732,7 @@ their preffered trade partner.</p></li>
 <p>GS alg is best for one side (proposers or acceptors) Can we find a variant that leads to a median graph ?</p>
 <p>This seems very hard to do.</p>
 <p>The originals GS alg considers all marriages within the population. Here I want and trade alg in which optimal trades emerge in the the median point on the trader’s marriage simplex.</p>
-<p>For this variant for ABM we want to impose two restrictions on marriages: 1. offers made are restricted by miopia to the agents FOV. 2. offers received are restricted localy to the agents Max_Vision FOV.</p>
+<p>For this variant for ABM we want to impose two restrictions on marriages: 1. offers made are restricted by myopia to the agents FOV. 2. offers received are restricted locally to the agents Max_Vision FOV.</p>
 <p>we should iterate over all agents once to so all</p>
 <p>, yet if all agents get to play both roles per round then it should cancel out the proposer advantage and give a median solution!</p>
 </section>
@@ -2702,7 +2750,7 @@ their preffered trade partner.</p></li>
 <li><p>the company can be dissolved after n-time steps, if enough agents migrate, or if the inventory is too low</p></li>
 <li><p>The partnership has no Metabolism so it will need a different utility function - (this can be ml based based on info from agents).</p></li>
 <li><p>members of a company may use an information utility to deploy to locations that maximize information….</p></li>
-<li><p>will agents have shares in multiple companies. (perhaps conflict of interest can force agent to be a silent partner in the coorporation)</p></li>
+<li><p>will agents have shares in multiple companies. (perhaps conflict of interest can force agent to be a silent partner in the cooperations they are not active in)</p></li>
 <li><p>can agents get rewards for bringing in trades</p></li>
 <li><p>can agents get loans from companies</p></li>
 <li><p>will comparative advantage let certain agent gain control of such companies</p></li>
@@ -2723,13 +2771,13 @@ their preffered trade partner.</p></li>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2024,
   author = {Bochman, Oren},
-  title = {Mesa {Lessons}},
+  title = {Mesa},
   date = {2024-03-31},
   url = {https://orenbochman.github.io/posts/2024/2024-03-31-mesa-lessons/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2024" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2024. <span>“Mesa Lessons.”</span> March 31. <a href="https://orenbochman.github.io/posts/2024/2024-03-31-mesa-lessons/">https://orenbochman.github.io/posts/2024/2024-03-31-mesa-lessons/</a>.
+Bochman, Oren. 2024. <span>“Mesa.”</span> March 31. <a href="https://orenbochman.github.io/posts/2024/2024-03-31-mesa-lessons/">https://orenbochman.github.io/posts/2024/2024-03-31-mesa-lessons/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

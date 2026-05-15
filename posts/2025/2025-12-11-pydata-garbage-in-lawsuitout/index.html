@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
 <meta name="keywords" content="PyData, ML Pipelines, Compliance, Reproducibility, Data Versioning, Audit Trails">
-<meta name="description" content="A detailed recap of the PyData Global 2025 talk on building compliant and reproducible ML pipelines.">
+<meta name="description" content="A recap of Itai Gilo’s PyData Global 2025 talk on defensible, reproducible, and auditable machine learning pipelines.">
 
 <title>Garbage In, Lawsuit Out – Oren Bochman’s Blog</title>
 <style>
@@ -26,6 +26,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -36,8 +71,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../../">
-<link href="../../../posts/2025/2025-10-01-Updates-to-the-github-action/index.html" rel="next">
-<link href="../../../posts/2025/2025-03-31-metamorphosis/index.html" rel="prev">
+<link href="../../../posts/2025/2025-12-10-pydata-optimal-binning-in-logistic-regression/index.html" rel="next">
+<link href="../../../posts/2025/2025-12-09-pydata-scaling-fuzzy-product-matching/index.html" rel="prev">
 <link href="../../../favicon.ico" rel="icon">
 <script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
 <link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
@@ -47,14 +82,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-d0ae9245876894da5ac7e18953ecc5cc.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-f418161beb48e0141c760e455f12af2c.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../site_libs/bootstrap/bootstrap-664a97c4693fa88ec4ae2307d57030f6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../../site_libs/bootstrap/bootstrap-dark-62f143ed8ab74e28ea514b705f0ec08b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../../site_libs/bootstrap/bootstrap-664a97c4693fa88ec4ae2307d57030f6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-b4590aaf962280b9c108d89a6a38dec7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark-586938257727bfff935bdc10595f1efd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../../site_libs/bootstrap/bootstrap-b4590aaf962280b9c108d89a6a38dec7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script src="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
 <link href="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
 <script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
@@ -144,7 +179,7 @@ cookieconsent.run({
 
 
 <meta name="twitter:title" content="Garbage In, Lawsuit Out – Oren Bochman’s Blog">
-<meta name="twitter:description" content="A detailed recap of the PyData Global 2025 talk on building compliant and reproducible ML pipelines.">
+<meta name="twitter:description" content="A recap of Itai Gilo’s PyData Global 2025 talk on defensible, reproducible, and auditable machine learning pipelines.">
 <meta name="twitter:image" content="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/pydata_logo.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
@@ -394,7 +429,7 @@ cookieconsent.run({
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-04-02-research-questions/index.html">2025</a></li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/index.html">Garbage In, Lawsuit Out</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-01-06-research-notes/index.html">2025</a></li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/index.html">Garbage In, Lawsuit Out</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -403,12 +438,12 @@ cookieconsent.run({
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-04-02-research-questions/index.html">2025</a></li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/index.html">Garbage In, Lawsuit Out</a></li></ol></nav>
+    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-01-06-research-notes/index.html">2025</a></li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/index.html">Garbage In, Lawsuit Out</a></li></ol></nav>
       <h1 class="title">Garbage In, Lawsuit Out</h1>
             <p class="subtitle lead">Building Compliant and Reproducible ML Pipelines</p>
                   <div>
         <div class="description">
-          A detailed recap of the PyData Global 2025 talk on building compliant and reproducible ML pipelines.
+          A recap of Itai Gilo’s PyData Global 2025 talk on defensible, reproducible, and auditable machine learning pipelines.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -532,8 +567,8 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2011/2011-11-29-text-mining-with-r/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Text Mining With R</span></a>
+  <a href="../../../posts/2011/2011-11-29-npl-python/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text Mining With Python</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -550,8 +585,20 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2011/2011-11-29-npl-python/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Text Mining With Python</span></a>
+  <a href="../../../posts/2011/2011-11-29-framer/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Frames</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2011/2011-11-29-R-todo-list/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">R todo list</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2011/2011-11-29-text-mining-with-r/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text Mining With R</span></a>
   </div>
 </li>
       </ul>
@@ -608,6 +655,12 @@ cookieconsent.run({
           </a> 
       </div>
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2014/2014-10-06-FinTech/2014-10-06-FinTech.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Finn-tech meetup</span></a>
+  </div>
+</li>
       </ul>
   </li>
       </ul>
@@ -647,6 +700,12 @@ cookieconsent.run({
           </a> 
       </div>
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2015/2015-02-07-optimal-bidding/2015-02-07-optimal-bidding .html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Optimal bidding</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -742,14 +801,14 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-16" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2019/2019-11-24-keys-to-the-kingdom-extracting-api-keys-from-a-json-file-with-jq/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Docker for data science</span></a>
+  <a href="../../../posts/2019/2019-07-31-Exploding-and-vanishing-nodes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exploding and vanishing nodes.</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2019/2019-07-31-Exploding-and-vanishing-nodes/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exploding and vanishing nodes.</span></a>
+  <a href="../../../posts/2019/2019-11-24-keys-to-the-kingdom-extracting-api-keys-from-a-json-file-with-jq/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Docker for data science</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
@@ -782,38 +841,44 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2020/2020-11-29-numpy-meltdown/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">numpy melt down</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2020/2020-12-30-meme-bank/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Meme bank</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2020/2020-10-25-deep-learning-relu-intutions/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Deep Learning Intuitions</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2020/2020-06-12-bash-tricks/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2020/06-12-bash-tricks/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">brace expansion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2020/2020-02-20-avoid-cross-site-scriptin-errors-with-a-Jupyter-local-runtime/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How to avoid cross site scripting (XSS) errors with the Jupyter local runtime for Colab</span></a>
+  <a href="../../../posts/2020/03-04-pandas-challanges/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pandas Productivity Challenge?</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2020/2020-03-04-pandas-challanges/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Pandas Productivity Challenge?</span></a>
+  <a href="../../../posts/2020/10-25-deep-learning-relu-intutions/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deep Learning Intuitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/04-10-pdf-extraction/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PDF extraction hacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/12-30-meme-bank/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Meme bank</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/02-20-avoid-cross-site-scriptin-errors-with-a-Jupyter-local-runtime/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How to avoid cross site scripting (XSS) errors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/11-29-numpy-meltdown/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">numpy meltdown</span></a>
   </div>
 </li>
       </ul>
@@ -829,86 +894,14 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-06-10-layout-models/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">TensorFlow probability</span></a>
+  <a href="../../../posts/2021/2021-08-17-algorithmic-intuition/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Algorithmic Intuition</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-04-27-wingrad-schema/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Q&amp;A and the Winograd schemas</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-09-16-python-graphs/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Python Graphs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-05-16-mulitlevel-models/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Multilevel Models</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-09-24-statistics-for-marketing-in-python/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Excel 2019 for Marketing Statistics in pandas</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-08-13-hackathon-notes/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hackathon session link dumps &amp; notes</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-09-10-clv-models-1/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Customer Lifetime Value - Pareto/NBD (BTYD) Model</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-04-09-modeling-events/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Modeling Events</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-07-14-type-witness-evolving-idiom/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">A type of Witness and an evolving Idiom</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-08-13-inlining-citations/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Inlining Citations for Wikipedia articles</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-09-22-what-is-in-a-citation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">What is in a citation?</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-11-12-language-models-and-explainability/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Language models and explainability</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-04-25-bayesian-agent/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bayesian agents</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-07-01-json-ld/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">json-ld</span></a>
+  <a href="../../../posts/2021/2021-08-13-tea-house-chatbot/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wikipedia Tea House chatbot</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -919,8 +912,20 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-04-24-summerization/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Automatic Summarization Task</span></a>
+  <a href="../../../posts/2021/2021-08-13-inlining-citations/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inlining Citations for Wikipedia articles</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-07-01-json-ld/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">json-ld</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-08-other-people-problems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">environments</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -931,14 +936,68 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-11-12-language-models-and-explainability/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Language models and explainability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-24-summerization/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatic Summarization Task</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-22-what-is-in-a-citation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">What is in a citation?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../../posts/2021/2021-09-09-advertising-models/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Advertising Models</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-09-08-wave-net-review/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">WaveNet</span></a>
+  <a href="../../../posts/2021/2021-06-10-layout-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TensorFlow probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-11-lexical-and-semantic-features/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lexical categories and their features</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-10-24-computer-age-statistical-inference-notes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Notes from Computer Age Statistical Inference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-25-bayesian-agent/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian agents</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-07-ten-tips-to-improve-your-workflow/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Tips To Improve Your Workflow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-11-08-advanced-ML-workflows/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ml workfows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-09-modeling-events/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Modeling Events</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -949,8 +1008,62 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-04-07-ten-tips-to-improve-your-workflow/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">10 Tips To Improve Your Workflow</span></a>
+  <a href="../../../posts/2021/2021-05-18-bayesian-betting/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian Betting</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-27-wingrad-schema/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Q&amp;A and the Winograd schemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-07-14-type-witness-evolving-idiom/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A type of Witness and an evolving Idiom</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-10-clv-models-1/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Customer Lifetime Value - Pareto/NBD (BTYD) Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-14-marketing-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Marketing Research Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-05-16-mulitlevel-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multilevel Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-08-13-hackathon-notes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hackathon session link dumps &amp; notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-24-statistics-for-marketing-in-python/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Excel 2019 for Marketing Statistics in pandas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-08-wave-net-review/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">WaveNet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-16-python-graphs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Graphs</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1008,6 +1121,12 @@ cookieconsent.run({
           </a> 
       </div>
       <ul id="quarto-sidebar-section-22" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-04-01-bandits/2022-04-01-bandits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multi-armed bandits problem</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -1036,6 +1155,12 @@ cookieconsent.run({
           </a> 
       </div>
       <ul id="quarto-sidebar-section-24" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-09-16-adaptive-learning-rate/2022-09-16-adaptive-learning-rate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Adaptive learning rates</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -1085,8 +1210,14 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-27" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/12-20-autogluon/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">AutoGluon Cheetsheets</span></a>
+  <a href="../../../posts/2023/06-01-synthesis-and-stabilization/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Summary: Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/04-22-mcmc-algs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCMC algorithms</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1109,14 +1240,14 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/04-22-mcmc-algs/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">MCMC algorithms</span></a>
+  <a href="../../../posts/2023/12-20-autogluon/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AutoGluon Cheetsheets</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false">
- <span class="menu-text">02 01 Ds from Scratch</span></a>
+ <span class="menu-text">02 20 Ts Nonlinear</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -1124,8 +1255,8 @@ cookieconsent.run({
       <ul id="quarto-sidebar-section-28" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/02-01-ds-from-scratch/ols-regression-from-scratch.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">OLS regression</span></a>
+  <a href="../../../posts/2023/02-20-ts-nonlinear/2023-02-20-ts-nonlinear.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">nonlinear time series</span></a>
   </div>
 </li>
       </ul>
@@ -1133,23 +1264,12 @@ cookieconsent.run({
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false">
- <span class="menu-text">02 20 Ts Nonlinear</span></a>
+ <span class="menu-text">02 28 NLP.IL Booking.com</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-29" class="collapse list-unstyled sidebar-section depth4 ">  
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false">
- <span class="menu-text">02 28 NLP.IL Booking.com</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-30" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2023/02-28-NLP.IL-Booking.com/NLP-IL-Booking Text2Topic.html" class="sidebar-item-text sidebar-link">
@@ -1159,7 +1279,24 @@ cookieconsent.run({
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2023/02-28-NLP.IL-Booking.com/NLP-IL-Booking Validating NLP.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Validating NLP data and models</span></a>
+ <span class="menu-text">Validating NLP data and models with deepchecks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false">
+ <span class="menu-text">03 01 Braindump</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-30" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/03-01-braindump/2023-03-01-braindump.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">braindump</span></a>
   </div>
 </li>
       </ul>
@@ -1167,34 +1304,29 @@ cookieconsent.run({
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false">
- <span class="menu-text">03 01 Braindump</span></a>
+ <span class="menu-text">03 01 Spark Emr</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-31" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/03-01-spark-emr/2023-03-01-spark-emr.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Spark &amp; EMR</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-32" role="navigation" aria-expanded="false">
- <span class="menu-text">03 01 Spark Emr</span></a>
+ <span class="menu-text">06 01 Spark</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-32" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-32" class="collapse list-unstyled sidebar-section depth4 ">  
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-33" role="navigation" aria-expanded="false">
- <span class="menu-text">06 01 Spark</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-33" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-33" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2023/06-01-spark/spark-progress.html" class="sidebar-item-text sidebar-link">
@@ -1205,30 +1337,13 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false">
- <span class="menu-text">06 01 Synthesis and Stabilization</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-34" class="collapse list-unstyled sidebar-section depth4 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2023/06-01-synthesis-and-stabilization/2023-06-01-Synthesis-and-Stabilization.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Summary: Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
             <a href="../../../posts/2023/01-11-nlp-il-meetup/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">NLP IL F2F Meetup at Intuit</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-35" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-33" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-35" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-33" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2023/01-11-nlp-il-meetup/talk0.html" class="sidebar-item-text sidebar-link">
@@ -1257,174 +1372,54 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-36" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false">
  <span class="menu-text">S3 Series</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-36" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-36" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-34" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/s3-series/s3-aws-s3-tools.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">S3 with AWS S3 Tools</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/s3-series/s3-boto3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">S3 with boto3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/s3-series/s3-utils-python.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">S3 with AWS S3 Tools</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/s3-series/s3cmd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">S3 with s3cmd</span></a>
+  </div>
+</li>
       </ul>
   </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-37" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-35" role="navigation" aria-expanded="false">
  <span class="menu-text">2024</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-37" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-35" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-37" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-35" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-10-10-marco-baoni-composionality/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Is compositionality overrated? The view from language emergence</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-10-10-lewis-petting-zoo/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Lewis Signaling Game for PettingZoo</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-04-04-rad-repl/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">RAD REPL</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-02-28-ocr-bd/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">OCR - Brain Dump</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-02-22-transformations/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Transformations in Linguistic Representation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-07-01-generalization-in-ML/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">two ideas on generalization</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-05-12-Evolutionary-games-and-population-dynamics/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Evolutionary Games and Population Dynamics Summary</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-02-12-post-with-code/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Post With Code</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2023-03-16-events-generator/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">event generator</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-05-02-Shanon-Game/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Shannon Game</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-06-11-risk-constrained-MDP/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Risk-constrained Markov decision processes</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-06-11-more-sugar-please/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">More Sugar please</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-05-05-complex-signal/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ad hoc complex signaling systems</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-01-04-understanding-emergent-languages/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Understanding Emergent Languages</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-09-25-readability/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Fine-tune llm for Style and Grammar advice.</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-09-28-missing-link/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">LLM and the missing link</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-07-02-replay-buffer-questions/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">replay buffer questions</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-09-30-LLMs/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">LLM the good the bad and the ugly</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-08-08-TS-with-Stumpy/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Stumpy</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-01-10-superlearner/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SuperLearner</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-03-31-sugarscapes/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Sugar Scapes</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-02-12-mermaid-mindmap/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">😁 Quarto 💖 Mermaid🧜 Mindmaps 🧠</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-01-02-d3/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">D3.js in in Quarto Observable</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-05-07-signaling-experiment/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Signals Experiment</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-08-26-six-quick-tips/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Six quick tips to improve modeling</span></a>
+  <a href="../../../posts/2024/2024-03-03-a-definition-by-p-winston/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A definition by Patrick Henry Winston</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1435,50 +1430,92 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-12-12-the-valentines-day-massacre/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Villeny pure and simple</span></a>
+  <a href="../../../posts/2024/2024-06-18-readings-in-rl/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">readings in rl</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-05-06-bayesian-perspective/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Lewis Game from a Bayesian Perspective</span></a>
+  <a href="../../../posts/2024/2024-08-08-TS-with-Stumpy/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stumpy</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-10-11-Vitter-alg/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Vitter’s Algorithm</span></a>
+  <a href="../../../posts/2024/2024-02-28-ocr-bd/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OCR - Brain Dump</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-10-01-topological-alignment/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">TL-DR rethinking 💭 topological alignment</span></a>
+  <a href="../../../posts/2024/2024-09-25-readability/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tune llm for Style and Grammar advice.</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-09-26-deduction-evaluation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Deduction Evaluation</span></a>
+  <a href="../../../posts/2024/2024-03-20-predictioneering/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prediction Bibliography</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-03-03-a-definition-by-p-winston/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">A definition by Patrick Henry Winston</span></a>
+  <a href="../../../posts/2024/2024-05-08-further-musing/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lewis game further musings</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-03-21-bayesian-agents/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bayesian Agent</span></a>
+  <a href="../../../posts/2024/2024-03-23-prompts/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Gradio Apps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-03-31-mesa-lessons/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Mesa</span></a>
+  <a href="../../../posts/2024/2024-05-12-Evolutionary-games-and-population-dynamics/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evolutionary Games and Population Dynamics Summary</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-11-risk-constrained-MDP/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Risk-constrained Markov decision processes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-11-EGG-State-Space-Gen/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Egg generator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-01-02-d3/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">D3.js in in Quarto Observable</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2023-02-16-learing-goals/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Q1 2023 Tasks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-11-EGG/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Egg</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-01-10-superlearner/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SuperLearner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-11-more-sugar-please/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">More Sugar please</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1489,30 +1526,210 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-06-18-readings-in-rl/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">readings in rl</span></a>
+  <a href="../../../posts/2024/2024-05-07-signaling-experiment/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Signals Experiment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-12-12-the-valentines-day-massacre/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Villeny pure and simple</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-22-text-to-IPA/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text to IPA</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-22-transformations/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformations in Linguistic Representation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-02-Shanon-Game/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shannon Game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-12-mermaid-mindmap/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">😁 Quarto 💖 Mermaid🧜 Mindmaps 🧠</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-12-post-with-code/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Post With Code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-11-Vitter-alg/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vitter’s Algorithm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-01-04-understanding-emergent-languages/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Understanding Emergent Languages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-07-02-replay-buffer-questions/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">replay buffer questions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-31-mesa-lessons/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mesa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-30-LLMs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLM the good the bad and the ugly</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-26-march-brain-dump/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">braindump 03 2024</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-04-04-rad-repl/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAD REPL</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-31-sugarscapes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sugar Scapes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-08-quarto-tailwindcss/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tailwindcss &amp; Quarto</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-10-lewis-petting-zoo/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lewis Signaling Game for PettingZoo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-26-deduction-evaluation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deduction Evaluation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-10-marco-baoni-composionality/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Is compositionality overrated? The view from language emergence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-01-topological-alignment/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TL-DR rethinking 💭 topological alignment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-21-bayesian-agents/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian Agent</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-25-rl-maps/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RL MindMap</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-28-missing-link/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLM and the missing link</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-08-26-six-quick-tips/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Six quick tips to improve modeling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-06-bayesian-perspective/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lewis Game from a Bayesian Perspective</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-24-sugar-ad-astra/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sugarscape Ad Astra</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-05-complex-signal/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ad hoc complex signaling systems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-04-03-focus/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Focus</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2023-03-16-events-generator/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">event generator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-07-01-generalization-in-ML/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">two ideas on generalization</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-38" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-36" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 02 01 Quarto Bootstrap</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-38" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-36" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-38" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-36" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-01-quarto_bootstrap/card.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quarto 💖 Bootstrap 😁</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-39" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-37" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 02 19 Rhetoric</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-39" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-37" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-39" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-37" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-02-19-rhetoric/rhetoric-ideas.html" class="sidebar-item-text sidebar-link">
@@ -1523,24 +1740,42 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-38" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 05 02 Signaling Games Tikz</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-38" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-40" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-38" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-02-signaling-games-tikz/tikz-complete-pooling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Complete pooling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">lewis game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-02-signaling-games-tikz/tikz-mixture-model.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian Gaussian mixture model</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-39" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 05 03 Urn Models</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-39" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-41" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-39" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-05-03-urn-models/urn.html" class="sidebar-item-text sidebar-link">
@@ -1551,24 +1786,30 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-42" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 05 04 Signals Bib</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-42" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-42" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-40" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-04-signals-bib/signals-summary-the-bibliography.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Skyrms Signals Summary Bibliography</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 05 09 Roth Erev RL</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-43" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-41" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-05-09-Roth-Erev-RL/re-rel.html" class="sidebar-item-text sidebar-link">
@@ -1579,35 +1820,47 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-42" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 06 01 Bayesian Agents</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-42" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-42" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-01-Bayesian-Agents/2024-06-01-Bayesian-Agents.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian Agents</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 12 Logic Puzzles</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-43" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-12-logic-puzzles/logic puzzles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">logic puzzles</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 13 Hyper</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-44" class="collapse list-unstyled sidebar-section depth4 ">  
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false">
- <span class="menu-text">2024 06 12 Logic Puzzles</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-45" class="collapse list-unstyled sidebar-section depth4 ">  
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="false">
- <span class="menu-text">2024 06 13 Hyper</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-46" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-06-13-hyper/2024-06-13-hyper.html" class="sidebar-item-text sidebar-link">
@@ -1618,13 +1871,13 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 06 23 Zero Inflated Data</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-47" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-45" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-06-23-zero-inflated-data/2024-06-23-zero-inflated-data.html" class="sidebar-item-text sidebar-link">
@@ -1635,13 +1888,13 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-48" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 06 25 Mesa Rl</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-48" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-48" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-46" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-06-25-mesa-rl/mesa-rl.html" class="sidebar-item-text sidebar-link">
@@ -1654,17 +1907,11 @@ cookieconsent.run({
       <div class="sidebar-item-container"> 
             <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Misbehavior of Markets and Scaling in financial prices 1-4</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-49" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-49" class="collapse list-unstyled sidebar-section depth4 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part1/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Scaling in financial prices 1</span></a>
-  </div>
-</li>
+      <ul id="quarto-sidebar-section-47" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part2/index.html" class="sidebar-item-text sidebar-link">
@@ -1683,181 +1930,25 @@ cookieconsent.run({
  <span class="menu-text">Scaling in financial prices 4</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part1/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling in financial prices 1</span></a>
+  </div>
+</li>
       </ul>
   </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-50" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-48" role="navigation" aria-expanded="true">
  <span class="menu-text">2025</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-50" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-48" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-50" class="collapse list-unstyled sidebar-section depth3 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-04-02-research-questions/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Complex Lewis Signaling - The Research Questions</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-i-built-a-transformer-from-scratch/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">I Built a Transformer from Scratch So You Don’t Have To</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-gpu-acc-zarr/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">GPU Accelerated Zarr</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-when-ai-makes-things-up/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">When AI Makes Things Up: Understanding and Tackling Hallucinations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-01-10-Engineering-RL-Algs/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Engineering Reinforcement Learning Algorithms</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-python-worst-practices/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Python Worst Practices - Learn from the Expert</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-01-11-a-garden-of-forking-paths/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">A garden of forking paths</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-01-14-Desiderata-for-Emergent-Languages/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Emergent Languages</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-10-pydata-optimal-binning-in-logistic-regression/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Optimal Variable Binning in Logistic Regression</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-10-pydata-time-series-for-coupled-neurons/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Time series analysis for coupled neurons.</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-scaling-fuzzy-product-matching/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Scaling Fuzzy Product Matching with BM25: A Comparative Study of Python and Database Solutions</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-04-03-langtalks/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Langtalks Resources # 43</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-01-01-books/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Books, Courses Tools</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-10-09-SGD/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Stochastic gradient Descent – a Deep Dive</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-09-14-bayes-for-llm/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Probabilitic Modeling with Language Models</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-11-pydata-scaling-data-processing-for-llm-with-nemo-curator/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Scaling Data Processing for LLMs with NeMo Curator</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/marketing mix model/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Marketing Mix Model</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-11-pydata-when-the-meter-maxes-out/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">When the Meter Maxes Out: Chernobyl Disaster Lessons for ML Systems in Production</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-09-02-Shiny-Mesa-Tutorial/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ShinyLive ❤️ Mesa Tutorial</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-10-pydata-optimizing-ai-ml-workloads/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Optimizing AI/ML Workloads: Resource Management and Cost Attribution</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-11-pydata-pycaret/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Automating ML with PyCaret: Train &amp; Compare Multiple Models to Find the Best Performer</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-01-02-rethinking-signaling-systems/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Rethinking Signaling systems via the lens of compositionality</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-09-19-MOR/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">FlexAttention: A Flexible Approach to Attention Mechanisms</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-03-09-referential-lewis-game/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Referential Lewis Signaling Game</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Combining Zarr, HDF5, and TIFF into a single data format</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-projspec/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">projspec: what’s this project anyway?</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-01-04-off-policy-learning/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Off-Policy Learning</span></a>
-  </div>
-</li>
+      <ul id="quarto-sidebar-section-48" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-01-06-research-notes/index.html" class="sidebar-item-text sidebar-link">
@@ -1866,20 +1957,14 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-10-pydata-ideas-to-apis/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">From Ideas to APIs: Delivering Fast with Modern Python</span></a>
+  <a href="../../../posts/2025/2025-10-01-Updates-to-the-github-action/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Updates to the github action</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-11-pydata-sparse-and-finch/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">PyData/Sparse &amp; Finch - Extending sparse computing in the Python ecosystem</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-04-02-a-morphology/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Base line Morphology Model</span></a>
+  <a href="../../../posts/2025/2025-12-09-pydata-optimizing-pandas-using-polars-cuDf-and-FireDucks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lessons learnt in optimizing a large-scale pandas application using Polars, FireDucks and cuDF: Go Smart and Save More!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1890,44 +1975,38 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-11-pydata-lightweight-feat-store/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Building a Lightweight Feature Store for Electricity Grid Forecasts with Polars</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2015-sept-06/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Allegations of War Crimes and the Palestinian Genocide</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-11-pydata-using-embeddings-in-trees/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How to Effectively use text embeddings in tree based models</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-torchTextClassifiers/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">torchTextClassifiers : Modernizing Text classification for French National Statistics</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-12-10-pydata-real-time-financial-fraud-detection/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Realtime Financial Fraud Detection with Modern Python</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-09-19-MOA/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2025/2025-12-11-pydata-tiny-troupe/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TinyTroupe: Enhancing Marketing Insights through LLM-Powered Multiagent Persona Simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Combining Zarr, HDF5, and TIFF into a single data format</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-20-FlexAttention/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">FlexAttention: A Flexible Approach to Attention Mechanisms</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-11-pydata-slm/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How Big are SLMs</span></a>
+  <a href="../../../posts/2025/2025-12-09-pydata-where-have-all-the-metrics-gone/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Where Have All the Metrics Gone?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-04-02-a-morphology/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Base line Morphology Model</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1938,8 +2017,206 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-decision-under-uncertainty/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Decisions Under Uncertainty: A Hands‑On Guide to Bayesian Decision Theory</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-torchTextClassifiers/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">torchTextClassifiers : Modernizing Text classification for French National Statistics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-synthetic-insurance-data/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Harnessing Generative Models for Synthetic Non-Life Insurance Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-09-linkage/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linkage</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-01-books/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Books, Courses Tools</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-gpu-acc-zarr/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GPU Accelerated Zarr</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-pycaret/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automating ML with PyCaret: Train &amp; Compare Multiple Models to Find the Best Performer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-14-Anthropic/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Anthropic’s Claude: Advancing AI with Safety and Scalability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-02-rethinking-signaling-systems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rethinking Signaling systems via the lens of compositionality</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-time-series-for-coupled-neurons/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Time series analysis for coupled neurons.</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-building-llm-powered-apps-for-ds/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building LLM-Powered Applications for Data Scientists and Software Engineers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-10-Engineering-RL-Algs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Engineering Reinforcement Learning Algorithms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-19-MOR/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">FlexAttention: A Flexible Approach to Attention Mechanisms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-31-metamorphosis/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RL, Metamorphosis and Memory</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-projspec/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">projspec: what’s this project anyway?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-22-Complex-Lewis-Singaling-Game-Part-1/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Research note for the Complex Lewis Signaling Game - Part 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-14-Desiderata-for-Emergent-Languages/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Emergent Languages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-26-vibe-coding/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vibe coding GPT5 Edition</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-python-meets-excel/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Meets Excel: Smarter Workflows for Analysts and Data Teams</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-09-referential-lewis-game/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Referential Lewis Signaling Game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-02-Shiny-Mesa-Tutorial/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ShinyLive ❤️ Mesa Tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-lightweight-feat-store/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building a Lightweight Feature Store for Electricity Grid Forecasts with Polars</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-jupyter-environment-lifecycle/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Lifecycle of a Jupyter Environment - From Exploration to Production-Grade Pipelines</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-when-the-meter-maxes-out/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">When the Meter Maxes Out: Chernobyl Disaster Lessons for ML Systems in Production</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-04-Bag-Of-Tricks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AI a bag of tricks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-12-09-pydata-automate-complex-and-critical-docs-in-healthcare/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Using Traditional AI and LLMs to Automate Complex and Critical Documents in Healthcare</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-when-ai-makes-things-up/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">When AI Makes Things Up: Understanding and Tackling Hallucinations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-04-03-langtalks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Langtalks Resources # 43</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-09-planning-in-complex-lewis-game/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Planning in the Complex Lewis Game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-python-worst-practices/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Worst Practices - Learn from the Expert</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-scaling-fuzzy-product-matching/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling Fuzzy Product Matching with BM25: A Comparative Study of Python and Database Solutions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Garbage In, Lawsuit Out</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-optimal-binning-in-logistic-regression/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Optimal Variable Binning in Logistic Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-blosc2/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hands-on with Blosc2: Accelerating Your Python Data Workflows</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1956,116 +2233,8 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-10-pydata-monty-hall/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Lessons in Decision Making from the Monty Hall Problem</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-10-pydata-decision-under-uncertainty/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Decisions Under Uncertainty: A Hands‑On Guide to Bayesian Decision Theory</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-09-04-Bag-Of-Tricks/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">AI a bag of tricks</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-09-20-FlexAttention/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">FlexAttention: A Flexible Approach to Attention Mechanisms</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-synthetic-insurance-data/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Harnessing Generative Models for Synthetic Non-Life Insurance Data</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-10-pydata-blosc2/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Hands-on with Blosc2: Accelerating Your Python Data Workflows</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-03-09-planning-in-complex-lewis-game/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Planning in the Complex Lewis Game</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-python-meets-excel/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Python Meets Excel: Smarter Workflows for Analysts and Data Teams</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-03-11-partial-pooling/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The roles of Partial pooling and mixed strategies in the Lewis signaling game</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-where-have-all-the-metrics-gone/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Where Have All the Metrics Gone?</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-11-pydata-bodo-dataframes/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bodo DataFrames: a fast and scalable HPC-based drop-in replacement for Pandas</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-09-26-vibe-coding/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Vibe coding GPT5 Edition</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-jupyter-environment-lifecycle/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Lifecycle of a Jupyter Environment - From Exploration to Production-Grade Pipelines</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-11-pydata-garbage-in-lawsuitout/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Garbage In, Lawsuit Out</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-10-01-Updates-to-the-github-action/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Updates to the github action</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-10-pydata-using-mcp-to-turn-claude-into-football-analyst/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Using MCP to turn Claude into a Football Opposition Analyst</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-11-pydata-tiny-troupe/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">TinyTroupe: Enhancing Marketing Insights through LLM-Powered Multiagent Persona Simulation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-optimizing-pandas-using-polars-cuDf-and-FireDucks/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Lessons learnt in optimizing a large-scale pandas application using Polars, FireDucks and cuDF: Go Smart and Save More!</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-09-pydata-building-llm-powered-apps-for-ds/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Building LLM-Powered Applications for Data Scientists and Software Engineers</span></a>
+  <a href="../../../posts/2025/2025-12-11-pydata-using-embeddings-in-trees/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How to Effectively use text embeddings in tree based models</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -2076,8 +2245,8 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2025/2025-12-14-Anthropic/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Anthropic’s Claude: Advancing AI with Safety and Scalability</span></a>
+  <a href="../../../posts/2025/2015-sept-06/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Allegations of War Crimes and the Palestinian Genocide</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -2088,19 +2257,127 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-14-bayes-for-llm/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Probabilitic Modeling with Language Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-using-mcp-to-turn-claude-into-football-analyst/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using MCP to turn Claude into a Football Opposition Analyst</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-bodo-dataframes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bodo DataFrames: a fast and scalable HPC-based drop-in replacement for Pandas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-04-02-research-questions/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Complex Lewis Signaling - The Research Questions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-11-partial-pooling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The roles of Partial pooling and mixed strategies in the Lewis signaling game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-10-09-SGD/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stochastic gradient Descent – a Deep Dive</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-09-game-composition/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Composition and Interpretation of Games with the Lewis Signaling Game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-11-a-garden-of-forking-paths/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A garden of forking paths</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-optimizing-ai-ml-workloads/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Optimizing AI/ML Workloads: Resource Management and Cost Attribution</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-ideas-to-apis/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From Ideas to APIs: Delivering Fast with Modern Python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-scaling-data-processing-for-llm-with-nemo-curator/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling Data Processing for LLMs with NeMo Curator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-04-off-policy-learning/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Off-Policy Learning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-i-built-a-transformer-from-scratch/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">I Built a Transformer from Scratch So You Don’t Have To</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-monty-hall/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lessons in Decision Making from the Monty Hall Problem</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-19-MOA/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">FlexAttention: A Flexible Approach to Attention Mechanisms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-12-09-pydata-llms-chatbots-and-dashboards/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">LLMs, Chatbots, and Dashboards: Visualize Your Data with Natural Language</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-slm/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How Big are SLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-sparse-and-finch/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PyData/Sparse &amp; Finch - Extending sparse computing in the Python ecosystem</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/marketing mix model/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Marketing Mix Model</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../../../posts/2025/2025-01-05-bifurcating-paths-to-signaling/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Many Path To A Signaling System</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-51" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-49" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-51" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-49" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-01-05-bifurcating-paths-to-signaling/podcast.html" class="sidebar-item-text sidebar-link">
@@ -2113,17 +2390,65 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-52" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-50" role="navigation" aria-expanded="false">
  <span class="menu-text">2026</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-52" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-50" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-52" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-50" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC AI 2026</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-20-nvidia-Nsight-GPU-profiling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">nvidia Nsight GPU profiling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/03-06-being-brave/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Being brave</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/02-14-CI-Ness/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Robert Ness on LLMs &amp; CI</span></a>
+  </div>
+</li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2026/01-19-kv-cache-efficiency/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KV Cache Efficiency &amp; Context Platform Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/02-15-CI-Tools/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CI - Libs for Python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-29-ODSC-AI-2026-Day-2/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC AI 2026 - Day 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-21-Discipline/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Art of Discipline: Mastering Self-Control for a Fulfilling Life</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-14-rise-of-the-agents/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rise of the agents</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -2140,66 +2465,6 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/04-31-ODSC-AI-2026-Day-4/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ODSC - AI 2026 - Workshops</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/03-08-smoothing-problems/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Smoothing problems</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/03-07-mixture-problems/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Mixture problems</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/01-21-Discipline/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Art of Discipline: Mastering Self-Control for a Fulfilling Life</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/02-15-CI-Tools/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CI - Libs for Python</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/03-06-being-brave/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Beng brave</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/04-29-ODSC-AI-2026-Day-2/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ODSC AI 2026 - Day 2</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/01-14-rise-of-the-agents/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Rise of the agents</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/01-09-convergence-of-RVs/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Three modes of convergence of random variables</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/02-14-CI-Ness/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Robert Ness on LLMs &amp; CI</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../../../posts/2026/01-03-convolutions-and-fft/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Convoluted Intuitions</span></a>
   </div>
@@ -2212,25 +2477,37 @@ cookieconsent.run({
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ODSC - AI 2026 - Day 3</span></a>
+  <a href="../../../posts/2026/03-07-mixture-problems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mixture problems</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/01-20-nvidia-Nsight-GPU-profiling/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">nvidia Nsight GPU profiling</span></a>
+  <a href="../../../posts/2026/01-09-convergence-of-RVs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Three modes of convergence of random variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/03-08-smoothing-problems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Smoothing problems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-31-ODSC-AI-2026-Day-4/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC - AI 2026 - Workshops</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ODSC AI 2026</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-53" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-51" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-53" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-51" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk1.html" class="sidebar-item-text sidebar-link">
@@ -2273,11 +2550,11 @@ cookieconsent.run({
       <div class="sidebar-item-container"> 
             <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ODSC AI 2026</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-54" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-52" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-54" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-52" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk1.html" class="sidebar-item-text sidebar-link">
@@ -2373,7 +2650,22 @@ cookieconsent.run({
         <li class="px-0"><hr class="sidebar-divider hi "></li>
     </ul>
     </div>
-    
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#the-subpoena-test" id="toc-the-subpoena-test" class="nav-link active" data-scroll-target="#the-subpoena-test">The subpoena test</a></li>
+  <li><a href="#compliance-is-now-part-of-the-production-interface" id="toc-compliance-is-now-part-of-the-production-interface" class="nav-link" data-scroll-target="#compliance-is-now-part-of-the-production-interface">Compliance is now part of the production interface</a></li>
+  <li><a href="#alices-bad-week-three-ways-ml-pipelines-fail" id="toc-alices-bad-week-three-ways-ml-pipelines-fail" class="nav-link" data-scroll-target="#alices-bad-week-three-ways-ml-pipelines-fail">Alice’s bad week: three ways ML pipelines fail</a></li>
+  <li><a href="#why-the-standard-stack-breaks-lineage" id="toc-why-the-standard-stack-breaks-lineage" class="nav-link" data-scroll-target="#why-the-standard-stack-breaks-lineage">Why the standard stack breaks lineage</a></li>
+  <li><a href="#git-semantics-for-data" id="toc-git-semantics-for-data" class="nav-link" data-scroll-target="#git-semantics-for-data">Git semantics for data</a></li>
+  <li><a href="#a-compliant-workflow" id="toc-a-compliant-workflow" class="nav-link" data-scroll-target="#a-compliant-workflow">A compliant workflow</a></li>
+  <li><a href="#blocking-pii-before-production" id="toc-blocking-pii-before-production" class="nav-link" data-scroll-target="#blocking-pii-before-production">Blocking PII before production</a></li>
+  <li><a href="#training-from-commits-not-folders" id="toc-training-from-commits-not-folders" class="nav-link" data-scroll-target="#training-from-commits-not-folders">Training from commits, not folders</a></li>
+  <li><a href="#audit-trails-as-a-byproduct" id="toc-audit-trails-as-a-byproduct" class="nav-link" data-scroll-target="#audit-trails-as-a-byproduct">Audit trails as a byproduct</a></li>
+  <li><a href="#what-i-take-from-the-talk" id="toc-what-i-take-from-the-talk" class="nav-link" data-scroll-target="#what-i-take-from-the-talk">What I take from the talk</a></li>
+  </ul>
+</nav>
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
@@ -2388,136 +2680,429 @@ cookieconsent.run({
 
 
 
-<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/ScNQwv2aEzM" title="Itai Gilo — Garbage In, Lawsuit Out: Building Compliant and Reproducible ML Pipelines" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div></div><p><strong>Speaker:</strong> <a href="https://www.linkedin.com/in/itai-gilo/">Itai Gilo</a>, software engineer working on lakeFS. The talk frames compliance as an engineering problem: not a matter of filling out paperwork after a model ships, but of making the data layer reproducible, traceable, and policy-aware from the start.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>TL;DR — a defensible model needs defensible data
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Your model might pass every benchmark and still fail the only test that matters during an audit: can you prove exactly which data produced it? Code versioning, dependency pinning, and model registries are not enough if the training data is mutable. The core prescription is simple: version the data, enforce policy before merge, train from immutable commits, and log those commits with every experiment.</p>
+</div>
+</div>
+<section id="the-subpoena-test" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="the-subpoena-test">The subpoena test</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="pydata_logo.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="pydata global"><img src="pydata_logo.png" class="img-fluid figure-img" alt="pydata global"></a></p>
-<figcaption>pydata global</figcaption>
+<p><a href="slide02.png" class="lightbox" data-gallery="slides" title="Celebration after the model performs well"><img src="slide02.png" class="img-fluid figure-img" alt="Celebration after the model performs well"></a></p>
+<figcaption>Celebration after the model performs well</figcaption>
 </figure>
-</div><div class="">
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/ScNQwv2aEzM" title="Itai Gilo-Garbage In, Lawsuit Out_ Building Compliant and Reproducible ML Pipelines" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
-</div></div>
-<div class="callout callout-style-default callout-tip callout-titled">
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide03.png" class="lightbox" data-gallery="slides" title="The subpoena arrives"><img src="slide03.png" class="img-fluid figure-img" alt="The subpoena arrives"></a></p>
+<figcaption>The subpoena arrives</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide04.png" class="lightbox" data-gallery="slides" title="The old data has been overwritten"><img src="slide04.png" class="img-fluid figure-img" alt="The old data has been overwritten"></a></p>
+<figcaption>The old data has been overwritten</figcaption>
+</figure>
+</div>
+</div></div><p>The talk opens with a deliberately uncomfortable scenario. On November 3, a team deploys an alpha credit-risk model. It performs beautifully in an A/B test, revenue rises, the business is pleased, and the launch is treated as a success.</p>
+<p>Three months later, regulators ask for the exact training data used on November 3, because the model is suspected of discriminating against particular zip codes. The team has the model weights and the code, but the original data in object storage has been overwritten by a later extract-transform-load job. The model may or may not have been biased; the immediate problem is worse. The team can no longer prove what happened.</p>
+<p>That is the central failure mode of many production machine learning systems: they version the code and sometimes the model artifact, but not the data state that made the model possible.</p>
+</section>
+<section id="compliance-is-now-part-of-the-production-interface" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="compliance-is-now-part-of-the-production-interface">Compliance is now part of the production interface</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide08.png" class="lightbox" data-gallery="slides" title="The compliance landscape"><img src="slide08.png" class="img-fluid figure-img" alt="The compliance landscape"></a></p>
+<figcaption>The compliance landscape</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide09.png" class="lightbox" data-gallery="slides" title="The cost of non-compliance"><img src="slide09.png" class="img-fluid figure-img" alt="The cost of non-compliance"></a></p>
+<figcaption>The cost of non-compliance</figcaption>
+</figure>
+</div>
+</div></div><p>For engineering teams, regulation shows up as a reproducibility and traceability requirement. The European Union Artificial Intelligence Act pushes high-risk systems toward rigorous record keeping. General Data Protection Regulation obligations make it necessary to explain consequential automated decisions. Healthcare and financial workflows add additional auditability requirements. Business-to-business customers also increasingly ask whether every model decision can be traced back to the source data.</p>
+<p>The practical implication is not merely “keep better notes.” It is stronger:</p>
+<div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Lecture Overview
+Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Your model might pass all the benchmarks—but can it survive a subpoena? In the race to ship AI, most teams are building workflows that look great in dashboards but fall apart under legal, regulatory, or ethical pressure. Because the real liability doesn’t live in your model weights—it’s buried in your data.</p>
+<p>A model is not reproducible unless the training code, environment, model artifact, and exact data snapshot can be recovered together.</p>
 </div>
 </div>
-<p>This session is a reality check for anyone shipping machine learning in production. We’ll walk through the dark corners of modern ML pipelines: mutable datasets with no history, mystery data sources with missing labels, and a forgotten column of PII that’s just been shipped to production. Then we’ll show how to fix it—without turning your data team into compliance officers.</p>
-<p>You’ll learn how to embed reproducibility, traceability, and policy enforcement into your pipeline without slowing it to a crawl: track every dataset change, version every experiment, validate against policy gates, and generate audit trails that actually mean something. Whether you’re dealing with GDPR, HIPAA, or just not wanting to get roasted by internal audit, this talk gives you the blueprint for ML you can defend in court—and still ship on time.</p>
+<p>Without that snapshot, a team is left reconstructing history from folder names, stale feature definitions, and informal memory. That is not an audit trail; it is archaeology.</p>
+</section>
+<section id="alices-bad-week-three-ways-ml-pipelines-fail" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="alices-bad-week-three-ways-ml-pipelines-fail">Alice’s bad week: three ways ML pipelines fail</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide10.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Meet Alice"><img src="slide10.png" class="img-fluid figure-img" alt="Meet Alice"></a></p>
+<figcaption>Meet Alice</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide11.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="PII leakage"><img src="slide11.png" class="img-fluid figure-img" alt="PII leakage"></a></p>
+<figcaption>PII leakage</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide12.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="The reproducibility trap"><img src="slide12.png" class="img-fluid figure-img" alt="The reproducibility trap"></a></p>
+<figcaption>The reproducibility trap</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide13.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="The traceability trap"><img src="slide13.png" class="img-fluid figure-img" alt="The traceability trap"></a></p>
+<figcaption>The traceability trap</figcaption>
+</figure>
+</div>
+</div></div><p>The talk uses Alice, a data engineer, to make the problem concrete.</p>
+<p>First, Alice faces <strong>personally identifiable information (PII) leakage</strong>. She ingests a new dataset, the model improves, and the team ships it. Later, someone discovers that the dataset contained data that should never have entered training. Because there is no reliable link between model versions and data versions, the team cannot easily determine which model artifacts are contaminated.</p>
+<p>Second, she faces <strong>the reproducibility trap</strong>. An auditor asks her to rerun training for a model decision made six months earlier. The code still runs, but the result is different because the underlying database changed: records were updated, deleted, or overwritten.</p>
+<p>Third, she faces <strong>the traceability gap</strong>. Legal asks whether a copyrighted dataset was used in the model shipped on Tuesday. The storage bucket contains folders named <code>v1</code>, <code>v2</code>, <code>v2-final</code>, and <code>v2-final-real</code>, but there is no automated link from the production model back to the precise files used for training.</p>
+<p>In all three cases, Alice has modern tooling around the model, but the data remains mutable and under-versioned.</p>
+</section>
+<section id="why-the-standard-stack-breaks-lineage" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="why-the-standard-stack-breaks-lineage">Why the standard stack breaks lineage</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide22.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="Typical workflow setup"><img src="slide22.png" class="img-fluid figure-img" alt="Typical workflow setup"></a></p>
+<figcaption>Typical workflow setup</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide23.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="Compliant ML workflow setup"><img src="slide23.png" class="img-fluid figure-img" alt="Compliant ML workflow setup"></a></p>
+<figcaption>Compliant ML workflow setup</figcaption>
+</figure>
+</div>
+</div></div><p>A typical machine learning workflow has specialized tools at every stage: ingestion pipelines, feature stores, training jobs, model registries, deployment infrastructure, and sometimes vector databases for embedding retrieval. This looks mature, but it often leaves a gap at the storage layer.</p>
+<p>The model registry versions the model binary. The feature store versions feature definitions. But the actual files — Parquet, images, text corpora, embeddings, or reindexed vector database states — often live in mutable object storage. If the data changes, the pipeline may retain metadata about the model while losing the material state that produced it.</p>
+<p>That is the broken link: the model artifact is preserved, but the data state is not.</p>
+</section>
+<section id="git-semantics-for-data" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="git-semantics-for-data">Git semantics for data</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide17.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12" title="Git for data"><img src="slide17.png" class="img-fluid figure-img" alt="Git for data"></a></p>
+<figcaption>Git for data</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide18.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="Introducing lakeFS"><img src="slide18.png" class="img-fluid figure-img" alt="Introducing lakeFS"></a></p>
+<figcaption>Introducing lakeFS</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide19.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14" title="Transparent integration"><img src="slide19.png" class="img-fluid figure-img" alt="Transparent integration"></a></p>
+<figcaption>Transparent integration</figcaption>
+</figure>
+</div>
+</div></div><p>The proposed solution is to apply the same discipline to data that software teams already apply to code. A data lake needs Git-like semantics:</p>
+<ul>
+<li><strong>Branches</strong> for isolated ingestion, cleaning, and experimentation.</li>
+<li><strong>Commits</strong> for immutable snapshots of the data lake at a particular point in time.</li>
+<li><strong>Merges</strong> guarded by validation checks.</li>
+<li><strong>Reverts</strong> when a bad data change enters the system.</li>
+<li><strong>History</strong> that records who changed what and when.</li>
+</ul>
+<p>lakeFS provides this layer over object storage such as Amazon S3, Azure Blob Storage, or Google Cloud Storage. The key scaling idea is that a branch is a metadata operation, not a copy of the entire data lake. lakeFS manages pointers to objects and uses copy-on-write behavior, so teams can create branches without duplicating petabytes of data.</p>
+<p>The usability point is equally important: Spark, Pandas, Databricks, and ordinary Python scripts can still read from object-storage-like paths. The path changes from “a bucket and folder” to “a repository and branch or commit,” but the compute stack does not have to be rewritten.</p>
+</section>
+<section id="a-compliant-workflow" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="a-compliant-workflow">A compliant workflow</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide20.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15" title="A compliant ML workflow"><img src="slide20.png" class="img-fluid figure-img" alt="A compliant ML workflow"></a></p>
+<figcaption>A compliant ML workflow</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide21.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16" title="Baking compliance into the pipeline"><img src="slide21.png" class="img-fluid figure-img" alt="Baking compliance into the pipeline"></a></p>
+<figcaption>Baking compliance into the pipeline</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide24.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17" title="Branching data"><img src="slide24.png" class="img-fluid figure-img" alt="Branching data"></a></p>
+<figcaption>Branching data</figcaption>
+</figure>
+</div>
+</div></div><p>The workflow mirrors software engineering practice. The <code>main</code> branch is the production data system of record. No ingestion job writes directly to <code>main</code>. New data lands on an ingest branch. Experiments happen on experiment branches. Data is merged into <code>main</code> only after passing quality and policy gates.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Failure mode</th>
+<th>Pipeline control</th>
+<th>Evidence produced</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PII leakage</td>
+<td>Pre-merge policy hook scans data before it reaches <code>main</code></td>
+<td>Blocked merge, validation log, isolated offending branch</td>
+</tr>
+<tr class="even">
+<td>Irreproducible model</td>
+<td>Training reads from an immutable data commit</td>
+<td>Commit identifier tied to model run</td>
+</tr>
+<tr class="odd">
+<td>Missing lineage</td>
+<td>lakeFS commit history records data changes</td>
+<td>Auditable history of files added, changed, or deleted</td>
+</tr>
+</tbody>
+</table>
+<p>The shift is from retrospective compliance to enforced workflow. The data platform prevents some classes of non-compliant state from reaching production in the first place.</p>
+</section>
+<section id="blocking-pii-before-production" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="blocking-pii-before-production">Blocking PII before production</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide25.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18" title="Pre-merge validation hook"><img src="slide25.png" class="img-fluid figure-img" alt="Pre-merge validation hook"></a></p>
+<figcaption>Pre-merge validation hook</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide26.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19" title="PII validation script"><img src="slide26.png" class="img-fluid figure-img" alt="PII validation script"></a></p>
+<figcaption>PII validation script</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide27.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20" title="PII detected before merge"><img src="slide27.png" class="img-fluid figure-img" alt="PII detected before merge"></a></p>
+<figcaption>PII detected before merge</figcaption>
+</figure>
+</div>
+</div></div><p>The first concrete mechanism is a pre-merge hook. In ordinary software engineering, a pull request should not merge if the tests fail. The talk applies the same principle to data: an ingest branch should not merge into <code>main</code> if it contains data that violates policy.</p>
+<p>For PII, the hook can scan changed files for patterns such as social security numbers, credit-card-like strings, email addresses, or other organization-specific identifiers. If the validation script returns a non-zero exit code, the merge fails. The sensitive data remains isolated on the ingest branch and never reaches the training pipeline.</p>
+<p>This is “shift-left” compliance: detect the violation immediately after ingestion, not six months later during an audit.</p>
+</section>
+<section id="training-from-commits-not-folders" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="training-from-commits-not-folders">Training from commits, not folders</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide28.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21" title="Immutable commit ID"><img src="slide28.png" class="img-fluid figure-img" alt="Immutable commit ID"></a></p>
+<figcaption>Immutable commit ID</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide29.png" class="lightbox" data-gallery="quarto-lightbox-gallery-22" title="Experiment branch code"><img src="slide29.png" class="img-fluid figure-img" alt="Experiment branch code"></a></p>
+<figcaption>Experiment branch code</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide30.png" class="lightbox" data-gallery="quarto-lightbox-gallery-23" title="Logging lakeFS metadata in MLflow"><img src="slide30.png" class="img-fluid figure-img" alt="Logging lakeFS metadata in MLflow"></a></p>
+<figcaption>Logging lakeFS metadata in MLflow</figcaption>
+</figure>
+</div>
+</div></div><p>The second mechanism is to change how training data is named. Instead of saying, “this model was trained on the Q3 dataset,” or “this model was trained on the files in this folder,” the pipeline should say:</p>
+<blockquote class="blockquote">
+<p>This model was trained on lakeFS commit <code>A1B2C3D...</code>.</p>
+</blockquote>
+<p>That commit is an immutable data snapshot. It is a cryptographic handle for the state of the data lake at training time. The model run should then log the repository, branch, and commit identifier with the experiment metadata.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sketch: bind a model run to an immutable data version.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the exact lakeFS and MLflow APIs configured in your stack.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> mlflow.start_run():</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    mlflow.log_input(training_dataset)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    mlflow.set_tag(<span class="st">"lakefs.repo"</span>, repo_id)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    mlflow.set_tag(<span class="st">"lakefs.branch"</span>, branch_id)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    mlflow.set_tag(<span class="st">"lakefs.commit"</span>, commit_id)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The important move is not the syntax. It is the invariant: every model artifact must point back to an immutable data commit. Six months later, the team can recover the same data state, rerun the training code, and answer an auditor from evidence rather than memory.</p>
+</section>
+<section id="audit-trails-as-a-byproduct" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="audit-trails-as-a-byproduct">Audit trails as a byproduct</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide31.png" class="lightbox" data-gallery="quarto-lightbox-gallery-24" title="Ingest into a branch"><img src="slide31.png" class="img-fluid figure-img" alt="Ingest into a branch"></a></p>
+<figcaption>Ingest into a branch</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide32.png" class="lightbox" data-gallery="quarto-lightbox-gallery-25" title="MLflow run linked to lakeFS commit"><img src="slide32.png" class="img-fluid figure-img" alt="MLflow run linked to lakeFS commit"></a></p>
+<figcaption>MLflow run linked to lakeFS commit</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide33.png" class="lightbox" data-gallery="quarto-lightbox-gallery-26" title="lakeFS commit browser"><img src="slide33.png" class="img-fluid figure-img" alt="lakeFS commit browser"></a></p>
+<figcaption>lakeFS commit browser</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide34.png" class="lightbox" data-gallery="quarto-lightbox-gallery-27" title="Checking out data at a commit"><img src="slide34.png" class="img-fluid figure-img" alt="Checking out data at a commit"></a></p>
+<figcaption>Checking out data at a commit</figcaption>
+</figure>
+</div>
+</div></div><p>Once data changes are committed, the audit trail becomes a byproduct of normal engineering work. The lakeFS history shows who changed the data, when the change happened, and which files were added, modified, or deleted. The model registry or experiment tracker points to the relevant commit. Together they establish lineage from production model back to training run and from training run back to source data.</p>
+<p>This is what solves Alice’s legal question. If legal asks whether a copyrighted dataset was present in the model shipped on Tuesday, Alice can inspect the model’s logged lakeFS commit and check whether the disputed file appears in that snapshot. The answer becomes a query over recorded lineage, not a manual investigation through ambiguous folder names.</p>
+</section>
+<section id="what-i-take-from-the-talk" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="what-i-take-from-the-talk">What I take from the talk</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide36.png" class="lightbox" data-gallery="quarto-lightbox-gallery-28" title="Traceability"><img src="slide36.png" class="img-fluid figure-img" alt="Traceability"></a></p>
+<figcaption>Traceability</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide37.png" class="lightbox" data-gallery="quarto-lightbox-gallery-29" title="File-level lineage"><img src="slide37.png" class="img-fluid figure-img" alt="File-level lineage"></a></p>
+<figcaption>File-level lineage</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide38.png" class="lightbox" data-gallery="quarto-lightbox-gallery-30" title="Version your data"><img src="slide38.png" class="img-fluid figure-img" alt="Version your data"></a></p>
+<figcaption>Version your data</figcaption>
+</figure>
+</div>
+</div></div><p>This is not the first data-versioning approach I have encountered; <a href="https://dvc.org/">DVC</a> and <a href="https://www.pachyderm.com/">Pachyderm</a> address related problems. The distinctive point in this talk is the framing of data versioning as a compliance control plane. The value is not only that old datasets can be recovered. The stronger claim is that production data changes should pass through branch isolation, automated policy gates, immutable commits, and experiment metadata before they become part of a model’s lineage.</p>
+<p>That distinction matters for modern ML and generative AI pipelines. Reproducibility now needs to cover raw data, curated features, embeddings, retrieval indexes, model artifacts, and sometimes post-training datasets. A model registry alone is too late in the pipeline to provide that guarantee.</p>
+<p>The hard open questions are organizational as much as technical: which validation hooks are trusted, who owns the policies, how are privacy deletion requests reconciled with immutable history, and how do we snapshot external systems such as vector databases? But the architectural principle is sound: compliance should be built into the data path, not appended as a document after deployment.</p>
 <!--
+## Slide map
 
-::: {.callout-tip}
-## What You'll Learn:
+The images below preserve the original talk outline and make the recap easier to cross-reference with the video.
 
-- 🔍 A walkthrough of key components: attention, positional encoding, encoder/decoder stack
-- 🧠 Visual explanations of attention masks, shapes, and residuals
-- ⚠️ Common bugs and debugging strategies (like handling shape mismatches and masking errors)
-- ✅ Real-world implementation tips and tricks that demystify the architecture
+![Title](slide01.png)
 
-By the end of the talk, attendees will:
+![Celebration](slide02.png)
 
-- Understand the full forward pass of a transformer
-- Know how each component connects to the original paper
-- Feel more confident reading or writing custom model architectures
-:::
+![Subpoena](slide03.png)
 
+![Data overwritten](slide04.png)
 
-::: {.callout-tip}
-## Prerequisites:
+![Regulators](slide05.png)
 
-- Basic Python and PyTorch
-- Some familiarity with neural networks (e.g., feedforward, softmax)
-- No need for prior experience in building models from scratch
-:::
+![About Itai Gilo](slide06.png)
 
-::: {.callout-important}
-## Tools and Frameworks:
+![Focus on what matters](slide07.png)
 
-We will introduce you to certain modern frameworks in the workshop but the emphasis be on first principles and using vanilla Python and LLM calls to build AI-powered systems.
-:::
+![The compliance landscape](slide08.png)
+
+![The cost of non-compliance](slide09.png)
+
+![Meet Alice](slide10.png)
+
+![PII leakage](slide11.png)
+
+![The reproducibility trap](slide12.png)
+
+![The traceability trap](slide13.png)
+
+![Three pillars of the ML workflow](slide14.png)
+
+![Control your data](slide15.png)
+
+![Control plane for AI-ready data](slide16.png)
+
+![Git for data](slide17.png)
+
+![Introducing lakeFS](slide18.png)
+
+![Transparent integration](slide19.png)
+
+![A compliant ML workflow](slide20.png)
+
+![Baking compliance into the pipeline](slide21.png)
+
+![Typical workflow setup](slide22.png)
+
+![Compliant ML workflow setup](slide23.png)
+
+![Branching data](slide24.png)
+
+![Pre-merge validation hook](slide25.png)
+
+![PII validation script](slide26.png)
+
+![PII validation failure](slide27.png)
+
+![Immutable data commit](slide28.png)
+
+![Experiment branch code](slide29.png)
+
+![Logging lakeFS metadata in MLflow](slide30.png)
+
+![Ingest into a branch](slide31.png)
+
+![MLflow run linked to lakeFS commit](slide32.png)
+
+![lakeFS commit browser](slide33.png)
+
+![Checking out data at a commit](slide34.png)
+
+![Audit history](slide35.png)
+
+![Traceability](slide36.png)
+
+![File-level lineage](slide37.png)
+
+![Version your data](slide38.png)
+
+![Closing slide](slide39.png)
 -->
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Speakers:
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="itai-gilo" class="level3">
-<h3 class="anchored" data-anchor-id="itai-gilo">Itai Gilo</h3>
-<p>Itai is a seasoned software engineer, passionate about clean code and design, and about simplifying what is complex. Doing what’s needed, whether it’s backend, full-stack, or mobile development, and enjoys creating well-crafted products.</p>
-<!-- use these or others 🌸 🤗 💼 
-- Contact:
-    - [ Personal Website](https://birdofparadise.ai/experience/)
-
-:::
-
-- [talk repo](https://github.com/hugobowne/AI-for-SWEs)
-- [slide deck](https://github.com/hugobowne/AI-for-SWEs)
-
--->
-</section>
-<section id="outline" class="level2">
-<h2 class="anchored" data-anchor-id="outline">Outline</h2>
-<p><a href="slide01.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="slide01.png" class="img-fluid"></a></p>
-<p><a href="slide02.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="slide02.png" class="img-fluid"></a></p>
-<p><a href="slide03.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="slide03.png" class="img-fluid"></a></p>
-<p><a href="slide04.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="slide04.png" class="img-fluid"></a></p>
-<p><a href="slide05.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="slide05.png" class="img-fluid"></a></p>
-<p><a href="slide06.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="slide06.png" class="img-fluid"></a></p>
-<p><a href="slide07.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="slide07.png" class="img-fluid"></a></p>
-<p><a href="slide08.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="slide08.png" class="img-fluid"></a></p>
-<p><a href="slide09.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="slide09.png" class="img-fluid"></a></p>
-<p><a href="slide10.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="slide10.png" class="img-fluid"></a></p>
-<p><a href="slide11.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="slide11.png" class="img-fluid"></a></p>
-<p><a href="slide12.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="slide12.png" class="img-fluid"></a></p>
-<p><a href="slide13.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="slide13.png" class="img-fluid"></a></p>
-<p><a href="slide14.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="slide14.png" class="img-fluid"></a></p>
-<p><a href="slide15.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="slide15.png" class="img-fluid"></a></p>
-<p><a href="slide16.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="slide16.png" class="img-fluid"></a></p>
-<p><a href="slide17.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="slide17.png" class="img-fluid"></a></p>
-<p><a href="slide18.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="slide18.png" class="img-fluid"></a></p>
-<p><a href="slide19.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="slide19.png" class="img-fluid"></a></p>
-<p><a href="slide20.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="slide20.png" class="img-fluid"></a></p>
-<p><a href="slide21.png" class="lightbox" data-gallery="quarto-lightbox-gallery-22"><img src="slide21.png" class="img-fluid"></a></p>
-<p><a href="slide22.png" class="lightbox" data-gallery="quarto-lightbox-gallery-23"><img src="slide22.png" class="img-fluid"></a></p>
-<p><a href="slide23.png" class="lightbox" data-gallery="quarto-lightbox-gallery-24"><img src="slide23.png" class="img-fluid"></a></p>
-<p><a href="slide24.png" class="lightbox" data-gallery="quarto-lightbox-gallery-25"><img src="slide24.png" class="img-fluid"></a></p>
-<p><a href="slide25.png" class="lightbox" data-gallery="quarto-lightbox-gallery-26"><img src="slide25.png" class="img-fluid"></a></p>
-<p><a href="slide26.png" class="lightbox" data-gallery="quarto-lightbox-gallery-27"><img src="slide26.png" class="img-fluid"></a></p>
-<p><a href="slide27.png" class="lightbox" data-gallery="quarto-lightbox-gallery-28"><img src="slide27.png" class="img-fluid"></a></p>
-<p><a href="slide28.png" class="lightbox" data-gallery="quarto-lightbox-gallery-29"><img src="slide28.png" class="img-fluid"></a></p>
-<p><a href="slide29.png" class="lightbox" data-gallery="quarto-lightbox-gallery-30"><img src="slide29.png" class="img-fluid"></a></p>
-<p><a href="slide30.png" class="lightbox" data-gallery="quarto-lightbox-gallery-31"><img src="slide30.png" class="img-fluid"></a></p>
-<p><a href="slide31.png" class="lightbox" data-gallery="quarto-lightbox-gallery-32"><img src="slide31.png" class="img-fluid"></a></p>
-<p><a href="slide32.png" class="lightbox" data-gallery="quarto-lightbox-gallery-33"><img src="slide32.png" class="img-fluid"></a></p>
-<p><a href="slide33.png" class="lightbox" data-gallery="quarto-lightbox-gallery-34"><img src="slide33.png" class="img-fluid"></a></p>
-<p><a href="slide34.png" class="lightbox" data-gallery="quarto-lightbox-gallery-35"><img src="slide34.png" class="img-fluid"></a></p>
-<p><a href="slide35.png" class="lightbox" data-gallery="quarto-lightbox-gallery-36"><img src="slide35.png" class="img-fluid"></a></p>
-<p><a href="slide36.png" class="lightbox" data-gallery="quarto-lightbox-gallery-37"><img src="slide36.png" class="img-fluid"></a></p>
-<p><a href="slide37.png" class="lightbox" data-gallery="quarto-lightbox-gallery-38"><img src="slide37.png" class="img-fluid"></a></p>
-<p><a href="slide38.png" class="lightbox" data-gallery="quarto-lightbox-gallery-39"><img src="slide38.png" class="img-fluid"></a></p>
-<p><a href="slide39.png" class="lightbox" data-gallery="quarto-lightbox-gallery-40"><img src="slide39.png" class="img-fluid"></a></p>
-</section>
-<section id="reflections" class="level2">
-<h2 class="anchored" data-anchor-id="reflections">Reflections</h2>
-<p>This is not the first time I see the concept of data version cotrol c.f. <a href="https://dvc.org/">DVC</a> and <a href="https://www.pachyderm.com/">Pachyderm</a>.</p>
-<p>However here we see a more comprehensive approach that includes not only data versioning but also experiment tracking, policy validation, and audit trail generation. This holistic view is crucial for building robust ML pipelines that can withstand legal and regulatory scrutiny.</p>
 
 
 </section>
-</div>
-</div>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
   author = {Bochman, Oren},
@@ -3042,13 +3627,13 @@ Bochman, Oren. 2025. <span>“Garbage In, Lawsuit Out.”</span> December
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../../posts/2025/2025-03-31-metamorphosis/index.html" class="pagination-link" aria-label="RL, Metamorphosis and Memory">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">RL, Metamorphosis and Memory</span>
+      <a href="../../../posts/2025/2025-12-09-pydata-scaling-fuzzy-product-matching/index.html" class="pagination-link" aria-label="Scaling Fuzzy Product Matching with BM25: A Comparative Study of Python and Database Solutions">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Scaling Fuzzy Product Matching with BM25: A Comparative Study of Python and Database Solutions</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../../posts/2025/2025-10-01-Updates-to-the-github-action/index.html" class="pagination-link" aria-label="Updates to the github action">
-        <span class="nav-page-text">Updates to the github action</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../../posts/2025/2025-12-10-pydata-optimal-binning-in-logistic-regression/index.html" class="pagination-link" aria-label="Optimal Variable Binning in Logistic Regression">
+        <span class="nav-page-text">Optimal Variable Binning in Logistic Regression</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

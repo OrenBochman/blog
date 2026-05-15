@@ -7,8 +7,9 @@ keywords: ["PyData", "Feature Store", "Polars", "Apache Beam", "parquet", "Elect
 image: pydata_logo.png
 ---
 
-![pydata global](pydata_logo.png){.column-margin}
-
+::: {.column-margin}
+{{< video src="https://youtu.be/LeQPTajNYJI" title="PyData Global 2025 - Building a Lightweight Feature Store for Electricity Grid Forecasts with Polars" >}}
+:::
 
 ::: {.callout-tip}
 ## Lecture Overview
@@ -37,81 +38,431 @@ Joined the grid forecast team in 2023.
 
 :::
 
-
 ## Outline
 
-![](slide01.png)
+:::: {.sl}
+::: {.sl-text}
+Building a Lightweight Feature Store
+For Electricity Grid Forecasts with `Polars`
 
-![](slide02.png)
+:::
+::: {.sl-fig}
+![Building a Lightweight Feature Store](slide01.png){alt="Building a Lightweight Feature Store" }
+:::
+::::
 
-![](slide03.png)
 
-![](slide04.png)
+:::: {.sl}
+::: {.sl-text}
+Who's talking?
 
-![](slide05.png)
+- Hey, I’m Robin!
+- Joined Electricity Maps in 2022 as a data engineer. Originally in the Data Platform team, now in the Grid Forecasts team.
+- My mission: making sure our models get all the features they need to produce forecasts and distributing forecasts to customers.
+:::
 
-![](slide06.png)
+::: {.sl-fig}
+![Who's Talking](slide02.png){alt="Who's Talking" }
+:::
+::::
 
-![](slide07.png)
+:::: {.sl}
+::: {.sl-text}
+Today’s agenda:
 
-![](slide08.png)
+- Forecasting at Electricity Maps
+- Why we needed a feature store
+- Breaking down our feature store
+- A few learnings
+:::
 
-![](slide09.png)
+::: {.sl-fig}
+![Slide caption](slide03.png){alt="Slide caption" }
+:::
+::::
 
-![](slide10.png)
+:::: {.sl}
+::: {.sl-text}
+Forecasting at Electricity Maps
+:::
+::: {.sl-fig}
+![Forecasting at Electricity Maps](slide04.png){alt="Forecasting at Electricity Maps" }
+:::
+::::
 
-![](slide11.png)
 
-![](slide12.png)
+:::: {.sl}
+::: {.sl-text}
+Electricity Maps centralises, standardizes and forecasts global electricity data in real-time
+:::
+::: {.sl-fig}
+![Electricity Maps centralises, standardizes and forecasts global electricity data in real-time](slide05.png){alt="Electricity Maps centralises, standardizes and forecasts global electricity data in real-time" }
+:::
+::::
 
-![](slide13.png)
 
-![](slide14.png)
+:::: {.sl}
+::: {.sl-text}
+### Our forecasts 
 
-![](slide15.png)
+Taking a look at the **problem setting** ✏️
 
-![](slide16.png)
+- Entities to model:
+  - 190+ consumption zones
+  - 250+ interconnectors
+- All available production modes:
+  - Wind
+  - Solar
+  - Nuclear
+  - Gas
+  - Coal
+  - And more (12 in total)
+- Let’s not forget the **interconnections**
+- Let’s provide **day-ahead prices**
+- And also **load**
+- And **carbon intensity**
+- And finally, **renewable energy %**
+:::
+::: {.sl-fig}
+![Our forecasts](slide06.png){alt="Our forecasts" }
+:::
+::::
 
-![](slide17.png)
+---
 
-![](slide18.png)
 
-![](slide19.png)
+:::: {.sl}
+::: {.sl-text}
+### Our forecasts 
+:::
+::: {.sl-fig}
+![Slide 07](slide07.png){alt="Slide 07" }
+:::
+::::
 
-![](slide20.png)
+---
 
-![](slide21.png)
 
-![](slide22.png)
 
-![](slide23.png)
+:::: {.sl}
+::: {.sl-text}
+The features behind our forecasts:
+Stateful time series features
 
-![](slide24.png)
+- Target Time: 2025-12-03 13:00:00
+- Reference Time: 2025-12-01 13:00:00
 
-![](slide25.png)
+- Target Time: 2025-12-03 13:00:00
+- Reference Time: 2025-12-02 13:00:00
+:::
 
-![](slide26.png)
+::: {.sl-fig}
+![The features behind our forecasts: Stateful time series features](slide08.png){alt="The features behind our forecasts: Stateful time series features" }
+:::
+::::
 
-![](slide27.png)
+----
 
-![](slide28.png)
+:::: {.sl}
+::: {.sl-text}
+## Why we need a feature store
+:::
+::: {.sl-fig}
+![Why we need a feature store](slide09.png){alt="Why we need a feature store" }
+:::
+::::
 
-![](slide29.png)
+---
 
-![](slide30.png)
+:::: {.sl}
+::: {.sl-text}
+## Before the feature store  I
 
-![](slide31.png)
+- pay every time they run a forecast
+- wait every time they want to run a forecast
+- doesn't scale with the number of features.
+- no shared features across users.
+:::
+::: {.sl-fig}
+![Costs and Speed](slide12.png){alt="Costs and Speed" }
+:::
+::::
 
-![](slide32.png)
+:::: {.sl}
+::: {.sl-text}
+## Before the feature store II
 
-![](slide33.png)
+- combos of features are tightly coupled 
+- combining features from different scales is very hard
+- combinatorial class number explosion ...
+:::
+::: {.sl-fig}
+![Combining features](slide13.png){alt="Combining features" }
+:::
+::::
 
-![](slide34.png)
+---
 
-![](slide35.png)
+:::: {.sl}
+::: {.sl-text}
+## Before the feature store III
 
-![](slide36.png)
+- 🐢 Experimentation is slow: building a new combination of features + computing ~days.
+- 🔥 Cloud costs are exploding the more we scale our forecast systems to train on longer horizons and on longer training sets (yearly).
+- 😡 A lot of frustration with memory errors due to memory spikes and large parquet files that can’t load (30GB for a single zone).
+:::
+::: {.sl-fig}
+![Reasons](slide14.png){alt="Reasons for the feature store" }
+:::
+::::
+
+---
+
+:::: {.sl}
+::: {.sl-text}
+## Powering the Feature Store: GCS and Polars
+:::
+::: {.sl-fig}
+![Behind our Feature Store: GCS and Polars](slide16.png){alt="Behind our Feature Store: GCS and Polars"}
+:::
+::::
+
+---
+
+:::: {.sl}
+::: {.sl-text}
+## General Overview 
+:::
+::: {.sl-fig}
+![General Overview](slide17.png){alt="General Overview" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+## Lazy Queries
+:::
+
+::: {.sl-fig}
+![Slide 18](slide18.png){alt="Slide 18" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+## The Querying process
+:::
+::: {.sl-fig}
+![the Querying process](slide19.png){alt="the Querying process" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+## Lazy read query
+:::
+::: {.sl-fig}
+![Slide 20](slide20.png){alt="Slide 20" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+## Aligning time dimensions
+:::
+::: {.sl-fig}
+![Aligning time dimensions](slide21.png){alt="Aligning time dimensions" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+## How to mix several features together?
+
+- 🌧️ WeatherData:
+  - Update frequency 6 hours
+  - Resolution 1 hour
+  - Lookahead 36 hours
+
+- 🔋 GridData:
+  - Update frequency hourly
+  - Resolution 30min
+  - Lookahead 24 hours
+
+- 🧠 What the model needs:
+  - Available data for every lead time
+  - Resolution 30min
+  - Lookahead 96 hours
+:::
+
+::: {.sl-fig}
+![How to mix several features together?](slide22.png){alt="How to mix several features together"}
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+## Solving the right problem at the right time
+
+Feature Generation Pipeline:
+
+- **Feature Inputs**: Source resolution and maximum lead time.
+- **Feature Generators**: Resolution and maximum lead time set by Feature Generator, refresh frequency based on source.
+- **Feature Store Storage**: Resolution and maximum lead time set by Feature Generator, Entity.
+- **Feature Store Client**: Resolution, maximum lead time set by user.
+
+### Examples:
+
+- 🌧️ **WeatherData**:
+  - Update frequency: 6 hours
+  - Resolution: 1 hour
+  - Lookahead: 120 hours
+
+- 🔋 **GridData**:
+  - Update frequency: Hourly
+  - Resolution: 15 minutes
+  - Lookahead: 48 hours
+
+- 🧠 **What the model needs**:
+  - Available data for every lead time
+  - Resolution: 30 minutes
+  - Lookahead: 96 hours
+:::
+::: {.sl-fig}
+![Solving the right problem at the right time](slide23.png){alt="Solving the right problem at the right time" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+## Solving the right problem at the right time II
+
+:::
+::: {.sl-fig}
+![Solving the right problem at the right time II](slide24.png){alt="Solving the right problem at the right time II" }
+:::
+::::
+
+
+:::: {.sl}
+::: {.sl-text}
+## Binding everything together
+:::
+::: {.sl-fig}
+![Binding everything together](slide25.png){alt="Binding everything together" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+## Binding everything together II
+:::
+::: {.sl-fig}
+![Binding everything together II](slide26.png){alt="Binding everything together II" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+## Binding everything together III
+:::
+::: {.sl-fig}
+![Binding everything together III](slide27.png){alt="Binding everything together III" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+Slide 28
+:::
+::: {.sl-fig}
+![Slide 28](slide28.png){alt="Slide 28" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+Slide 29
+:::
+::: {.sl-fig}
+![Slide 29](slide29.png){alt="Slide 29" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+Slide 30
+:::
+::: {.sl-fig}
+![Slide 30](slide30.png){alt="Slide 30" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+Slide 31
+:::
+::: {.sl-fig}
+![Slide 31](slide31.png){alt="Slide 31" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+Slide 32
+:::
+::: {.sl-fig}
+![Slide 32](slide32.png){alt="Slide 32" }
+:::
+::::
+
+
+:::: {.sl}
+::: {.sl-text}
+Slide 33
+:::
+::: {.sl-fig}
+![Slide 33](slide33.png){alt="Slide 33" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+Slide 34
+:::
+::: {.sl-fig}
+![Slide 34](slide34.png){alt="Slide 34" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+Slide 35
+:::
+::: {.sl-fig}
+![Slide 35](slide35.png){alt="Slide 35" }
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+THank You + Contact
+:::
+::: {.sl-fig}
+![Slide 36](slide36.png){alt="Slide 36" }
+:::
+::::
 
 ## Reflections
+
+- People often say that data science is 90% data cleaning and 10% modeling. 
+
+- This war story is a great example of this. 
+The only time we heard about data science was when we talked about the feature aggregation. P.s. this should be a one liner.
+
+- However for the one liner to actually work they had to iterate and do some data engineering work. The data engineering is trivial from a data science perspective however it takes a lot of time and effort to get it right. And data scientist are not dev ops. So there are often a few iterations. 
+
+- Another well known secret is even when it comes together the client etc will change thier api, data scheme or requirements and you have to iterate again.
+
 
 

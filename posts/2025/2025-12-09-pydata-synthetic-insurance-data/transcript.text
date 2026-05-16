@@ -1,0 +1,577 @@
+
+0:07
+Welcome everyone. Uh to not waste any time, please give a warm welcome to
+0:14
+Claudio. Hi.
+0:19
+Thanks uh for having me today. Welcome everybody. Thanks to having me
+0:26
+today with you. And uh I want to talk about the synthetic insurance data.
+0:36
+A briefly introduction about me. I'm an actor that working during the day in
+0:41
+insurance company and in free time I'm involved in the data science activities.
+0:47
+There are some in the quer code my some links to reach me. Okay. The agenda
+0:53
+today is really full. We start with the motivation and uh we achieve the
+0:59
+results. The motivation of this study motivation is that um I was looking for an
+1:06
+insurance use case that will allow me to work with a wide range of generative
+1:12
+models and I want to work on a synthetic non-life insurance data.
+1:19
+So the first issue is that uh about the scarcity in insurance uh data insurance
+1:26
+research but the core issue that is not the lack of data is a lack of sharable
+1:33
+data. So we need a realistic claim history, policy details and pre data that test to
+1:41
+new models and deep learning techniques that require mass mass volumes of data.
+1:49
+But there are some barrier in the insurance research uh coming from the
+1:58
+most insurance data is confidential and proprietary. So is not accessible for
+2:04
+external research. And when is accessible there are issues
+2:10
+such as um bureaucrative process masking technique that complex the
+2:17
+filters the re resharable of the data. Otherwise
+2:23
+you can use also open resource data set. There are some open data set available
+2:29
+but sometimes they lack about the necessary diversity and the
+2:35
+volume requires to modeling in a robust way especially in complex area such as
+2:43
+pro detection and risk. The solution can come with the use of
+2:49
+the synthetic data generated [clears throat] by generative motors which provide a a quite a good solution
+2:57
+with a a necessary volume of data records and
+3:02
+also respecting the relationship between the the detail side. So this allows us to
+3:11
+rapidly prototype and validate sophisticated models uh in the same way
+3:17
+be before to go into the production. But uh before to start have a look about
+3:25
+how works a insurance no life does. So at the heart of the every non-life
+3:32
+insurance policies there is the uh sorry there is the risk premium that there is
+3:39
+the crucial element to cover the damage. This premium is not a guess but is
+3:44
+coming from a result of an empirical approach combining two essential uh statistical
+3:51
+component the frequency and the sarity. The frequency measure how often a claim
+3:57
+is expected to occur the number of claims per year and is modeled usually
+4:02
+by the person or negative binomial distributions. The other way there is a
+4:07
+severity that measures how much average our claim is expected to uh cost. How
+4:14
+often the the how and is often moderate by the gamma or log normal distribution
+4:24
+and by the multiplication of these two components we obtain the risk premium.
+4:30
+This uh value is the baseline is the reference premium and uh then can be also further
+4:37
+customized uh for individual policy holder applying factor risk factors to
+4:43
+reflect their individual risk. So the individual prof risk profile so your
+4:50
+collective risk can be transformed into a fair personalized price.
+4:56
+For this job, I employed two data set uh retrieved from the cast data set hard
+5:03
+package and one is the first data set is a house pre is a car insurance data set coming
+5:12
+from Australia and is a data frame built by nine column and with more than 67,000
+5:20
+roads. The second one is a Swedish motorcycle in short data set uh also with nine
+5:27
+columns and more than 64,000 records.
+5:33
+Both of them have standard variables in the data set used in insurance such as exposure, claim number of claims, claim
+5:40
+amount and then also come in common are the gender vehicle age and the age of
+5:46
+the driver. So to build this
+5:54
+um synthetic data, I use several modeling and uh with a twist with uh
+6:03
+using a variable that I discovered in the first data set and I repro reproduced also in the second data set.
+6:11
+These variables used as a conditional variable in this generative model and is
+6:17
+the claim occurrence claim OCC variable that is a binary indicator of the claim
+6:24
+occurrence and plays a crucial role for the high quality of synthetic data
+6:30
+because this variable links the two uh principal outcomes the claim when the
+6:36
+claim of CC is equal to zero you have the zero claim frequency so no claims
+6:41
+and zero claim severity. So your damage is equal to zero. Meanwhile, claim OCC
+6:47
+is equal to one. So the event happened so you have a positive claim event and
+6:54
+the you have a number of claim and a claim amount positive claim amount.
+7:00
+So modeling this conditional variable um
+7:06
+you are able to uh respect the imbalancing on the insurance data set uh
+7:11
+separating array claim event uh with uh from the common non claim event because
+7:19
+insurance data set are uh typically known as rare event. So as imbalanced
+7:27
+for this reason these strategies also enhance the model stability and improves the overall quality of the uh synthetic
+7:34
+data through the condition is conditional variable.
+7:42
+Okay, before to start to look about speak about the model also is important
+7:47
+that okay I can take this I take this two tile data set and I applied the
+7:54
+model to generate synthetic data set to reproduce this data set but uh how to
+8:00
+validate my synthetic data I have thought about three trials the first one
+8:07
+about is the baseline uh to um evaluate the quality assessment
+8:15
+by uh splitting the data set into the train and test set. So about the
+8:21
+classical 80% for train and 20% for test set. Why this I to this um type of um
+8:28
+baseline performance because uh when I reproduce the data set the synthetic
+8:33
+data I want to understand if this data set can be employed into the pricing no
+8:40
+life insurance pricing. So applying the evaluating the performance with the
+8:45
+generalized linear model that is a machine learning model we used by actor
+8:50
+for the pricing. The second trial is a little hard because I thought okay I
+8:59
+reproduce inter train set and then I used to predict the train and the test set. But what happens if instead of to
+9:07
+fed all the train set into the model I use a restrict number of rows and I ask
+9:14
+to produce the same number of rows of the train set. So I I used the 60%
+9:20
+training uh of the uh data into the the generative model and asked to the model
+9:26
+to generate 80% to use then for the predictive uh modeling
+9:32
+and uh to evaluate if there is a investigating whether a significant data augmentation can be achieved while
+9:39
+maintaining both statistical fidelity between variables and predictive performance. And also it's important to
+9:47
+um take care about the the fairness. So I used I masked one variable the gender
+9:55
+variable and I trained the model with this mas variable to look about also the
+10:02
+same uh to look about if I have the same accuracy the same performance
+10:10
+in the in the with the insurance synthetic data set.
+10:15
+Okay, now we can start with the models inside. Okay, the first one is used as a
+10:23
+benchmark is the the conditional gausian mix model. We speak about the gausian
+10:29
+mixer model that usually we think about this type of model as used in the
+10:34
+clustering. Think about the gasha mixer model as a party where people are
+10:39
+chatting in a small groups each with own wbe. Some are load are another energetic
+10:46
+others quiet or thoughtful but from distance you perceive that the room
+10:52
+sounds like a single h of a conversation but as you get closer you realize it's actually a blend of distinct voices. A
+10:59
+gasha mix models works in the same manner. So it assumed that the complex data distributions
+11:06
+can be um composed by several simpler overlapping distribution. Each one
+11:12
+modeled by Gaussian distribution and each component of the Gaussian distribution have these component the
+11:18
+mean vector. So the central distribution the coverance the spread that
+11:26
+spread the shape and orientation of the distribution. the mixing weights at the cofficient that represent the weights
+11:32
+how much each gausian distribution contributes to the overall mixture.
+11:38
+So the ashra mix model is trained using the expectation maximiz maximization
+11:44
+algorithm in iterative process um use it for parameter optimization
+11:50
+algorithm and is based start with the initial guess of the the models
+11:56
+parameters then with his step calculate poster probability that each data point
+12:01
+belong to the each gash component and with a step update the model parameters to maximize the likelihood of the
+12:07
+observer data and then this process is repeated until the model converge. So
+12:13
+once fed the observation the Gaussian mix model can be used as a generative probabilistic model and this generative
+12:21
+natural of the Gaussian mix model is a powerful tool for tasks such as anomaly detection density estimation and also
+12:28
+for unsupervised clustering. So the switch with to into the
+12:34
+conditional ga mix modes happen with the introduction of this variable the claim OCC. So the claim occurrence that is a
+12:42
+binary conditioning variable zero with no claim and one with claim and in this way the model fit separate models from
+12:51
+claim or no claim groups policy policy order groups preserving the original
+12:57
+status with the claim occurrence patterns.
+13:02
+The second model that I used was the condition variation autoenccoder. So the
+13:08
+variation of the code I think about um a forge art forge that trying to recreate
+13:14
+masterpieces not by coming internally but understanding the sketch the sense
+13:21
+of the artist style and generating new painting that are similar and can be used in belong to the same in the in the
+13:28
+gallery art gallery. So the variational encoder work in the same way. It doesn't just memorize all the data but try to
+13:35
+understand the underlying patterns this structure of the data enabling it to generate new realistic variation of your
+13:43
+data. So let's score varational encoder is based on two component two neural
+13:50
+networks an encoder and the decoder linked by a latent space. So the encoder
+13:56
+maps uh the input data into a compact representation not a single point but just a probability distribution over the
+14:03
+lated space usually is use the dashion distribution. The model learn the
+14:08
+distribution and capture the uncertainty and variability. The other side there is the decoder that samples from this lat
+14:15
+space and try to rebuild the original input. This probabilistic formulation
+14:20
+allows then the model to generate different outputs just with interpolation of the data points. The
+14:26
+variation out encoder is a loss. We use a loss function based on two steps
+14:34
+split into two component. The first one is the reconstruction laws that evaluate
+14:40
+how close the output is to the original input and the kback label divergence
+14:45
+that encourage the latin space to follow the gaussian distribution ensuring that the smoothness continuity in the latin
+14:52
+space. Also here there is the CL concurrency that is the binary condition
+14:58
+input that learns the claim dependent Latin structure enabling the decoder to
+15:03
+generate new synthetic samples consistent with the status claim.
+15:11
+Now there is a a little variation of the variation of encoder. I added the um um
+15:19
+transformer decoder. So you imagine that you are a novelist that want to write a
+15:24
+story. Then you first draft a rogue outline before writing the no all the
+15:30
+story. But this outline is compressed in is an abstract capturing the essential
+15:37
+um the essential sketch of the of the story before to create the um
+15:44
+the narrative. The variation of the encoder works in the same way as we seen before. But if you add the um transform
+15:52
+decoder, you can think about a higher master class that is is able to um turn
+15:59
+your outline into a rich story. So the transform decoder use the attention mechanism to a model complex dependence
+16:08
+on the data. So in this way can be considered as a conditional variation
+16:13
+autoenccoder with a transformer based decoder as a a blending uh of two models a probabistic reasoning and the dep
+16:21
+contextual understanding. Another model is the conditional uh
+16:28
+diffusion model. So uh when you say about the diffusion model think about
+16:34
+that uh try to restore a forget up about the picture. So take the first um clear
+16:41
+image then gradually add the fog a layer of fog noise until it's completely
+16:46
+obscure. Then try to reverse this process step by step removing the fog
+16:52
+and recovering the original image. The essence this is the essence of the
+16:57
+fusion model. So h start with adding noise the poor noise and learns how to den noiseise the the this out noise this
+17:07
+into a current into a um high quality output of data. So the
+17:14
+architecture is based on the reverse uh the forward process that graduated this noise and the reverse process that
+17:20
+learns to remove this noise step by step using a unit a network that predicts the
+17:25
+noise at each step and also the score function that estimates the gradient of the data
+17:32
+distribution with respect to the noise and drive the model into the direct direction during the the noising.
+17:40
+So a can be considered an iterative and probabilistic process and the quality of the refinement gives the diffusion
+17:47
+models such as the popularity in here and the stable diffusion and also here there is the claim
+17:53
+occurrences that binary condition that ensure that the synthetic sample maintain logical consistent with the
+17:59
+claim and unclaim structure. At the end I use the large language
+18:05
+models. Okay, large language models we know because we from the GBT we have a
+18:11
+good know about the larger language model. So is a quite a go fastly. The
+18:16
+large language model can be thought as a big library. For instance, when uh you have a inside an expert librarian, the
+18:23
+library the library contains a bill of war books. You and the librarian know the pattern inside the library and not
+18:31
+is not memorize every book. But when you ask uh a question, the lab doesn't fetch a single book but compose a new answer
+18:38
+by uh the um converging blend all together patterns learned from uh across
+18:44
+the library and so the LLM can be considered a statistical pattern finder that generates generate human like text
+18:52
+predicting what words should come next based on the training data set. Okay,
+18:57
+the um core function function. So how it works start with the tokenization check
+19:02
+convert the words into numbers that understand can be understood by the machine. This numerical representation
+19:09
+then transform into vector by the token embeddings. Then that map each token to
+19:17
+vector space and then to capture the ordering of the word is use the position embedding and the meaningful impact is
+19:25
+coming from the self attention that the me that are send to every word relative to each other in the input allowing the
+19:33
+model to understand the complex context. At this point there is the the feed forward network that predict the
+19:39
+following words and with the score and the soft max layer cover the score into
+19:45
+the probability and then the tokenization that convert the token into word into human readable word how I use
+19:53
+the large language models in my experiment in easy way I use the platform charge with the GPD 5.1 that uh
+20:02
+recent and um to genicity data using the prompt. We detail prompt with a
+20:09
+distribution data describing some relationship between variables and providing also few records example.
+20:15
+Okay. Now after this model is important consider the validation about the fifth
+20:22
+step is evaluate the consistency of the records produced respecting the the
+20:28
+business logic. So if a claim exist then a claim amount and claim occurrences must also be positive otherwise all the
+20:35
+three variable claim number of claims claim occurrences and claim amount are equal
+20:40
+to zero. So uh there this check identify
+20:46
+record that in which mod failed to learn these dependencies thereby ensuring data quality. The second step was a
+20:53
+statistical test using the commino test um is a nonp parametric statistical
+20:59
+test that measure the the distance between uh the cumulative distribution
+21:04
+function of the two data set. A high pi value greater than 5% indicate that the two distribution are statistically
+21:11
+similar. and then data visualization with
+21:17
+um data analysis to validate synthetic data. So looking about the alignment
+21:23
+between the single future between the real and synthetic data you can see that
+21:29
+the result from the conditional variation of the encoder you see from about the with the synthetic data and
+21:36
+the blue the real data. Okay, we can see that from climate there is the um the
+21:42
+pattern as quite the same are the same also for the gender for the vehicle age
+21:48
+and um legal is close about the claim number of claims but in climate amount
+21:54
+but there is there is some estimation then also the correlation matrix is
+22:00
+important because assess the structure fid the relationship between the variables. So looking about the um how
+22:07
+the coration max matrix is similar to uh these two data set
+22:13
+and also I used the um the I used the principal component analysis and the
+22:19
+human map. So the um algorith to reduce the um data I used the principal
+22:27
+component analysis to understand the synthetic relations the relationship linear relationship between data and you
+22:34
+can see that there is overlapping between real data and synthetic data also I used the h map to evaluate about
+22:42
+the uh topological structure of the original data and also here there is
+22:47
+overlapping but I haven't found such more much more um uh good in understand
+22:53
+the the relationship between variable. Now there is about the predictive modeling. So the results that I obtain
+23:01
+uh from the use of this data set these two data set this is the the valuation
+23:08
+matrix about uh from the use of the conditional variation of the encoder. when we go to into the demo app and I
+23:17
+use the GRM to generate both on the real and the synthetic data. So there is the
+23:23
+performance evaluated from the frequency model with the mean pass on Davians MPD and also the performance by the mean G
+23:32
+meanians MGD and we can see that for instance this is okay the test set is
+23:39
+good but the um the valuation the performance of the train is really good because it's under the the train set of
+23:46
+the the original but they create the overfeitting also looking about the uh second data
+23:55
+set there is some overfitting. Okay. Now we go also to about the um
+24:02
+feature importance to ensure that the model robustness and the generalization uh about the performance also about the
+24:10
+features used in the prediction important prediction also there is a result from coming from the conditional
+24:16
+version of the code. You can see that for the claim frequency model the claim occurrency does is both the second also
+24:24
+the vehicle value vehicle um is different because in the original data they use the vehicle value instead the
+24:31
+second is vehicle age about the severity model there is a completely change drive
+24:36
+ages in the synthetic data instead the vehicle body is in important in the original data now for to look about the
+24:45
+overall result I just want to uh share with you the
+24:51
+demo app just with stream it and they publish in the next days. This is app by
+24:58
+[clears throat] stream run is running locally. There is a different trials trial one
+25:05
+trial two the trial three I haven't upload next days just we see the conditional gausian moisture model that
+25:12
+I think that is one of the best model that I like it so the check on
+25:18
+consistency so there is no number in consistent data in the first data set
+25:24
+there is for instance the univer data analysis that is quite good following some
+25:31
+variable for instance the claim occurrences, the vehicle value, also the claim number of claims and also the
+25:39
+claim amount. Now about the decoration matrix a little different
+25:44
+interesting about the com minor test because we have B then
+25:50
+age vehicle body gender cl number of claims that are really similar.
+25:56
+I jump the the map and the PCA comparison and I look about for instance
+26:03
+[clears throat] the second data set where also here we have the consistency
+26:08
+good the universe distribution we say that the model capture the claim amount
+26:14
+claim of C claim number of claims and generally in good way here the grow the
+26:20
+stat the the coration matrix is really good are similar in the in the in the
+26:25
+color in the in the coent here also the uh mean of test is quite good with the
+26:31
+gender number of claims claim OCC that are uh really similar
+26:37
+at the end I want to share about the performance okay this is the performance
+26:43
+about the synthetic data set is similar of the first the original data set and
+26:48
+quite similar also the synthetic data set the second synthetic data set okay also the LLM M uh we reach a good also
+26:58
+results here about the exposure for instance not so good about for instance in the drive age of age variables uh but
+27:06
+decoration matrix is really similar in the first data set
+27:13
+less variable about gender climc and cl number claims are similar
+27:20
+also in the about the I Example the feature is important
+27:25
+because I watch that sometimes are changing. I go also about the
+27:31
+consistencies is good also here good the comparison of H and also the claim
+27:37
+amount the claim number of claims claim OCC and the correlation matrix is really
+27:42
+good. I discover that the large language models respect the correlation matrix in
+27:48
+different trials. Here also the minor test is these many variables are similar
+27:55
+and looking about the performance. We can see that the first data set is really good uh the in the performance
+28:02
+and quite good also is also the the the second data set the synthetic is respect
+28:09
+the performance of the original data set. I come back to the the the the
+28:15
+slide to to end and I say that in the overall for I focus on the performance
+28:20
+that I had done a lot of validation test but just focus on the predictive
+28:26
+modeling and and to look about the coration matrix or this minest about the preserving of the statistical
+28:31
+properties. I liked the as I as I understood that the conditional gian mix
+28:38
+models, the large language models and also the conditional diffuse model. The conditional rational encoders and also
+28:44
+with the um variation with the transformers tend to is good. All model
+28:50
+are good in the train set but tend to overfeit and with the other two trials
+28:55
+the there is a little degradation in performance but in some case they are acceptable.
+29:01
+At the end just to conclude I want to say that the condition ga mix model for my opinion is a good competitive
+29:07
+generative model that used as a generative as a benchmark and is good for tabular data and is I think that is
+29:14
+good compromise between the easy to use and in the modeling and effectiveness about the performance larger language
+29:21
+models are promising because the synthetic data generation um and given
+29:28
+by their performance uh is good and also are easy to use. You need to have keep
+29:33
+by detail prompt but you have to have a good data analysis of your data. So to
+29:38
+write a good prompt conditionally for your models yes is competitive in performance but require a lot of
+29:45
+computational effort and also coding effort because is really hard to uh to
+29:51
+code this type of model. [snorts] This is some reference and okay I'm here I'm
+29:58
+happy to reply to your questions. Thank you.
+30:07
+Thank you Clauddio for this amazing presentation. We do have a quite a few
+30:14
+questions um and we are unfortunately out of time. So um attendees we can
+30:23
+continue this conversation. Okay. One okay one is say the other is not possible. How can decoration matrix
+30:30
+be better than okay is I think that I think that both
+30:36
+are need to to to to watch because uh the univers because at the beginning
+30:42
+when I model the the data set the instrument data set I look about the
+30:47
+univar analysis but it's important to the correlation matrix because the relationship between variables and the
+30:53
+prediction is the result from this correlation this relationship between variables
+30:59
+Uh, okay. We'll have to wrap up to start our next session, but I think um they're asking
+31:06
+about the slide deck. Do you have a link for that? Uh,
+31:12
+sorry. And the link for I go to the backstage.
+31:17
+No, I think they're asking for your presentation.
+31:23
+ah the presentation is I share the GitHub repository that I put the
+31:29
+presentation. Okay. Okay. Uh okay.
+31:36
+All right. So we'll end the session. Thank you all so much for joining and again we can continue the conversation
+31:42
+on Discord or in the lobby. Thank you. Okay.

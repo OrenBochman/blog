@@ -1,0 +1,648 @@
+# tactiq.io free youtube transcript
+# Agustin Figueroa Nazar - Enhancing Marketplace Competitiveness - PyData Global 2025
+# https://www.youtube.com/watch/wbp0qCClyF4
+
+00:00:07.200 Hello everybody. Welcome to our next
+00:00:09.920 talk at PI data global. We are so happy
+00:00:12.800 to have you here and I'm very excited
+00:00:14.799 for our next talk. Uh next talk is by
+00:00:17.600 Augustine Nazar and the talk is titled
+00:00:20.560 enhancing marketplace competitiveness a
+00:00:22.640 basian approach to modeling the cold
+00:00:25.119 start problem. Uh August is a senior
+00:00:28.320 data analyst at Get Your Guide where he
+00:00:30.640 specializes in using data to identify
+00:00:33.440 customer and marketplace need that could
+00:00:35.440 be solved at scale with data products.
+00:00:38.239 His work encompasses identifying
+00:00:41.040 customer problems, designing um
+00:00:43.440 experimentation frameworks and to
+00:00:46.079 measure progress, developing analytical
+00:00:48.079 solutions and translating business
+00:00:49.840 requirements into data science uh
+00:00:52.000 projects. And beyond his core
+00:00:53.920 responsibilities, August is passionate
+00:00:55.920 about storytelling, teaching, singing,
+00:00:57.840 and almost anything on stage. So with
+00:01:01.120 that, let's hand it over.
+00:01:04.159 >> Yeah. Hi everyone. Thanks Jim for the
+00:01:07.119 introduction. Um, yeah. So I said, this
+00:01:10.159 is me. I work as a data analyst at get
+00:01:12.640 your guide. And
+00:01:15.680 today I want to talk about this. So you
+00:01:18.720 may be wondering why I have why am I
+00:01:20.960 showing this slide and the reason is
+00:01:24.080 because
+00:01:25.600 at get your guide we have this tradition
+00:01:27.200 to start with a little look back into
+00:01:29.439 our last vacation. Get your guide is a
+00:01:32.320 marketplace for activities that you can
+00:01:34.400 do while traveling and basically it's a
+00:01:38.000 marketplace to find unforgettable
+00:01:39.840 experiences. This is in Thailand. I had
+00:01:42.479 a great time during this cooking class.
+00:01:45.040 And what I want to take you on is that
+00:01:48.560 this great activity in which you my my
+00:01:50.799 wife and I can be seen cooking was at
+00:01:54.079 some point something more or less like
+00:01:55.520 this. Not exactly this one but more or
+00:01:57.040 less like this. So it had no reviews, no
+00:02:00.799 bookings, no past because I work in
+00:02:03.840 ranking and we have this problem or we
+00:02:07.520 say how how do we even model the the
+00:02:10.000 beginning of this activities then this
+00:02:12.959 is what I want to to discuss today.
+00:02:18.400 My goal for today is that you can
+00:02:20.720 identify a basin problem at your company
+00:02:23.200 and that you can navigate through the
+00:02:24.640 messiness of real world data. Right?
+00:02:27.440 This is my goal. If we accomplish this,
+00:02:30.319 then I'm done. I there is of course a
+00:02:33.680 bit of structure. I'm gonna cover the
+00:02:36.239 business problem, the modeling choice,
+00:02:39.440 the basian binomial approach. We
+00:02:41.599 developed some notes on implementing
+00:02:43.519 this at scale and then last but not
+00:02:46.000 least hopefully space for open
+00:02:48.160 questions.
+00:02:52.400 Let's go into the business problem that
+00:02:55.280 we had in our hands.
+00:03:00.480 Uh the get your guide. We have 35,000
+00:03:03.440 suppliers. So we have this again this
+00:03:06.400 experiences you can do what traveling
+00:03:08.480 marketplace and we have suppliers who
+00:03:11.599 offer those experiences. So like me
+00:03:13.519 cooking on the right and 35k of them 50
+00:03:18.800 150,000 activities across 12k cities
+00:03:21.519 worldwide. What is a problem is that
+00:03:24.000 those experiences are personal and are
+00:03:26.319 very hard to compare. Right? So imagine
+00:03:28.800 you have this cooking class on the
+00:03:30.159 right. Imagine you may get the
+00:03:32.319 ingredients like the picture above or
+00:03:34.319 like the picture at the bottom. Those
+00:03:36.560 are two completely different things for
+00:03:38.879 you. And what you got out out of the
+00:03:40.799 experience is very different. even if
+00:03:43.680 the activity takes place in this at the
+00:03:46.560 same spot with the same cook and the
+00:03:48.560 same people helping you out. So this
+00:03:50.879 means that it's very very hard to tell
+00:03:54.720 that activity A and that activity B is
+00:03:56.879 different. It's hard to extrapolate,
+00:03:58.959 right?
+00:04:00.799 And building upon that, it's hard to
+00:04:04.159 extrapolate. And what happens when an
+00:04:07.840 activity is new, right? So imagine that
+00:04:10.159 you are the the ranker system for a
+00:04:12.879 second, right? You're going to Concord.
+00:04:14.879 Lucky you. You have this grid of eight
+00:04:16.720 activities and you have an activity that
+00:04:22.160 this a promising speed boat tour that
+00:04:24.639 you not know nothing about it and you
+00:04:27.440 have some activities that you you need
+00:04:29.680 to choose between the two, right? So, a
+00:04:31.600 new tour or an average tour that you
+00:04:34.160 know it's average. It may not be great,
+00:04:35.759 but you know it's average, right? And
+00:04:37.840 then the question is how do you even
+00:04:40.080 place what do where do you even put this
+00:04:42.160 this new activity right
+00:04:45.120 and
+00:04:47.280 here we see right so the I'm new this is
+00:04:49.680 the the one I'm talking about and the
+00:04:53.520 reason why this is tricky is because if
+00:04:56.639 you never explore you may get stuck so
+00:05:00.240 let's move
+00:05:02.240 here on to the next
+00:05:04.800 if you don't give new experiences new
+00:05:06.800 activities ities in the marketplace a
+00:05:08.479 shot, how do you learn about them?
+00:05:10.720 Right? So, this boat tour can be great
+00:05:12.560 or it can be disastrous, but if you
+00:05:14.720 don't give exposure, how do you even
+00:05:17.039 know? And the dilemma is that the new
+00:05:20.560 activities and the the new experiences
+00:05:22.639 and the existing experiences compete for
+00:05:25.120 the same space. So, we only have here
+00:05:27.280 let's say eight slots and we need to
+00:05:29.520 define what goes where. um and where if
+00:05:33.360 I show an activity in this position
+00:05:35.440 number three that is the new one then I
+00:05:37.680 am not showing another one that I may
+00:05:39.680 know the performance of. So I hope by
+00:05:42.880 now you get a the gist of like what the
+00:05:45.680 what the problem here is
+00:05:50.479 how can we learn about new experiences
+00:05:52.400 performance intelligently. This was the
+00:05:55.199 question that I asked myself and that I
+00:05:58.800 want to cover today. And what does even
+00:06:01.919 if intelligently means this means that I
+00:06:05.039 am efficient in terms of impressions
+00:06:06.960 right so that I get this exposure and
+00:06:09.520 that with as little as exposure as I can
+00:06:12.639 I can learn about the performance while
+00:06:15.120 I enable travelers to find unforgettable
+00:06:17.280 experiences like you can uprank this all
+00:06:19.919 the way to the top you will get exposure
+00:06:22.319 but then if you're breaking the
+00:06:23.680 experience for someone remember people
+00:06:25.520 come to us when they go on holidays you
+00:06:27.600 don't want that to happen so you need to
+00:06:29.199 balance the two things like being
+00:06:30.800 efficient in terms of impressions and
+00:06:32.560 generating in insights while enabling
+00:06:35.680 always travelers to find unforgettable
+00:06:37.919 experiences.
+00:06:39.600 I hope so far so good. Please if not put
+00:06:42.240 a question in the the chat.
+00:06:46.639 I want to ask you um or reflect on what
+00:06:50.240 a model is. So what do you think is a
+00:06:52.960 model?
+00:06:57.039 three two one
+00:07:00.960 right the definition that I like the
+00:07:03.280 most um is it is a representation and
+00:07:06.800 simplification of reality right so it's
+00:07:09.759 how we choose to see the world it's some
+00:07:12.400 lenses that we put on we know that we
+00:07:14.160 are leaving some details behind um we
+00:07:17.520 leave some stuff aside but this allows
+00:07:19.599 us to also make some predictions on how
+00:07:21.919 the world works and then it's important
+00:07:25.680 that we know Okay, this is how I see
+00:07:27.440 reality. I know it's not perfect, but
+00:07:28.800 it's a way to see it. And based on that,
+00:07:32.080 I can make predictions and I can see if
+00:07:34.400 I do A, then B is going to happen or not
+00:07:36.800 and so on.
+00:07:39.440 Um, this is important because if the if
+00:07:42.160 we know that the model is not perfect
+00:07:43.520 and if the model doesn't fit reality,
+00:07:46.080 please do not think like this, but
+00:07:49.680 rather
+00:07:51.280 more like this. Right? If the model
+00:07:53.120 doesn't fit reality, the model is wrong.
+00:07:55.039 This is very important whenever you're
+00:07:56.560 picking a model that you yeah that you
+00:07:59.919 keep this in mind and that sometimes you
+00:08:02.080 need to drop your your ego on where you
+00:08:03.919 started and and go from scratch again.
+00:08:06.800 The reason why I'm talking about this is
+00:08:08.400 because I'm going to talk about modeling
+00:08:09.680 choice.
+00:08:11.599 um for my cold problem um and what I
+00:08:14.479 navigate which is using an ML model or
+00:08:17.759 using stats to help me understand the
+00:08:20.720 performance of the new activities on our
+00:08:24.000 marketplace.
+00:08:28.800 Yeah, too much. Yeah, most are wrong,
+00:08:30.960 some are useful. That's a good one. Um
+00:08:34.240 one thing more important than train
+00:08:35.760 predict is framing your problem in the
+00:08:37.279 right way. Um again going back to the
+00:08:40.159 problem which is like how can we learn
+00:08:41.760 about the new experiences performance
+00:08:43.839 intelligently
+00:08:45.440 we had this family of ML models which
+00:08:47.839 can predict right or can classify I can
+00:08:51.519 predict given 10 impressions how many
+00:08:54.000 bookings you'll get or if you'll get to
+00:08:56.640 n bookings given 10 impressions or so on
+00:09:00.000 and so forth you can predict your
+00:09:01.680 classify
+00:09:05.120 and when I came up with this. Then a
+00:09:08.080 colleague comes up to me and he says,
+00:09:10.240 &quot;Hey, like what you're doing actually I
+00:09:13.440 appreciate your thinking, but I believe
+00:09:15.519 your problem is you're you're solving
+00:09:17.600 the wrong problem.&quot; It's like what do
+00:09:19.279 you even mean? It's like we have this
+00:09:21.920 new activities and we just want to know
+00:09:25.680 what the performance will be when
+00:09:26.880 they're starting off. Like what is wrong
+00:09:28.640 about that? And
+00:09:32.000 basically his point was like you're not
+00:09:34.320 focused on predicting or classifying
+00:09:37.279 things.
+00:09:38.399 >> What you want to know is or where you're
+00:09:40.399 starting off from is you don't know
+00:09:43.200 about the activity and you want to model
+00:09:46.080 this uncertainty and you want to chop
+00:09:47.920 this down over time as you gather more
+00:09:49.839 traffic. So on the surface they may look
+00:09:52.240 like very similar problems but on the
+00:09:54.160 one hand you say okay I it's
+00:09:56.560 theoretically possible to predict how
+00:09:59.040 many bookings you're going to get given
+00:10:00.880 any impressions or classify this whereas
+00:10:03.440 on the other hand you would say I don't
+00:10:05.600 know about you I'm going to get more
+00:10:08.720 information about you as we go and I can
+00:10:12.240 quantify this uncertainty which is how
+00:10:14.320 much I don't know about you and see it
+00:10:17.360 hopefully drop over time. So it may not
+00:10:21.519 look very different but actually in fact
+00:10:23.120 it is
+00:10:25.279 exactly like this.
+00:10:30.160 Um
+00:10:31.920 for us again like you can go into more
+00:10:34.480 theoretical discussions but what I've
+00:10:36.640 learned is that machine learning and
+00:10:37.600 basin stats have usually very different
+00:10:39.600 goals right so machine learning is
+00:10:42.000 better suited for when the outcome
+00:10:43.680 depends on the attributes of the
+00:10:45.519 predicted item. So if there is a way of
+00:10:47.760 saying hey based on XYZ like is this
+00:10:50.320 experience great or will we get bookings
+00:10:52.399 and so on and so forth. So I have some
+00:10:55.040 attributes that I can use to predict
+00:10:56.720 something. Whereas basing statistics is
+00:10:59.600 more about I have a starting point based
+00:11:01.920 on previous knowledge and maybe
+00:11:05.360 activities that I'm seem that I deem
+00:11:07.279 somewhat similar. They behave in a
+00:11:08.880 specific way and then I model this
+00:11:10.959 uncertainty over time as I gather more
+00:11:13.600 and more information.
+00:11:15.760 The reason why I'm calling this out is
+00:11:18.000 because how the organization you work in
+00:11:20.240 sees the problem influences you. So it's
+00:11:23.760 very important that you're intentional
+00:11:25.040 about this, right? If you say this is a
+00:11:27.839 machine learning problem, then if if you
+00:11:30.320 fail, then it means hey this is solvable
+00:11:33.040 via data science. We need to predict a
+00:11:34.959 few outcome and let's build a model to
+00:11:37.279 to solve this. And if it doesn't work,
+00:11:40.320 let's build a better model, right? And
+00:11:41.920 we believe this is the right way to
+00:11:43.519 solve this. Where is if we say hey we
+00:11:46.160 don't know and we do not assume that
+00:11:47.680 there is a way to based on the
+00:11:50.000 attributes understand if this is going
+00:11:51.839 to be successful or not if this
+00:11:53.200 experience will be successful or not so
+00:11:55.519 let's start from I don't know let's
+00:11:57.440 gather information on the way and then
+00:11:59.519 we see how this develops right and then
+00:12:02.959 if we play at this and it's okay like
+00:12:04.880 maybe we're starting from the wrong
+00:12:06.880 place or maybe we don't have the the
+00:12:10.959 right information or maybe we don't have
+00:12:12.399 enough information but we are assuming
+00:12:14.480 starting that we know nothing and this
+00:12:16.480 starting point really shifts the
+00:12:18.079 conversation.
+00:12:20.720 Um to me if I could go talk back to my
+00:12:27.680 if I could go back to my my younger self
+00:12:30.240 I would say like spend good time
+00:12:31.760 defining the questions that you want to
+00:12:33.600 answer and finding the right approach.
+00:12:35.600 So in the first place I got very excited
+00:12:37.839 about like deploying models and using
+00:12:40.560 trees and then like the stuff that was
+00:12:42.639 more complex to try to predict
+00:12:45.920 sensation of that not ex not entirely
+00:12:50.000 but yeah in the direction it goes I'll
+00:12:51.760 cover that in the presentation but
+00:12:53.680 basically understand what what's the
+00:12:56.800 question is and be yeah spend
+00:13:01.279 a lot of time on that maybe even more
+00:13:03.040 than than you than you would
+00:13:07.040 going on the bas and binomial approach
+00:13:09.839 itself
+00:13:12.240 a binomial I cover what bi binomial is
+00:13:15.040 what basian is and then how we put
+00:13:17.360 things together right so this binomial
+00:13:19.360 distribution is useful when you have a
+00:13:20.800 trials with a binary outcome pass or
+00:13:22.800 fail so let's say this this picture on
+00:13:25.519 the left I have like these four activity
+00:13:28.639 cards and I see all of them and I may
+00:13:31.440 click or may not click on them so it's
+00:13:33.200 like you have like four trials and that
+00:13:35.279 may or may not click to determining the
+00:13:37.839 success.
+00:13:40.000 You can see it here in the example,
+00:13:41.360 right? So let's say that this is my
+00:13:43.200 trial, this is my success and there are
+00:13:45.120 a few assumptions. One is like that each
+00:13:48.320 impression is independent and that
+00:13:50.480 there's like constant probability of
+00:13:52.079 success. So if you do this on an
+00:13:53.839 activity level then ideally you say okay
+00:13:56.320 I gather information every time that I
+00:13:58.000 show you you get click or you or you
+00:14:00.399 don't.
+00:14:03.839 And there's one thing here to call out
+00:14:06.399 which is that sometimes assumptions will
+00:14:09.680 break right in our case we know that
+00:14:12.639 when when there are reviews this reviews
+00:14:15.600 may affect the clicking behavior right
+00:14:17.600 so imagine you do not have any reviews
+00:14:19.760 and then all of a sudden you have then
+00:14:21.760 this may change how people click on your
+00:14:23.519 activity so what I want to say with this
+00:14:26.399 is be wary of when the assumptions break
+00:14:29.279 in every model you will need to make
+00:14:30.800 some assumptions
+00:14:32.000 No model will be perfect.
+00:14:35.040 Define and be very intentional about
+00:14:36.639 like when you want to flex and when you
+00:14:39.040 when you don't with this assumptions
+00:14:43.519 and the constant probability of success
+00:14:45.440 then the same right like you may say
+00:14:47.279 okay I show this in places that I deem
+00:14:49.279 that are similar on my platform or
+00:14:51.760 marketplace so then the probability of
+00:14:54.160 success is somewhat similar for
+00:14:56.160 activity. You may want you may say no
+00:14:58.639 when this is shown on the clickthrough
+00:15:00.880 rate in a specific swim lane is very
+00:15:02.399 different than any other place and you
+00:15:03.920 want to separate those two cases. this
+00:15:05.440 is also fine but again it's stuff that
+00:15:07.680 you need to check um when you're
+00:15:10.000 modeling things in a certain way just so
+00:15:12.160 that you can draw the right conclusions
+00:15:18.480 so that was on the binomial side and
+00:15:20.720 then like the basian approach right and
+00:15:23.920 the basian approach allows for regular
+00:15:25.760 updates to the binomial distribution I
+00:15:28.160 will make a very easy example about this
+00:15:31.199 let's imagine for a second that I'm I'm
+00:15:33.519 going to a new city right So trials or
+00:15:35.760 I'm going I'm in my city. I'm here in
+00:15:37.279 Berlin. So I'm going to my favorite
+00:15:39.440 restaurant. Those are my trials and
+00:15:41.360 successes that I leave happy, right? I
+00:15:44.480 would expect this ratio to be close to
+00:15:46.399 the rating of the restaurant. Um this is
+00:15:48.720 one of my favorite places here and what
+00:15:51.360 I see first on my on my phone, right? I
+00:15:53.759 check oh put up on Google Maps and like
+00:15:55.360 this is what I see. I I think that this
+00:15:57.519 is awesome.
+00:15:59.600 But then actually I may read the reviews
+00:16:02.000 and I update my expectations and then I
+00:16:04.240 say okay this place is great but
+00:16:06.160 actually there's long lines in then if I
+00:16:10.480 if I'm in a hurry then this wouldn't be
+00:16:12.720 such a great fit. So I update this 4.9
+00:16:16.079 to something else depending on what's my
+00:16:19.040 how much time I have on that day. But
+00:16:21.360 what I want to say with this is that we
+00:16:22.959 do this all the time. So we know
+00:16:25.360 something then we get more information
+00:16:27.759 and when we update like our belief on
+00:16:30.720 something uh you can see the chart on
+00:16:32.720 the right uh again with restaurants I I
+00:16:35.680 think it's a good way of of putting it
+00:16:37.360 and showing
+00:16:39.440 uh how our brain does this and then if
+00:16:42.880 our brain does this and if we operate
+00:16:44.560 that way then why shouldn't models
+00:16:46.639 operate that way right and again the
+00:16:49.440 basing approach is just um just a way to
+00:16:52.480 enable this to
+00:16:54.560 when it comes to your question um Thomas
+00:16:57.519 on it sounds like a decision based on
+00:16:59.279 the risk appetite
+00:17:01.759 on the one hand yes but the most
+00:17:03.519 important thing here is that we model
+00:17:05.039 the uncertainty so we model what we do
+00:17:07.439 not know right and then we will be able
+00:17:10.799 to say okay what we didn't know was this
+00:17:12.720 big and now what we don't know is this
+00:17:14.959 big am I okay with this yes no so there
+00:17:17.679 is a component of risk but also
+00:17:19.199 important is I knew that it was like
+00:17:21.280 this and now I know it's closer to this
+00:17:23.599 So like you chop down the risk as you
+00:17:25.839 collect more info over time.
+00:17:28.720 That said, defining the metric you want
+00:17:31.280 to optimize for the weight of the prior
+00:17:33.840 which is how important prior history is
+00:17:36.799 for you to to your model and the
+00:17:39.280 stopping criteria. So this means when do
+00:17:41.600 you say hey I have enough information.
+00:17:44.160 I'm fine. This is a context dependent
+00:17:46.799 call and and it's important that you
+00:17:48.640 know that. So on the right on the right
+00:17:50.720 hand side you see a chart of um of a
+00:17:53.520 performance um of an activity that you
+00:17:56.880 have those confidence intervals right
+00:17:59.280 and then at some point when it the the
+00:18:01.120 background turns green screen it means
+00:18:02.400 that hey the confidence interval is
+00:18:04.480 narrower than the threshold so I believe
+00:18:07.120 I know enough about this I can stop. Um
+00:18:10.160 but again like this is what you expect
+00:18:12.080 to see. You start with a very wide
+00:18:13.280 confidence interval and it narrows down
+00:18:14.960 over time. How much narrow is good
+00:18:17.919 enough? This is depends on your context.
+00:18:20.720 To me the most important thing is that
+00:18:22.640 again you ask yourself those questions.
+00:18:24.480 So what's a trial? What's a success?
+00:18:27.840 How important is the prior knowledge?
+00:18:31.200 And also how much certainty are you okay
+00:18:34.320 with? Um
+00:18:37.520 and again of course like as we said that
+00:18:39.520 if there are certain assumptions in your
+00:18:41.360 model just go check if those assumptions
+00:18:43.919 hold yes or no. and up to what extent do
+00:18:47.760 you want to flex with that.
+00:18:51.200 The other part is defining the stopping
+00:18:53.360 criteria which you can do I would say
+00:18:56.000 mostly in two ways. So you can define
+00:18:58.960 the confidence interval with and say I
+00:19:02.240 gather information for my binomial
+00:19:04.480 model. I update this in a basian fashion
+00:19:06.559 over time and then when my confidence
+00:19:08.880 interval is narrower than let's say plus
+00:19:10.720 minus 10% then I believe okay I'm fine
+00:19:12.880 or 1% or whatever
+00:19:15.520 or you can also say based on the value
+00:19:17.919 of incoming information which means that
+00:19:21.679 hey if time goes by let's say I I have I
+00:19:25.200 collect information for a week and my
+00:19:27.760 confidence interval doesn't really move
+00:19:29.919 then this means that even though I get
+00:19:32.480 more even though I get more more traffic
+00:19:37.200 or more information. This is not adding
+00:19:40.000 anything new to me. So this is not
+00:19:41.520 adding any knowledge to me. So I can say
+00:19:43.440 okay the value of the incoming
+00:19:44.720 information is is very little. So I can
+00:19:47.600 stop or you can just again take a
+00:19:49.760 combination of both which is also fine.
+00:19:52.799 But this shifts your conversation from
+00:19:54.320 hey I can predict if an activity is
+00:19:56.160 going to be successful or not to say I
+00:19:58.400 can model how much I know and I don't
+00:20:00.160 know about this and also I will
+00:20:02.799 determine what is enough or what's not
+00:20:04.480 enough depending on my confidence
+00:20:06.320 interval or the value of incoming
+00:20:08.880 information
+00:20:13.039 which is exactly what we say.
+00:20:16.640 Then some last notes on how I
+00:20:19.919 implemented this at scale.
+00:20:24.000 Basically an very very simplified
+00:20:27.120 overview but good on good good enough
+00:20:29.440 for this on how we generate and collect
+00:20:31.039 data. We have some visitors they browse
+00:20:33.200 schedule guide we collect some events
+00:20:35.679 and we calculate daily stats per
+00:20:38.000 experience. So this is how it looked
+00:20:40.080 like at the moment I I started this
+00:20:42.000 work.
+00:20:44.320 So then what I said was okay given the
+00:20:47.200 fact that I have all of this I have this
+00:20:48.880 daily stats let's aggregate those let's
+00:20:51.919 apply the basin statistics and then
+00:20:54.080 output the results into a table. So the
+00:20:55.919 first part occurs on S3 and Airflow DBT
+00:20:59.520 and then the rest is um all of that on
+00:21:01.840 on data bricks and
+00:21:07.120 it's important that you identify like
+00:21:09.120 where are where you're starting from and
+00:21:12.320 basically what can you leverage already
+00:21:14.000 so you don't need you don't reinvent the
+00:21:16.480 wheel in my case leveraging the pisparks
+00:21:20.240 udfs and scypi was the most efficient
+00:21:22.159 way of implementing this at scale right
+00:21:24.880 So there you can see on the right it's
+00:21:26.799 very very simple again like considering
+00:21:29.120 that I have the experience level
+00:21:31.039 pre-agreated data. So someone else was
+00:21:33.039 doing the heavy lifting for me and
+00:21:34.400 querying the events table that each row
+00:21:36.880 is independent of each other because I
+00:21:38.880 have data on a on an experience level.
+00:21:41.360 So this is already fine and that pispark
+00:21:45.440 and data bricks like that this yeah
+00:21:48.000 environment allows for distributed
+00:21:49.520 computing. um this was the best way to
+00:21:52.159 to do this
+00:21:54.240 and simple and and elegant which I
+00:21:56.159 really liked
+00:22:00.640 and again um we're just now getting into
+00:22:04.559 the end of this but one thing that I
+00:22:07.280 realized at the very end and that would
+00:22:08.880 have saved me time too was to put into
+00:22:11.600 question if you need the evolution or
+00:22:13.440 the end state when you're doing this
+00:22:15.440 kind of work right so when you're
+00:22:18.480 building and understanding this new
+00:22:20.799 approach when you're back feeling and
+00:22:22.480 understanding things and how history
+00:22:24.320 would have been and you're recreating
+00:22:26.000 history and I'm sure many of us actually
+00:22:28.720 have been there in one way or the other
+00:22:31.360 you may need the evolution day by day of
+00:22:34.880 your system
+00:22:38.159 but actually when you're deciding
+00:22:39.919 whether to stop or continue gathering
+00:22:42.159 information you don't care about the
+00:22:43.919 rest you only care about the end right
+00:22:47.679 this taught me mostly to things um or
+00:22:50.799 one thing that sometimes dev at scale is
+00:22:53.280 not pro right so be very mindful of okay
+00:22:56.320 what will I really need to make a
+00:22:58.960 decision when when I am do when I'm in
+00:23:02.080 production and do I need all of this
+00:23:03.840 intermediate steps maybe not and if you
+00:23:06.400 don't then you're going to save yourself
+00:23:08.400 a lot of time and and complexity right
+00:23:11.280 um yeah not only this reduced runtime
+00:23:14.240 and credits and complexity but also this
+00:23:16.480 made it easier for other people to
+00:23:18.480 understand the code which is in every
+00:23:21.360 case yeah just better.
+00:23:27.280 Uh
+00:23:28.880 yeah my three key takeaways of this is
+00:23:32.080 that getting the problem right uh which
+00:23:34.799 is what I spent most of my time talking
+00:23:36.559 about can be much harder than building
+00:23:38.960 the solution. It's like we're wired in a
+00:23:41.120 certain way. We work surrounded by
+00:23:43.039 people. we see problems in a certain way
+00:23:45.360 and identifying the right right problem
+00:23:48.559 uh can be tough. So do not underestimate
+00:23:51.840 that then the development may be more
+00:23:55.360 complex than what you need in
+00:23:56.799 production. So again like you may be
+00:23:59.520 very excited about that and say okay
+00:24:01.200 like I have this and now I need to find
+00:24:02.720 a way to make it scale
+00:24:05.360 maybe you don't and actually it may feel
+00:24:08.000 like okay what is too simple that's
+00:24:10.640 better than building a complex system
+00:24:12.000 and then need to maintain it if it does
+00:24:13.840 the job and then beware of when your
+00:24:17.279 assumptions don't hold anymore so what I
+00:24:20.000 mentioned about this reviews and when
+00:24:22.240 you get a review then the clicking
+00:24:23.679 behavior changes it's like you will need
+00:24:25.600 to make a judgment call because again no
+00:24:27.840 model will be perfect. Um so
+00:24:31.360 recommendations for users are there by
+00:24:32.799 sorting via the calculate stats. I can
+00:24:34.960 take that in a second. Um but yeah be
+00:24:38.480 very very mindful of that and remember
+00:24:41.840 especially with like when you're
+00:24:44.080 breaking some assumptions that this this
+00:24:46.080 means great power and this also means
+00:24:47.919 great responsibility for people.
+00:24:51.840 I hope that by now you can identify a
+00:24:53.679 basian problem at your company that you
+00:24:55.520 can differentiate between this I need to
+00:24:57.360 predict how this would work versus I I
+00:25:00.880 need to model uncertainty and that this
+00:25:03.120 helps you navigate through the messiness
+00:25:04.400 of real world data. Um, if you're
+00:25:07.440 interested, if you want to learn more,
+00:25:09.039 please learn about what we do. You can
+00:25:10.960 see the you can see our blog posts
+00:25:13.840 there, uh, scanning the QR code. You can
+00:25:16.240 reach out to me, you can send me an
+00:25:17.600 email, LinkedIn. Yeah, I'll be happy to
+00:25:19.760 happy to help you out. So, yeah, thank
+00:25:22.240 you so so much. Um, now I'll move on to
+00:25:24.960 the questions. Yes. So yeah, Tomas
+00:25:28.880 mentioned that this is like the decision
+00:25:30.960 is based on the risk appetite and arro
+00:25:33.600 mentions if the recommendations for
+00:25:34.960 users are derived by sorting via the
+00:25:37.200 calculated stats. So our problem was to
+00:25:39.760 say when are the what is the performance
+00:25:42.880 of a new activity and if we have enough
+00:25:44.799 data for that or not and then the output
+00:25:47.200 is a table in which we say this activity
+00:25:50.240 has this confidence interval for the
+00:25:52.880 performance metric. So it's not that I'm
+00:25:55.279 recommending something to users. It's
+00:25:57.360 not a ranking algorithm, but rather
+00:25:59.679 showing hey um this is the performance
+00:26:03.120 of the the the confidence intervals for
+00:26:05.279 this new activity
+00:26:13.360 if I've used my optimize any or any
+00:26:16.240 other type of function for something
+00:26:18.080 from the posterior. Um, no I did not,
+00:26:22.559 but I think that would be something cool
+00:26:24.720 to check out. So, thanks for the
+00:26:26.640 suggestion. No, I did not.
+00:26:33.039 >> Thank you. Um, we are just about at time
+00:26:35.760 here. If uh anyone has any other
+00:26:38.320 questions, you can go over to the
+00:26:39.840 Discord page and ask there. Um, and then
+00:26:42.880 the recording of this will be up for
+00:26:44.320 replay soon. So, we appreciate it. Um,
+00:26:47.760 thanks for your time. Cool. Thank you
+00:26:50.159 very very much.
+00:26:51.200 >> Yeah. Have a great day everyone.
+00:26:52.960 >> Thank you. Have a great day everyone.
+00:26:54.559 Bye.

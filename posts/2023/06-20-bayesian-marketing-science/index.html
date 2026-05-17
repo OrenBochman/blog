@@ -1,0 +1,3363 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Oren Bochman">
+<meta name="keywords" content="bayesian statistics, marketing science, data analysis, decision-making, pydata, media mix models, customer lifetime value">
+<meta name="description" content="A recap of Dr.&nbsp;Thomas Wiecki’s talk at PyData Berlin 2023 on how Bayesian statistical modeling can help solve marketing’s biggest problems, enabling efficient decision-making with minimal data and providing interpretable results for business stakeholders.">
+
+<title>Bayesian Marketing Science - Solving Marketing’s 3 Biggest Problems – Oren Bochman's Blog</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<link href="../../../posts/2023/12-20-autogluon/index.html" rel="next">
+<link href="../../../posts/2023/05-10-migration-notes/index.html" rel="prev">
+<link href="../../../favicon.ico" rel="icon">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark-d0ae9245876894da5ac7e18953ecc5cc.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-57272dec2c35704c3cd730981f37fba3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark-6ce001d4fc9cef40b73897b2365a2cb1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../../site_libs/bootstrap/bootstrap-57272dec2c35704c3cd730981f37fba3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-GYZ17VPVEJ"></script>
+
+<script type="text/plain" cookie-consent="tracking">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GYZ17VPVEJ', { 'anonymize_ip': true});
+</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"headline",
+  "consent_type":"express",
+  "palette":"dark",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<style>html{ scroll-behavior: smooth; }</style>
+<script type="application/json" class="js-hypothesis-config">
+{
+  "theme": "clean",
+  "openSidebar": false
+}
+</script>
+<script async="" src="https://hypothes.is/embed.js"></script>
+<script>
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    document.body.classList.add('hypothesis-enabled');
+  });
+</script>
+<script type="module" src="../../../js/slide-margin.js"></script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" integrity="sha384-5TcZemv2l/9On385z///+d7MSYlvIEw9FuZTIdZ14vJLqWphw7e7ZPuOiCHJcFCP" crossorigin="anonymous">
+<script>
+  window.WebFontConfig = {
+    custom: {
+      families: ['KaTeX_AMS', 'KaTeX_Caligraphic:n4,n7', 'KaTeX_Fraktur:n4,n7',
+        'KaTeX_Main:n4,n7,i4,i7', 'KaTeX_Math:i4,i7', 'KaTeX_Script',
+        'KaTeX_SansSerif:n4,n7,i4', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3',
+        'KaTeX_Size4', 'KaTeX_Typewriter'],
+    },
+  };
+</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js" integrity="sha384-cMkvdD8LoxVzGF/RPUKAcvmm49FQ0oxwDF3BGKtDXcEc+T1b2N+teh/OJfpU0jr6" crossorigin="anonymous"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+
+<meta name="twitter:title" content="Bayesian Marketing Science - Solving Marketing’s 3 Biggest Problems – Oren Bochman’s Blog">
+<meta name="twitter:description" content="A recap of Dr.&nbsp;Thomas Wiecki’s talk at PyData Berlin 2023 on how Bayesian statistical modeling can help solve marketing’s biggest problems, enabling efficient decision-making with minimal data and providing interpretable results for business stakeholders.">
+<meta name="twitter:image" content="https://orenbochman.github.io/posts/2023/06-20-bayesian-marketing-science/pydata_logo.png">
+<meta name="twitter:creator" content="@orenbochman">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed slimcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo light-content">
+    <img src="../../../images/logo.png" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">Oren Bochman’s Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/orenbochman"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog">
+ <span class="dropdown-text">Source Code</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/OrenBochman/blog/issues">
+ <span class="dropdown-text">Report a Bug</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../index.xml"> <i class="bi bi-rss" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../archive.html"> <i class="bi bi-archive" role="img">
+</i> 
+<span class="menu-text">Archive</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2023/03-08-responsible-AI/index.html">2023</a></li><li class="breadcrumb-item"><a href="../../../posts/2023/06-20-bayesian-marketing-science/index.html">Bayesian Marketing Science - Solving Marketing’s 3 Biggest Problems</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2023/03-08-responsible-AI/index.html">2023</a></li><li class="breadcrumb-item"><a href="../../../posts/2023/06-20-bayesian-marketing-science/index.html">Bayesian Marketing Science - Solving Marketing’s 3 Biggest Problems</a></li></ol></nav>
+      <h1 class="title">Bayesian Marketing Science - Solving Marketing’s 3 Biggest Problems</h1>
+            <p class="subtitle lead">Dr.&nbsp;Thomas Wiecki’s PyData Global 2023 Recap</p>
+                  <div>
+        <div class="description">
+          A recap of Dr.&nbsp;Thomas Wiecki’s talk at PyData Berlin 2023 on how Bayesian statistical modeling can help solve marketing’s biggest problems, enabling efficient decision-making with minimal data and providing interpretable results for business stakeholders.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">pydata</div>
+                <div class="quarto-category">marketing</div>
+                <div class="quarto-category">bayesian statistics</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Oren Bochman </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">Tuesday, June 20, 2023</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">Sunday, May 17, 2026</p>
+      </div>
+    </div>
+      
+    </div>
+    
+
+  <div>
+    <div class="keywords">
+      <div class="block-title">Keywords</div>
+      <p>bayesian statistics, marketing science, data analysis, decision-making, pydata, media mix models, customer lifetime value</p>
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true"><i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text">Notes</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://orenbochman.github.io/notes-bayes/" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian Specialization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://orenbochman.github.io/notes-rl/" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reinforcement Learning Specialization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://orenbochman.github.io/notes-model-thinking/" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model Thinking</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://orenbochman.github.io/notes-nlp" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NLP Specialization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://orenbochman.github.io/notes-ab-testing" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AB testing</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../index.html" class="sidebar-item-text sidebar-link"><i class="bi bi-substack" role="img">
+</i> 
+ <span class="menu-text">Posts</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Posts</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">2011</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2011/2011-11-29-tidy-text-mining-with-r/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tidy Text Mining With R</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2011/2011-11-29-text-mining-with-r/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text Mining With R</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2011/2011-08-11-time-management/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Time management Tips</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2011/2011-11-29-npl-python/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text Mining With Python</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">2012</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2012/2012-07-26-wikisym-2012_files/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wikisym 2012</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">2013</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2013/2013-06-07-lifehacks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">life hacks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">2014</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">2014 10 06 FinTech</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">2015</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">2015 02 07 Analytics Checklist</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2015/2015-02-07-analytics-checklist/2015-02-07-analytics-checklist.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Analytics Checklist</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">2015 02 07 Optimal Bidding</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">2015 04 20 All Things Data</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2015/2015-04-20-all-things-data/2015-04-20-hotjar-heat-map-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HotJar Heat Map Analysis - Dr.&nbsp;David Darmanin</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2015/2015-04-20-all-things-data/2015-04-20-organizational-culture-of-analytics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using Competitive Analysis to Benchmark Your Marketing Efforts Ariel Rosenstein - Similar Web</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2015/2015-04-20-all-things-data/2015-04-20-using-competitive-analysis-to-benchmark Your-Marketing-Efforts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using Competitive Analysis to Benchmark Your Marketing Efforts - Ariel Rosenstein - Similar Web</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false">
+ <span class="menu-text">2016</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2016/2016-12-14-Travel-checklist/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Travel checklist</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false">
+ <span class="menu-text">2017</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2017/2017-07-30-experimental-design/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A/B testing cost and risks?</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false">
+ <span class="menu-text">2018</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2018/2018-01-16-BRAT/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">text annotation with BRAT</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false">
+ <span class="menu-text">2019</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-16" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-16" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2019/2019-11-24-keys-to-the-kingdom-extracting-api-keys-from-a-json-file-with-jq/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Docker for data science</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2019/2019-07-31-Exploding-and-vanishing-nodes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exploding and vanishing nodes.</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../posts/2019/2019-07-19-lobeformation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lobeformation: A New Architecture for Deep Learning</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-17" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-17" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2019/2019-07-19-lobeformation/routing_networks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">litrature review on routing networks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false">
+ <span class="menu-text">2020</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-18" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-18" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/03-04-pandas-challanges/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pandas Productivity Challenge?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/02-20-avoid-cross-site-scriptin-errors-with-a-Jupyter-local-runtime/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How to avoid cross site scripting (XSS) errors</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/10-25-deep-learning-relu-intutions/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deep Learning Intuitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/11-29-numpy-meltdown/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">numpy meltdown</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/12-30-meme-bank/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Meme bank</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/06-12-bash-tricks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">brace expansion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2020/04-10-pdf-extraction/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PDF extraction hacks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false">
+ <span class="menu-text">2021</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-19" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-19" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-11-12-language-models-and-explainability/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Language models and explainability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-10-clv-models-1/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Customer Lifetime Value - Pareto/NBD (BTYD) Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-08-13-hackathon-notes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hackathon session link dumps &amp; notes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-27-wingrad-schema/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Q&amp;A and the Winograd schemas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-07-01-json-ld/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">json-ld</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-16-python-graphs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Graphs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-05-16-mulitlevel-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multilevel Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-08-18-transfer-learning-nlp/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transfer learning in NLP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-22-what-is-in-a-citation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">What is in a citation?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-06-10-layout-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TensorFlow probability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-24-summerization/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatic Summarization Task</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-08-13-inlining-citations/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inlining Citations for Wikipedia articles</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-09-advertising-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Advertising Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-10-15-storytelling-and-other-essentials/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Storytelling and other essentials</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-25-bayesian-agent/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian agents</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-24-statistics-for-marketing-in-python/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Excel 2019 for Marketing Statistics in pandas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-07-ten-tips-to-improve-your-workflow/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Tips To Improve Your Workflow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-08-wave-net-review/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">WaveNet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-04-09-modeling-events/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Modeling Events</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-07-14-type-witness-evolving-idiom/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A type of Witness and an evolving Idiom</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-09-27-getting-more-from-your-agency/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Getting more from your agency ?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-05-29-djvu-to-pdf/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ebook Hacks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-20" role="navigation" aria-expanded="false">
+ <span class="menu-text">2021 12 07 Attention for Sensor Fusion</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-20" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-20" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2021/2021-12-07-attention-for-sensor-fusion/2021-12-07-attention-for-sensor-fusion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Attention for sensor fusion</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-21" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-21" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-21" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-09-12-robust-regression/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Robust Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-03-05-m1/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Set Up M1 MacBooks for DS &amp; ML</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-22" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022 04 01 Bandits</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-22" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-22" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-23" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022 05 05 Command Line</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-23" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-23" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-05-05-command_line/2022-05-05-command_line.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">command line</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-24" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022 09 16 Adaptive Learning Rate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-24" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-24" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-25" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022 09 16 Loss Engineering</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-25" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-25" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-09-16-loss-engineering/2022-09-16-loss-engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Loss engineering and uncertainty for multi-task learning</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="false">
+ <span class="menu-text">2022 09 22 Entropy for Uncertainty Quantification</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-26" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-26" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2022/2022-09-22-entropy_for_uncertainty_quantification/2022-09-22-entropy_for_uncertainty_quantification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">entropy for uncertainty quantification</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-27" role="navigation" aria-expanded="true">
+ <span class="menu-text">2023</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-27" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-27" class="collapse list-unstyled sidebar-section depth3 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/03-08-responsible-AI/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Responsible AI Mitigations and Tracker</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/04-11-quarto-loves-psudocode/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quarto loves pseudocode</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/04-22-mcmc-algs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCMC algorithms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/05-10-migration-notes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Great Migration</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/06-20-bayesian-marketing-science/index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Bayesian Marketing Science - Solving Marketing’s 3 Biggest Problems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/12-20-autogluon/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AutoGluon Cheetsheets</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false">
+ <span class="menu-text">02 20 Ts Nonlinear</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-28" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-28" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false">
+ <span class="menu-text">02 28 Nlp Il Booking Meetup</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-29" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-29" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/02-28-nlp-il-booking-meetup/NLP-IL-Booking Text2Topic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text2topic - Leverage reviews data for multi-label topics classification in Booking.com</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/02-28-nlp-il-booking-meetup/NLP-IL-Booking Validating NLP.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validating NLP data and models with deepchecks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false">
+ <span class="menu-text">03 01 Braindump</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-30" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-30" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false">
+ <span class="menu-text">03 01 Spark Emr</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-31" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-31" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-32" role="navigation" aria-expanded="false">
+ <span class="menu-text">06 01 Spark</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-32" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-32" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/06-01-spark/spark-progress.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Spark Tips: Understanding the Progress Bar</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../posts/2023/01-11-nlp-il-meetup-intuit/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NLP IL F2F Meetup at Intuit</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-33" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-33" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/01-11-nlp-il-meetup-intuit/talk0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NLP IL F2F Meetup at Intuit</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/01-11-nlp-il-meetup-intuit/talk1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SCROLLS - Standardized CompaRison Over Long Language Sequences</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/01-11-nlp-il-meetup-intuit/talk2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Efficient Long-Text Understanding with Short-Text Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2023/01-11-nlp-il-meetup-intuit/talk3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">An Overview of Modern Speech Recognition</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false">
+ <span class="menu-text">S3 Series</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-34" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-34" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-35" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-35" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-35" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-10-lewis-petting-zoo/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lewis Signaling Game for PettingZoo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-28-ocr/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OCR building blocks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-12-post-with-code/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Post With Code</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-08-08-TS-with-Stumpy/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stumpy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-07-02-replay-buffer-questions/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">replay buffer questions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-11-risk-constrained-MDP/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Risk-constrained Markov decision processes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-01-04-understanding-emergent-languages/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Understanding Emergent Languages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-05-complex-signal/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ad hoc complex signaling systems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-28-ocr-bd/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">OCR - Brain Dump</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-28-missing-link/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLM and the missing link</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-12-mermaid-mindmap/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">😁 Quarto 💖 Mermaid🧜 Mindmaps 🧠</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-21-bayesian-agents/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bayesian Agent</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-18-readings-in-rl/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">readings in rl</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2023-03-16-events-generator/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">event generator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-22-transformations/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformations in Linguistic Representation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-04-04-rad-repl/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAD REPL</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-27-NLP-RL/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NLP with RL</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-02-Shanon-Game/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Shannon Game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-01-topological-alignment/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TL-DR rethinking 💭 topological alignment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-07-01-generalization-in-ML/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">two ideas on generalization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-03-a-definition-by-p-winston/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A definition by Patrick Henry Winston</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-11-more-sugar-please/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">More Sugar please</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-10-marco-baoni-composionality/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Is compositionality overrated? The view from language emergence</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-08-26-six-quick-tips/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Six quick tips to improve modeling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-26-deduction-evaluation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deduction Evaluation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-31-sugarscapes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sugar Scapes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-01-02-d3/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">D3.js in in Quarto Observable</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-30-LLMs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLM the good the bad and the ugly</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-06-bayesian-perspective/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lewis Game from a Bayesian Perspective</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-12-12-the-valentines-day-massacre/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Villeny pure and simple</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-03-31-mesa-lessons/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mesa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-01-10-superlearner/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SuperLearner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-12-Evolutionary-games-and-population-dynamics/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evolutionary Games and Population Dynamics Summary</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-10-11-Vitter-alg/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vitter’s Algorithm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-09-25-readability/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tune llm for Style and Grammar advice.</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-07-signaling-experiment/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Signals Experiment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-36" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 02 01 Quarto Bootstrap</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-36" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-36" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-37" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 02 19 Rhetoric</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-37" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-37" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-02-19-rhetoric/rhetoric-ideas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rhetoric NLP Tasks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-38" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 05 02 Signaling Games Tikz</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-38" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-38" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-39" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 05 03 Urn Models</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-39" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-39" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-03-urn-models/urn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Urn models using Numpy</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 05 04 Signals Bib</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-40" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 05 09 Roth Erev RL</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-41" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-05-09-Roth-Erev-RL/re-rel.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Roth Erev learning in Lewis signaling games</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-42" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 01 Bayesian Agents</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-42" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-42" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 12 Logic Puzzles</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-43" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 13 Hyper</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-44" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-13-hyper/2024-06-13-hyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hyperparameter Optimization</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 23 Zero Inflated Data</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-45" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-23-zero-inflated-data/2024-06-23-zero-inflated-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">zero inflated data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 25 Mesa Rl</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-46" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-06-25-mesa-rl/mesa-rl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mesa &amp; RL</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Misbehavior of Markets and Scaling in financial prices 1-4</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-47" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part1/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling in financial prices 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part4/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling in financial prices 4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part2/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling in financial prices 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part3/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling in financial prices 3</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-48" role="navigation" aria-expanded="false">
+ <span class="menu-text">2025</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-48" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-48" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-11-partial-pooling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The roles of Partial pooling and mixed strategies in the Lewis signaling game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-14-bayes-for-llm/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Probabilitic Modeling with Language Models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-ideas-to-apis/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From Ideas to APIs: Delivering Fast with Modern Python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-19-MOA/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">FlexAttention: A Flexible Approach to Attention Mechanisms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-20-FlexAttention/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">FlexAttention: A Flexible Approach to Attention Mechanisms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-11-a-garden-of-forking-paths/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A garden of forking paths</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-26-vibe-coding/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vibe coding GPT5 Edition</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-04-02-research-questions/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Complex Lewis Signaling - The Research Questions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-when-the-meter-maxes-out/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">When the Meter Maxes Out</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-real-time-financial-fraud-detection/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Realtime Financial Fraud Detection with Modern Python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-reverse-geocoder/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Designing a Fast, Offline-Capable Reverse Geocoder in Python: An Open Source Alternative to Big Geo APIs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-automate-complex-and-critical-docs-in-healthcare/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using Traditional AI and LLMs to Automate Complex and Critical Documents in Healthcare</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-02-Shiny-Mesa-Tutorial/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ShinyLive ❤️ Mesa Tutorial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-projspec/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">projspec: what’s this project anyway?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-where-have-all-the-metrics-gone/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Where Have All the Metrics Gone?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-04-02-a-morphology/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Base line Morphology Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-optimizing-pandas-using-polars-cuDf-and-FireDucks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lessons learnt in optimizing a large-scale pandas application using Polars, FireDucks and cuDF: Go Smart and Save More!</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-10-Engineering-RL-Algs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Engineering Reinforcement Learning Algorithms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-jupyter-environment-lifecycle/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Lifecycle of a Jupyter Environment - From Exploration to Production-Grade Pipelines</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-14-Anthropic/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Anthropic’s Claude: Advancing AI with Safety and Scalability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-torchTextClassifiers/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">torchTextClassifiers : Modernizing Text classification for French National Statistics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-01-books/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Books, Courses Tools</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-04-off-policy-learning/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Off-Policy Learning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-monty-hall/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lessons in Decision Making from the Monty Hall Problem</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-04-Bag-Of-Tricks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">AI a bag of tricks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-optimal-binning-in-logistic-regression/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Optimal Variable Binning in Logistic Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-pycaret/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automating ML with PyCaret: Train &amp; Compare Multiple Models to Find the Best Performer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-lightweight-feat-store/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building a Lightweight Feature Store for Electricity Grid Forecasts with Polars</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-causal-thinking-in-machine-learning/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Beyond Just Prediction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/marketing mix model/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Marketing Mix Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-10-01-Updates-to-the-github-action/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Updates to the github action</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-from-feat-engineering-to-context-engineeting-for-agents/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From Feature Engineering to Context Engineering for Agents</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-decision-under-uncertainty/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Decisions Under Uncertainty: A Hands‑On Guide to Bayesian Decision Theory</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-bodo-dataframes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bodo DataFrames: a fast and scalable HPC-based drop-in replacement for Pandas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-14-Desiderata-for-Emergent-Languages/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Emergent Languages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-using-embeddings-in-trees/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How to Effectively use text embeddings in tree based models</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-02-rethinking-signaling-systems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rethinking Signaling systems via the lens of compositionality</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-building-llm-powered-apps-for-ds/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building LLM-Powered Applications for Data Scientists and Software Engineers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-using-mcp-to-turn-claude-into-football-analyst/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using MCP to turn Claude into a Football Opposition Analyst</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-rapids/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GPU Python for the Real World: Practical Steps to GPU-Accelerated Python with RAPIDS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-combining-zarr-haf5-tiff-into-a-single-data-format/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Combining Zarr, HDF5, and TIFF into a single data format</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-python-meets-excel/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Meets Excel</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2015-sept-06/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Allegations of War Crimes and the Palestinian Genocide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-enhancing-marketplace-competitiveness/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Enhancing Marketplace Competitiveness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-scaling-fuzzy-product-matching/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling Fuzzy Product Matching with BM25: A Comparative Study of Python and Database Solutions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-09-19-MOR/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">FlexAttention: A Flexible Approach to Attention Mechanisms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-tiny-troupe/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TinyTroupe: Enhancing Marketing Insights through LLM-Powered Multiagent Persona Simulation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-scaling-data-processing-for-llm-with-nemo-curator/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scaling Data Processing for LLMs with NeMo Curator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-blosc2/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hands-on with Blosc2: Accelerating Your Python Data Workflows</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-10-09-SGD/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stochastic gradient Descent – a Deep Dive</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-i-built-a-transformer-from-scratch/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">I Built a Transformer from Scratch So You Don’t Have To</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-synthetic-insurance-data/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Harnessing Generative Models for Synthetic Non-Life Insurance Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-06-research-notes/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Complex Signals Questions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-python-worst-practices/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Worst Practices - Learn from the Expert</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-09-planning-in-complex-lewis-game/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Planning in the Complex Lewis Game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-garbage-in-lawsuit-out/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Garbage In: Lawsuit Out</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-03-09-referential-lewis-game/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Referential Lewis Signaling Game</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-optimizing-ai-ml-workloads/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Optimizing AI/ML Workloads: Resource Management and Cost Attribution</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-slm/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How Big are SLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-survial/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reviving Survival Analysis: Timeless, Yet Overlooked?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-gpu-acc-zarr/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GPU Accelerated Zarr</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-10-pydata-time-series-for-coupled-neurons/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Time series analysis for coupled neurons.</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-llms-chatbots-and-dashboards/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs, Chatbots, and Dashboards: Visualize Your Data with Natural Language</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-04-03-langtalks/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Langtalks Resources # 43</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-11-pydata-sparse-and-finch/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PyData/Sparse &amp; Finch - Extending sparse computing in the Python ecosystem</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-julia-ode-solvers/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Why Julia’s GPU-Accelerated ODE Solvers are 20x-100x Faster than Jax and PyTorch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-12-09-pydata-when-ai-makes-things-up/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">When AI Makes Things Up: Understanding and Tackling Hallucinations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../posts/2025/2025-01-05-bifurcating-paths-to-signaling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Many Path To A Signaling System</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-49" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-49" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2025/2025-01-05-bifurcating-paths-to-signaling/podcast.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Podcast</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-50" role="navigation" aria-expanded="false">
+ <span class="menu-text">2026</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-50" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-50" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-31-ODSC-AI-2026-Day-4/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC - AI 2026 - Workshops</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-19-kv-cache-efficiency/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KV Cache Efficiency &amp; Context Platform Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/03-07-mixture-problems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Mixture problems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-21-Discipline/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Art of Discipline: Mastering Self-Control for a Fulfilling Life</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-01-sick/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sick</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-20-nvidia-Nsight-GPU-profiling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">nvidia Nsight GPU profiling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/03-08-smoothing-problems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Smoothing problems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC AI 2026</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/02-14-CI-Ness/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Robert Ness on LLMs &amp; CI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-10-rl-agent-last-all-summer-long/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RL Agents Last All Summer Long</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-03-agentic-buzz/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentic Buzz</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-09-convergence-of-RVs/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Three modes of convergence of random variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/03-06-being-brave/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Being brave</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-14-rise-of-the-agents/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rise of the agents</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-29-ODSC-AI-2026-Day-2/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC AI 2026 - Day 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/01-03-convolutions-and-fft/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Convoluted Intuitions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/02-15-CI-Tools/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CI - Libs for Python</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC AI 2026</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-51" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-51" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tensor Logic</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Deploying Multimodal AI at the Edge</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Architectural Patterns</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kyle Stratis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk13.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building FSI Agents with Claude</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk14.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Meaningful Data Visualization in the Age of AI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Practical Foundations for Organization-Wide AI Adoption</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">vLLM with the Transformers Modelling Backend</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Verifier–Compiler Loop</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From Intelligent to Agentic Applications</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Operational Transformation of Data Architecture</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Harness Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Real-Time Event-Time Consistent Analytics Pipelines</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Using Model Context Protocol with Python</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC AI 2026</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-52" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-52" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Engineering the Harness</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to the Math Behind Transformers and LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to Machine Learning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A Practical Introduction to Agentic AI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to the Agent2Agent (A2A) Protocol</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/talk6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building Responsible AI Agents</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+    </ul>
+    </div>
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#outline" id="toc-outline" class="nav-link active" data-scroll-target="#outline">Outline</a>
+  <ul class="collapse">
+  <li><a href="#analyzing-effectiveness-of-a-marketing-campaign" id="toc-analyzing-effectiveness-of-a-marketing-campaign" class="nav-link" data-scroll-target="#analyzing-effectiveness-of-a-marketing-campaign">Analyzing Effectiveness of a Marketing Campaign</a></li>
+  <li><a href="#estimating-customer-lifetime-value" id="toc-estimating-customer-lifetime-value" class="nav-link" data-scroll-target="#estimating-customer-lifetime-value">Estimating Customer Lifetime Value</a></li>
+  <li><a href="#transcript" id="toc-transcript" class="nav-link" data-scroll-target="#transcript">Transcript</a></li>
+  </ul></li>
+  <li><a href="#qa-transcript" id="toc-qa-transcript" class="nav-link" data-scroll-target="#qa-transcript">Q&amp;A Transcript</a></li>
+  <li><a href="#resources" id="toc-resources" class="nav-link" data-scroll-target="#resources">resources</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+
+
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/RY-M0tvN77s" title="Dr. Thomas Wiecki: Bayesian Marketing Science - Solving Marketing's 3 Biggest Problems" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+</div></div><div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Lecture Overview
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I presented two powerful open-source packages:</p>
+<ul>
+<li><a href="https://github.com/your-repo/pymc-marketing">PyMC-Marketing</a></li>
+<li><a href="https://github.com/your-repo/causalpy">CausalPy</a></li>
+</ul>
+<p>These tools provide robust estimation of customer acquisition costs, customer lifetime value, and the causal impact of marketing campaigns, all while making optimal budget decisions in complex scenarios.</p>
+</div>
+</div>
+<ul>
+<li>slides
+<ul>
+<li>🔗 <a href="https://docs.google.com/presentation/d/1GceAGz83AdcNRETg2sm7TTIMo_tfFWVf0VGisWLR7t8/edit?slide=id.p1#slide=id.p1">Bayesian Marketing Science</a></li>
+</ul></li>
+</ul>
+<section id="outline" class="level2">
+<h2 class="anchored" data-anchor-id="outline">Outline</h2>
+<p>In the opening, the speaker Thomas Wiecki sets the scene for Bayesian marketing science by framing marketing as a complex, high-stakes problem where teams need fast, transparent, and deployable solutions. He introduces Amy, a data science leader under pressure to deliver measurable customer acquisition costs, lifetime value, and campaign impact while working with diverse data sources and limited marketing expertise.</p>
+<div class="sl">
+<div class="sl-text">
+<p>Introducing Amy.</p>
+<p>She is the VP of data science at an e-commerce company.</p>
+<p>She is of course not an island but embedded in the whole organization and has certain requirements and people that provide inputs and certain resources.</p>
+<p>I wanted to map out that and see what challenge she has.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide02.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Meet Amy"><img src="slide02.png" class="img-fluid figure-img" alt="Meet Amy"></a></p>
+<figcaption>Meet Amy</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p>This is the Amy organization map: CFO constraints, marketing budget pressure, CMO needs, diverse marketing datasets, customer acquisition cost, customer lifetime value, campaign impact, pressure on the data science team, lack of statistical modeling expertise, lack of marketing-domain expertise, and deployment requirements from data engineering.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide03.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Org chart"><img src="slide03.png" class="img-fluid figure-img" alt="Org chart"></a></p>
+<figcaption>Org chart</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<ul>
+<li><strong>the solution begins:</strong></li>
+<li>PyMC Labs’ open-source marketing stack, currently <em>CausalPy</em> and <em>PyMC-Marketing</em></li>
+<li>Bayesian transparency; interpretable model parameters;</li>
+<li>open-source advantages over expensive software-as-a-service media mix tools; modifiability;</li>
+<li>integration with the <em>PyData stack</em></li>
+<li>deployability; the problem that every customer is different;</li>
+<li>the Unix-principle / Tidyverse-style ecosystem idea</li>
+<li>and collaboration with domain experts.</li>
+</ul>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide04.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Solution: PyMC Labs’ OSS Marketing Stack"><img src="slide04.png" class="img-fluid figure-img" alt="Solution: PyMC Labs’ OSS Marketing Stack"></a></p>
+<figcaption>Solution: PyMC Labs’ OSS Marketing Stack</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p>This introduces PyMC-Marketing: Bayesian, built on PyMC, Apache 2.0 licensed, high-level user-friendly application programming interface, media mix models, customer lifetime value models, successor to the Lifetimes library, and credits to the domain experts and contributors.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide05.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="PyMC-Marketing"><img src="slide05.png" class="img-fluid figure-img" alt="PyMC-Marketing"></a></p>
+<figcaption>PyMC-Marketing</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>The Bayesian-advantages</strong>: priors encode stakeholder knowledge, domain expertise is not discarded, lift tests and other evidence can be incorporated, complex models are easier to fit in PyMC, and generative models support forecasting, posterior predictive validation, and scenario analysis.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide06.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Bayesian models have several advantages over traditional models"><img src="slide06.png" class="img-fluid figure-img" alt="Bayesian models have several advantages over traditional models"></a></p>
+<figcaption>Bayesian models have several advantages over traditional models</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>media mix models</strong>: allocate a media budget across channels, estimate how effective each channel is, connect budget to activations or signups, and infer customer acquisition cost, with transfer functions as additional nuance.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide07.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Media Mix Models"><img src="slide07.png" class="img-fluid figure-img" alt="Media Mix Models"></a></p>
+<figcaption>Media Mix Models</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>An example dataset</strong>: two marketing channels, normalized spend over time, sales as the output, and the question of how marketing efforts drive sales.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide08.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Our marketing spend &amp; sales data"><img src="slide08.png" class="img-fluid figure-img" alt="Our marketing spend &amp; sales data"></a></p>
+<figcaption>Our marketing spend &amp; sales data</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>PyMC-Marketing usage example</strong>: instantiate the delayed-saturated media mix model, specify target, date, channel, control columns, Fourier seasonality terms, events such as Christmas, and transfer-function parameters.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide09.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="Using PyMC-Marketing"><img src="slide09.png" class="img-fluid figure-img" alt="Using PyMC-Marketing"></a></p>
+<figcaption>Using PyMC-Marketing</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Generated model</strong>: call <code>.fit</code>, get a fairly complex model with likelihood, inputs, transfer-function parameters, and media mix model components that would otherwise require substantial hand-written PyMC code.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide10.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="Builds a fairly complex model"><img src="slide10.png" class="img-fluid figure-img" alt="Builds a fairly complex model"></a></p>
+<figcaption>Builds a fairly complex model</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Posterior predictive check</strong>: compare model predictions with observed data; the model’s predicted series tracks the actual sales data fairly well.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide11.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="Posterior Predictive Check"><img src="slide11.png" class="img-fluid figure-img" alt="Posterior Predictive Check"></a></p>
+<figcaption>Posterior Predictive Check</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Posterior predictive model components</strong>: decompose sales into seasonality, events, channel contribution, intercept, and the combined sales signal.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide12.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="Posterior Predictive Model Components"><img src="slide12.png" class="img-fluid figure-img" alt="Posterior Predictive Model Components"></a></p>
+<figcaption>Posterior Predictive Model Components</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Open-source contribution note</strong>: the plot came from a pull request by a user who tried the package, illustrating that people are already contributing improvements back.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide13.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12" title="Media Mix Model"><img src="slide13.png" class="img-fluid figure-img" alt="Media Mix Model"></a></p>
+<figcaption>Media Mix Model</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Contribution plots</strong>: as spend increases, response does not grow linearly forever; it levels off due to saturation. In the Bayesian framework, the result is a posterior distribution rather than a point estimate, which helps quantify uncertainty and supports optimization.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide14.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="Contribution Plot"><img src="slide14.png" class="img-fluid figure-img" alt="Contribution Plot"></a></p>
+<figcaption>Contribution Plot</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Posterior return on ad spend</strong>: because this is a simulation study, the inferred return on ad spend can be compared with the true underlying parameters, and the model recovers them reasonably well.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide15.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14" title="Posterior ROAS"><img src="slide15.png" class="img-fluid figure-img" alt="Posterior ROAS"></a></p>
+<figcaption>Posterior ROAS</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<section id="analyzing-effectiveness-of-a-marketing-campaign" class="level3">
+<h3 class="anchored" data-anchor-id="analyzing-effectiveness-of-a-marketing-campaign">Analyzing Effectiveness of a Marketing Campaign</h3>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Campaign effectiveness example</strong>: Amy’s next task is to evaluate whether a February 2023 marketing campaign increased sales. Visually, sales rose, but the variance may also have changed, so the causal question is not trivial. A proper experiment would have a control group, but here there is no untreated control.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide17.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15" title="Marketing Campaign Effectiveness"><img src="slide17.png" class="img-fluid figure-img" alt="Marketing Campaign Effectiveness"></a></p>
+<figcaption>Marketing Campaign Effectiveness</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>CausalPy and Bayesian quasi-experiments</strong>: fit a model to pre-intervention sales, predict the counterfactual path without intervention, compare observed post-campaign sales to the synthetic control, inspect residual and cumulative effects, and support flexible models including covariates, <code>scikit-learn</code> forecasters, synthetic controls, and difference-in-differences variants.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide18.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16" title="Bayesian causal analysis of quasi-experiments"><img src="slide18.png" class="img-fluid figure-img" alt="Bayesian causal analysis of quasi-experiments"></a></p>
+<figcaption>Bayesian causal analysis of quasi-experiments</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="estimating-customer-lifetime-value" class="level3">
+<h3 class="anchored" data-anchor-id="estimating-customer-lifetime-value">Estimating Customer Lifetime Value</h3>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Customer lifetime value</strong>: sales come from individual customers, some of whom are repeat buyers. Use a beta-geometric model from the customer-lifetime-value submodule of PyMC-Marketing with frequency, recency, and customer age.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide20.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17" title="CLV"><img src="slide20.png" class="img-fluid figure-img" alt="CLV"></a></p>
+<figcaption>CLV</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Probability of repeat purchase</strong>: after a purchase on day 31, estimate the probability that the customer will buy again. As time passes without another purchase, confidence declines because customers churn.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide21.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18" title="Probability Customer will purchase again"><img src="slide21.png" class="img-fluid figure-img" alt="Probability Customer will purchase again"></a></p>
+<figcaption>Probability Customer will purchase again</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p>If the customer buys again, confidence that the customer is still active rises, and the model expects additional future purchases.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide22.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19" title="Probability Customer will purchase again"><img src="slide22.png" class="img-fluid figure-img" alt="Probability Customer will purchase again"></a></p>
+<figcaption>Probability Customer will purchase again</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Combining models</strong>: the goal is not merely minimizing customer acquisition cost or maximizing customer lifetime value, but maximizing revenue or profitability. Different channels bring different customer value, so combine media mix model estimates, customer lifetime value estimates, and causal impact analysis. The value comes from triangulating across datasets and models.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide23.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20" title="Combining Multiple Models"><img src="slide23.png" class="img-fluid figure-img" alt="Combining Multiple Models"></a></p>
+<figcaption>Combining Multiple Models</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<p><strong>Vision</strong>: the toolbox is just getting started; planned additions include hierarchical models across channels and locations, time-varying parameters, Bayesian optimization, dashboards, and more community contributions.</p>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide24.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21" title="Vision"><img src="slide24.png" class="img-fluid figure-img" alt="Vision"></a></p>
+<figcaption>Vision</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="transcript" class="level3 hidden">
+<h3 class="anchored" data-anchor-id="transcript">Transcript</h3>
+<p>0:03 thanks for the introduction thank you all for coming um I had a nightmare this morning that I 0:09 got here and then my laptop broke down and then once we fixed that I was standing here and was wearing my pajamas 0:14 it’s terrible so I’m very excited to be here with functioning laptop and no pajamas 0:20 and talk to you about Basic Marketing science solving marketing’s three biggest problems 0:29 as we already established on Thomas I uh it’s my mission to bring Bayesian 0:36 modeling to its fullest potential and I started this when I was in grad school at Brown and found that Bayesian 0:42 modeling is a really amazing tool to solve all kinds of Applied problems and build custom models to solve these 0:48 problems and however there are still and were back then even more things standing 0:55 in the way of those widered options and that started with the tooling and it’s why I got involved with some other folks 1:00 like responders back to develop pymc and then during my work at quantopian 1:08 which was a Quant Finance Company I also discovered that it was not only 1:13 really useful for academic research but also for solving applied business problems and then after 1:21 that chapter ended I started Ponzi labs to really dry try and bring this to 1:27 establish it in business so privacy Labs is basically a bunch of the 1:36 people that have developed Pine C and joined the development team over the years to help companies use pimc more 1:44 effectively or just solve any kind of problem where Bayesian might be a good fit and I couldn’t be more 1:52 happy about the the team that I’m working with like these are some of the most talented amazing modelers I’ve ever 1:59 had the pleasure of working with which is also what I like to call them the the Bayesian Avengers uh because each one of 2:04 them is especially in their own way and in hardcore 2:10 we work with clients from all over the industry and solved their problems and so for 2:20 example hellofresh you probably know them uh they’re also here in Berlin we help them with some media mixed 2:27 modeling marketing attribution uh visual vest there’s a company also here in Germany with custom lifetime value 2:33 modeling so you see uh there’s definitely a large exposure of marketing companies marketing departments in 2:40 e-commerce companies that were helping and that was a bit surprising to us because 2:46 none of us really had a marketing background and nonetheless there was this huge demand there so marketing does 2:52 seem to be very eager to adopt these methods and the other big branch of companies that we’re working with are 2:58 Healthcare biotech companies which I guess also makes sense because a lot of us have a biotech background and also 3:05 because it’s often much closer Associated to academic research where basement modeling is a bit more established 3:12 uh but we’re not limited to this so we work with um all kinds of companies so I want to start this talk by 3:19 introducing our protagonist Amy uh I generated her on this person does not exist 3:25 um she is the VP of data science at an e-commerce company and she is of course uh not an island 3:33 but embedded in the whole organization and has certain uh well requirements and 3:39 people that provide inputer and certain resources so I wanted to map out that and see what challenge she has and then 3:47 what I think the market needs and what we developed to help people like Amy in 3:52 the marketing space so there’s the CFO right and he said he 3:58 or she sets revenue and profitability targets uh and also of course has a probably a 4:07 pretty tight grip on the budget so Amy can’t just go out and buy software Solutions uh for every little problem 4:13 that she has she will have to develop Solutions herself right and of course like any 4:21 retail or e-commerce company marketing will probably be the biggest expense in 4:26 the business and a large effort is going to be placed on that so really it’s very important to maximize the marketing 4:31 return on investment uh the other team that she’s working with closely is the CMO slash the 4:38 marketing team and what they really want is to maximize the efficiency of their marketing budget 4:45 and towards that goal what they want is accurate measurements of all their different efforts right so they’re 4:51 asking data science to help them measure the things that they’re doing 4:57 and one complexity well several complexities with that but one is that they have all kinds of diverse different 5:02 data sets so they have data sets on the marketing dollars that they’re spending on 5:09 different channels they tracking the new users that are coming in the sales that 5:14 they’re doing they’re launching campaigns and they want to know the impact of those they have lift tests so 5:21 just all kinds of different data sets and somehow out of that 5:27 stuff they need to form a coherent picture right and that’s what they’re asking data science to do 5:32 but not only a Korean picture but also insights that are transparent and 5:37 actionable and things that they’re often are looking for and these are these three things uh what are my customer 5:44 acquisition costs how much do you have to spend in marketing to get a single customer as well as once I have acquired that 5:51 customer how much do I earn from the customer right the customer lifetime value and then other things related to for 5:58 example campaigns is or any type of action that they’re doing what is the effect of that what is the causal impact 6:04 of the actions that we’re taking so these are the asks 6:10 um of Amy but also there is a uh they’re all resources that she has so for 6:17 example she will have a data science team working for her and 6:22 probably many of you will be familiar with what that is I assume most of you are data scientists who are working in 6:29 uh in a group like that or are at a different level and there’s often a lot 6:35 of pressure to produce results fast right so the marketing team wants those 6:40 reports and insights for this quarter this deadline and that makes it 6:46 difficult to really come up with long-term r d strategy to say okay well now we’re going to build like a huge 6:52 amazing statistical model that incorporates all these different data sources and attributes uncertainty in 6:58 the right way so that compounded with the fact that it’s very hard to find these statistical 7:03 modeling experts in the market makes that pretty challenging 7:09 and another challenge of course is that most data scientists are not themselves experts in marketing right so there’s 7:15 sort of a domain expert problem where the knowledge is differently located in the company 7:22 and then any solution that the data science team comes up with needs to be deployed and so they will go 7:29 to the data engineering team and they really care about things like maintainability and being able to run these things on premise and things like 7:37 that okay so this is after having worked at 7:42 PYMC Labs with in many of those settings I think we have provided some 7:49 tools that will hopefully help Amy and and people like her and that is what up here the PYMC 7:54 labs open source marketing stack consisting out of currently causal pi and PYMC marketing which are the tools 8:00 that I will be talking more about so a key tenant and 8:06 because you came to the stock you’ll probably know that we’ll talk about Bayesian modeling and they have many 8:12 benefits but one of them is that they are inherently transparent in what they do right so there is a model graph and 8:18 you can explain this to your stakeholders to the marketing people of how your inputs relate to your outputs and that of course is very important 8:25 when you want to build trust but not only can you explain the model you can also explain the results right so the 8:31 parameters are not some crazy uh thing in a very high 8:37 dimensional space some embeddings but rather there are parameters that relate to things that you actually want to 8:43 estimate right so for example customer lifetime value 8:48 also this stack is open source which I think is very important and this is also 8:53 what I think is the big difference right there’s many media mix models out there that people sell for hundreds of 9:00 thousands in annual licensing costs which of course is a quite a big drain on on any budget so obviously it’s free 9:09 which is cool uh it’s transparent you can look at the code if you just get a SAS solution you don’t really know they 9:15 tell you all that their model is state of the art amazing but how can you really verify what it’s really doing 9:21 it’s modifiable so you can just use that code as a template and do your own thing or inherit from That Base Class right 9:27 and build your own custom model and of course it integrates with the pi data stack so your data scientists will 9:34 love it because it you can use it with pandas and Jupiter and the engineers hopefully you will like it too because 9:41 it you can just like deploy it in-house and airflow and use kubernetes and all 9:46 these other deployment tools that are out there now one Central problem that we’ve come 9:53 across over and over again in PYMC Labs in trying to solve these problems is that 10:01 every customer is very very different so we in the beginning we thought when we did this once we were like okay cool now we can just like do the same thing for 10:08 everyone but we found that’s not at all what it is so we always needed to do 10:13 custom Solutions which is what we’re mainly doing right we’re coming into the company and helping them solve their 10:19 very particular problem so we found that it was pretty much impossible to build like a one-size-fits-all solution that 10:26 has like everything in one tool so rather I think the Unix principle uh 10:32 will come into play or it will be helpful here where you have simple tools that you can combine simply which makes 10:39 sense if if we’re talking about like an ecosystem of tools that are compatible with each other 10:44 and then build your own custom workflows around that 10:52 also that idea from the Tidy verse right uh where you have all these individual tools and they just speak the same 10:57 language so this is really the vision behind this and of course developed by the base and Avengers 11:03 um so the modeling is uh is legit but also as I said we’re not marketing 11:09 experts ourself but we teamed up with domain experts that have done this for many many years 11:16 so privacy marketing uh is something that we just released so I’m very excited to 11:22 announce this here and tell you a little bit more about it so it is as I already said Bayesian so built on Pine c 11:28 um which is a probabilistic programming package for python that allows you to build these fairly complex statistical Bayesian 11:35 models and it’s open source Apache V2 licensed 11:40 so just do whatever you want with it use it in commercial selling set it sell it whatever and we pride ourselves on 11:48 uh having made time c as user friendly as possible not to say that’s very user friendly but we try 11:55 um so we try to extend this here to Primacy marketing and just give user-friendly high level API that is 12:00 easy to use it comes with two models that are commonly used in marketing media mix 12:07 models and customer lifetime value models we plan to add more but that’s where we started 12:13 and in that it’s the success of the lifetimes Library if you’re familiar with this so This was done by cam 12:18 Davidson and he I think mostly abandoned this so people were looking for new 12:24 solutions to do customer lifetime value models and that’s what we provide and also doing it in a Bayesian framework so this 12:31 is the UL check it out and also a big shout out to the people who helped us develop this 12:36 um domain experts uh Juan did a lot of work on this also with the code uh he’s 12:41 the data scientist as Walt um and there’s a lot of experience with this called Ellen was largely 12:47 responsible for the customer lifetime value stuff Niall Alton and Luca fiaski they just 12:54 have a Decades of experience in this space so yeah we really tried and not 12:59 only do what we as statisticians think is the right thing but also uh what what people told us what they need 13:05 uh if you’re more interested in learning about this there’s a webinar today actually 13:10 um where you can sign up just go to meet up I’m see labs and then you can find it 13:16 but I wanted to talk a little bit more about Bayesian models uh and and why that is so powerful in marketing but 13:23 also specifically for the problems that we’re trying to solve here so one of them is the ability to set 13:28 constraints on modeling parameters using priors so this is extremely helpful when 13:35 working with other stakeholders because you can just get the input so you can ask them well what do you think in 13:42 general like a rough parameter range of the customer lifetime value is they will already have several ideas on that right 13:49 so they have been doing this for many many years and you don’t have to throw away that domain expertise because you 13:55 have your black box machine learning model that just learns everything from data you can take the input and enter into a conversation with them and really 14:02 get the download from them and co-develop like a model with them that all that also really helps to 14:08 um well make people adopt your Solutions related to this we can incorporate 14:15 existing knowledge about effects of advertising so not only by asking people but also from other data sources so for 14:22 example if we have run a b tests or lift tests we can incorporate that to get better estimates and this is the idea 14:28 behind this that we have these diverse data sets and we ideally want to come up 14:33 with a Korean picture that takes all of those into account 14:38 also because we’re in a Bayesian framework and the inference algorithms by now have been very have become very 14:45 very powerful we can just build whatever crazy model we want and usually the sampler will have no huge issues 14:53 sampling everything that you put into your model so for example the robin model has a very sophisticated fitting 15:01 structure with iterative optimization and some evolutionary algorithms just 15:06 because if you don’t have price and UI in this very 15:11 difficult statistical modeling space fitting these irons can be challenged but fortunately primes that’s the 15:17 strength of Pi MC right that it just like code your model and then we try and figure it out for you 15:24 and finally the idea that we produce generative models 15:30 so the benefit of that is that once we fit the model we can just generate new 15:36 data creating forecasts we can use that for model validation to see does it actually replicate the data that I know 15:41 that I used to fit this with but also things like scenario analysis like what if I doubled my marketing spend so this 15:48 generative framework is very powerful for this so what are media mix models well 15:56 um they start with a certain Media budget that you allocate and then you 16:02 want to know how effective each marketing channel is so you have a total budget you get a certain number of activations or sign ups and from that 16:10 you can back out the customer acquisition costs there’s a lot more Nuance to this like transfer 16:15 functions but this is the core of it so let’s look at an example that was provided by Juan and we have two 16:21 marketing channels in our example and over time we spend a certain amount which is normalized 16:28 here to be between 0 and 1. and on the output side we measure how many sales we got right so we want to know how do our 16:34 marketing efforts Drive sales now with privacy marketing this is we 16:40 try to make this as simple as possible you just call the delayed saturate mmm class you instantiate it you pass in all 16:47 these different things so you see well we have a Target output column we have a date column 16:54 the channel columns you can have certain control columns you see these sine and cosine these are the Fourier bases to 17:01 model seasonality effects we can include certain events like Christmas 17:07 um and then parameters for other transfer functions in the model so with this single line and then to fit 17:14 it you just call Dot fit you build a model that’s actually fairly complex right so I’m not going to go 17:21 through this but we have the likelihood here we have inputs we have parameters for transfer functions and everything 17:27 that goes into an mmm so you can just imagine that if you were to write this from hand using pi MC it would probably 17:33 be quite an effort and there’s many tutorials out there and talks and people asking questions how do I do this so 17:39 here we just try it and do this for you that it’s just out of the box 17:45 when you fit this the first thing you want to do is probably just see what the how good is it that’s replicating your 17:51 data so this is called a posterior predictive check and in blue we have what the model predicts and in Black we have the actual data so you can see it’s 17:58 actually modeling the data fairly well then we can also decompose the signal 18:04 right so we have certain things like the sine cosine pattern here for modeling 18:09 seasonality that’s one component we have these events here that are these spikes we have the channel contribution in blue 18:14 in intercept term and these together give you this sales data 18:22 just including this plot here because we’ve just gotten it from Herbert Kubler who just checked out the package and did 18:28 a pull request to add this so this is just my um love note to open source that like 18:34 you put stuff out there and then people start working with it and contributing back which is just amazing that that’s 18:40 already happening yeah these uh contribution plots so you see that the the more you spend on the 18:45 x-axis it’s not that you get just more and more on the y-axis there’s a leveling off effect 18:51 um a saturation effect and of course you get posteriorist because when a Bayesian framework it’s 18:57 not just single estimates but whole probability distributions and this helps 19:02 when assessing your uncertainty in these estimates but also helps with uh optimization for example there you 19:08 really want to take uncertainty into account and since there’s a simulation study we can compare this to the true 19:13 return on ad spend and see that we recover the trooper underlying parameters pretty well 19:21 the other thing that I laid out before was analyzing the effectiveness of a 19:26 marketing campaign so this is the next task that Amy has to solve and here’s 19:32 another example so we launched a new product and in in 2022 this was an example 19:40 um contributed by called Allen and we see that sales have been pretty steadily increasing since then which is great and 19:47 then here in February 2023 the marketing team decided to run a 19:53 campaign to boost sales even further and now the question is did that campaign work yes or no 20:00 and well just visually it’s kind of difficult right I mean yeah maybe the variants may be also increase so hard to 20:07 say just by gauging so obviously that’s just a question but actually not a trivial statistical question because 20:14 usually what we would hope for if we’re like good scientists is a proper experiment where we have a control group 20:20 where we didn’t have the campaign and one where we did give the campaign to but we don’t have that here 20:28 so this is the framework where of causal 20:33 analysis and quasi-experiments and this is the other library that um I’m very excited about called causal 20:40 Pi developed by Ben Vincent and this is doing not only causal 20:45 analysis but in a Bayesian framework which I think has many benefits so you can see basically the logic behind 20:52 this just from these plots I hope it makes sense is we have this path sales data and we just fit a model to this and 20:58 then we predict what would have happened if there was no intervention right and that’s why this is called a synthetic 21:03 control so we there is no real control we’re creating one and so we just assume that like well it 21:09 would just continue like this and then we can look at the residuals and 21:15 then compare the residuals in the out of sample essentially to compare the 21:20 difference between what a predict would have happened and what actually happened with the intervention and then we can also just look at the 21:26 cumulative effect to really see what is going on and we see that there’s a very strong effect that indeed it seems to 21:33 have made a difference and increased sales even further 21:39 and also I’m I I’m not trying to code but this is just a single line also to do this and there’s a lot of flexibility 21:45 in this so it’s not just linear models you can add covariates you can also use scikit-learn models to do more complex 21:51 forecasts and synthetic controls and and also different type of so this is a 21:58 synthetic control example but there’s different like different differences within differences and there’s a whole 22:03 zoo of things and we include many of those the last thing I wanted to show is 22:08 estimating customer lifetime value so that’s the other task and usually data 22:13 and this is actually the data underlying the plot I just showed it’s not just sales 22:18 right those sales come from Individual customers some are repeat buyers so we want to get more insight into this and 22:25 we can use a they have somewhat obscure names a beta Geo model 22:32 from the customer lifetime sub module in privacy marketing and putting in data 22:38 like this like how many how often did they buy when was the last time they bought and how long have they been a 22:44 customer with us for each customer and then get for example over time let’s 22:51 say they bought something here on day 31 what is the probability that this 22:56 particular customer that I use as an example here is going to buy again and as you can see over time we’re 23:03 losing uh confidence that they will come back right like customers churn all the time and the longer we haven’t seen them 23:09 the lower the probability that they will come back or assume now that they have actually 23:15 then bought again here so now we have this confidence that well probably they’re gonna they’re definitely still 23:22 alive and we’re gonna just um expect that they are gonna buy more 23:29 so this and many more analyzes you can get insight into which customers are driving your Revenue 23:35 which customers are at the highest risk of churning and of course you also get 23:41 uncertainty in all of these because we’re in that Bayesian framework now the last point I want to make is 23:46 this idea of combining models so again I would like the way I laid it I was like oh task a 23:52 tool a but the power comes from this Unix Principle as I explained before where usually in a company the goal is 23:59 not to minimize custom acquisition cost or to maximize custom lifetime value but rather to maximize Revenue right that’s 24:05 really what we’re after at the end of the day and all these other things are just sort of waypoints on that path 24:12 because we do know that not all marketing channels for example provide equally valuable customers 24:17 they are different and really what we want to do then is combine the media mix and clv estimates to get a measure of 24:24 our profitability and not just these other metrics and of course we can just include customer causal impact analysis 24:31 into this as well and not only estimate the custom the causal impact of our 24:37 marketing efforts onto sales but really profitability right and this type of 24:42 thing so the way that I like to view this is as just cogs and machine and each tool is an individual clock but 24:50 the power comes from combining them together and also by combining these things 24:55 together there’s this idea of triangulation right so this is the thing that we’re after which we can’t observe but we have different data sets and 25:03 models that provide insight and if you just have a single one right you have much more you can say many fewer things 25:11 about this but if we triangulate and combine many data sets and the insights 25:17 we can get an estimate that’s much more accurate 25:22 possibility is endless so where are we going with this well we’re just getting started we plan to 25:30 add many additions if you follow our Blog then you have heard that we have hierarchical 25:36 models across channels and location time varying parameters 25:41 Bayesian optimization dashboard but really there’s much more we can do so 25:49 asking everyone here to help us build the most amazing toolbox out there find the code on GitHub and here’s some 25:56 more links if you want to know how this can help you</p>
+</section>
+<hr>
+</section>
+<section id="qa-transcript" class="level2">
+<h2 class="anchored" data-anchor-id="qa-transcript">Q&amp;A Transcript</h2>
+<p>The audience submitted questions on Slido; the most popular asked how PyMC scales with growing data and whether there’s a distributed mode.</p>
+<p>The speaker explained that while older Bayesian tooling struggled to scale, recent advances have helped: PyMC supports a JAX backend for CPU/GPU execution (useful for very large datasets), and new samplers (e.g., NUTS implementations with Rust + NumPy backends) provide significant CPU speedups.</p>
+<p>On CLTV projections for ad-based businesses (e.g., mobile apps), the speaker said you can extract projections from the tools but a dedicated function may not yet exist — contributions are welcome.</p>
+<p>Comparing PyMC and Stan: historically similar, but PyMC’s JAX/GPU path and new sampler implementations have shown notable speed improvements in some benchmarks.</p>
+<p>Validation and recalibration: use posterior predictive checks as part of the Bayesian workflow (simulate, check, iterate, refine) to diagnose and improve model fit.</p>
+<p>Model visualization: PyMC can produce model graphs (e.g., via Graphviz) with a single call; these visualizations help explain structure, though extremely large graphs remain challenging to present to stakeholders.</p>
+<p>Great — that’s all for the session; thanks and applause.</p>
+</section>
+<section id="resources" class="level2">
+<h2 class="anchored" data-anchor-id="resources">resources</h2>
+<ul>
+<li><a href="https://www.pymc-labs.io">PyMC Labs: www.pymc-labs.io</a></li>
+<li><a href="https://www.pymc-labs.io/newsletter">Bayesian newsletter: www.pymc-labs.io/newsletter</a></li>
+<li><a href="https://www.pymc-marketing.io">PyMC-Marketing: www.pymc-marketing.io</a></li>
+<li><a href="https://causalpy.readthedocs.io">CausalPy: causalpy.readthedocs.io</a></li>
+<li><a href="https://www.pymc.io">PyMC: www.pymc.io</a></li>
+<li><a href="https://www.intuitive-bayes.com">Intuitive Bayes: www.intuitive-bayes.com</a></li>
+<li><a href="https://twitter.com/twiecki">Twitter for twiecki</a> <a href="https://twitter.com/pymc_labs">Twitter for PyMC Labs</a></li>
+</ul>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2023,
+  author = {Bochman, Oren},
+  title = {Bayesian {Marketing} {Science} - {Solving} {Marketing’s} 3
+    {Biggest} {Problems}},
+  date = {2023-06-20},
+  url = {https://orenbochman.github.io/posts/2023/06-20-bayesian-marketing-science/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2023" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2023. <span>“Bayesian Marketing Science - Solving
+Marketing’s 3 Biggest Problems.”</span> June 20. <a href="https://orenbochman.github.io/posts/2023/06-20-bayesian-marketing-science/">https://orenbochman.github.io/posts/2023/06-20-bayesian-marketing-science/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("^(?:http:|https:)\/\/www\.quarto\.org\/custom");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+            // default icon
+            link.classList.add("external");
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
+        for (let i=0; i<annoteTargets.length; i++) {
+          const annoteTarget = annoteTargets[i];
+          const targetCell = annoteTarget.getAttribute("data-target-cell");
+          const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
+          const contentFn = () => {
+            const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+            if (content) {
+              const tipContent = content.cloneNode(true);
+              tipContent.classList.add("code-annotation-tip-content");
+              return tipContent.outerHTML;
+            }
+          }
+          const config = {
+            allowHTML: true,
+            content: contentFn,
+            onShow: (instance) => {
+              selectCodeLines(instance.reference);
+              instance.reference.classList.add('code-annotation-active');
+              window.tippy.hideAll();
+            },
+            onHide: (instance) => {
+              unselectCodeLines();
+              instance.reference.classList.remove('code-annotation-active');
+            },
+            maxWidth: 300,
+            delay: [50, 0],
+            duration: [200, 0],
+            offset: [5, 10],
+            arrow: true,
+            appendTo: function(el) {
+              return el.parentElement.parentElement.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'quarto',
+            placement: 'right',
+            popperOptions: {
+              modifiers: [
+              {
+                name: 'flip',
+                options: {
+                  flipVariations: false, // true by default
+                  allowedAutoPlacements: ['right'],
+                  fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
+                },
+              },
+              {
+                name: 'preventOverflow',
+                options: {
+                  mainAxis: false,
+                  altAxis: false
+                }
+              }
+              ]        
+            }      
+          };
+          window.tippy(annoteTarget, config); 
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../../posts/2023/05-10-migration-notes/index.html" class="pagination-link" aria-label="The Great Migration">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">The Great Migration</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../../posts/2023/12-20-autogluon/index.html" class="pagination-link" aria-label="AutoGluon Cheetsheets">
+        <span class="nav-page-text">AutoGluon Cheetsheets</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+ Copyright 2025, Oren Bochman
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">
+<p>About</p>
+</a>
+  </li>  
+</ul>
+    <div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+    <script type="text/javascript">
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let pseudocodeOptions = {
+          indentSize: el.dataset.indentSize || "1.2em",
+          commentDelimiter: el.dataset.commentDelimiter || "//",
+          lineNumber: el.dataset.lineNumber === "true" ? true : false,
+          lineNumberPunc: el.dataset.lineNumberPunc || ":",
+          noEnd: el.dataset.noEnd === "true" ? true : false,
+          titlePrefix: el.dataset.captionPrefix || "Algorithm"
+        };
+        pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+      });
+    })(document);
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let captionSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+        if (captionSpan !== null) {
+          let captionPrefix = el.dataset.captionPrefix + " ";
+          let captionNumber = "";
+          if (el.dataset.pseudocodeNumber) {
+            captionNumber = el.dataset.pseudocodeNumber + " ";
+            if (el.dataset.chapterLevel) {
+              captionNumber = el.dataset.chapterLevel + "." + captionNumber;
+            }
+          }
+          captionSpan.innerHTML = captionPrefix + captionNumber;
+        }
+      });
+    })(document);
+    </script>
+  
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

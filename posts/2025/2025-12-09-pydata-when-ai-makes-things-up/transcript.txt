@@ -1,0 +1,1167 @@
+
+Aarti Jha-When AI Makes Things Up_ Understanding and Tackling Hallucinations-PyData Global 2025
+PyData
+172K subscribers
+
+    
+    
+    
+    
+
+    
+  
+
+    
+    
+    
+    
+
+    
+  
+111 views  Jan 9, 2026
+AI systems are increasingly being integrated into real-world products - from chatbots and search engines to summarisation tools and coding assistants. Yet, despite their fluency, these models can produce confident but false or misleading information, a phenomenon known as hallucination. In production settings, such errors can erode user trust, misinform decisions, and introduce serious risks. This talk unpacks the root causes of hallucinations, explores their impact on various applications, and highlights emerging techniques to detect and mitigate them. With a focus on practical strategies, the session offers guidance for building more trustworthy AI systems fit for deployment.
+Transcript
+
+Follow along using the transcript.
+PyData
+172K subscribers
+Videos
+About
+0 Comments
+Default profile photo
+Add a comment...
+Transcript
+0:07
+Hello everyone, my name is Articha and I
+0:09
+work as a principal data scientist at
+0:11
+Red Hat. Um, and uh, a little about me,
+0:15
+I work on building a lot of AI solutions
+0:18
+especially to ensure uh, you know cost
+0:21
+cutting and more efficiency uh, in the
+0:24
+internal workspace. So today I'm here to
+0:27
+talk about the most common problem that
+0:29
+we face whenever we are dealing with any
+0:31
+AI application and that's hallucination.
+0:34
+It's when your AI application or your
+0:36
+model makes things up that does not
+0:38
+actually exist. In this talk today we'll
+0:41
+basically go through how what is the
+0:43
+reason for these hallucinations? How can
+0:45
+you detect them? How can you actually
+0:47
+prevent them in your um in the life
+0:50
+cycle of your production application?
+0:53
+Right? Let's get started.
+0:56
+So um it won't be wrong to say that AI
+0:59
+has become an integral part of our life.
+1:02
+Everything that we do be it related to
+1:04
+work or personal life we're always using
+1:06
+AI in some sort some form or the other.
+1:10
+For example at work you may have certain
+1:12
+assistants that are helping you or code
+1:14
+assistants that you're using in order to
+1:16
+code. Whereas in personal work, I'm sure
+1:18
+everyone present here is using chart
+1:20
+GPT, perplexity, claude or some of the
+1:23
+other tools to just um help them in the
+1:26
+daily work. Something like creating an
+1:28
+itinary for yourself. Well, I'll be
+1:31
+honest. I use GPT almost every day and
+1:34
+in fact treat it as my personal
+1:36
+assistant. Basically, I throw questions
+1:38
+and scenarios and situations to GPT and
+1:41
+expect it to come up with the answer.
+1:43
+And I'll be honest, most of the times I
+1:46
+do believe everything that it says. But
+1:49
+it's important to know that every time
+1:51
+when AI sounds right, it actually isn't.
+1:54
+Let's try and understand this with a
+1:56
+very simple example. Let's say I am
+1:59
+planning a trip abroad for 90 days or 3
+2:01
+months and I want to make sure that I'm
+2:04
+allowed to work while I'm out for these
+2:06
+90 days. So um and my company is uh
+2:10
+adopting AI and so they've built a HR
+2:12
+assist. This is basically uh an
+2:14
+assistant that's going to help ask uh
+2:16
+answer all the questions related to my
+2:18
+company policies. I go ahead, I type in
+2:21
+my question saying asking if I'm allowed
+2:23
+to work from abroad for 90 days or 3
+2:25
+months. My HR assist is quick enough to
+2:28
+come up with the answer. It says yes,
+2:31
+the company policy allows remote work
+2:33
+internationally for 90 days. I'm
+2:36
+surprised one because I received this
+2:38
+answer in less than 30 seconds. I did
+2:40
+not have to go through creating tickets
+2:42
+or reaching out to a human HR in order
+2:44
+to get all of these details which would
+2:46
+then take a couple of uh hours or days
+2:50
+to get the response and secondly it's of
+2:52
+course in my favor. So I'm really happy
+2:54
+about it. I go ahead make my plan pack
+2:57
+my things and move abroad and start
+2:59
+working from there. It's only then that
+3:01
+I get to hear from the human HR who says
+3:04
+that I am not allowed to work outside
+3:07
+unless I've taken certain permissions.
+3:09
+Now I have a major compliance breach and
+3:12
+also some tax violation waiting for me.
+3:14
+At this point I'm completely frustrated
+3:17
+and more than that I it would won't be
+3:19
+wrong to say that I don't trust AI
+3:21
+anymore. Now this is a hypothetical
+3:24
+situation could happen with uh doesn't
+3:26
+really happen in real but imagine if
+3:29
+something like this does happen at a
+3:30
+scale that can have some very severe
+3:33
+impacts or outcomes. What would you do?
+3:37
+Let's go ahead and define what
+3:38
+hallucinations are. Hallucination is
+3:40
+when AI systems or applications generate
+3:43
+answers or information that are
+3:45
+factually incorrect, have no grounding,
+3:47
+and are totally fabricated. But it's
+3:50
+going to generate them with such
+3:51
+confidence and fluency that you tend to
+3:54
+believe and accept them as truth.
+3:57
+But it's important to note that this is
+3:59
+not just an assistant or a chatbot
+4:01
+problem. Most of the times we associate
+4:03
+hallucination with just something that
+4:05
+you would face in an assistant. While of
+4:07
+course assistant is the most common uh
+4:10
+application or tool being used in most
+4:12
+of the enterprises and also at personal
+4:14
+level and it becomes really easy to
+4:16
+track and understand hallucination. Here
+4:18
+other systems like search and knowledge
+4:21
+might also face this. Sometimes your
+4:23
+model might end up referencing multiple
+4:26
+different search results but still
+4:28
+answering or creating an uh aggregated
+4:30
+answer which does not match any of that
+4:32
+or you you may have a summarization or
+4:35
+reporting uh going on. Now in
+4:37
+summarization it may have certain uh
+4:40
+sentence or a knowledge that was never
+4:42
+present in your actual content.
+4:44
+Similarly in reporting it might add
+4:46
+certain numbers which is not true and uh
+4:49
+not a part of your actual data. The last
+4:52
+one is coding and debugging. I think
+4:54
+this is something that's really trending
+4:55
+these days and a lot of developers and
+4:57
+data scientists are using uh code
+4:59
+assistants in order to uh generate their
+5:02
+code, right? And sometimes it does end
+5:04
+up creating APIs or functions that are
+5:07
+not exactly uh supposed to be there.
+5:10
+I'll give you a firsthand experience. I
+5:12
+start I was basically stuck with a piece
+5:15
+of code and used one of the assistants
+5:17
+in order to get the answer for it. I was
+5:19
+using an open- source package uh a
+5:21
+library and um had a function that was
+5:24
+creating the issue. Well, my model ended
+5:27
+up adding an argument to it stating that
+5:29
+this would definitely resolve my issue.
+5:31
+However, it was only when I ran that
+5:33
+code I realized no such arguments exist
+5:35
+at all. For me, it was a very small two
+5:38
+and fro just a bit timeconuming but I
+5:41
+did understand that this was completely
+5:42
+wrong. However, imagine if someone is
+5:46
+presenting something, presenting a
+5:47
+report to some stakeholder or someone in
+5:50
+the higher hierarchy and presenting
+5:53
+certain wrong numbers without
+5:54
+fact-checking it. Imagine the outcome
+5:56
+that would have.
+5:58
+Now that we've seen what hallucinations
+6:00
+are, it's important to know why do these
+6:02
+actually occur. We can categorize them
+6:05
+into four different buckets. Starting
+6:06
+off with the very first one and the most
+6:08
+simplest yet the most obvious reason
+6:11
+which is the input in input or the
+6:13
+prompt issues. Now most of the times
+6:16
+people think that if you're using a very
+6:18
+good large boolean model and uh a very
+6:20
+good reasoning model this model would
+6:23
+not need enough instructions and would
+6:25
+be able to understand things on its own.
+6:27
+However, that's not the case. Uh a lot
+6:30
+of times incomplete or in ambiguous
+6:32
+prompts is the main reason why
+6:34
+hallucination occurs. Sometimes you
+6:36
+forget to add certain con constraints
+6:38
+that do this or don't do that which can
+6:41
+lead the model to rely on its own
+6:43
+information. Also missing context
+6:45
+especially in case of retrieval systems
+6:48
+could lead to this. The next one is the
+6:51
+model behavior. Of course the model that
+6:53
+you choose becomes a very important
+6:55
+parameter here. It could be
+6:57
+overgeneralizing on the data it is using
+7:00
+it based on the temperature. It can have
+7:02
+randomness in its generation and of of
+7:05
+course certain cases for example if
+7:07
+you're summarizing a 100page book.
+7:09
+Sometimes the long context may lead to
+7:11
+degradation wherein the model might end
+7:14
+up forgetting or just uh missing the
+7:16
+initial information and replacing it
+7:18
+with something fabricated.
+7:21
+The third one is related to model
+7:24
+itself. Now every time you use a model,
+7:26
+the model has been trained on most of
+7:28
+the public data set. However, it's
+7:30
+restricted and the knowledge is outdated
+7:33
+uh beyond that particular time. So, for
+7:35
+example, if I'm asking a question about
+7:37
+recent current events to a model that
+7:39
+was trained up to 2020 2024, it would
+7:43
+just end up creating random answers
+7:44
+unless I've provided it with certain
+7:47
+external help.
+7:49
+Um, also asking any question that is not
+7:52
+related to that particular application
+7:53
+but totally uh out of scope may also
+7:56
+lead to hallucinations. And finally,
+7:58
+your system design choices also impacts
+8:00
+this. Are you do you have a grounding?
+8:02
+Are you able to evaluate it correctly?
+8:05
+Or are you focusing more on fluency
+8:07
+rather than accuracy? All of these play
+8:09
+a very important role.
+8:12
+Now that we know how hallucinations
+8:14
+occur, um let's also get into
+8:16
+understanding how do we detect these
+8:18
+hallucinations in our own system.
+8:20
+Starting off with the very first one,
+8:22
+which is evidence-based hallucination uh
+8:25
+detection. As you can tell by the name
+8:27
+here, we are trying to get some evidence
+8:29
+or source and check if it's supporting
+8:32
+the answer that the model has produced.
+8:35
+Let's understand this with a very simple
+8:36
+example. Let's go back to the HR assist
+8:39
+that I was initially talking about. Say
+8:41
+I'm asking my HR assist if contractors
+8:43
+are also covered in the medical
+8:46
+insurance policy within the company. my
+8:48
+model outputs saying that the policy was
+8:51
+updated on March 2020 2024 and all
+8:54
+contractors are a part of it. This is
+8:56
+what the model claims. However, I do
+8:59
+have source evidence with me which
+9:01
+basically is a policy document present
+9:04
+in in either my docs in my database that
+9:07
+tells me that the last uh revision was
+9:10
+only in Jan 2023 and the coverage
+9:13
+applies to full-time employees only. Now
+9:15
+you can basically tell that the model
+9:17
+has created output that's not at all uh
+9:20
+similar or uh grounded by the source
+9:23
+evidence. We go ahead to find an
+9:26
+evidence match using certain similarity
+9:28
+check. This could be using any embedding
+9:30
+model or LLMS judge to come up with a
+9:33
+score. A threshold is what we need to
+9:35
+have. So for example, I say anything
+9:38
+less than or equal to 35% is
+9:41
+hallucination. This would basically tell
+9:43
+us that this particular case is a
+9:44
+hallucination case and that helps
+9:47
+detecting these uh cases within our
+9:50
+system.
+9:51
+There are certain scenarios wherein you
+9:53
+would not have source evidence or you
+9:55
+don't have ground truth data at all. In
+9:57
+such cases, you can use something like
+9:59
+consistency based hallucination
+10:01
+detection. Here what you're trying to
+10:03
+see is that your model is consistent
+10:06
+throughout with the outputs or not. So
+10:09
+taking an example again if I ask the
+10:11
+question what is the duration of notice
+10:13
+period to my uh model multiple times and
+10:16
+get the answer that it has generated the
+10:18
+answer should be consistent throughout.
+10:21
+Sometimes it might be same similar or
+10:23
+completely different just like this one
+10:25
+here as we can see that all three
+10:28
+answers are different basically pointing
+10:30
+that the model is not consistent at all
+10:32
+and there's a good chance that this is
+10:33
+hallucinating.
+10:35
+we go ahead and find the semantic
+10:36
+similarity to get the u if it's
+10:39
+logically consistent or not. Remember
+10:41
+we're not trying to do like a frequency
+10:43
+match here because there might bea cases
+10:45
+where one part would say 2 months while
+10:47
+the other would say 60 days. So we don't
+10:49
+want to go ahead with just um frequency
+10:52
+match. Once we have these different
+10:55
+comparison numbers with us that will
+10:57
+again give us the agreement score as to
+10:59
+how consistent is my model. Based on
+11:01
+that I can classify it as low, medium or
+11:03
+high. And finally a low score means it's
+11:06
+hallucinating.
+11:08
+Similar to this we have another uh way
+11:11
+which is the model confidence-based
+11:13
+hallucination. Previously we were just
+11:15
+trying to see if it's consistent by
+11:17
+semantic similarity. In this case we use
+11:20
+the token probabilities in order to come
+11:22
+up with the u metrics that we are
+11:25
+looking into. For example I have a user
+11:28
+query or the question that I have asked.
+11:30
+Based on that the LLM is going to
+11:32
+generate uh next uh tokens one by one.
+11:36
+This happens using probabilities. So for
+11:38
+example, if these are the four tokens or
+11:41
+the token vocab that I have uh in my
+11:44
+LLM, it's going to have probability
+11:46
+across all of these different tokens and
+11:48
+select the one that has the highest. So
+11:50
+in this case, you can see that is has
+11:52
+the highest. So the token that's going
+11:54
+to be selected is going to be is. Now
+11:57
+imagine if there was a situation where
+12:00
+all of these four tokens had a very
+12:02
+similar distribution something like 3 2
+12:05
+in that case you would say that the
+12:07
+model is not very certain about which
+12:10
+one to select there is a little
+12:12
+uncertaintity present and that's exactly
+12:14
+what we're trying to calculate here. We
+12:16
+have certain uh uncertaintity metrics
+12:18
+defined for us. The first one is token
+12:21
+entropy. This is basically just checking
+12:23
+how spread out is the probability or
+12:26
+during the generation. So based on these
+12:29
+numbers, it's just going to calculate
+12:30
+the entropy. The lower the entropy, the
+12:32
+more certain the model is. The second
+12:35
+one is probability drop. This is a way
+12:38
+to detect if two consecutive tokens have
+12:40
+a very high difference in the confidence
+12:42
+uh score. So for example, the first
+12:44
+token had the probability of 0.91, but
+12:47
+the next one drops down to.3. In this
+12:50
+case, there is a possibility that the
+12:52
+model is not really sure what to have
+12:54
+selected as the next token and as a
+12:56
+result could lead to hallucinations.
+12:59
+The last one is pretty similar to what
+13:01
+we just did in the previous section, but
+13:04
+instead of calculating the uh instead of
+13:06
+calculating semantic similarity on
+13:08
+multiple uh runs, it checks for the
+13:11
+token changes that happens within the
+13:13
+answers. So for example, if I run the
+13:15
+same question again and again and I see
+13:18
+that this particular token changes every
+13:20
+time, it does give me a hint that there
+13:22
+is some sort of uncertaintity. And as
+13:25
+you can see, low uncertaintity means
+13:27
+that it is definitely stable and the
+13:29
+output is confident. Whereas the other
+13:32
+way around is a potential hallucination
+13:34
+risk. One thing to note here is that
+13:36
+both of these metrics that is uh methods
+13:39
+that is the con consistency based and
+13:42
+confidence-based methods are not really
+13:44
+taking into account whether your answers
+13:46
+are factually correct or not. If that's
+13:48
+that is the requirement. It we need to
+13:50
+refer to the first method. These are
+13:52
+only trying to tell you whether the
+13:54
+output is stable and if the model is
+13:57
+consistent uh with its answers um over
+14:00
+the period of uh asking the questions.
+14:03
+Right now that we know how to detect
+14:06
+these hallucinations, next comes how to
+14:09
+prevent them. So preventing
+14:11
+hallucinations is the most important
+14:13
+part. Just knowing is not enough that
+14:16
+your part your application is
+14:17
+hallucinating. In this case, what we do
+14:21
+is um we have two different methods
+14:23
+basically at a high level that can be
+14:25
+used in order to overcome this
+14:27
+hallucination problem. The first one is
+14:30
+model and prompt level. So this is
+14:33
+basically going to be talking about what
+14:35
+are the prompt constraints that you
+14:36
+could add. Uh temperature changes,
+14:39
+fine-tuning, all of those details comes
+14:41
+um uh under model and prompt. At system
+14:45
+level, everything around the model, how
+14:47
+do you feed things to your model uh
+14:49
+would be accommodated. For example,
+14:50
+grounding using tools or rag systems and
+14:53
+human in the loop. Let's go into these
+14:55
+one by one and try to understand uh each
+14:58
+of them. Starting off with the model and
+15:00
+prompt level. The very first one is
+15:03
+constraint prompts. Like I mentioned
+15:05
+initially that uh prompt is the most
+15:08
+common cause of why hallucination occurs
+15:10
+because there is a lack of uh enough
+15:12
+instructions and certain constraints as
+15:15
+well. Uh as you can see here what's
+15:17
+important is to limit how the model is
+15:20
+going to reason and react to the
+15:21
+questions that are being asked. For
+15:23
+example, if you have a rag based system,
+15:26
+all you have to do is mention that uh
+15:28
+answer only using the provided context
+15:30
+and do not use your own uh or general
+15:33
+knowledge. Adding this one line is going
+15:36
+to make sure that your model is uh
+15:38
+restricted to the data being provided.
+15:41
+Of course, if the retrieval isn't
+15:43
+correct, that is going to impact your
+15:45
+overall um answers, but that is not
+15:48
+going to be uh a hallucination problem.
+15:51
+An extension to this is the refusal
+15:53
+policies. While here we are telling the
+15:56
+model not to answer anything that it's
+15:58
+not fully aware or grounded with. Here
+16:01
+we uh let the model also decline or let
+16:04
+the user know that I don't know the
+16:06
+answer for this. So basically imagine
+16:08
+scenarios where we were not able to find
+16:10
+any verified source or the user ended up
+16:13
+asking some totally different question.
+16:15
+Um let's say I go ahead and ask a
+16:17
+finance related question to my HR
+16:19
+assist. In that case, my model should be
+16:21
+able to tell me that I don't know the
+16:23
+answer for this or this is out of scope.
+16:26
+So adding those uh additional
+16:27
+instructions will also make sure that
+16:29
+the model never goes to its own
+16:31
+knowledge to answer such questions. The
+16:34
+third one is low temperature. We've all
+16:37
+I'm sure worked around with LLMs and
+16:39
+know that temperature is what handles
+16:41
+the creativity of the model or the
+16:43
+randomness of the generated output.
+16:46
+Having the temperature set as low as
+16:48
+possible is going to make sure that your
+16:50
+outputs are mostly stable and
+16:52
+deterministic uh uh and kind of
+16:54
+replicable.
+16:56
+Finally comes the domain fine-tuning.
+16:58
+Well, of course, fine-tuning is not the
+17:00
+first choice for most of the
+17:02
+applications that we build, but can
+17:04
+definitely be uh proved to be a good um
+17:07
+way of uh uh getting rid of
+17:09
+hallucinations because once your model
+17:12
+is trained on your domain specific data,
+17:14
+it will know exactly what to answer even
+17:16
+if it's not provided with any ground
+17:18
+truth.
+17:20
+Moving to the system level prevention,
+17:23
+the first one is grounding. Now
+17:25
+grounding means that you have a single
+17:27
+source of truth that needs to be
+17:29
+referred to every time a question is
+17:31
+being asked. You're forcing the model to
+17:33
+only refer to this particular ground
+17:35
+truth. Uh for example, there might be
+17:38
+cases wherein an internal database needs
+17:40
+to be hit every time a question is asked
+17:42
+or an API has to be used in order to
+17:44
+answer a particular question.
+17:47
+An extension to this is the tool use.
+17:50
+These days, LLM support tool calls as
+17:52
+well and it's a very good example of um
+17:57
+uh in situations for example let's say I
+17:59
+want to get the weather instead of
+18:01
+relying on my LLM to do that let's have
+18:03
+an API that can do that for me when fed
+18:06
+with the appropriate city or state it
+18:08
+should be able to fetch that for me
+18:09
+similarly instead of asking the LLM or
+18:13
+the model what is 2 plus 2 we can have a
+18:15
+calculator tool that can do this for me
+18:18
+this makes sure that you're not relying
+18:20
+on the model's knowledge uh but
+18:23
+providing it with external grounding
+18:25
+data that can be used and will
+18:27
+definitely be logical.
+18:29
+The third and the most common one is rag
+18:31
+or retrieval augmented generation which
+18:34
+is nothing but context injection. You're
+18:36
+retrieving certain relevant information
+18:38
+for the question asked or for the use
+18:40
+case that you're serving and provide
+18:42
+that to the model so that it can use
+18:44
+this in order to answer your questions.
+18:47
+Now, it would have been really good if
+18:48
+my HR assist in the beginning would have
+18:51
+um accessed the document uh HR document
+18:53
+policy before answering about the 90-day
+18:56
+uh international travel.
+18:58
+Also, it's important to note that just
+19:01
+drag alone is not going to solve the
+19:03
+problem. Most of these different
+19:04
+prevention mechanisms do not work well
+19:07
+when used alone. They have to be done uh
+19:10
+in combinations. So that let's say rag
+19:12
+plus tool use plus prompt these together
+19:15
+might help minimize hallucination
+19:17
+overall. The last one is human in the
+19:20
+loop. This is a bit tricky uh manual and
+19:24
+also um in uh you know it's expensive in
+19:27
+terms of using a human always to get the
+19:30
+answers validated. However, for
+19:32
+scenarios that are really high- risk,
+19:34
+have high-risisk outputs, it all it's
+19:36
+always better to have a human evaluating
+19:39
+the final answers before it goes out.
+19:41
+Um, because hallucinations could then
+19:44
+impact have really severe impact
+19:46
+especially at business level as well.
+19:49
+What we have seen so far is uh uh is how
+19:53
+do what is hallucination, how do you
+19:55
+detect them and how do you prevent them.
+19:57
+But most of this uh till now has been
+19:59
+with the assumption uh of a controlled
+20:01
+environment. Things change completely
+20:04
+when we go live with production.
+20:07
+So um let me give you a very brief case
+20:10
+study. This is related to a task u an AI
+20:14
+assistant basically that I was building
+20:16
+along with my team. Now this AI
+20:18
+assistant had access to multiple data
+20:20
+sources and had multiple tools that it
+20:22
+could access and finally based on the
+20:25
+question that the user asked it could go
+20:27
+ahead and generate the answers. When we
+20:30
+started with a demo in the initial days
+20:32
+it worked perfectly fine. So before the
+20:34
+release we were able to give uh clean
+20:36
+curated queries and it passed offline
+20:39
+accuracy tests. In fact the tool call
+20:41
+was also happening correctly.
+20:43
+But things changed when this went live
+20:46
+when real users came into picture. The
+20:48
+reason being that the real users don't
+20:50
+ask clean questions. There are a lot of
+20:52
+vague and messy questions being asked.
+20:54
+Uh the tools that are being called are
+20:57
+sometimes not in the right order and
+20:59
+also there could be half or partial
+21:02
+retrieval of context and the LLM could
+21:04
+do the rest of the part by creating very
+21:07
+confident answers.
+21:09
+That's when we realized that uh it's
+21:12
+very different to work in production
+21:14
+versus in u say a stage or a demo uh
+21:18
+scenario. These errors that we saw were
+21:21
+not because of a single error that has
+21:23
+been caused. It is basically an
+21:25
+accumulation of multiple errors across
+21:26
+the layers that finally amplified to
+21:29
+become the failure that we were looking
+21:31
+into. So basically tackling
+21:33
+hallucinations is not just at prompt
+21:36
+level at model level or even at base
+21:40
+limited to detection. It's basically a
+21:42
+full system and life cycle level that
+21:44
+you need to ensure this entire process.
+21:48
+This brings me to the final part of how
+21:51
+to brustworthy
+21:53
+AI life cycle. Starting off with data.
+21:56
+data plays the most important role when
+21:58
+dealing with any of the large language
+22:01
+models or any models for that matter.
+22:04
+The first step is to have
+22:05
+Hi, I'm so sorry. Um but we would have
+22:08
+to end this session. So sorry.
+22:12
+Um I'm I'm almost on the last slide. Can
+22:14
+I just complete in two minutes?
+22:16
+Um because I we have to start the next
+22:19
+session. I'm so so so so sorry.
+22:21
+Um okay. All right.
+22:24
+Thanks everyone. I'll um please feel
+22:26
+free to ask me any questions. You can
+22:28
+reach out to me on LinkedIn and I can
+22:31
+take your questions there.
+22:34
+Thank you.

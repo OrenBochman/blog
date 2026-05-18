@@ -8,9 +8,9 @@
 
 <meta name="author" content="Oren Bochman">
 <meta name="keywords" content="PyData, Sparse Computing, Finch, Compiler, Python">
-<meta name="description" content="A detailed recap of the PyData Global 2025 talk on extending sparse computing in the Python ecosystem using PyData/Sparse and the Finch compiler, covering current landscape, benchmarks, and future developments.">
+<meta name="description" content="A detailed recap of the PyData Global 2025 talk by Mateusz Sokół and Willow Marie Ahrens   on implementing sparse computing in the Python ecosystem   using PyData/Sparse and the Finch compiler.   They cover the current landscape, benchmarks, and future developments.   And they deep dive into lowering and looplets optimization techniques.">
 
-<title>PyData/Sparse &amp; Finch - Extending sparse computing in the Python ecosystem – Oren Bochman’s Blog</title>
+<title>Sparse &amp; Finch – Oren Bochman’s Blog</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -25,6 +25,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -127,6 +162,24 @@ cookieconsent.run({
     document.body.classList.add('hypothesis-enabled');
   });
 </script>
+<style>
+
+      .quarto-title-block .quarto-title-banner h1,
+      .quarto-title-block .quarto-title-banner h2,
+      .quarto-title-block .quarto-title-banner h3,
+      .quarto-title-block .quarto-title-banner h4,
+      .quarto-title-block .quarto-title-banner h5,
+      .quarto-title-block .quarto-title-banner h6
+      {
+        color: #fbb85b;
+      }
+
+      .quarto-title-block .quarto-title-banner {
+        color: #fbb85b;
+background-image: url(banner.png);
+background-size: cover;
+      }
+</style>
 <script type="module" src="../../../js/slide-margin.js"></script>
 <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" integrity="sha384-5TcZemv2l/9On385z///+d7MSYlvIEw9FuZTIdZ14vJLqWphw7e7ZPuOiCHJcFCP" crossorigin="anonymous">
 <script>
@@ -144,13 +197,13 @@ cookieconsent.run({
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 
-<meta name="twitter:title" content="PyData/Sparse &amp; Finch - Extending sparse computing in the Python ecosystem – Oren Bochman’s Blog">
-<meta name="twitter:description" content="A detailed recap of the PyData Global 2025 talk on extending sparse computing in the Python ecosystem using PyData/Sparse and the Finch compiler, covering current landscape, benchmarks, and future developments.">
-<meta name="twitter:image" content="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-sparse-and-finch/pydata_logo.png">
+<meta name="twitter:title" content="Sparse &amp; Finch – Oren Bochman’s Blog">
+<meta name="twitter:description" content="A detailed recap of the PyData Global 2025 talk by Mateusz Sokół and Willow Marie Ahrens  on implementing sparse computing in the Python ecosystem  using PyData/Sparse and the Finch compiler.  They cover the current landscape, benchmarks, and future developments.  And they deep dive into lowering and looplets optimization techniques.">
+<meta name="twitter:image" content="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-sparse-and-finch/hero.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image-height" content="500">
-<meta name="twitter:image-width" content="500">
+<meta name="twitter:image-height" content="1024">
+<meta name="twitter:image-width" content="1024">
 </head>
 
 <body class="nav-sidebar floating nav-fixed slimcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -395,7 +448,7 @@ cookieconsent.run({
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-03-11-partial-pooling/index.html">2025</a></li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-12-11-pydata-sparse-and-finch/index.html">PyData/Sparse &amp; Finch - Extending sparse computing in the Python ecosystem</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-03-11-partial-pooling/index.html">2025</a></li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-12-11-pydata-sparse-and-finch/index.html">Sparse &amp; Finch</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -404,12 +457,12 @@ cookieconsent.run({
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-03-11-partial-pooling/index.html">2025</a></li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-12-11-pydata-sparse-and-finch/index.html">PyData/Sparse &amp; Finch - Extending sparse computing in the Python ecosystem</a></li></ol></nav>
-      <h1 class="title">PyData/Sparse &amp; Finch - Extending sparse computing in the Python ecosystem</h1>
-            <p class="subtitle lead">PyData Global 2025 Recap</p>
+    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item">Posts</li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-03-11-partial-pooling/index.html">2025</a></li><li class="breadcrumb-item"><a href="../../../posts/2025/2025-12-11-pydata-sparse-and-finch/index.html">Sparse &amp; Finch</a></li></ol></nav>
+      <h1 class="title">Sparse &amp; Finch</h1>
+            <p class="subtitle lead">Extending sparse computing in the Python ecosystem</p>
                   <div>
         <div class="description">
-          A detailed recap of the PyData Global 2025 talk on extending sparse computing in the Python ecosystem using PyData/Sparse and the Finch compiler, covering current landscape, benchmarks, and future developments.
+          A detailed recap of the PyData Global 2025 talk by Mateusz Sokół and Willow Marie Ahrens <br> on implementing sparse computing in the Python ecosystem <br> using PyData/Sparse and the Finch compiler. <br> They cover the current landscape, benchmarks, and future developments. <br> And they deep dive into lowering and looplets optimization techniques.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -1519,23 +1572,12 @@ cookieconsent.run({
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-39" role="navigation" aria-expanded="false">
- <span class="menu-text">2024 05 04 Signals Bib</span></a>
+ <span class="menu-text">2024 05 09 Roth Erev RL</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-39" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-39" class="collapse list-unstyled sidebar-section depth4 ">  
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false">
- <span class="menu-text">2024 05 09 Roth Erev RL</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-40" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-05-09-Roth-Erev-RL/re-rel.html" class="sidebar-item-text sidebar-link">
@@ -1546,8 +1588,19 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 06 01 Bayesian Agents</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-40" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-40" class="collapse list-unstyled sidebar-section depth4 ">  
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false">
+ <span class="menu-text">2024 06 12 Logic Puzzles</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-41" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -1558,23 +1611,12 @@ cookieconsent.run({
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-42" role="navigation" aria-expanded="false">
- <span class="menu-text">2024 06 12 Logic Puzzles</span></a>
+ <span class="menu-text">2024 06 13 Hyper</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-42" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-42" class="collapse list-unstyled sidebar-section depth4 ">  
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false">
- <span class="menu-text">2024 06 13 Hyper</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-43" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-06-13-hyper/2024-06-13-hyper.html" class="sidebar-item-text sidebar-link">
@@ -1585,13 +1627,13 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 06 23 Zero Inflated Data</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-43" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-44" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-43" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-06-23-zero-inflated-data/2024-06-23-zero-inflated-data.html" class="sidebar-item-text sidebar-link">
@@ -1602,13 +1644,13 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false">
  <span class="menu-text">2024 06 25 Mesa Rl</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-44" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-45" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-44" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-06-25-mesa-rl/mesa-rl.html" class="sidebar-item-text sidebar-link">
@@ -1621,11 +1663,11 @@ cookieconsent.run({
       <div class="sidebar-item-container"> 
             <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Misbehavior of Markets and Scaling in financial prices 1-4</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-45" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-46" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-45" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2024/2024-11-28-misbahaviour-of-markets/part1/index.html" class="sidebar-item-text sidebar-link">
@@ -1656,13 +1698,13 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="true">
  <span class="menu-text">2025</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-46" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-47" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-46" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-03-11-partial-pooling/index.html" class="sidebar-item-text sidebar-link">
@@ -2050,7 +2092,7 @@ cookieconsent.run({
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-12-11-pydata-sparse-and-finch/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">PyData/Sparse &amp; Finch - Extending sparse computing in the Python ecosystem</span></a>
+ <span class="menu-text">Sparse &amp; Finch</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -2069,11 +2111,11 @@ cookieconsent.run({
       <div class="sidebar-item-container"> 
             <a href="../../../posts/2025/2025-01-05-bifurcating-paths-to-signaling/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Many Path To A Signaling System</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-48" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-48" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-47" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2025/2025-01-05-bifurcating-paths-to-signaling/podcast.html" class="sidebar-item-text sidebar-link">
@@ -2086,13 +2128,13 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-49" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-48" role="navigation" aria-expanded="false">
  <span class="menu-text">2026</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-49" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-48" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-49" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-48" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2026/04-31-ODSC-AI-2026-Day-4/index.html" class="sidebar-item-text sidebar-link">
@@ -2133,12 +2175,6 @@ cookieconsent.run({
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2026/03-08-smoothing-problems/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Smoothing problems</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">ODSC AI 2026</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -2199,11 +2235,11 @@ cookieconsent.run({
       <div class="sidebar-item-container"> 
             <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ODSC AI 2026</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-50" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-49" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-50" class="collapse list-unstyled sidebar-section depth4 ">  
+      <ul id="quarto-sidebar-section-49" class="collapse list-unstyled sidebar-section depth4 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2026/04-28-ODSC-AI-2026-Day-1/talk1.html" class="sidebar-item-text sidebar-link">
@@ -2292,6 +2328,101 @@ cookieconsent.run({
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
+            <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ODSC AI 2026</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-50" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-50" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Towards Trustworthy LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentic AI for Autonomous Root-Cause Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk11.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building Effective Agents</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk12.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GraphRAG in Healthcare</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk13.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Changing Shape of AI Systems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk14.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentic LLMs in Practice</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Art of Clustering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reinforcement Learning for LLM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Beyond the black box -</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Outclassing Frontier LLMs at Extracting Information</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Towards Trustworthy LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The AI Agent Memory Landscape</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk8.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Towards Trustworthy LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../posts/2026/04-30-ODSC-AI-2026-Day-3/talk9.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Governing Agentic AI</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
             <a href="../../../posts/2026/04-27-ODSC-AI-2026-Day-0/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ODSC AI 2026</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-51" role="navigation" aria-expanded="false" aria-label="Toggle section">
@@ -2369,18 +2500,15 @@ cookieconsent.run({
 
 
 
-<div class="no-row-height column-margin column-container"><div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="pydata_logo.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="pydata global"><img src="pydata_logo.png" class="img-fluid figure-img" alt="pydata global"></a></p>
-<figcaption>pydata global</figcaption>
-</figure>
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/RK2ccdmZ3FA" title="PyData/Sparse &amp; Finch: Extending sparse computing in the Python ecosystem" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 </div></div><div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Lecture Overview
+<span class="screen-reader-only">Tip</span>Overview
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -2398,38 +2526,6 @@ cookieconsent.run({
 </div>
 <p>In this talk we’re going to understand the current landscape of sparse computing in the Python ecosystem first. Then a high-level overview of the Finch technology and compiler’s architecture will be presented together with other solutions vital for the project: Array API Standard and binsparse format.</p>
 <p>Next, we’re going to present a selected set of benchmarks - also focusing on real world use-cases: how Finch impacts users’ experience when writing sparse programs in Python. Last but not least a showcase of the current development will be shown - pure Python rewrite of Finch compiler.</p>
-<!--
-
-::: {.callout-tip}
-## What You'll Learn:
-
-- 🔍 A walkthrough of key components: attention, positional encoding, encoder/decoder stack
-- 🧠 Visual explanations of attention masks, shapes, and residuals
-- ⚠️ Common bugs and debugging strategies (like handling shape mismatches and masking errors)
-- ✅ Real-world implementation tips and tricks that demystify the architecture
-
-By the end of the talk, attendees will:
-
-- Understand the full forward pass of a transformer
-- Know how each component connects to the original paper
-- Feel more confident reading or writing custom model architectures
-:::
-
-
-::: {.callout-tip}
-## Prerequisites:
-
-- Basic Python and PyTorch
-- Some familiarity with neural networks (e.g., feedforward, softmax)
-- No need for prior experience in building models from scratch
-:::
-
-::: {.callout-important}
-## Tools and Frameworks:
-
-We will introduce you to certain modern frameworks in the workshop but the emphasis be on first principles and using vanilla Python and LLM calls to build AI-powered systems.
-:::
--->
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -2440,301 +2536,718 @@ We will introduce you to certain modern frameworks in the workshop but the empha
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<section id="mateusz-sokół" class="level3">
-<h3 class="anchored" data-anchor-id="mateusz-sokół">Mateusz Sokół</h3>
-<p>Mateusz Sokół is a Software Engineer at Quansight, working on multitude of open source projects in the Scientific Python Ecosystem.</p>
 <ul>
+<li>Mateusz Sokół
+<ul>
+<li>is a Software Engineer at Quansight, working on multitude of open source projects in the Scientific Python Ecosystem.</li>
 <li>His GitHub profile here: https://github.com/mtsokol</li>
-</ul>
-</section>
-<section id="willow-marie-ahrens" class="level2">
-<h2 class="anchored" data-anchor-id="willow-marie-ahrens">Willow Marie Ahrens</h2>
-<p>Willow Marie Ahrens is assistant professor in the School of Computer Science at Georgia Tech. She is inspired to make programming high-performance computers more productive, efficient, and accessible. Her research focuses on using compilers to accelerate productive programming languages with state-of-the-art datastructures, algorithms, and architectures, bridging the gap between program flexibility and performance. She’s the author of the Finch sparse tensor programming language. Finch supports general programs on general tensor formats, such as sparse, run-length-encoded, banded, or otherwise structured tensors. Please reach out if you are interested in doing research at Georgia Tech!</p>
-<!-- use these or others 🌸 🤗 💼 
-- Contact:
-    - [ Personal Website](https://birdofparadise.ai/experience/)
--->
-</section>
-</div>
-</div>
+</ul></li>
+<li>Willow Marie Ahrens
 <ul>
-<li><a href="https://github.com/hugobowne/AI-for-SWEs">talk repo</a></li>
-<li><a href="https://github.com/hugobowne/AI-for-SWEs">slide deck</a></li>
+<li>is assistant professor in the School of Computer Science at Georgia Tech. She is inspired to make programming high-performance computers more productive, efficient, and accessible. Her research focuses on using compilers to accelerate productive programming languages with state-of-the-art data structures, algorithms, and architectures, bridging the gap between program flexibility and performance. She’s the author of the Finch sparse tensor programming language. Finch supports general programs on general tensor formats, such as sparse, run-length-encoded, banded, or otherwise structured tensors. Please reach out if you are interested in doing research at Georgia Tech!</li>
+<li><a href="https://github.com/pydata/sparse">talk repo</a> https://sparse.pydata.org/en/stable/</li>
+<li><a href="slides.pdf">slide deck</a></li>
+</ul></li>
 </ul>
+</div>
+</div>
 <section id="outline" class="level2">
 <h2 class="anchored" data-anchor-id="outline">Outline</h2>
+<ul>
+<li><p><strong>High-level user model:</strong></p>
+<ul>
+<li>Domain users should be able to write NumPy-like array code.</li>
+<li>They should specify whether inputs are dense or sparse, but not manually decide loop order, fusion strategy, or format-specific traversal.</li>
+<li>Finch’s auto-scheduler is meant to replace the human performance engineer in that optimization step.</li>
+</ul></li>
+<li><p><strong>Project architecture:</strong></p>
+<ul>
+<li>The Python-facing layer uses the Array Application Programming Interface standard so code can be written against a common array interface.</li>
+<li>Finch lowers code through several stages: Python Array API → Finch Logic → Finch Notation → Finch Assembly → backend code such as Numba or C.</li>
+<li>The speakers emphasize that each stage has interpreters/tests to validate correctness.</li>
+</ul></li>
+<li><p><strong>Compilation example:</strong></p>
+<ul>
+<li>The example multiplies two tensors where one input is lower triangular.</li>
+<li>Finch represents the triangular mask in its internal logic.</li>
+<li>During lowering, it generates loops that only traverse the lower triangular part.</li>
+<li>Algebraic simplification then removes useless work, such as multiplying by zero or keeping empty loops.</li>
+</ul></li>
+<li><p><strong>Use-case workflow:</strong></p>
+<ul>
+<li>Start with NumPy-like numerical code.</li>
+<li>Rewrite it to be Array API-compatible.</li>
+<li>Isolate the computationally expensive loop.</li>
+<li>Add a sparse compile decorator and wrap inputs in appropriate tensor formats.</li>
+<li>Finch then Just-in-Time compiles the sparse kernel.</li>
+</ul></li>
+<li><p><strong>Examples shown:</strong></p>
+<ul>
+<li><strong>Hyperlink-Induced Topic Search (HITS):</strong> A graph link-analysis algorithm was rewritten from GraphBLAS-style code into Array API-compatible code, then the power-iteration kernel was compiled.</li>
+<li><strong>Canonical Polyadic (CP) decomposition:</strong> A masked tensor decomposition routine from <code>tensortools</code> was adapted with relatively small code changes and compiled with Finch.</li>
+</ul></li>
+<li><p><strong>Benchmark result:</strong></p>
+<ul>
+<li>For Canonical Polyadic decomposition at low density, around 3%, the speakers report more than a sevenfold speedup on their test infrastructure.</li>
+</ul></li>
+<li><p><strong>Ecosystem direction:</strong></p>
+<ul>
+<li><code>finch-tensor</code> is available as a Python package, currently using JuliaCall to access the Julia implementation.</li>
+<li>The project is also working on a pure Python compiler path using Numba as a backend.</li>
+<li>The 2026 goal is to push “Finch Light” toward an initial community release.</li>
+</ul></li>
+<li><p><strong>Standardization angle:</strong></p>
+<ul>
+<li>The speakers also discuss <code>binsparse</code>, a binary sparse storage/interchange format intended to standardize sparse array exchange across formats and platforms.</li>
+<li>The goal is broader PyData/Sparse integration, including Finch as a selectable backend.</li>
+</ul></li>
+</ul>
+<div class="sl">
+<div class="sl-text">
+<ul>
+<li><p><strong>Talk:</strong></p>
+<ul>
+<li><em>PyData/Sparse and Finch</em>, PyData Global 2025.</li>
+</ul></li>
+<li><p><strong>Main thesis:</strong></p>
+<ul>
+<li><p>Array programming is highly productive, but sparse arrays are still hard to use efficiently in Python.</p></li>
+<li><p>The speakers argue that sparse tensor compilers can unify sparse computation by translating high-level array code into efficient kernels for many formats and backends.</p></li>
+</ul></li>
+</ul>
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="slide01.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Title"><img src="slide01.png" class="img-fluid figure-img" alt="Title"></a></p>
+<p><a href="slide01.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Title"><img src="slide01.png" class="img-fluid figure-img" alt="Title"></a></p>
 <figcaption>Title</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<ul>
+<li><p><strong>Problem being addressed:</strong></p>
+<ul>
+<li>Sparsity appears in scientific computing, social networks, machine learning, and image processing.</li>
+<li>Dense arrays have a simple relationship between mathematical indexing and memory layout.</li>
+<li>Sparse arrays break that simplicity because formats such as Compressed Sparse Column store only nonzero values, plus index and pointer arrays.</li>
+<li>Efficient sparse algorithms must avoid multiplying by zero and must traverse sparse data structures correctly.</li>
+</ul></li>
+</ul>
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="slide02.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Array Programming is Productive"><img src="slide02.png" class="img-fluid figure-img" alt="Array Programming is Productive"></a></p>
+<p><a href="slide02.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Array Programming is Productive"><img src="slide02.png" class="img-fluid figure-img" alt="Array Programming is Productive"></a></p>
 <figcaption>Array Programming is Productive</figcaption>
 </figure>
 </div>
-<p>!Sparsity is everywhere…<a href="slide03.png"></a></p>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<ul>
+<li><p><strong>Current ecosystem issue:</strong></p>
+<ul>
+<li>Sparse support in the PyData ecosystem is fragmented.</li>
+<li>SciPy, PyTorch, and PyData/Sparse each support different dimensions, formats, operations, and backends.</li>
+<li>The desired target is a central sparse array library that is n-dimensional, performant, supports central processing units and graphics processing units, and has broad linear algebra and graph algorithm coverage.</li>
+</ul></li>
+</ul>
+</div>
+<div class="sl-fig">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="slide03.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Sparsity is everywhere"><img src="slide03.png" class="img-fluid figure-img" alt="Sparsity is everywhere"></a></p>
+<figcaption>Sparsity is everywhere</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<ul>
+<li><p><strong>Why compilers matter:</strong></p>
+<ul>
+<li>The implementation burden grows combinatorially across operations, structures, data formats, and hardware architectures.</li>
+<li>A sparse tensor compiler can take a high-level sparse program plus format descriptions and generate specialized code automatically.</li>
+<li>This lets different interfaces and sparse formats map into a shared intermediate representation rather than requiring hand-written kernels for every case.</li>
+</ul></li>
+</ul>
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide04.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Sparsity is Challenging"><img src="slide04.png" class="img-fluid figure-img" alt="Sparsity is Challenging"></a></p>
 <figcaption>Sparsity is Challenging</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide05.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Fragmented sparse support today"><img src="slide05.png" class="img-fluid figure-img" alt="Fragmented sparse support today"></a></p>
 <figcaption>Fragmented sparse support today</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="slide06.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Implementation Burden Grows Exponentially…"><img src="slide06.png" class="img-fluid figure-img" alt="Implementation Burden Grows Exponentially…"></a></p>
-<figcaption>Implementation Burden Grows Exponentially…</figcaption>
+<p><a href="slide06.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Implementation Burden Grows Exponentially"><img src="slide06.png" class="img-fluid figure-img" alt="Implementation Burden Grows Exponentially"></a></p>
+<figcaption>Implementation Burden Grows Exponentially</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="slide07.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Sparse Tensor Compilers Can Help…"><img src="slide07.png" class="img-fluid figure-img" alt="Sparse Tensor Compilers Can Help…"></a></p>
-<figcaption>Sparse Tensor Compilers Can Help…</figcaption>
+<p><a href="slide07.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Sparse Tensor Compilers Can Help"><img src="slide07.png" class="img-fluid figure-img" alt="Sparse Tensor Compilers Can Help"></a></p>
+<figcaption>Sparse Tensor Compilers Can Help</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide08.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="High-Level Sparse Array Programming in Python"><img src="slide08.png" class="img-fluid figure-img" alt="High-Level Sparse Array Programming in Python"></a></p>
 <figcaption>High-Level Sparse Array Programming in Python</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide09.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="Agenda"><img src="slide09.png" class="img-fluid figure-img" alt="Agenda"></a></p>
 <figcaption>Agenda</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide10.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="Project Overview"><img src="slide10.png" class="img-fluid figure-img" alt="Project Overview"></a></p>
 <figcaption>Project Overview</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide11.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="Array API standard"><img src="slide11.png" class="img-fluid figure-img" alt="Array API standard"></a></p>
 <figcaption>Array API standard</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide12.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12" title="Finch compiler &amp; Galley"><img src="slide12.png" class="img-fluid figure-img" alt="Finch compiler &amp; Galley"></a></p>
 <figcaption>Finch compiler &amp; Galley</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide13.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="Finch Architecture"><img src="slide13.png" class="img-fluid figure-img" alt="Finch Architecture"></a></p>
 <figcaption>Finch Architecture</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide14.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14" title="Compilation Example:"><img src="slide14.png" class="img-fluid figure-img" alt="Compilation Example:"></a></p>
 <figcaption>Compilation Example:</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide15.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15" title="Lowering example"><img src="slide15.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide16.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16" title="Lowering example"><img src="slide16.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide17.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17" title="Lowering example"><img src="slide17.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide18.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18" title="Lowering example"><img src="slide18.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide19.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19" title="Lowering example"><img src="slide19.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide20.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20" title="Lowering example"><img src="slide20.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide21.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21" title="Lowering example"><img src="slide21.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide22.png" class="lightbox" data-gallery="quarto-lightbox-gallery-22" title="Lowering example"><img src="slide22.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide23.png" class="lightbox" data-gallery="quarto-lightbox-gallery-23" title="Lowering example"><img src="slide23.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide24.png" class="lightbox" data-gallery="quarto-lightbox-gallery-24" title="Lowering example"><img src="slide24.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide25.png" class="lightbox" data-gallery="quarto-lightbox-gallery-25" title="Lowering example"><img src="slide25.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide26.png" class="lightbox" data-gallery="quarto-lightbox-gallery-26" title="Lowering example"><img src="slide26.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide27.png" class="lightbox" data-gallery="quarto-lightbox-gallery-27" title="Lowering example"><img src="slide27.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide28.png" class="lightbox" data-gallery="quarto-lightbox-gallery-28" title="Lowering example"><img src="slide28.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide29.png" class="lightbox" data-gallery="quarto-lightbox-gallery-29" title="Lowering example"><img src="slide29.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide30.png" class="lightbox" data-gallery="quarto-lightbox-gallery-30" title="Lowering example"><img src="slide30.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide31.png" class="lightbox" data-gallery="quarto-lightbox-gallery-31" title="Lowering example"><img src="slide31.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide32.png" class="lightbox" data-gallery="quarto-lightbox-gallery-32" title="Lowering example"><img src="slide32.png" class="img-fluid figure-img" alt="Lowering example"></a></p>
 <figcaption>Lowering example</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide33.png" class="lightbox" data-gallery="quarto-lightbox-gallery-33" title="Use cases &amp; benchmarks"><img src="slide33.png" class="img-fluid figure-img" alt="Use cases &amp; benchmarks"></a></p>
 <figcaption>Use cases &amp; benchmarks</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide34.png" class="lightbox" data-gallery="quarto-lightbox-gallery-34" title="Use case workflow"><img src="slide34.png" class="img-fluid figure-img" alt="Use case workflow"></a></p>
 <figcaption>Use case workflow</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<p><a href="https://en.wikipedia.org/wiki/HITS_algorithm">HITS</a> ::: {.sl-text}</p>
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide35.png" class="lightbox" data-gallery="quarto-lightbox-gallery-35" title="Use case: HITS algorithm"><img src="slide35.png" class="img-fluid figure-img" alt="Use case: HITS algorithm"></a></p>
 <figcaption>Use case: HITS algorithm</figcaption>
 </figure>
 </div>
-<ul>
-<li><a href="https://en.wikipedia.org/wiki/HITS_algorithm">HITS</a></li>
-</ul>
+</div>
+<p>::::</p>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide36.png" class="lightbox" data-gallery="quarto-lightbox-gallery-36" title="HITS algorithm: Array API conversion"><img src="slide36.png" class="img-fluid figure-img" alt="HITS algorithm: Array API conversion"></a></p>
 <figcaption>HITS algorithm: Array API conversion</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide37.png" class="lightbox" data-gallery="quarto-lightbox-gallery-37" title="HITS algorithm: complied with Finch"><img src="slide37.png" class="img-fluid figure-img" alt="HITS algorithm: complied with Finch"></a></p>
 <figcaption>HITS algorithm: complied with Finch</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide38.png" class="lightbox" data-gallery="quarto-lightbox-gallery-38" title="Use case: CP Decomposition"><img src="slide38.png" class="img-fluid figure-img" alt="Use case: CP Decomposition"></a></p>
 <figcaption>Use case: CP Decomposition</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide39.png" class="lightbox" data-gallery="quarto-lightbox-gallery-39" title="CP Decomposition: accelerated computation"><img src="slide39.png" class="img-fluid figure-img" alt="CP Decomposition: accelerated computation"></a></p>
 <figcaption>CP Decomposition: accelerated computation</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide40.png" class="lightbox" data-gallery="quarto-lightbox-gallery-40" title="Try it out yourself!"><img src="slide40.png" class="img-fluid figure-img" alt="Try it out yourself!"></a></p>
 <figcaption>Try it out yourself!</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide41.png" class="lightbox" data-gallery="quarto-lightbox-gallery-41" title="Ecosystem Overview"><img src="slide41.png" class="img-fluid figure-img" alt="Ecosystem Overview"></a></p>
 <figcaption>Ecosystem Overview</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide42.png" class="lightbox" data-gallery="quarto-lightbox-gallery-42" title="Ecosystem Integration"><img src="slide42.png" class="img-fluid figure-img" alt="Ecosystem Integration"></a></p>
 <figcaption>Ecosystem Integration</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide43.png" class="lightbox" data-gallery="quarto-lightbox-gallery-43" title="binsparse: A binary sparse storage format"><img src="slide43.png" class="img-fluid figure-img" alt="binsparse: A binary sparse storage format"></a></p>
 <figcaption>binsparse: A binary sparse storage format</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide44.png" class="lightbox" data-gallery="quarto-lightbox-gallery-44" title="Questions"><img src="slide44.png" class="img-fluid figure-img" alt="Questions"></a></p>
 <figcaption>Questions</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div class="sl">
+<div class="sl-text">
+<ul>
+<li><p><strong>Q&amp;A point:</strong></p>
+<ul>
+<li>A question focused on understanding the lowering process.</li>
+<li>The answer emphasized that the lowering design is intended to be extensible across triangular, run-length encoded, and general sparse matrix structures, making the system more future-proof.</li>
+</ul></li>
+</ul>
+</div>
+<div class="sl-fig">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="slide45.png" class="lightbox" data-gallery="quarto-lightbox-gallery-45" title="Q&amp;A"><img src="slide45.png" class="img-fluid figure-img" alt="Q&amp;A"></a></p>
 <figcaption>Q&amp;A</figcaption>
 </figure>
 </div>
+</div>
+</div>
 </section>
 <section id="reflections" class="level2">
 <h2 class="anchored" data-anchor-id="reflections">Reflections</h2>
 <p>WoW</p>
+<ol type="1">
+<li>a good sparse library for python calls for implementing many Stats and ML algorithm using this backend.</li>
+<li>Also streaming algorithms can benefit from this.</li>
+<li>The tensor logic needs <code>einsum</code> - is this op supported ?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For situations where more complex operations are needed, Finch supports an <span class="citation" data-cites="einsum">(<a href="#ref-einsum" role="doc-biblioref"><strong>einsum?</strong></a>)</span> syntax on sparse and structured tensors.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="pp">@einsum</span> E[i] <span class="op">+=</span> A[i, j] <span class="op">*</span> B[i, j]</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>julia<span class="op">&gt;</span> <span class="pp">@einsum</span> F[i, k] <span class="op">&lt;&lt;</span>max<span class="op">&gt;&gt;=</span> A[i, j] <span class="op">+</span> B[j, k]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
 </section>
 <section id="resources" class="level2">
 <h2 class="anchored" data-anchor-id="resources">Resources</h2>
@@ -2756,15 +3269,13 @@ We will introduce you to certain modern frameworks in the workshop but the empha
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2025,
   author = {Bochman, Oren},
-  title = {PyData/Sparse \&amp; {Finch} - {Extending} Sparse Computing in
-    the {Python} Ecosystem},
+  title = {Sparse \&amp; {Finch}},
   date = {2025-12-12},
   url = {https://orenbochman.github.io/posts/2025/2025-12-11-pydata-sparse-and-finch/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2025" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2025. <span>“PyData/Sparse &amp; Finch - Extending Sparse
-Computing in the Python Ecosystem.”</span> December 12. <a href="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-sparse-and-finch/">https://orenbochman.github.io/posts/2025/2025-12-11-pydata-sparse-and-finch/</a>.
+Bochman, Oren. 2025. <span>“Sparse &amp; Finch.”</span> December 12. <a href="https://orenbochman.github.io/posts/2025/2025-12-11-pydata-sparse-and-finch/">https://orenbochman.github.io/posts/2025/2025-12-11-pydata-sparse-and-finch/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

@@ -1,0 +1,1198 @@
+0:06
+Hello and welcome to Pi Data Global 2025
+0:11
+day two. We're kicking off the general
+0:13
+track this morning
+0:15
+um with Pi Data Sparse and Finch U
+0:19
+presented to you by Willow Emit. So, um,
+0:24
+if you are joining us this morning, I
+0:28
+really encourage you to use the chat
+0:30
+feature and engage with the speakers,
+0:33
+engage with other attendees, drop some
+0:36
+questions. We'll have about five minutes
+0:38
+in the end for some Q&A and um would
+0:42
+love to hear your thoughts throughout.
+0:44
+So, um, that's on the right side of your
+0:47
+screen. You can share over there, but
+0:49
+right now I don't want to take up any
+0:51
+more time. So, I'll hand the stage over
+0:53
+to you all.
+0:59
+Nice, Tamara. Um, yeah, go ahead, Matas.
+1:03
+Let's do the next slide. Um, so we're
+1:06
+here today because I think um in part I
+1:09
+I don't know about y'all, but I'll speak
+1:11
+for myself. I'm obsessed with array
+1:12
+programming. Um, array programming is
+1:15
+incredibly productive and programming
+1:17
+with these collective operations on uh
+1:20
+large data sets has really changed um
+1:23
+and shaped a lot of the modern
+1:24
+innovations um in in the scientific
+1:27
+domain in the machine learning domain.
+1:29
+Um frameworks like TensorFlow and NumPy
+1:31
+um and Jax are are really shaping a lot
+1:34
+of this uh innovation. These frameworks
+1:36
+are efficient. They run at you know the
+1:39
+peak processing speed on on your
+1:40
+processors and they're easy to use. Um,
+1:43
+next slide.
+1:46
+Um, one thing these frameworks can't
+1:47
+really do though is uh represent things
+1:50
+like uh sparity. Um, so we see sparity
+1:54
+in scientific computing with like
+1:56
+triangular matrices or banded matrices
+1:58
+in social networks. Um, we we see this
+2:01
+sort of unstructured sparity
+2:03
+representing connections. So here we
+2:05
+have an adjacency matrix. Um, and one
+2:08
+thing to note about sparity in
+2:10
+particular is that um, if this adjacency
+2:13
+met matrix is representing the
+2:15
+connections between triangles in this
+2:16
+mesh, triangles only have three sides.
+2:19
+And so um, this only has three non-zeros
+2:23
+per row. It's incredibly sparse. If we
+2:25
+were to store this using a dense
+2:26
+representation, it would actually be
+2:28
+invisible. Um so it's really critical
+2:30
+that that um we actually do represent um
+2:33
+these sparse matrices uh only storing
+2:36
+the non-zeros um which which adds some
+2:38
+complexity to the implementation. Um in
+2:41
+machine learning we see uh more
+2:43
+structured forms of sparity these days
+2:45
+um trying to improve the the processing
+2:48
+speed of the uh network. So we see block
+2:51
+sparity. Um and then in image processing
+2:54
+um you can also represent things like
+2:56
+convolution using matrix multiply if you
+2:58
+use a special kind of sparity where you
+3:00
+do circular shifts of the filter. Um and
+3:02
+you might even see sparity um in padded
+3:05
+operators as well. Let's do the next
+3:07
+slide.
+3:09
+um sparsity is uh challenging uh and and
+3:13
+one of the ways to think about this
+3:14
+right is that in the dense world um it
+3:19
+the problems are kind of self similar um
+3:22
+all the way from their definition where
+3:24
+it's kind of a matrix vector multiply
+3:26
+all the way down to hardware um where
+3:28
+it's still you know small matrix vector
+3:30
+multiplies we have this beautiful row
+3:32
+major relationship between where things
+3:34
+are stored in theory and where they are
+3:36
+represented in memory um but in a sparse
+3:39
+world, uh, this is really no longer the
+3:42
+case. Um, because we're only storing the
+3:44
+nonzeros,
+3:46
+um, if if we're only going to store the
+3:48
+non-zero values, we kind of break this
+3:50
+assumption. Um, here's an example of the
+3:53
+CSC format, compressed sparse column.
+3:56
+And you can see that in the val array,
+3:58
+we're only storing the non-zeros. In the
+4:00
+idx array, we're only storing the
+4:03
+locations, like which row um, the
+4:05
+nonzeros reside in. Um and then here in
+4:08
+this ptr array we're storing the um
+4:11
+delineation between columns um in this
+4:13
+representation.
+4:15
+Um and so the challenge comes from not
+4:17
+just only storing the non-zeros, right?
+4:20
+But we also need to be able to
+4:21
+efficiently iterate over these data
+4:23
+structures and modify our computations
+4:26
+to only um multiply the non-zeros,
+4:30
+right? Because anything times zero is
+4:32
+zero. And so sparsity represents this
+4:35
+opportunity for optimization. Um but we
+4:37
+do need to modify all of our algorithms
+4:39
+to operate on these data structures
+4:41
+efficiently. Um let's do the next slide.
+4:45
+Uh so this has sort of led to this
+4:47
+situation where sparity has fragmented
+4:50
+support today. Um support for a lot of
+4:53
+different operations is fragmented
+4:55
+across key libraries in the PI data
+4:56
+ecosystem. Um we know that like you know
+5:00
+in in scypi maybe we only have two
+5:02
+dimensional arrays. PI data sparse has n
+5:04
+dimensional arrays. Um, PyTor torch also
+5:07
+has some optimized n dimensional arrays.
+5:09
+Um, but the support for different kinds
+5:11
+of operations is still in progress. Um,
+5:14
+and then, uh, of course there's a desire
+5:16
+really to have this single library
+5:19
+central to the ecosystem that's n
+5:20
+dimensional, that has CPU and GPU
+5:22
+support, um, that's performant, and has,
+5:25
+uh, broad support for all of the
+5:27
+different kinds of operations that we
+5:29
+may actually want to to to use with a
+5:31
+sparse matrix. Let's do the next slide.
+5:35
+So this kind of leads to this situation
+5:37
+where the implementation burden starts
+5:39
+to grow. Um so you know we we we have
+5:43
+our wish list of all these different
+5:44
+things we want but because we always
+5:46
+need to modify these operations to
+5:50
+process the data structures. Um we have
+5:53
+many different operations and many
+5:54
+different data structures many different
+5:56
+like you know algorithms that we can use
+5:58
+to store the data structure like a hash
+6:00
+table or list. Um and then of course we
+6:03
+have these different architectures that
+6:04
+we want to target. Um and this leads to
+6:07
+a competatorial explosion of uh
+6:09
+maintenance and kernels that we need to
+6:11
+implement. Um so we really believe that
+6:13
+compilers can help. Um a compiler can
+6:16
+automatically generate code for each of
+6:18
+these situations. Um
+6:22
+let's do the next slide.
+6:24
+Um so uh we we uh sparse tensor
+6:28
+compilers are this emerging technology.
+6:30
+um they allow us to combine high-level
+6:33
+descriptions of formats with highle
+6:36
+descriptions of kind of like the
+6:38
+imperative version of the sparse program
+6:40
+that we want to run. So we can sketch
+6:42
+how we want the kernel to be
+6:43
+implemented. Um and that that that's
+6:46
+really helpful. Um the the compiler can
+6:49
+handle the rest. Um and so this allows
+6:51
+us to kind of unify this ecosystem by
+6:53
+combining all of these different
+6:54
+definitions of sparity. Um uh these
+6:57
+different you know structures. you have
+6:59
+like jacks, you have pietorrch, um maybe
+7:02
+you have like a numpy algorithm and we
+7:05
+can compile all of these like we can
+7:07
+represent all of these different
+7:08
+specifications and data structures using
+7:11
+the same uh intermediate representation.
+7:14
+Um so we have our uh tensor formats um
+7:18
+described at the top and then we have a
+7:20
+little bit of annotations for
+7:22
+performance like what kind of loop
+7:23
+order, what kind of pointwise expression
+7:25
+are we going to use, what kind of
+7:26
+aggregate are we using. Um so if we can
+7:29
+represent it in the unified format then
+7:31
+the compiler can generate efficient code
+7:33
+for each situation.
+7:36
+Go ahead let's next next slide. Um so uh
+7:42
+sparse tensor compilers are very helpful
+7:44
+for um empowering performance engineers
+7:48
+to um to to uh make the the make
+7:52
+efficient kernels more more uh easily.
+7:55
+Um but for the domain expert for the
+7:57
+user right um they're really going to
+8:00
+write some numpy code. So here's our
+8:02
+domain expert um and she's writing this
+8:04
+numpy code at a high level. Um the
+8:06
+domain expert will also you know specify
+8:08
+their array formats. Is it dense or
+8:10
+sparse? Um and then uh the optimization
+8:15
+uh part uh is is the job of the
+8:17
+performance engineer. So this is
+8:19
+historically how a lot of these tensor
+8:20
+compilers have been built. Um and so it
+8:23
+was the job of the performance engineer
+8:25
+to specify things like loop ordering um
+8:27
+formatting uh and and which operation
+8:30
+should be fused together. Um and then uh
+8:33
+the performance engineer would put all
+8:35
+of that into this intermediate
+8:37
+representation that represents the
+8:38
+optimization decisions. Um and then of
+8:42
+course you know that that gets compiled
+8:44
+by this tensor compiler and you get your
+8:45
+results. Um but in order for us to
+8:49
+really claim that the interface is this
+8:52
+high level um productive interface that
+8:54
+has really been battle tested and shown
+8:56
+to be um effective uh we need to
+8:59
+automate this part of the pipeline. Um
+9:02
+we can't rely on a human in the loop at
+9:04
+this uh critical juncture. So um instead
+9:08
+for this project we have to build what
+9:10
+we call an autouler. Um and so the
+9:13
+autosculer automatically makes a
+9:15
+schedule um a a list of the kind of
+9:17
+optimizations that are relevant for each
+9:20
+situation of sparsity. Um so uh this
+9:24
+this kind of technology of automatic
+9:26
+decision- making about the um
+9:28
+implementation uh is is actually
+9:30
+critical for this application. Um slide.
+9:37
+Um
+9:38
+yeah, so I I think um at this point I'll
+9:40
+turn it over to um Matas.
+9:45
+So the overall agenda here for us is to
+9:48
+to present the the project overview. So
+9:52
+what tools we're actually using here to
+9:55
+enable this this the Finch compiler for
+9:58
+the Python community. We'll see how it's
+10:01
+actually lowered with some with some
+10:04
+benchmarks. So how actually you would
+10:06
+use it in your workflow and then we will
+10:08
+show you where you can find more
+10:09
+information about it.
+10:12
+So for the project overview
+10:16
+first of all we want to introduce to you
+10:18
+array API standard. So so the purpose is
+10:21
+to find a common language a common API
+10:25
+for different libraries to use. That's
+10:27
+something that is already supported for
+10:29
+example by by Numpy or Jax where you can
+10:32
+write the code one in one way with with
+10:36
+one API and then just replace an import
+10:39
+to use a different libraries. That's
+10:41
+something that's already used in for
+10:42
+example scikitlearn to to use different
+10:46
+um different backend libraries for for
+10:49
+running operations.
+10:55
+And the tool that here we want to to
+10:57
+enable community to use is our finch
+11:00
+compiler that basically operates on this
+11:03
+imperative control flow and we want to
+11:07
+to to Python community to be able to use
+11:10
+it with with with the API that they're
+11:13
+familiar with that they use on daily
+11:15
+basis. So some people are for example
+11:18
+only familiar with Cypi sparse. That's
+11:21
+something that we also want to take into
+11:23
+account when when when allowing people
+11:27
+to to use it.
+11:31
+The Finch architecture in a nutshell
+11:34
+here we we have a few layers basically
+11:37
+that we that we use for lowering. So you
+11:40
+know the Python array API already. So
+11:44
+that's something that you you would use.
+11:46
+And then we we lower to finch logic
+11:50
+where we express it in in more
+11:53
+structured way. Then the auto
+11:55
+scheduleuler does all the operations the
+11:59
+the optimizations that Willow mentioned
+12:02
+to to produce and finch notation and
+12:05
+then a looplet lowering an example that
+12:08
+we're going to see soon generates
+12:12
+a a finch assembly code that then is
+12:15
+translated to a specific back end. So
+12:19
+either for example number or or C code
+12:24
+and for our testing there are multiple
+12:26
+interpreters at each each layer to make
+12:29
+sure that the the layer that we
+12:31
+implemented makes sense that it's
+12:34
+actually
+12:36
+implemented the the way that that is
+12:38
+actually usable
+12:41
+a compilation example. So for for our
+12:45
+for for this purpose let's assume that
+12:47
+we want to perform an element wise
+12:49
+multiplication but here to take
+12:52
+advantage of a structure let's assume
+12:55
+that the second tensor is a lower
+12:58
+triangular so in numpai you know a tree
+13:00
+L function where the upper part is
+13:03
+zeroed so instead of multiplying each
+13:06
+elements in both tensors let's see how
+13:09
+the lowering will take advantage of the
+13:11
+fact that we only want to access the
+13:13
+lower triangular part.
+13:16
+So the Python API is something that you
+13:18
+write as a user. So we define the the
+13:22
+format that is double dense layer. We
+13:25
+pass it to the lazy we we call compute
+13:29
+and the Python
+13:32
+API is then
+13:35
+interpreted is is represented as a finch
+13:38
+logic. So here you can see a two tables
+13:41
+where the second one has this lower
+13:43
+triangular mask inserted in its
+13:46
+structure. So this is the point where
+13:48
+you can already see where this tree
+13:52
+lower triangular is present. And our
+13:55
+element wise operation is a map is a is
+13:58
+a map join operation with a with a
+14:02
+multiplication.
+14:05
+The Finch logic then is translated lower
+14:09
+to to Finch notation. And within Finch
+14:12
+notation, we have a notion of a of a
+14:14
+declare for for declaring the the result
+14:18
+pensor that we're going to return. And
+14:20
+instead of a map join here, you can see
+14:23
+we have a double loops. We have a nested
+14:26
+loops for for traversing the the
+14:29
+two-dimensional tensors. And the each
+14:32
+element is an increment where we read
+14:34
+from two slots and write to the to the
+14:37
+output. So at this point it's still
+14:39
+pretty simple.
+14:43
+Now moving from notation to to assembly,
+14:46
+we're going for sake of simplicity move
+14:48
+already to to a Numba back end. So how
+14:52
+the the notation is translated to let's
+14:54
+say Numba assembly or Numba code. So the
+14:59
+two parts that we're going to focus on
+15:01
+is lowering declare and these this this
+15:03
+loop loop nest. We're going to do this
+15:07
+by traversing levels of our tensors. So
+15:11
+just to remember these are two
+15:13
+dimensional dense tensors where the
+15:15
+second one has this lower triangular
+15:18
+mask that's going to play an important
+15:20
+role here.
+15:22
+First let's lower declare. So as the
+15:25
+result is a two-dimensional tensor,
+15:28
+we're going to declare it by writing a
+15:32
+zero to each element within the buffer.
+15:35
+Now we would like to lower the first
+15:37
+loop. We descend. We we move to the to
+15:41
+the next level. We see that each level
+15:44
+for for all the inputs and the output
+15:46
+tensor are dense. So the loop is lowered
+15:50
+to a lookup looplet which then when we
+15:54
+lower it results in a in a dense loop.
+15:57
+So we have a for loop that starts at the
+16:01
+numba extent for for the first
+16:03
+dimension. We compute some position
+16:06
+variables that's going to be just used
+16:08
+for accessing the right element in the
+16:10
+in the buffer. Now we move to the next
+16:13
+level because there are no other
+16:14
+looplets to um to to lower. And the next
+16:19
+part we see that we have two dense
+16:21
+levels but also a mask with a dense
+16:23
+level. So that's at this point we see
+16:26
+that this loop is going to be lowered a
+16:28
+little bit differently.
+16:31
+The loop is lowered to a looplet nest
+16:33
+with a sequence and two lookups for head
+16:37
+and tail where split is a is a variable.
+16:40
+That's that's the like let's say a a
+16:44
+barrier here.
+16:47
+And the sequence and lookup that we're
+16:48
+going to lower will result in two loops.
+16:51
+So that's the the loop for for head and
+16:55
+tail where where we start where where we
+16:59
+finish and we start at i
+17:03
+variable. Now we have the leaf loops
+17:07
+looplets that we are also lowering right
+17:09
+now which results in accesses to to the
+17:13
+result tensor. So again some positioned
+17:16
+variables. Additionally we have a check
+17:19
+where we assert that this is the first
+17:21
+time we access the the result
+17:25
+tensor.
+17:27
+And the last element to lower are
+17:29
+accesses to to the input tensors.
+17:33
+And here
+17:36
+it's just access to the buffers. But the
+17:39
+only thing different here is in the
+17:42
+second loop where the A1 is instead of
+17:45
+accessing it, we just write zero because
+17:48
+that's where we know that the the upper
+17:52
+triangular is. So that's where where all
+17:55
+the zeros are by the the structure of a
+17:58
+of a of it of the input tensor that we
+18:00
+received. So we've finished lowering all
+18:03
+looplets. Now let's think about some
+18:05
+simplifications that we can apply here.
+18:07
+For example, we know that zero is
+18:10
+aniculator for a multiplication. So that
+18:13
+part can be automatically
+18:16
+removed and replaced with zero. Another
+18:20
+thing to notice here in simplification
+18:22
+is that we assert that the the access
+18:25
+that the value is zero because that the
+18:27
+first time we access the buffer and you
+18:29
+write immediately zero. So the whole
+18:32
+contents of of a second loop can be also
+18:35
+removed.
+18:38
+And the last simplification here if we
+18:40
+see that there is a loop with an empty
+18:42
+body we can remove that loop.
+18:45
+And at this point we we completed the
+18:48
+the lowering and that's a kernel that is
+18:52
+ready to use with Namba back end that
+18:54
+takes advantage of the of the structure
+18:56
+of inputs where our operation will only
+19:00
+visit will only traverse the the
+19:02
+elements of the lower triangular.
+19:08
+So we've seen how this this this
+19:11
+machinery works, how actually we can
+19:14
+compile our kernels with with with our
+19:17
+inputs. Let's see some use cases and
+19:20
+some performance gains that we that we
+19:23
+managed to achieve here.
+19:25
+So the workflow that you as a user will
+19:28
+be exposed to is that you have some
+19:31
+numerical code written which might be
+19:33
+similar for example to numpy.
+19:36
+then you want to make sure that it's
+19:38
+array API compatible. So, so you rewrite
+19:42
+it in a way that every function every
+19:45
+mechanism there is present in the array
+19:47
+API.
+19:48
+And the second step in this workflow is
+19:52
+sparsifying it. So you you can move a
+19:55
+certain parts of your of your code to a
+19:59
+separate function. Write compile to to
+20:02
+JIT compile that part. Make sure that
+20:05
+you wrap your inputs in in some tensors
+20:08
+with some format.
+20:10
+So that's the workflow that we're going
+20:12
+to show you in a heat algorithm. So
+20:15
+that's a algorithm taken from graph plus
+20:18
+algorithms repository
+20:20
+which is used in network analysis.
+20:25
+So it's it's very short one. There are
+20:28
+some graph blast uh custom APIs. So for
+20:32
+example, left shift for for assignments
+20:35
+you we have some some vector classes. So
+20:39
+that's only for for graph purpose.
+20:44
+Then we want to make sure that it's
+20:46
+array API compatible. So let's say we
+20:49
+rewrite it. So we can then run it with
+20:51
+numpy with JS anything that supports
+20:54
+array API.
+20:57
+Then we would like to for the
+21:00
+specification we would like to jet
+21:01
+compile the part that is present in a
+21:04
+loop in a power iteration part
+21:08
+and we do this by moving it to a
+21:10
+separate function. We write the spur
+21:13
+compile decorator and call that fun uh
+21:16
+call that function in an appropriate
+21:18
+place. So then when we call our hits
+21:21
+algorithm, this part gets compiled and
+21:23
+we just execute again the kernel.
+21:28
+And this workflow that I just showed you
+21:30
+in this example is something that we
+21:32
+applied to
+21:35
+tensor tools library. So that's a
+21:37
+library written for for numpy
+21:40
+and it uses canonical polyadic de
+21:43
+composition algorithm
+21:45
+in research in in tensor component
+21:47
+analysis. We decided to take a function
+21:50
+that has a masked version of it, make it
+21:54
+error API compatible, which wasn't
+21:56
+really that much to change, and specify
+21:59
+the part that it's it's in a in a loop
+22:01
+or the the part that takes most of the
+22:04
+computations.
+22:07
+For the results, for some low density of
+22:10
+3%, we got a speed up over seven times
+22:13
+speed up on our uh infrastructure.
+22:17
+So we don't provide code here but in in
+22:20
+in my fork there is a PR where you
+22:23
+actually can can see how much code
+22:26
+changed there to make it API compatible
+22:30
+and to make it JIT compiled with our
+22:33
+finch. So the code change was rather
+22:36
+rather small. It wasn't just you know
+22:39
+rewriting the whole function. It was a
+22:41
+few small changes and then you just get
+22:44
+just the speed up for you know write
+22:47
+running your um CP composition. So I can
+22:51
+I can paste a link later in the chat.
+22:56
+You can try yourself what we just showed
+22:59
+you. So it's available as a pinch tensor
+23:01
+library on pipi.
+23:04
+This uses Julia call for bringing Julia
+23:08
+implementation in place. We also have
+23:10
+the the pure Python rewrite that we're
+23:16
+going to show you in a landscape in a
+23:18
+minute.
+23:20
+Oh, actually it's that slide. So here
+23:22
+you can see uh see here you can go to
+23:25
+finch-tensor.org.
+23:28
+This is the landing page of our
+23:30
+ecosystem.
+23:32
+Um and apart from the the pure Julia
+23:35
+implementation that you can use, we have
+23:38
+the the Python wrapper which we
+23:40
+benchmarked and show our our use cases
+23:44
+and the ongoing work is a rewrite to
+23:48
+pure Python the whole compiler so that
+23:50
+you can use it without Julia runtime but
+23:54
+with with for example Namba as a
+23:58
+back end for for kernel generation.
+24:04
+Last but not least, we have some other
+24:08
+topics in overall ecosystem integration
+24:10
+for sparity. One of them is bin sparse
+24:13
+file format for standardized interchange
+24:15
+format.
+24:18
+The the back end that we showed you that
+24:21
+the solution is also available within pi
+24:24
+data sparse library. So that's that's a
+24:26
+n dimensional sparse library for uh with
+24:29
+number as a back end for for python and
+24:32
+we want to to provide the the finch as a
+24:36
+one of the back ends that you can select
+24:38
+with a environment variable.
+24:45
+Last thing that we want to talk a little
+24:48
+bit is the bin sparse uh sparse storage
+24:52
+format. So that's that's the format that
+24:55
+also we we we push to to introduce to
+24:59
+the community to to unify to standardize
+25:02
+the array computations in Python even
+25:05
+more. So so the idea is to support
+25:08
+multiple formats here
+25:11
+and also in a crossplatform way. So so
+25:14
+this can be can be used efficiently by
+25:18
+by the users. So that's something that
+25:20
+you also can read about in our uh
+25:23
+landing page and in our resources.
+25:28
+So that was all that we presented for
+25:31
+today. Thank you so much for for for
+25:33
+listening. Again feel free to to visit
+25:36
+our page to to learn more about it. And
+25:39
+again the 2026 is the year when we want
+25:43
+to to push for finch light to to make it
+25:46
+available in some some first stage to to
+25:50
+the community. Thank you very much.
+25:58
+Thank you both so much for the wonderful
+26:00
+presentation.
+26:02
+Um,
+26:04
+let's see. If anybody has any questions,
+26:07
+go ahead and drop those. Now, it looks
+26:09
+like we had this one and [clears throat]
+26:13
+Willows already answered that. Uh,
+26:17
+you'll be sharing the slides,
+26:22
+but uh, Mateas can also step back and
+26:24
+and show the the before after um, as
+26:28
+well. I'll I'll upload like a link to
+26:30
+like a PDF or something.
+26:44
+Here is what they said. I'm just trying
+26:46
+to understand the lowering more. I
+26:48
+thought it was very interesting.
+26:51
+So,
+26:58
+yeah. And we have um academic papers
+27:00
+that describe this lowering process as
+27:02
+well. Um it was developed to be flexible
+27:05
+to a wide variety of uh matrix
+27:07
+structures like triangular matrices or
+27:09
+run length encoded matrices or sparse
+27:11
+matrices. Um hopefully uh using a really
+27:15
+extensible lowering process can um make
+27:18
+it so the library is a little bit uh you
+27:21
+know f futurep proofed and and able to
+27:23
+extend to new applications.
+27:35
+And I have the link here in the chat for
+27:38
+the um for the slides. Um but you can
+27:40
+also check out finchensor.org and uh
+27:42
+follow follow the links to some
+27:44
+publications.
+27:46
+Awesome.
+27:48
+and you all can drop those in the uh
+27:51
+resources as well and and then everybody
+27:53
+can um go back and reference that. But
+27:58
+doesn't look like we have any other
+27:59
+questions. Thank you both so much for
+28:02
+your time and dedication to PI data
+28:04
+global. Thank you everybody for being
+28:06
+here. Uh and we'll see you in a session
+28:10
+later today. Thank you.

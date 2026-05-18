@@ -1,0 +1,96 @@
+---
+date: 2026-04-28
+title: Governing Agentic AI
+subtitle: A Blueprint for Safe & Compliant Healthcare Agents in Production 
+categories: [odsc, ai, safety]
+keywords: [governance, risk assessment, testing, monitoring, healthcare, agentic AI]
+description:  A deep dive into the challenges and best practices for governing agentic AI systems in healthcare, including risk assessment, continuous testing, and production monitoring.
+---
+
+::: {.column-margin}
+{{< video https://vimeo.com/1189123317 >}}
+:::
+
+- David Talby
+    - [LinkedIn](https://www.linkedin.com/in/davidtalby)
+- John Snow Labs 
+- [slides](drive.google.com/file/d/1uUZKFUClQzS-T65wWIp6rrBGNWAC8H0Z)
+- [pacific.ai/ai-policies](https://pacific.ai/ai-policies)
+
+::: {.callout-note collapse="true"}
+### Notes
+
+* **Talk structure:**
+  1. Automated Risk Assessment - How to comply with AI regulations, laws, and standards.
+  2. Continuous Testing - How to perform continuous testing across many risk dimensions.
+  3. Live Red Teaming - How to monitor and govern AI systems once they are in production.
+
+* **Regulatory and compliance burden:**
+  * Healthcare AI systems must comply with general AI regulations, privacy law, industry standards, insurance requirements, and healthcare-specific rules.
+  * Relevant frameworks include the NIST AI Risk Management Framework, ISO standards, the EU AI Act, U.S. state-level AI laws, and healthcare-specific evaluation frameworks.
+  * Talby emphasizes that the landscape is fragmented, fast-moving, and too broad to handle manually without structured support.
+* **Impact assessment and risk assessment:**
+  * Organizations need a disciplined process before AI systems reach production.
+  * This includes documenting intended use, affected populations, risks, likelihood, impact, and mitigating controls.
+  * Talby argues that large language models can help automate parts of impact assessments by checking projects against hundreds of regulatory and governance requirements.
+  * A risk registry is important because approvals are often not simply “yes” or “no,” but “yes, provided these controls are in place.”
+
+
+* **Testing must go beyond accuracy:**
+  * [Accuracy alone is insufficient]{.marked}, especially in healthcare.
+  * AI systems must also be tested for robustness, bias, fairness, privacy, safety, hallucination, calibration, reliability, and task-specific clinical validity.
+  * Talby describes accuracy as only one metric among many.
+* **Major testing concerns:**
+  * **Data contamination:** Public benchmark questions may already be in model training data, inflating scores.
+  * **Fragility:** Small wording changes, such as replacing a drug brand name with a generic name, can reduce performance.
+  * **Task mismatch:** Many medical benchmarks do not reflect real clinical workflows.
+  * **Lack of patient-data testing:** Few published evaluations use actual electronic health record data.
+  * **Bias and stigmatizing language:** Models can reproduce social, clinical, racial, gender, mental-health, and substance-use biases.
+  * **Framing and ordering effects:** Models can be influenced by how information is presented or ordered, similar to human cognitive biases.
+* **Healthcare-specific evaluation:**
+  * The talk highlights Med-HELM and similar efforts as examples of richer healthcare AI evaluation.
+  * Better testing requires clinically meaningful task taxonomies, specialty-specific datasets, and realistic workflows such as summarizing visits, reviewing literature, generating patient education materials, or supporting clinical operations.
+* **Recommended testing practice:**
+  * Build broad automated test suites.
+  * Run them continuously through continuous integration and continuous deployment pipelines.
+  * Treat AI testing like software testing, but with additional dimensions specific to large language models, agents, and clinical risk.
+
+
+* **Production governance:**
+  * [Guardrails and observability are useful but insufficient.]{.marked}
+  * [Agentic systems can fail in intermediate steps, not only at final output.]{.marked}
+  * Therefore, monitoring must inspect the internal chain of agents, tools, intermediate decisions, and hidden failure modes.^[is that even possible...llms are black boxes and most dont share their weight or even thier system prompt]
+* **Emerging design pattern:**
+  * Use a separate monitoring or “guardian” agent to challenge the primary agent and its tools.
+  * This guardian should perturb inputs, test edge cases, detect recurring failure modes, and produce actionable feedback for developers.
+  * In the future, some feedback may be sent back to the primary agent itself, but this raises additional change-management and safety issues.
+* **Main conclusion:**
+  * Agentic AI in healthcare is still immature.
+  * Talby compares it to a “year one attendant”: useful, but not ready for autonomous trust.
+  * Production systems need strong guardrails, gatekeeping, monitoring, testing, and human oversight.
+  * The field is still young; many methods, datasets, libraries, and best practices are only one or two years old.
+
+:::
+
+### Reflections on the talk
+
+- As I'm on the lookout for design patterns. Talby Talks about a Guardian agent pattern
+
+::: {.callout-note collapse="false"}
+#### Guardian pattern
+
+- Use a separate monitoring or “guardian” agent to challenge the primary agent and its tools.
+- This guardian should perturb inputs, test edge cases, detect recurring failure modes, and produce actionable feedback for developers.^[why is fuzz testing is so important here...]
+:::
+
+Nice but This is however is unlikely to mitigate any of the fundamental issues with LLMs hallucination or poor reasoning skills. 
+
+I think that another issue that I call "non experiential learning". LLM don't learn from experience so they 
+
+1. Don't really have a good sense of what they know or don't know.
+2. May often have access to all the facts yet fail to put them together coherently.
+
+So this pattern may be fine for lower stakes use cases. But for medicine you need logic based reasoning and likely humans in the loop. Agentic harasses are unlikely to be able to mitigate the weakness of LLMs to any degree needed by practitioners of medicine anytime soon.
+
+So the guardian is an agent but having an agent monitor may leads to the guardian colluding with the primary agent. It like a lewis signaling game - they only win if they cooperate. 
+

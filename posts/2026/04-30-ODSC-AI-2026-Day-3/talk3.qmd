@@ -1,0 +1,126 @@
+---
+date: 2026-04-28
+title: Reinforcement Learning for LLM  
+subtitle: Talk recap
+categories: [odsc, rl, llm]
+keywords: [reinforcement learning, large language models, GRPO, verifiable rewards, memory management, rollout generation]
+description:  A recap of the talk "Reinforcement Learning for LLM" by Datta Nimmaturi at ODSC AI 2026 Day 3.
+---
+
+
+## Reinforcement Learning for LLM  {#sec-rl-for-llm}
+
+::: {.column-margin}
+{{< video https://vimeo.com/1189279263 >}}
+:::
+
+- Datta Nimmaturi
+  - [Homepage](https://datta0.github.io/)
+  - [LinkedIn](https://www.linkedin.com/in/datta0/)
+  - [GitHub](https://github.com/datta0)
+  - [X](https://twitter.com/im_datta0)
+  - Unsloth AI
+  - [slides](https://docs.google.com/presentation/d/1R_htmucAsNbAQIWL9f6F2xyNtYl-uUbRPqPVGuXcZec/)
+  - [notebook](https://colab.research.google.com/drive/1ECoAWsEwV_fXC2upLidUIsbOQ59KQON0?usp=sharing)
+
+::: {.callout-note collapse="true"}
+### Notes
+
+* The session introduces **reinforcement learning for large language models (LLMs)** and contrasts it with **supervised fine-tuning (SFT)**.
+
+  * SFT teaches a model by imitation: given a prompt, it learns from labeled examples of desirable answers.
+  * The speaker argues that SFT works well but is expensive, data-hungry, and limited when the desired behavior cannot be fully specified through examples.
+
+* Reinforcement learning is presented as a way for models to learn through exploration.
+
+  * The speaker uses game-playing systems such as chess and Go as motivation.
+  * The key idea is that an agent interacts with an environment, takes actions, and receives rewards.
+  * This lets the model discover strategies rather than merely imitate human demonstrations.
+
+* The speaker emphasizes that reinforcement learning is powerful but dangerous.
+
+  * **Reward hacking** is a major risk: a model may optimize the literal reward while violating the intended goal.
+  * Reinforcement learning is also highly sensitive to hyperparameters.
+  * Poorly designed rewards can produce undesirable behaviors, such as overly long answers or deceptive strategies.
+
+* The talk then explains the standard reinforcement learning setup for LLM alignment.
+
+  * Earlier systems used several model components:
+
+    * an actor model that generates responses,
+    * a critic model that estimates difficulty or value,
+    * a reward model that evaluates response quality,
+    * and a reference model that prevents the trained model from drifting too far from the original model.
+  * This setup is expensive because it may require several model copies in GPU memory.
+
+* The speaker introduces **Group Relative Policy Optimization (GRPO)** as a more efficient alternative.
+
+  * GRPO removes the critic model.
+  * Instead of generating one answer per prompt, it samples a group of answers and compares them within the group.
+  * If every answer is correct, the task is treated as easy; if only a few answers are correct, the task provides a stronger learning signal.
+  * This reduces memory requirements and makes reinforcement learning more feasible on limited hardware.
+
+* Verifiable rewards are presented as especially useful.
+
+  * In mathematics, the final answer can often be checked directly.
+  * In code, generated solutions can be tested against unit tests.
+  * These rewards are deterministic, unlike learned reward models, which can vary depending on configuration.
+  * With verifiable rewards, the reward model can also be removed, leaving mainly the actor and reference model.
+
+* The talk discusses stabilizing reinforcement learning updates.
+
+  * **Kullback–Leibler divergence (KL divergence)** is used to keep the trained model close to the reference model.
+  * The update size is clipped so that learning does not become unstable.
+  * The speaker frames this as necessary to prevent the model from forgetting its general conversational abilities.
+
+* The speaker then explains systems-level optimizations that make GRPO practical.
+
+  * **Low-Rank Adaptation (LoRA)** allows fine-tuning only small adapter weights instead of the entire model.
+  * The speaker claims LoRA can perform close to full fine-tuning in this reinforcement learning setting.
+  * **vLLM** is used for fast rollout generation, but its key-value cache can consume substantial GPU memory.
+  * Memory is managed by alternating between rollout generation and gradient updates, discarding or offloading memory structures when they are not needed.
+  * Chunking rollouts further reduces memory pressure by processing samples in smaller batches.
+  * Weight sharing avoids loading duplicate model weights.
+
+* The applied demonstration trains an LLM to generate a strategy for the game **2048**.
+
+  * The game is described as a 4×4 grid where the player moves tiles up, down, left, or right.
+  * Matching tiles merge, and the goal is to reach the 2048 tile.
+  * Instead of asking the model to output one move, the setup asks it to write Python code for a strategy function.
+
+* The notebook example uses a Qwen 3 model loaded with Unsloth.
+
+  * The model is given a prompt specifying the allowed actions and the expected Python function format.
+  * The system extracts code from markdown code blocks and evaluates only the generated strategy.
+  * The speaker adds explicit prompt constraints to prevent inefficient or reward-hacking behavior.
+
+* The reward function checks both performance and rule compliance.
+
+  * Strategies are rewarded for reaching high tiles such as 1024 or 2048.
+  * Poor strategies are penalized if they fail to reach at least modest tile values.
+  * The code also penalizes imports, file access, randomness, loops, or other forms of cheating.
+  * The speaker adds a diversity-related reward because the model initially overused a single move.
+
+* Training progress is evaluated through rollout rewards and game statistics.
+
+  * Early strategies receive negative rewards.
+  * Over training, rewards improve substantially, reaching positive territory.
+  * The speaker recommends tracking reward trends, reward standard deviation, maximum tile reached, score, and KL divergence.
+  * If all rollouts receive the same reward, the task may have become too easy and should be made harder.
+
+* The main takeaway is that reinforcement learning for LLMs is not only an algorithmic problem.
+
+  * Practical success depends on model choice, reward design, memory management, rollout generation, and monitoring.
+  * GRPO is presented as attractive because it reduces the number of models required during training.
+  * The speaker summarizes the contrast as **imitation learning through SFT** versus **exploratory learning through reinforcement learning**.
+
+* In the Q&A, the speaker clarifies several points.
+
+  * GRPO can be used with an LLM-as-judge reward, but that gives up some of the efficiency and reliability of verifiable rewards.
+  * Reinforcement learning and model alignment overlap, but they are not the same thing.
+  * For customized domains such as healthcare, GRPO is recommended when rewards are verifiable; otherwise, some reliable evaluation mechanism is still needed.
+  * Even without verifiable rewards, GRPO can still remove the critic model, though the systems requirements increase.
+:::
+
+### Reflection
+

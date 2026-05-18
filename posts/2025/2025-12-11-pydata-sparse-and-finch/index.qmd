@@ -1,18 +1,21 @@
 ---
-title: "PyData/Sparse & Finch - Extending sparse computing in the Python ecosystem"
-subtitle: "PyData Global 2025 Recap"
 date: 2025-12-12
+title: "Sparse & Finch"
+subtitle: "Extending sparse computing in the Python ecosystem"
 categories: [pydata, odsc, sparse computing]
 keywords: [PyData, Sparse Computing, Finch, Compiler, Python]
-description: "A detailed recap of the PyData Global 2025 talk on extending sparse computing in the Python ecosystem using PyData/Sparse and the Finch compiler, covering current landscape, benchmarks, and future developments."
-image: pydata_logo.png
+description: "A detailed recap of the PyData Global 2025 talk by  Mateusz Sokół and Willow Marie Ahrens <br> on implementing sparse computing in the Python ecosystem <br> using PyData/Sparse and the Finch compiler. <br> They cover the current landscape, benchmarks, and future developments. <br> And they deep dive into lowering and looplets optimization techniques."
+title-block-banner-color: "#fbb85b"
+title-block-banner: banner.png
+image: hero.png
 ---
 
-![pydata global](pydata_logo.png){.column-margin}
-
+::: {.column-margin}
+{{< video src="https://www.youtube.com/watch?v=RK2ccdmZ3FA" title="PyData/Sparse & Finch: Extending sparse computing in the Python ecosystem" >}}
+:::
 
 ::: {.callout-tip}
-## Lecture Overview
+## Overview
 
 Scientific Python Ecosystem offers a wide variety of numerical packages, such as `NumPy`, `CuPy`, or `JAX`. One of the domains that also captures a lot of attention in the community is sparse computing.
 
@@ -29,172 +32,526 @@ Real-world use-cases will show you how, step-by-step, Python practitioners can m
 
 Apart from the existing Julia implementation, the number of sparse backends offered by PyData/Sparse will grow in the future to provide a Python-native alternatives for `scipy.sparse` and `Numba` solutions. One of them that is currently under development is finch-tensor-lite, a pure Python rewrite of `Finch.jl` compiler, meant to make the solution lightweight by dropping Julia runtime dependency while providing the majority of features.
 
-
 :::
 
 In this talk we're going to understand the current landscape of sparse computing in the Python ecosystem first. Then a high-level overview of the Finch technology and compiler's architecture will be presented together with other solutions vital for the project: Array API Standard and binsparse format.
 
 Next, we're going to present a selected set of benchmarks - also focusing on real world use-cases: how Finch impacts users' experience when writing sparse programs in Python. Last but not least a showcase of the current development will be shown - pure Python rewrite of Finch compiler.
 
-<!--
 
 ::: {.callout-tip}
-## What You'll Learn:
-
-- 🔍 A walkthrough of key components: attention, positional encoding, encoder/decoder stack
-- 🧠 Visual explanations of attention masks, shapes, and residuals
-- ⚠️ Common bugs and debugging strategies (like handling shape mismatches and masking errors)
-- ✅ Real-world implementation tips and tricks that demystify the architecture
-
-By the end of the talk, attendees will:
-
-- Understand the full forward pass of a transformer
-- Know how each component connects to the original paper
-- Feel more confident reading or writing custom model architectures
-:::
-
-
-::: {.callout-tip}
-## Prerequisites:
-
-- Basic Python and PyTorch
-- Some familiarity with neural networks (e.g., feedforward, softmax)
-- No need for prior experience in building models from scratch
-:::
-
-::: {.callout-important}
-## Tools and Frameworks:
-
-We will introduce you to certain modern frameworks in the workshop but the emphasis be on first principles and using vanilla Python and LLM calls to build AI-powered systems.
-:::
--->
-
-:::: {.callout-tip}
 ## Speakers: 
 
-### Mateusz Sokół
-
-
-Mateusz Sokół is a Software Engineer at Quansight, working on multitude of open source projects in the Scientific Python Ecosystem. 
-
-- His GitHub profile here: https://github.com/mtsokol
-
-## Willow Marie Ahrens
-
-
-Willow Marie Ahrens is assistant professor in the School of Computer Science at Georgia Tech. She is inspired to make programming high-performance computers more productive, efficient, and accessible. Her research focuses on using compilers to accelerate productive programming languages with state-of-the-art datastructures, algorithms, and architectures, bridging the gap between program flexibility and performance. She’s the author of the Finch sparse tensor programming language. Finch supports general programs on general tensor formats, such as sparse, run-length-encoded, banded, or otherwise structured tensors. Please reach out if you are interested in doing research at Georgia Tech!
-
-
-<!-- use these or others 🌸 🤗 💼 
-- Contact:
-    - [ Personal Website](https://birdofparadise.ai/experience/)
--->
-
+- Mateusz Sokół
+    - is a Software Engineer at Quansight, working on multitude of open source projects in the Scientific Python Ecosystem. 
+    - His GitHub profile here: https://github.com/mtsokol
+- Willow Marie Ahrens
+    - is assistant professor in the School of Computer Science at Georgia Tech. She is inspired to make programming high-performance computers more productive, efficient, and accessible. Her research focuses on using compilers to accelerate productive programming languages with state-of-the-art data structures, algorithms, and architectures, bridging the gap between program flexibility and performance. She’s the author of the Finch sparse tensor programming language. Finch supports general programs on general tensor formats, such as sparse, run-length-encoded, banded, or otherwise structured tensors. Please reach out if you are interested in doing research at Georgia Tech!
+    - [talk repo](https://github.com/pydata/sparse) https://sparse.pydata.org/en/stable/
+    - [slide deck](slides.pdf)
 :::
-
-- [talk repo](https://github.com/hugobowne/AI-for-SWEs)
-- [slide deck](https://github.com/hugobowne/AI-for-SWEs)
 
 ## Outline
 
+
+
+* **High-level user model:**
+
+  * Domain users should be able to write NumPy-like array code.
+  * They should specify whether inputs are dense or sparse, but not manually decide loop order, fusion strategy, or format-specific traversal.
+  * Finch’s auto-scheduler is meant to replace the human performance engineer in that optimization step.
+
+* **Project architecture:**
+
+  * The Python-facing layer uses the Array Application Programming Interface standard so code can be written against a common array interface.
+  * Finch lowers code through several stages: Python Array API → Finch Logic → Finch Notation → Finch Assembly → backend code such as Numba or C.
+  * The speakers emphasize that each stage has interpreters/tests to validate correctness.
+
+* **Compilation example:**
+
+  * The example multiplies two tensors where one input is lower triangular.
+  * Finch represents the triangular mask in its internal logic.
+  * During lowering, it generates loops that only traverse the lower triangular part.
+  * Algebraic simplification then removes useless work, such as multiplying by zero or keeping empty loops.
+
+* **Use-case workflow:**
+
+  * Start with NumPy-like numerical code.
+  * Rewrite it to be Array API-compatible.
+  * Isolate the computationally expensive loop.
+  * Add a sparse compile decorator and wrap inputs in appropriate tensor formats.
+  * Finch then Just-in-Time compiles the sparse kernel.
+
+* **Examples shown:**
+
+  * **Hyperlink-Induced Topic Search (HITS):** A graph link-analysis algorithm was rewritten from GraphBLAS-style code into Array API-compatible code, then the power-iteration kernel was compiled.
+  * **Canonical Polyadic (CP) decomposition:** A masked tensor decomposition routine from `tensortools` was adapted with relatively small code changes and compiled with Finch.
+
+* **Benchmark result:**
+
+  * For Canonical Polyadic decomposition at low density, around 3%, the speakers report more than a sevenfold speedup on their test infrastructure. 
+
+* **Ecosystem direction:**
+
+  * `finch-tensor` is available as a Python package, currently using JuliaCall to access the Julia implementation.
+  * The project is also working on a pure Python compiler path using Numba as a backend.
+  * The 2026 goal is to push “Finch Light” toward an initial community release.
+
+* **Standardization angle:**
+
+  * The speakers also discuss `binsparse`, a binary sparse storage/interchange format intended to standardize sparse array exchange across formats and platforms.
+  * The goal is broader PyData/Sparse integration, including Finch as a selectable backend.
+
+
+:::: {.sl}
+::: {.sl-text}
+* **Talk:** 
+  
+  - *PyData/Sparse and Finch*, PyData Global 2025.
+
+* **Main thesis:** 
+  
+  - Array programming is highly productive, but sparse arrays are still hard to use efficiently in Python. 
+
+  - The speakers argue that sparse tensor compilers can unify sparse computation by translating high-level array code into efficient kernels for many formats and backends. 
+:::
+::: {.sl-fig}
 ![Title](slide01.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+* **Problem being addressed:**
+
+  * Sparsity appears in scientific computing, social networks, machine learning, and image processing.
+  * Dense arrays have a simple relationship between mathematical indexing and memory layout.
+  * Sparse arrays break that simplicity because formats such as Compressed Sparse Column store only nonzero values, plus index and pointer arrays.
+  * Efficient sparse algorithms must avoid multiplying by zero and must traverse sparse data structures correctly.
+:::
+::: {.sl-fig}
 ![Array Programming is Productive](slide02.png)
+:::
+::::
 
-!Sparsity is everywhere...[](slide03.png)
 
+:::: {.sl}
+::: {.sl-text}
+* **Current ecosystem issue:**
+
+  * Sparse support in the PyData ecosystem is fragmented.
+  * SciPy, PyTorch, and PyData/Sparse each support different dimensions, formats, operations, and backends.
+  * The desired target is a central sparse array library that is n-dimensional, performant, supports central processing units and graphics processing units, and has broad linear algebra and graph algorithm coverage.
+:::
+::: {.sl-fig}
+![Sparsity is everywhere](slide03.png)
+:::
+::::
+
+
+:::: {.sl}
+::: {.sl-text}
+
+* **Why compilers matter:**
+
+  * The implementation burden grows combinatorially across operations, structures, data formats, and hardware architectures.
+  * A sparse tensor compiler can take a high-level sparse program plus format descriptions and generate specialized code automatically.
+  * This lets different interfaces and sparse formats map into a shared intermediate representation rather than requiring hand-written kernels for every case.
+:::
+::: {.sl-fig}
 ![Sparsity is Challenging](slide04.png)
 
+:::
+::::
+
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Fragmented sparse support today](slide05.png)
 
-![Implementation Burden Grows Exponentially...](slide06.png)
+:::
+::::
 
-![Sparse Tensor Compilers Can Help...](slide07.png)
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
+![Implementation Burden Grows Exponentially](slide06.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
+![Sparse Tensor Compilers Can Help](slide07.png)
+:::
+::::
+
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![High-Level Sparse Array Programming in Python](slide08.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Agenda](slide09.png)
 
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Project Overview](slide10.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Array API standard](slide11.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Finch compiler & Galley](slide12.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Finch Architecture](slide13.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Compilation Example:](slide14.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide15.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide16.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide17.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide18.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide19.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide20.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide21.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide22.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide23.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide24.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide25.png)
+:::
+::::
+
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 
 ![Lowering example](slide26.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide27.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide28.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide29.png)    
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide30.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide31.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Lowering example](slide32.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Use cases & benchmarks](slide33.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Use case workflow](slide34.png)
 
+:::
+::::
+
+:::: {.sl}
+[HITS](https://en.wikipedia.org/wiki/HITS_algorithm)
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Use case: HITS algorithm](slide35.png)
+:::
+::::
 
-- [HITS](https://en.wikipedia.org/wiki/HITS_algorithm)
-
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![HITS algorithm: Array API conversion](slide36.png)
+:::
+::::
 
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![HITS algorithm: complied with Finch](slide37.png)
 
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Use case: CP Decomposition](slide38.png)
 
+:::
+::::
+
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![CP Decomposition: accelerated computation](slide39.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Try it out yourself!](slide40.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Ecosystem Overview](slide41.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Ecosystem Integration](slide42.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![binsparse: A binary sparse storage format](slide43.png)
+:::
+::::
 
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
 ![Questions](slide44.png)
 
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+* **Q&A point:**
+
+  * A question focused on understanding the lowering process.
+  * The answer emphasized that the lowering design is intended to be extensible across triangular, run-length encoded, and general sparse matrix structures, making the system more future-proof.
+:::
+::: {.sl-fig}
 ![Q&A](slide45.png)
+:::
+::::
 
 ## Reflections
 
-WoW
+WoW 
+
+1. a good sparse library for python calls for implementing many Stats and ML algorithm
+using this backend.
+2. Also streaming algorithms can benefit from this.
+3. The tensor logic needs `einsum` - is this op supported ?
+
+
+::: {.callout-tip}
+### Tip
+
+For situations where more complex operations are needed, Finch supports an @einsum syntax on sparse and structured tensors.
+
+```julia
+julia> @einsum E[i] += A[i, j] * B[i, j]
+julia> @einsum F[i, k] <<max>>= A[i, j] + B[j, k]
+```
+
+:::
+
 
 ## Resources
-
 
 Repos and Docs:
 
@@ -202,8 +559,7 @@ Repos and Docs:
 
 
 - [finch-tensor](https://github.com/finch-tensor)
-- [Program seamlessly with sparse and structured tensors
-](https://finch-tensor.org/)
+- [Program seamlessly with sparse and structured tensors](https://finch-tensor.org/)
 
 
 - Papers:

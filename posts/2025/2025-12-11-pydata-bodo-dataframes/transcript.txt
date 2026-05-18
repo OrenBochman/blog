@@ -1,0 +1,591 @@
+
+0:06
+Hello everyone and welcome to day three of PI data global. We're excited to have you joining us at this session. Um bit
+0:14
+of housekeeping um for this one. Just uh feel free to use the chat to connect with connect with uh fellow attendees
+0:20
+and share your thoughts during the session. If you have any questions though, please post them in the Q&A tab.
+0:27
+Um and um we'll have some time at the end for to take a few of those questions
+0:33
+before we end the session. So with that uh it's my absolute pleasure
+0:38
+to introduce um Scott. Uh they'll be presenting um I think it's Bodto dataf
+0:45
+frames something scalable HPCbased dropin replacement for pandas. I hope I
+0:51
+got it there. Um and we're looking forward to hearing about this. So with that, I'll let you take over the stage
+0:57
+there, Scott. Go ahead. All right. So, thank you. Hello everyone and welcome to my talk on BTO dataf
+1:05
+frames, a fast and scalable high performance computing or HPCbased dropin
+1:11
+replacement for pandas. My name is Scott Rutled and I am a software engineer here
+1:16
+at Bodto.ai. So, a little bit of background on me. I've been at Bodto since summer of 2024.
+1:25
+Previously was pursuing my undergrad in computer science and machine learning at
+1:31
+Carnegie Melon University here in Pittsburgh, which is where I'm from and
+1:36
+also where I'm currently speaking to you from today. And since joining Bodto,
+1:41
+I've worked on projects from the Python compiler and Boto SQL to what I'm going
+1:47
+to be presenting today, which is Bodto dataf frames since about April of 2025.
+1:54
+And throughout my professional and academic career, I've been a pandas user. So I'm very excited to be speaking
+2:02
+to you all here today at PI data. So a little background on Bodto. Photo
+2:08
+is a high performance data processing engine in Python. We are open- source
+2:14
+and installable via pip and the quickest way to get started which is
+2:20
+the subject of today's talk is replacing your import pandas as pd with import
+2:27
+photo.pandas as pd. And with that you get a lot of great performance features
+2:33
+like the parallel computing with message passing interface just in time
+2:38
+compilation and query optimization which we are going to talk about in the
+2:44
+following slides. This is just a overview. And we also have a SQL engine as a
+2:51
+separate package. And this diagram on the right just shows the different file
+2:57
+formats and storage systems that BTO supports. And also wanted to mention it
+3:02
+works on your laptop and as well as a cluster in the cloud as well. So some
+3:10
+agenda before we get started. We're going to talk about the challenge with simple scalable data infrastructure in
+3:17
+Python. Give an overview of Bodto dataf frames as well as a demo. Talk about how
+3:23
+it works and go over some specific features like the just in time compilation for custom code and
+3:30
+integration with the iceberg table format.
+3:36
+So the challenge that we've seen with building scalable data infrastructure in
+3:41
+Python is that frequently code that works on small data in testing often
+3:48
+breaks when running on real world data. So for example, people like to
+3:53
+experiment and iterate using pandas, but pandas has known issues with
+3:59
+scalability and often is too slow to run on real data sets.
+4:06
+And this problem is compounded by the fact that large data sets are stored in
+4:12
+cloud storage like S3 which adds more latencies further slowing down workloads
+4:18
+and the ecosystem is also fragmented with a lot of tools that have different
+4:23
+use cases leading to more code rewrites. And so when we set out to create boto
+4:30
+dataf frames, we wanted to make something that was fast and scalable to any data size with minimal code changes.
+4:38
+And we also wanted something that was easy to use and understand, which is why we chose pandas because it is widely
+4:45
+used and one of the first libraries that people learn when they're learning Python, for instance. And we also wanted
+4:52
+something flexible for a variety of different workloads and also be able to
+4:57
+integrate well into AI workloads where you're interle training and inference
+5:02
+with pre-processing. So this brings us to boto dataf frames.
+5:08
+So boto dataf frames is a dropin replacement for pandas. So you replace
+5:13
+your import at the top of the file and then the code is just regular pandas
+5:18
+code like this example on the right where we're reading some paret file
+5:23
+doing some transformation filtering and writing to a paret file. So this is
+5:29
+valid pandas code and if you change the import import boto.pandas pandas as PD
+5:34
+it will also be valid boto code and this gives you a lot of nice features and
+5:40
+benefits like a database grade query optimizer so we actually collect
+5:46
+sequences of pandanda's operations transform them into this plan structure
+5:52
+so that we can apply optimizations and transformations to make execution more
+5:58
+efficient and we also have just in time compilation for custom code and the
+6:05
+execution of Bodto is in parallel using MPI which stands for the message passing
+6:12
+interface. It's a standard communication protocol for how parallel processors
+6:19
+communicate with each other typically used in high performance computing systems.
+6:25
+We also use streaming execution. So data is run in batches to avoid running out
+6:33
+of memory enabling you to process larger than memory data sets. And for operators
+6:39
+like sort where you need the full data set in order to continue with execution,
+6:45
+we also have spilling to disk. So you can write a portion of the data set to a
+6:50
+file temporarily to avoid running out of memory. further increasing the chances
+6:55
+of success. And lastly, since pandas is a large
+7:01
+library with lots of different features, we don't support everything at the moment. So we do have this fallback
+7:07
+mechanism to pandas for unsupported operations. So converts your data to
+7:13
+pandas dataf frame before continuing execution. And the hope is that at this point your data is small enough that
+7:21
+this is not going to break your workload. We've been working very hard on supporting the performance critical
+7:27
+operators that you want to do in pandas. So now I'm going to give a concrete
+7:36
+demonstration showing photo data frames in action. So, I'm going to be using an
+7:44
+ETL style workload on New York City taxi and ride share data stored in a parket
+7:52
+file. And we're going to be enriching this data set with weather observations
+7:58
+from Central Park, doing some transformations, some aggregation, and
+8:03
+then finally sorting and writing the transformed data set. So we like this
+8:10
+example because it shows a lot of performance critical operations that a
+8:16
+dataf frame library should have like reading CSV files,
+8:21
+reading parquet files, doing datetime transformations,
+8:28
+joining data sets via this df.mmerge, custom transformations
+8:35
+with this series.map API. by group by aggregate and finally sorting and
+8:42
+writing to a parket file. So when I run this code using pandas, note that I am
+8:48
+passing pandas as the pd argument here and that's used in this read parquet and
+8:56
+read csv calls. It runs in about 60 to 70 seconds on my
+9:03
+Mac on about 44 million rows of data. And now when I replace the PD argument
+9:10
+with boto.pandas, you can see that the execution actually becomes much faster.
+9:17
+And we do this without changing any of the actual code. See, it was about 7
+9:22
+seconds or a 10 time speed up. And in this example, I'm using four cores on my
+9:28
+Mac.
+9:37
+So that was an example of boto dataf frames in action. I'm now going to talk
+9:43
+about the execution model and compare to other distributed dataf frame libraries
+9:50
+that have pandas like APIs. So for example spark which has pandas on spark,
+9:57
+there's dask or even ray. So with these libraries, they often have pandas like
+10:05
+APIs or APIs that are almost pandas compatible, but they still require code
+10:12
+rewrites and refactoring, especially because of the execution model. There's
+10:17
+a lot of manual configuration and performance tuning that needs to be done.
+10:23
+So with Bodto as you can see the idea is that it's fully pandas compatible and
+10:29
+all you need to do is just replace the import at the top of your file.
+10:34
+And secondly the execution model is also different with bodo. So with Spark or
+10:41
+Dask, they use what's called the driver executor model in which a driver has a
+10:49
+series of tasks that it assigns to a pool of executors. Those executors
+10:55
+complete those tasks and then report back to the driver. So the issue with this model is that the
+11:03
+communication is heavily bottlenecked around the driver and additionally if
+11:09
+your tasks are too small you also get a lot of runtime overheads from creating a
+11:15
+waves of tiny tasks. So contrasting that with the Bodto execution model
+11:23
+uses what's called the single program multiple data model or SPMD. So Bodto
+11:30
+spawns a group of parallel workers who are all running the same program on
+11:36
+different chunks of data and get different output.
+11:42
+And the advantage of this execution model is that the workers are aware of each other and what they're doing. So
+11:49
+they can actually communicate directly with each other using efficient communication libraries like the message
+11:57
+passing interface which has implementations like mpitch or intel
+12:02
+MPI. So with this execution model the workers communicate directly. They're also truly
+12:09
+processing the program in parallel. And this leads to a more scalable solution
+12:16
+that can scale well from not only a laptop to a large single node but also to a cluster as well.
+12:25
+So now going to walk through a smaller example highlighting the workflow of the
+12:31
+dataf frame library how it works. So when we have this code like the snippet
+12:37
+on the left, we call a read parquet. It's not actually going to read any data
+12:44
+at this point. It's going to create this read parquet node. It might still open
+12:50
+the file to learn column names and data types, for example, but it's not
+12:56
+actually going to pull any data into memory at this point.
+13:01
+Continuing with this, as we do more transformations on our data, we're going to add more nodes on top of our plan. So
+13:09
+this these two lines are going to create additional projection nodes. And note
+13:16
+that at this point there's no data that's actually been processed. Finally, we can do a filter, which again
+13:23
+just adds another node on top of our plant. And finally, whenever we do an operation
+13:30
+where the data is needed in order to continue with the program like writing
+13:35
+to a paret file, the user process is going to send this
+13:41
+plan to a set of parallel workers. The workers are then going to optimize
+13:48
+this plan and then execute on this parallel
+13:54
+backend that we saw on the previous slide. And in this case, they're going to write their results to this results
+14:01
+directory. And so one of the benefits of this model
+14:07
+of execution, often called lazy evaluation, is that we have more context
+14:13
+on what the user is trying to do. So we can apply optimizations. So for example
+14:18
+in this query we are reading a parquet file doing some transformations and then
+14:24
+finally filtering. However you can notice that we can actually make this more efficient by
+14:30
+doing the filter and read essentially at the same time so that we process less data in our projections.
+14:39
+So this is called filter push down and it's a very important optimization.
+14:45
+And now I'm going to explain how we go from an optimized plan into actually
+14:51
+executing on real data. So in this example, we're reading a parquet file,
+14:57
+doing some transformations, and then aggregating via this group by
+15:03
+agg, and then writing the result to another file. So you'll notice that for
+15:09
+this group by call, we want the mean and min of some columns. And this is going
+15:15
+to require actually having the full data set. So what we do is we decompose this plan
+15:23
+into a set of physical pipelines. In these pipelines, data flows from a
+15:29
+source node to a sync fully in batches. So for example in the first pipeline we
+15:37
+would read a batch from the parquet file do some projection and then put it in
+15:44
+our aggregate table that we're collecting and then once we've aggregated all of our values we're going
+15:51
+to read a batch from the aggregate table and write it to the parket file. So this
+15:56
+plan becomes two different pipelines. And the execution model of pushing data
+16:03
+from source nodes onto their parents is often called the pushbased execution
+16:08
+model. And so as I mentioned, this pipeline is
+16:15
+being executed in parallel via the SPMD model. So we actually have these
+16:21
+parallel workers that are processing the pipeline at the same time and they will
+16:27
+need to communicate in this case for the aggregated result. If one worker is
+16:32
+processing a sensor ID value that the other worker has, the worker two would
+16:39
+need to send over that data to worker one so that it can complete the
+16:44
+aggregated statistics for that value. And so this communication can actually happen asynchronously using async MPI
+16:52
+calls. And this allows the work the workers to process the pipeline.
+16:58
+They do not have to be synchronized at every step along the way. So for example, they could be processing a
+17:05
+different operator. They could be also at different iterations within the pipeline loop as long as they
+17:11
+synchronize at the end of the pipeline.
+17:20
+So to summarize what we've talked about so far and to compare to some of the
+17:26
+other dataf frame libraries that are out there, we compare on three different
+17:32
+criteria and the coloring is based on how likely
+17:37
+it is to satisfy that criteria. So red being low, orange being medium likely
+17:43
+and green being very likely. So for the ease of use, we've shown that Bodto is a
+17:51
+fully drop in replacement for pandas even when it doesn't have an operation.
+17:56
+It can fall back for the query optimizer.
+18:02
+We've shown some examples like filter pushdown, but actually optimizing
+18:08
+queries like this is a very difficult problem and requires a lot of complex
+18:14
+transformations. For example, the order in which you apply joins. So
+18:21
+joining multiple tables together requires some kind of cost model to
+18:27
+explore the space of possible plans and select the plan with the lowest cost. So
+18:35
+this is what we mean when we say database grade. So the the complexity and the level of transformations it that
+18:41
+is needed to run on real workloads. And then finally for the execution model we
+18:47
+talked about how the parallel SPMD model compared to some of the taskbased
+18:54
+scheduling based execution models and how it can be more efficient
+19:01
+there.
+19:07
+So now I wanted to transition to talk about some features of the dataf frame
+19:12
+library. So this first feature is just in time compilation for custom code. So in this
+19:21
+example on the right we have some random walk that we want to do over a balance
+19:28
+column. And this would actually be really slow if you tried to execute it in Python or
+19:35
+pandas because of the overhead you get from the Python interpreter. So what boto does
+19:42
+when it encounters a call like series.mmap or df.apply apply is that it
+19:48
+automatically compiles that userdefined function into an optimized binary so
+19:54
+that it can then execute it more efficiently. And in the case where the compilation
+20:02
+fails, so Python is not a strongly typed language for instance, there are
+20:07
+userdefined functions that are non-compilable. Photo just falls back to Python
+20:14
+execution. But it's important to note that this Python execution is still
+20:20
+streaming in parallel as opposed to just falling back to pandas.
+20:26
+And this is actually Bodto has a separate just in time compiler
+20:32
+for transforming functions consisting of pandas and numpy operations into
+20:40
+optimized binaries. And when used as a standalone function decorator similar to
+20:47
+Numba, Bodto actually inserts MPI calls into the binary. So this is
+20:54
+also executed in a parallel way like we saw on the previous slides.
+21:03
+And we've seen actually that just in time compilation can have better performance than the dataf frame library
+21:10
+for some workloads, but it's limited in that compilation time adds delays. There
+21:16
+are also unsupported operations causing you to refactor and there's currently no
+21:21
+streaming or spilling support for JIT. And this is actually an a benchmark that
+21:28
+we ran on the taxi style workload showed
+21:34
+on the demo. This was running on a much larger data set of over 1 billion rows.
+21:41
+And we compared both single node and multiode performance for a handful of
+21:46
+dataf frame libraries and see that the just in time compiler. So adding a JIT
+21:53
+decorator on top of the function that I showed earlier was slightly faster than
+21:58
+data frames although it was very close.
+22:09
+So lastly, I wanted to transition. The examples that we've discussed up
+22:18
+until this point have been reading parquet files. Uh but actually Bodto supports other
+22:25
+ways of reading data. This is iceberg support. So, iceberg is an open table
+22:34
+format which brings SQL like reliability and functionality on top of large data
+22:41
+sets stored in data lakes like S3.
+22:48
+And it adds features like data versioning, acid transactions,
+22:53
+and a unified schema that can evolve over time without costly rewriting
+23:00
+rewrites. And so it's important that Bodto supports a table format like iceberg
+23:07
+because we have a query optimizer, we have a streaming execution backend. The
+23:15
+part that's missing is really this scalable data set management that Iceberg brings. And so combined with
+23:21
+Iceberg and Bodto, you get really a almost a complete data warehouse
+23:26
+solution that can be deployed anywhere you store your data.
+23:32
+And so the read iceberg API is also going to be added in pandas 3.0
+23:41
+zero the sequential version and it is relatively simple to set up. So you just
+23:48
+pass in a table name as well as a location. In this case it is an S3 table
+23:53
+bucket. And you can also provide the snapshot information. So if you wanted
+23:58
+to query a past version of your data set and iceberg's metadata actually plays
+24:06
+really nicely with the boto data frames for example in this workload where you
+24:13
+want to filter some column based on a cutoff date when boto applies the filter
+24:19
+pushdown that we saw in the previous slides this can actually read iceberg's
+24:27
+metadata data and when planning it can eliminate entire runs of data files that
+24:34
+does not match that filter criteria using things like the partition
+24:40
+summaries. So we can do much fewer reads and actually make this query a lot more efficient than if it was running on
+24:48
+parquet files. And so that is my presentation. To
+24:56
+summarize, photo is a high performance dataf frame library for Python.
+25:02
+It is a drop-in replacement for pandas. So you replace your import and it will
+25:08
+automatically scale and accelerate your pandas code. And we've talked a little
+25:14
+bit about how it does this with the front end that transforms the Panda code
+25:19
+into a plan. the query optimizer that optimizes this plan
+25:25
+and finally the execution which executes the pipelines in parallel in a streaming
+25:32
+fashion to process larger than memory data sets and we've also talked about
+25:37
+the just in time compilation as well as the iceberg IO which add additional
+25:43
+features and functionality and I just wanted to say thank you for
+25:48
+coming to this talk And thanks to Pi Data Global and Num Focus for organizing
+25:54
+this event and having me. And we have a community Slack. You could also check us
+26:01
+out on GitHub. And we'd love to hear your feedback. Thank you.
+26:07
+Uh this is co-host uh for this session. Um thank you so much Scott. This is
+26:13
+interesting and great great talk for the day three. I mean budo data frame. Um
+26:19
+attendees if you have more questions there are a couple of questions Scotts uh so let me bring on to the stage um uh
+26:28
+can you see the question um I can read the question as well um what percentage
+26:34
+of pandas API supported do you support the Chinese uh uh that's one of the
+26:40
+question from uh let's see uh Ionians
+26:47
+Okay. Yeah. So, percentage-wise, I am not sure if it's I don't I don't
+26:55
+think I have an exact number. I can get back to you on that. But, Bodto supports a lot of the string
+27:03
+functions, datetime, basically all of those functions, group by, join, UDFs like apply and map,
+27:13
+but also group by.apply, group by.ag. tag and yeah all the standard arithmetic
+27:21
+that you would do on dataf frames. I don't think we support method chaining
+27:27
+which I I didn't read the question was it chaining like
+27:32
+yeah do do we do you support the chaining um uh if you can elaborate more
+27:38
+it will be great but that's what the question is okay yeah so the chaining I guess is
+27:45
+automatically done for you by things like the lazy evaluation if that's what
+27:50
+you mean if you're talking about something like df.pipe pipe. We do not support pipe at this point.
+27:57
+Yeah. Great. Uh moving to next question. Um how does this compare with fire ducks?
+28:05
+Question from Ash. Yeah. So Fire ducks I am not familiar
+28:14
+with FireX but I do have seen that it is a drop in
+28:20
+replacement on the benchmarks. I think that I did see I did notice that the data size was
+28:29
+rather small. So I'm not sure if it's fully
+28:34
+how it handles like large data sets. Um but I'd be really interested to learn more about that.
+28:42
+Um here come the next question. Uh we'll bring that to the stage. Uh so
+28:50
+Pulas implements the filter push back afk.
+28:57
+Uh what budo uh optimization brings to make this a simple
+29:04
+heristic if I pronounce it correctly. Yeah. So polers does have optimizations
+29:13
+like filter push down I believe. So it applies rules to the query plan to
+29:20
+transform it what I was talking about with uh the boto optimizer that's slightly different and I do have some
+29:27
+supplemental slides as well. So for things like joining multiple tables uh
+29:33
+so in this example we're joining like a returns table uh locations and online
+29:40
+orders. So there's different orders that you could join these tables and still produce the same set of results. So this
+29:49
+is actually a really difficult problems because it requires knowing certain statistics about your data. So
+29:56
+for example, if you join these two tables in the wrong order, the result
+30:01
+could potentially blow up and become very large. um where versus if you were
+30:07
+to join a different ordering of tables, you might end up filtering a lot of data. So this is an example of an opt
+30:14
+optimization that typically requires some kind of cost model to estimate how
+30:19
+expensive a order of joins is going to be and uses some dynamic programming
+30:26
+algorithms to explore the space of possible queries. So hopefully that
+30:31
+answers your question. Perfect. Um a next question
+30:38
+um from again from SC Ash would budo support Oracle connections in future
+30:48
+Oracle sorry I can't see the questions actually um
+30:54
+I invite I just invite
+30:59
+um can ask questions. Yeah. So I think Bodtojit supports
+31:06
+Oracle. I think that's definitely an interesting direction for the dataf frame library to
+31:12
+support more storage types and ways of querying. But yeah, Boto SQL and Boto
+31:20
+should support Oracle databases via the read SQL table function in pandas.
+31:30
+Awesome. Great. Uh thank that's that's all question. Um
+31:36
+thank you everyone. Um we uh reached a uh provided time limit. It's um as C
+31:45
+already provided the more details to connect back with him. We can ask more questions him and learn more about the
+31:51
+budo. That was a great session. Um so we are we reached to the exactly expected
+31:59
+time window and we hope we answered all the questions but if you more have more questions preach reach preach please
+32:04
+please reach to the Scott. Uh with this we are ending this session. Um have a
+32:09
+rest great day and enjoy um day three uh
+32:15
+for PI data. Yeah. Thanks. Thanks everyone.

@@ -1,13 +1,12 @@
 ---
 date: 2025-12-12
-title: "Bodo DataFrames: a fast and scalable HPC-based drop-in replacement for Pandas"
-subtitle: "PyData Global 2025 Recap"
-categories: [pydata]
-keywords: [pydata, odsc, Transformers, Deep Learning, PyTorch, Machine Learning]
-description: "A detailed recap of the PyData Global 2025 talk on building a transformer model from scratch using PyTorch, covering key components, common pitfalls, and practical implementation tips."
+title: Bodo DataFrames
+subtitle: a fast and scalable HPC-based drop-in replacement for Pandas
+categories: [pydata, odsc, dataframes, hpc, apache iceberg]
+keywords: [Bodo, DataFrames, HPC, Pandas, JIT, MPI, Parquet, Apache Iceberg]
+description: "A detailed recap of Scott Routledge talk at the PyData Global 2025 conference. In which he discusses Bodo DataFrames, a high-performance computing-based drop-in replacement for Pandas, covering key features, performance benchmarks, and practical implementation tips."
 image: pydata_logo.png
 ---
-
 
 ::: {.column-margin}
 {{< video https://www.youtube.com/watch?v=bp_mDzQTBDI title="Bodo DataFrames: a fast and scalable HPC-based drop-in replacement for Pandas" >}}
@@ -17,13 +16,11 @@ image: pydata_logo.png
 ::: {.callout-tip}
 ## Lecture Overview
 
-Pandas is a popular library for data scientists but it struggles with large datasets; programs either become too slow or run out of memory. 
-[In this talk, we introduce [Bodo DataFrames](https://github.com/bodo-ai/Bodo) as a drop-in replacement for the Pandas library that uses high performance computing (HPC) based techniques such as Message Passing Interface (MPI) and JIT compilation for acceleration and scaling.]{.mark} 
-
-We give an overview of its architecture and explain how it avoids the problems of Pandas (while keeping user code the same), go over concrete examples, and finally discuss current limitations. 
-
-This talk is for Pandas users who would like to run their code on larger data while avoiding frustrating code rewrites to other APIs. 
-Basic knowledge of Pandas and Python is recommended.
+- Pandas is a popular library for data scientists but it struggles with large datasets; programs either become too slow or run out of memory. 
+- [In this talk, we introduce [Bodo DataFrames](https://github.com/bodo-ai/Bodo) as a drop-in replacement for the Pandas library that uses high performance computing (HPC) based techniques such as Message Passing Interface (MPI) and JIT compilation for acceleration and scaling.]{.mark} 
+- We give an overview of its architecture and explain how it avoids the problems of Pandas (while keeping user code the same), go over concrete examples, and finally discuss current limitations. 
+- This talk is for Pandas users who would like to run their code on larger data while avoiding frustrating code rewrites to other APIs. 
+- Basic knowledge of Pandas and Python is recommended.
 :::
 
 Despite its popularity for data manipulation tasks, Pandas struggles at scale due to its single threaded execution and significant Python-based overheads. In this talk, we introduce Bodo DataFrames as a solution to scaling Pandas with a single line of code change; simply replace import pandas as pd with import bodo.pandas as pd.
@@ -44,89 +41,389 @@ This talk is designed for users of Pandas; data scientists, data engineers and A
 :::: {.callout-tip}
 ## Speakers: 
 
-### Scott Routledge
-
-
-Scott is a Software Engineer at [Bodo.ai](bodo.ai), where he has worked on the performance and reliability of the BodoSQL engine, contributed to the Bodo Just-In-Time Python Compiler, and is currently working on Bodo DataFrames. 
-He earned his undergraduate in computer science from Carnegie Mellon University.
-
+- Scott Routledge
+    - Scott is a Software Engineer at [Bodo.ai](https://bodo.ai), where he has worked on the performance and reliability of the `BodoSQL` engine, contributed to the Bodo Just-In-Time Python Compiler, and is currently working on Bodo DataFrames. 
+    - He earned his undergraduate in computer science from Carnegie Mellon University.
+    - [talk repo](https://github.com/bodo-ai/Bodo)
+    - [slide deck](./slides.pdf)
 :::
-
-- [talk repo]()
-- [slide deck]()
 
 ## Outline
 
-![](slide01.png)
 
-![](slide02.png)
+:::: {.sl}
+::: {.sl-text}
+## Bodo DataFrames: a fast and scalable HPC-based drop-in replacement for Pandas
 
-![](slide03.png)
+- **Core problem:**
+    - `pandas` is easy and familiar, but often fails or becomes slow on large real-world datasets, especially when data lives in cloud storage such as `S3`. 
+    - Other scalable tools often require code rewrites, tuning, or different APIs.
+:::
+::: {.sl-fig}
+![Title slide](slide02.png)
+:::
+::::
 
-![](slide04.png)
+:::: {.sl}
+::: {.sl-text}
+## About Me
 
-![](slide05.png)
+- Software Engineer at Bodo.ai
+- B.S. in CS and ML @ Carnegie Mellon 
+- Worked on Python Compiler & BodoSQL
+- Currently working on Bodo DataFrames
 
-![](slide06.png)
+:::
+::: {.sl-fig}
+![About Me](slide03.png)
+:::
+::::
 
-![](slide07.png)
+:::: {.sl}
+::: {.sl-text}
+- Open source: 
+    - `pip install bodo`
+    - `conda install bodo -c conda-forge`
+    - `import bodo.pandas as pd`
+- Parallel computing with MPI
+- JIT compilation & query optimization
+- SQL engine (`pip install bodosql`)
 
-![](slide08.png)
 
-![](slide09.png)
 
-![](slide10.png)
+* **Main claim:** Bodo DataFrames lets users replace:
 
-![](slide11.png)
+  `import pandas as pd`
 
-![](slide12.png)
+  with:
 
-![](slide13.png)
+  `import bodo.pandas as pd`
 
-![](slide14.png)
+  and keep mostly ordinary pandas-style code while gaining parallel execution, query optimization, streaming, and just-in-time compilation.
+:::
+::: {.sl-fig}
+![About Bodo](slide04.png)
+:::
+::::
 
-![](slide15.png)
+:::: {.sl}
+::: {.sl-text}
+## Agenda
+- The Challenge: Simple, Scalable Data Infrastructure
+- Bodo DataFrames Overview and Demo
+- JIT Compiler for Custom Code
+- Integration with *Iceberg Table Format*
+:::
+::: {.sl-fig}
+![Agenda](slide05.png)
+:::
+::::
 
-![](slide16.png)
+:::: {.sl}
+::: {.sl-text}
 
-![](slide17.png)
+## The Challenge: Simple, Scalable Data Infrastructure
+::::: {.columns}
+:::::: {.column width="50%"}
 
-![](slide18.png)
+### Challenges:
 
-![](slide19.png)
+- Frequent code rewrites and performance tuning
+- Complexity in managing large cloud  datasets
+- Fragmentation of tools for different use  cases
 
-![](slide20.png)
+::::::
+:::::: {.column width="50%"}
+### Requirements:
 
-![](slide21.png)
+- Fast and scalable for data size without code changes
+- Easy to use and understand
+- Flexibility: ETL, analytics, preprocessing, AI workloads (inference, training)
+::::::
+:::::
+:::
+::: {.sl-fig}
+![The Challenge: Simple Scalable Data Infra](slide06.png)
+:::
+::::
 
-![](slide22.png)
+:::: {.sl}
+::: {.sl-text}
+- Database-grade query optimizer & JIT 
+compiler
+- MPI backend with streaming execution
+- Spill to disk to prevent Out of Memory  (OOM) Errors
+- Fallback to Pandas for unsupported operations
 
-![](slide23.png)
+```python
+import bodo.pandas as pd
+df = pd.read_parquet(path)
+df["month"] = df.F.dt.month
+df["year"] = df.F.dt.year
+df = df[df.B == "gamma"]
+df.to_parquet("result.pq")
+```
+:::
+::: {.sl-fig}
+![Bodo DataFrames](slide07.png) 
+:::
+::::
 
-![](slide24.png)
+:::: {.sl}
+::: {.sl-text}
+- NYC Taxi ETL
 
-![](slide25.png)
+* **Demo result:** On a New York City taxi and rideshare ETL workload with about **44 million rows**, regular pandas took roughly **60–70 seconds**, while Bodo DataFrames ran in about **7 seconds** on four Mac cores, giving around a **10× speedup**.
 
-![](slide26.png)
+:::
+::: {.sl-fig}
+![Demo Notebook](slide08.png)
+:::
+::::
 
-![](slide27.png)
+:::: {.sl}
+::: {.sl-text}
+### Bodo Scales Pandas Efficiently
 
-![](slide28.png)
+**Could use Spark, Dask, etc.**
 
-![](slide29.png)
+-  Implementation complexity
+-  Task-based model creates high  overheads
 
-![](slide30.png)
+**Or... Use Bodo!**
+
+-  Drop-in Pandas replacement
+-  HPC execution scales from laptop to large cluster
+-  JIT compilation & query optimization
+
+:::
+::: {.sl-fig}
+![Bodo Scales Pandas Efficiently](slide09.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+
+* **Execution model:** Bodo uses **single program, multiple data (SPMD)** execution rather than the usual driver-executor model used by systems like Spark or Dask. Workers run the same program on different data chunks and communicate directly using **message passing interface (MPI)**, which reduces driver bottlenecks.
+
+
+:::
+::: {.sl-fig}
+![DataFrames Workflow](slide10.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+* **Lazy evaluation and optimization:** Bodo does not immediately execute each pandas operation. 
+:::
+::: {.sl-fig}
+![DataFrames Workflow](slide11.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+- It builds a query plan, optimizes it, and then executes it. 
+:::
+::: {.sl-fig}
+![DataFrames Workflow](slide12.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
+![DataFrames Workflow](slide13.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+- This enables database-style optimizations such as **filter pushdown**, where filters are applied as early as possible to reduce later work.
+:::
+::: {.sl-fig}
+![Plan Optimization: Filter Pushdown](slide14.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+* **Streaming and spilling:** Data is processed in batches, allowing workloads larger than memory. For operations requiring global data, such as sorting or aggregation, Bodo can spill intermediate data to disk.
+:::
+::: {.sl-fig}
+![Vectorized Execution Example](slide15.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
+![Vectorized Execution Example](slide16.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+
+- Logical plan is converted to a series of pipelines
+- Push based execution model: data flows from source node(s) to a sink
+
+:::
+::: {.sl-fig}
+![Vectorized Execution Example](slide16.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+### Async Messaging in Pipelines
+- Workers process pipelines independently
+- Async MPI communication can overlap with compute
+- Workers sync only at pipeline boundaries
+:::
+::: {.sl-fig}
+![Async Messaging in Pipelines](slide17.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+### DataFrame Libraries Comparison
+
+|Library|Ease of Use|Query Optimizer|Execution|
+|-------|-----------------|---------|-------|
+|Bodo DataFrames | Full Pandas compatibility with fallback| Database-grade optimizer| HPC/MPI and database-based backend|
+|Pandas on  Spark| Pandas compatible; JVM complexity| Spark Catalyst (database-grade)| Task scheduling on JVM|
+|Dask| Mostly Pandas compatible; explicit “.compute()” and code changes| Basic compute graph optimization| Task scheduling in Python|
+|Modin/Ray| Pandas-compatible with fallbacks| No optimizer| Slow task scheduling (Ray-based)|
+|Polars| SQL-like API, not Pandas-compatible| Simple heuristic rules| Single-node threaded task scheduling|
+|Daft| SQL-like API, not Pandas-compatible| Simple heuristic rules| Ray-based task scheduling (non-vectorized)|
+
+* **Comparison with alternatives:** The speaker contrasted Bodo with Spark, Dask, Ray, Polars, and other pandas-like systems. The key differentiators claimed were stronger pandas compatibility, database-grade optimization, and the SPMD/MPI execution backend.
+:::
+::: {.sl-fig}
+![DataFrame Libraries Comparison](slide18.png)
+:::
+::::
+
+
+:::: {.sl}
+::: {.sl-text}
+* **Custom Python code:** For operations like `Series.map` and `DataFrame.apply`, Bodo tries to compile user-defined functions into optimized binaries. If compilation fails, it falls back to Python execution, but still keeps parallel and streaming execution where possible.
+
+
+
+:::
+::: {.sl-fig}
+![JIT Compilation for Custom Code](slide19.png)
+:::
+::::
+
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
+![Bodo JIT Compiler](slide20.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+* **Pandas API coverage:** Bodo supports many common pandas operations, including string functions, datetime operations, joins, groupby aggregations, `apply`, `map`, arithmetic, and user-defined functions. It does not yet support everything; unsupported operations may fall back to pandas.
+:::
+::: {.sl-fig}
+![Benchmarks](slide21.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+* **Iceberg support:** 
+- Bodo supports reading from **Apache Iceberg**, an open table format for data lakes. 
+- Iceberg metadata allows Bodo to skip irrelevant files using partition summaries and snapshot metadata.
+- This makes filtered queries more efficient than scanning plain Parquet files.
+:::
+::: {.sl-fig}
+![Bodo Iceberg Support](slide22.png)
+:::
+::::
+:::: {.sl}
+::: {.sl-text}
+### Summary
+
+Bodo provides high-performance data processing in native Python
+
+- True parallel computing with powerful MPI backend  
+- Pandas drop-in replacement
+- JIT compiler & query optimizer Azure 
+
+* **Bottom line:** Bodo DataFrames is positioned as a way to preserve the pandas programming model while adding parallel high-performance execution, query planning, and large-scale data processing capabilities.
+:::
+::: {.sl-fig}
+![Summary](slide24.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+* **Limitations mentioned:** Full pandas coverage is not complete. Some APIs such as `df.pipe` appear unsupported. Just-in-time compilation can introduce compile-time overhead and does not yet support every operation, streaming, or spilling in all modes.
+:::
+::: {.sl-fig}
+![Thank you!](slide25.png)
+:::
+::::
+
+
+### Supplemental Slides (if time allows)
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
+![Plan Optimization: Join Reordering](slide27.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
+![Plan Optimization: Join Reordering](slide28.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
+![Plan Optimization: Join Filters](slide29.png)
+:::
+::::
+
+:::: {.sl}
+::: {.sl-text}
+:::
+::: {.sl-fig}
+![Plan Optimization: Join Filters](slide30.png)
+:::
+::::
+
+## Q&A 
+
+- Highlights
+  * On API coverage: no exact percentage was given, but many common performance-critical pandas APIs are supported.
+  * On Polars: Polars also has optimizations like filter pushdown, but Bodo emphasizes cost-based database-style optimization, especially for join ordering.
+  * On Oracle: Bodo SQL/Bodo JIT may support Oracle through pandas-style SQL table reading, and broader storage support is an area of interest.
 
 ## Reflections
 
-Isn't this what Polars, dask, cuDF, do ?
-
-## Some code snippets
-
-
-1. install bodo
-
-```bash
-pip install bodo
-conda install bodo -c bodo
-```
+- Isn't this what Polars, dask, cuDF, do ?
+    - There is a chart now explaining the differences
+- Don't these other libraries also promis to be drop in replacements for pandas ? 
+    - Yes but they have some gotchas and often require code changes. 
+    - Bodo is more focused on compatibility and fallback to pandas when it doesn't support something. 

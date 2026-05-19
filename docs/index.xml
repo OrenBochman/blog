@@ -15,18 +15,7 @@
 <link>https://orenbochman.github.io/</link>
 </image>
 <generator>quarto-1.9.36</generator>
-<lastBuildDate>Thu, 15 Jul 2027 21:00:00 GMT</lastBuildDate>
-<item>
-  <title></title>
-  <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2017/self-assembling-games/</link>
-  <description><![CDATA[ undefined ]]></description>
-  <category>draft</category>
-  <category>review</category>
-  <guid>https://orenbochman.github.io/reviews/2017/self-assembling-games/</guid>
-  <pubDate>Thu, 15 Jul 2027 21:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/images/lit-review-cover.jpg" medium="image" type="image/jpeg"/>
-</item>
+<lastBuildDate>Wed, 29 Apr 2026 21:00:00 GMT</lastBuildDate>
 <item>
   <title>ODSC - AI 2026 - Workshops</title>
   <dc:creator>Oren Bochman</dc:creator>
@@ -7579,6 +7568,174 @@ AI Adoption.”</span> April 28. <a href="https://orenbochman.github.io/posts/20
   <guid>https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk2.html</guid>
   <pubDate>Mon, 27 Apr 2026 21:00:00 GMT</pubDate>
   <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Real-Time Event-Time Consistent Analytics Pipelines</title>
+  <dc:creator>Oren Bochman</dc:creator>
+  <link>https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk8.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<section id="sec-real-time-event-time-consistent-analytics-pipelines-using-kafka-flink-and-apache-pinot" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="sec-real-time-event-time-consistent-analytics-pipelines-using-kafka-flink-and-apache-pinot">Real-Time Event-Time Consistent Analytics Pipelines using Kafka, Flink, and Apache Pinot</h2>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://player.vimeo.com/video/1189322767" frameborder="0" title="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen=""></iframe></div>
+</div></div><ul>
+<li>Deep Patel
+<ul>
+<li><a href="https://www.linkedin.com/in/deeppatel710/">LinkedIn</a></li>
+<li>Robinhood</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Notes
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<ul>
+<li><p><strong>Talk topic:</strong> Deep, a senior data engineer at Robinhood, explains how Robinhood built <strong>Catbox Data</strong>, an internal real-time analytics platform using <strong>Kafka, Flink, and Apache Pinot</strong>.</p></li>
+<li><p><strong>Motivation: batch analytics was too slow</strong></p>
+<ul>
+<li>Robinhood relied heavily on Looker and Presto-based dashboards.</li>
+<li>Dashboards were slow, sometimes taking many seconds or even minutes.</li>
+<li>There was no standardized materialization of reusable analytic cubes.</li>
+<li>Batch data freshness was often daily, hourly, or at best around 30 minutes.</li>
+<li>Product, analytics, and fraud-investigation teams needed fresher data, especially after launches or alerts.</li>
+</ul></li>
+<li><p><strong>Platform goals</strong></p>
+<ul>
+<li>Provide low-latency ingestion.</li>
+<li>Support sub-second or near-sub-second analytical queries.</li>
+<li>Preserve <strong>event-time consistency</strong>, not merely processing-time consistency.</li>
+<li>Combine fresh streaming data with reconciled historical data.</li>
+<li>Keep a SQL-based interface for data scientists and analysts.</li>
+<li>Scale horizontally as usage and data volume increased.</li>
+</ul></li>
+<li><p><strong>Architecture overview</strong></p>
+<ul>
+<li>Product and service events are emitted into <strong><a href="https://kafka.apache.org/">Kafka</a></strong>.</li>
+<li>A central <strong><a href="https://flink.apache.org/">Flink</a></strong> application consumes Kafka streams.</li>
+<li>Flink performs stateful processing and enrichment where needed.</li>
+<li>Processed events are written back to Kafka.</li>
+<li><strong><a href="https://pinot.apache.org/">Apache Pinot</a></strong> ingests the processed Kafka stream in real time.</li>
+<li>In parallel, historical and reconciled data is processed from the <em><a href="https://en.wikipedia.org/wiki/Data_lake">data lake</a></em> using <strong><a href="https://spark.apache.org/">Spark</a></strong> and ingested into Pinot as offline data.</li>
+</ul></li>
+<li><p><strong>Why Flink</strong></p>
+<ul>
+<li><span class="marked">Flink was chosen for true streaming, event-time processing, state management, and exactly-once-style semantics.</span></li>
+<li>Existing Robinhood infrastructure already used Flink for fraud and feature engineering.</li>
+<li>Event time mattered because financial analytics should reflect when a trade occurred, not when the pipeline happened to process it.</li>
+</ul></li>
+<li><p><strong>Why Apache Pinot</strong></p>
+<ul>
+<li><span class="marked">Pinot is a distributed columnar Online Analytical Processing database designed for high-throughput, low-latency analytics.</span></li>
+<li>It supports real-time ingestion from Kafka.</li>
+<li>It supports <em>upserts</em>, useful for changing entities such as order status or user profile attributes.</li>
+<li>It can consume change data capture streams, for example through <a href="https://debezium.io/">Debezium</a>.</li>
+<li>It offers <em>retention policies</em>, <em>partial upserts</em>, <em>indexing</em>, and high query throughput.</li>
+<li><em>Star-tree</em> and other indexes were important for fast analytical queries.</li>
+</ul></li>
+<li><p><strong>Hybrid table strategy</strong></p>
+<ul>
+<li>Robinhood used Pinot’s hybrid table model to combine real-time and offline data.</li>
+<li>A table has both an online/real-time side and an offline/batch side with the same schema.</li>
+<li>Users query a single logical table without needing to know which part is online or offline.</li>
+<li>Pinot determines the boundary between offline and real-time data and merges the results.</li>
+<li>This enabled <span class="marked">Lambda-style architecture: fast approximate/fresh data first, then corrected/reconciled data later.</span></li>
+<li>The same mechanism also helped bootstrap historical data before starting real-time ingestion.</li>
+</ul></li>
+<li><p><strong>Join and denormalization strategy</strong></p>
+<ul>
+<li>The team preferred to denormalize data at the producer level whenever possible.</li>
+<li>Flink joins were used sparingly because stateful joins can become difficult to operate and debug, especially with late-arriving data.</li>
+<li>Some enrichment was done in Flink, for example attaching customer tags to transactions.</li>
+<li>Pinot’s query-time joins provided another option when producer-side denormalization was not feasible.</li>
+</ul></li>
+<li><p><strong>Results</strong></p>
+<ul>
+<li>Dashboard P95 latency improved from about <strong>24 seconds</strong> to about <strong>800 milliseconds</strong>.</li>
+<li>Some dashboards loaded in <strong>50–100 milliseconds</strong> after migration.</li>
+<li>Data freshness improved from daily/hourly/30-minute batch updates to about <strong>five seconds</strong>.</li>
+<li>Concurrent usage grew from roughly <strong>50 users</strong> to around <strong>500 users</strong>.</li>
+<li>Robinhood also moved from Looker to Superset for dashboarding.</li>
+</ul></li>
+<li><p><strong>Lessons learned</strong></p>
+<ul>
+<li>Real-time analytics should be treated as a platform, not only as infrastructure for fraud or machine learning features.</li>
+<li>Event-time consistency is critical in financial analytics.</li>
+<li>Hybrid real-time/offline tables are a practical way to balance freshness with correctness.</li>
+<li>Denormalization should happen as early as possible, ideally at the producer, while stateful stream joins should be minimized.</li>
+<li>Index design in Pinot is central to achieving low-latency query performance.</li>
+</ul></li>
+<li><p><strong>Q&amp;A points</strong></p>
+<ul>
+<li>Pinot was not considered a good fit for unstructured data in Robinhood’s experience; they used document stores for that.</li>
+<li>Robinhood’s data engineering team was described as lean, with around 20 data engineers.</li>
+<li>The company uses AI agents heavily, including tools such as Claude Code and Codex, and encourages even non-technical employees to write code.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+<section id="reflection" class="level3">
+<h3 class="anchored" data-anchor-id="reflection">Reflection</h3>
+<ul>
+<li>This is one of the three most interesting talks of the conference for me along with Tensor Logic and RL talks.</li>
+<li>This talk is more on the level of a <em>pydata</em> session.</li>
+<li>I recently started to implement a pattern of incorporating an analytical DB (OLAP) in my agentic projects.
+<ul>
+<li>This led me to get tight with <a href="https://duckdb.org/">DuckDB</a>.</li>
+</ul></li>
+<li>I like many others was also looking for tooling efficient search and RAG that are required by many of the agentic applications and harness engineering patterns.</li>
+<li>I have lots of experience with Lucene as I used it to implement NLP boosted search for Wikipedia sized corpus.</li>
+<li>I got interested in implementing dual search tool i.e.&nbsp;<a href="https://en.wikipedia.org/wiki/Okapi_BM25">BM25F</a> type ranking for <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a> and RAG via vectors using lucene and this is started.</li>
+<li>This led me to and heard about <a href="https://pinot.apache.org/">Apache Pinot</a> and since Pinot is built on top of Lucene this naturally peaked my curiosity.</li>
+<li>I am looking at using an OLAP for:
+<ol type="1">
+<li>Tracking diverse project metrics.</li>
+<li>Collecting proof of work artifacts.</li>
+<li>Handling project traces from open telemetry and logs.</li>
+<li>Having multiple replay buffers for RL sub-agents</li>
+<li>Anomaly detection - for early detection of failure modes by the project and the agents</li>
+</ol></li>
+</ul>
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Real-Time {Event-Time} {Consistent} {Analytics} {Pipelines}},
+  date = {2026-04-28},
+  url = {https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk8.html},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2026. <span>“Real-Time Event-Time Consistent Analytics
+Pipelines.”</span> April 28. <a href="https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk8.html">https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk8.html</a>.
+</div></div></section></div> ]]></description>
+  <category>odsc</category>
+  <category>flink</category>
+  <category>pinot</category>
+  <category>kafka</category>
+  <category>data-engineering</category>
+  <category>ai</category>
+  <guid>https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk8.html</guid>
+  <pubDate>Mon, 27 Apr 2026 21:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/t8_hero_flink.png" medium="image" type="image/png"/>
 </item>
 </channel>
 </rss>

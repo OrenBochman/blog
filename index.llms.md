@@ -2,6 +2,22 @@
 
 ![](./images/calabi_yau_manifold.png)
 
+##### Harnesses in AI
+
+A Deep Dive
+
+2 min
+
+A deep dive into harnesses in AI, exploring how they can be used to improve the performance of AI agents, with a focus on a demo by Tejas Kumar that builds a browser agent…
+
+Sunday, May 17, 2026
+
+|          |                         |
+|----------|-------------------------|
+| Modified | Wednesday, May 20, 2026 |
+
+![](./images/calabi_yau_manifold.png)
+
 ##### ODSC - AI 2026 - Workshops
 
 1 min
@@ -265,8 +281,6 @@ Tuesday, April 28, 2026
 |          |                         |
 |----------|-------------------------|
 | Modified | Wednesday, May 20, 2026 |
-
-![](./images/calabi_yau_manifold.png)
 
 ##### Outclassing Frontier LLMs at Extracting Information
 

@@ -307,6 +307,7 @@ WoW
 1.  a good sparse library for python calls for implementing many Stats and ML algorithm using this backend.
 2.  Also streaming algorithms can benefit from this.
 3.  The tensor logic needs `einsum` - is this op supported ?
+4.  work by [Willow Arhens](https://willowahrens.net/publications/) and her team suggest that it is possible to dramatically speed up einsums for sparse tensors using an `insum` operation that skips zero values and empty loops. [code](https://github.com/nullplay/IndirectEinsum) and [paper](https://dl.acm.org/doi/10.1145/3779212.3790176)
 
 > **TIP:**
 >

@@ -7,9 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Oren Bochman">
-<meta name="description" content="Excel 2019 for Marketing Statistics in pandas">
+<meta name="keywords" content="harnesses, ai, agents, guardrails, verification">
+<meta name="description" content="A deep dive into harnesses in AI, exploring how they can be used to improve the performance of AI agents, with a focus on a demo by Tejas Kumar that builds a browser agent on GPT-3.5 Turbo and layers in a harness without touching the prompt once.">
 
-<title>Excel 2019 for Marketing Statistics in pandas – Oren Bochman’s Blog</title>
+<title>Harnesses in AI – Oren Bochman’s Blog</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -25,41 +26,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -70,8 +36,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../../">
-<link href="../../../posts/2021/2021-04-07-ten-tips-to-improve-your-workflow/index.html" rel="next">
-<link href="../../../posts/2021/2021-04-25-bayesian-agent/index.html" rel="prev">
+<link href="../../../posts/2026/03-07-mixture-problems/index.html" rel="next">
+<link href="../../../posts/2026/01-19-kv-cache-efficiency/index.html" rel="prev">
 <link href="../../../favicon.ico" rel="icon">
 <script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
 <link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
@@ -174,55 +140,14 @@ cookieconsent.run({
 <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-  <script defer="" src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", function () {
- var mathElements = document.getElementsByClassName("math");
- var macros = [];
- for (var i = 0; i < mathElements.length; i++) {
-  var texText = mathElements[i].firstChild;
-  if (mathElements[i].tagName == "SPAN") {
-   katex.render(texText.data, mathElements[i], {
-    displayMode: mathElements[i].classList.contains('display'),
-    throwOnError: false,
-    macros: macros,
-    fleqn: false
-   });
-}}});
-  </script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<meta name="twitter:title" content="Excel 2019 for Marketing Statistics in pandas – Oren Bochman’s Blog">
-<meta name="twitter:description" content="Excel 2019 for Marketing Statistics in pandas">
-<meta name="twitter:image" content="https://orenbochman.github.io/posts/2021/2021-09-24-statistics-for-marketing-in-python/pandas2.jpg">
+<meta name="twitter:title" content="Harnesses in AI – Oren Bochman’s Blog">
+<meta name="twitter:description" content="A deep dive into harnesses in AI, exploring how they can be used to improve the performance of AI agents, with a focus on a demo by Tejas Kumar that builds a browser agent on GPT-3.5 Turbo and layers in a harness without touching the prompt once.">
+<meta name="twitter:image" content="https://orenbochman.github.io//images/calabi_yau_manifold.png">
 <meta name="twitter:creator" content="@orenbochman">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image-height" content="1024">
+<meta name="twitter:image-width" content="1024">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -467,7 +392,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item"><a href="../../../posts/2021/2021-11-12-language-models-and-explainability/index.html">2021</a></li><li class="breadcrumb-item"><a href="../../../posts/2021/2021-09-24-statistics-for-marketing-in-python/index.html">Excel 2019 for Marketing Statistics in pandas</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item"><a href="../../../posts/2026/04-31-ODSC-AI-2026-Day-4/index.html">2026</a></li><li class="breadcrumb-item"><a href="../../../posts/2026/05-17-harnesses-in-ai-a-deep-dive-tejas-kumar/index.html">Harnesses in AI</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -476,17 +401,18 @@ window.Quarto = {
 <!-- content -->
 <header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item"><a href="../../../posts/2021/2021-11-12-language-models-and-explainability/index.html">2021</a></li><li class="breadcrumb-item"><a href="../../../posts/2021/2021-09-24-statistics-for-marketing-in-python/index.html">Excel 2019 for Marketing Statistics in pandas</a></li></ol></nav>
-      <h1 class="title">Excel 2019 for Marketing Statistics in pandas</h1>
+    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../index.html">Posts</a></li><li class="breadcrumb-item"><a href="../../../posts/2026/04-31-ODSC-AI-2026-Day-4/index.html">2026</a></li><li class="breadcrumb-item"><a href="../../../posts/2026/05-17-harnesses-in-ai-a-deep-dive-tejas-kumar/index.html">Harnesses in AI</a></li></ol></nav>
+      <h1 class="title">Harnesses in AI</h1>
+            <p class="subtitle lead">A Deep Dive</p>
                   <div>
         <div class="description">
-          Excel 2019 for Marketing Statistics in pandas
+          A deep dive into harnesses in AI, exploring how they can be used to improve the performance of AI agents, with a focus on a demo by Tejas Kumar that builds a browser agent on GPT-3.5 Turbo and layers in a harness without touching the prompt once.
         </div>
       </div>
                           <div class="quarto-categories">
-                <div class="quarto-category">data science</div>
-                <div class="quarto-category">statistics</div>
-                <div class="quarto-category">marketing</div>
+                <div class="quarto-category">ai</div>
+                <div class="quarto-category">agents</div>
+                <div class="quarto-category">harnesses</div>
               </div>
                   </div>
   </div>
@@ -504,19 +430,26 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">Friday, September 24, 2021</p>
+        <p class="date">Sunday, May 17, 2026</p>
       </div>
     </div>
     
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">Sunday, May 1, 2022</p>
+        <p class="date-modified">Wednesday, May 20, 2026</p>
       </div>
     </div>
       
     </div>
     
+
+  <div>
+    <div class="keywords">
+      <div class="block-title">Keywords</div>
+      <p>harnesses, ai, agents, guardrails, verification</p>
+    </div>
+  </div>
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
@@ -1474,13 +1407,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="false">
  <span class="menu-text">2021</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-47" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-47" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-47" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2021/2021-11-12-language-models-and-explainability/index.html" class="sidebar-item-text sidebar-link">
@@ -1573,7 +1506,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2021/2021-09-24-statistics-for-marketing-in-python/index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../../posts/2021/2021-09-24-statistics-for-marketing-in-python/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Excel 2019 for Marketing Statistics in pandas</span></a>
   </div>
 </li>
@@ -2723,13 +2656,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-76" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-76" role="navigation" aria-expanded="true">
  <span class="menu-text">2026</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-76" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-76" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-76" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-76" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../../posts/2026/04-31-ODSC-AI-2026-Day-4/index.html" class="sidebar-item-text sidebar-link">
@@ -2744,7 +2677,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../posts/2026/05-17-harnesses-in-ai-a-deep-dive-tejas-kumar/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../../posts/2026/05-17-harnesses-in-ai-a-deep-dive-tejas-kumar/index.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Harnesses in AI</span></a>
   </div>
 </li>
@@ -3076,22 +3009,7 @@ window.Quarto = {
         <li class="px-0"><hr class="sidebar-divider hi "></li>
     </ul>
     </div>
-    <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#tldr" id="toc-tldr" class="nav-link active" data-scroll-target="#tldr">TLDR</a></li>
-  <li><a href="#sample-size-mean-standard-deviation-and-standard-error-of-the-mean" id="toc-sample-size-mean-standard-deviation-and-standard-error-of-the-mean" class="nav-link" data-scroll-target="#sample-size-mean-standard-deviation-and-standard-error-of-the-mean">Sample Size, Mean, Standard Deviation, and Standard Error of the Mean</a>
-  <ul class="collapse">
-  <li><a href="#sample-size" id="toc-sample-size" class="nav-link" data-scroll-target="#sample-size">Sample Size</a>
-  <ul class="collapse">
-  <li><a href="#pitfall" id="toc-pitfall" class="nav-link" data-scroll-target="#pitfall">pitfall:</a></li>
-  </ul></li>
-  <li><a href="#standard-deviation" id="toc-standard-deviation" class="nav-link" data-scroll-target="#standard-deviation">Standard Deviation</a></li>
-  <li><a href="#standard-error-of-the-mean" id="toc-standard-error-of-the-mean" class="nav-link" data-scroll-target="#standard-error-of-the-mean">Standard Error of the Mean</a></li>
-  </ul></li>
-  </ul>
-</nav>
+    
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
@@ -3105,66 +3023,40 @@ window.Quarto = {
 
 
 
-<section id="tldr" class="level1">
-<h1>TLDR</h1>
-<p>Is there a port of Excel 2019 for Marketing Statistics ?</p>
-</section>
-<section id="sample-size-mean-standard-deviation-and-standard-error-of-the-mean" class="level1">
-<h1>Sample Size, Mean, Standard Deviation, and Standard Error of the Mean</h1>
-<p>Let’s start with some data:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># importing pandas as pd</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating the data frame</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"A"</span>:[<span class="dv">12</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">44</span>, <span class="dv">1</span>],</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"B"</span>:[<span class="dv">5</span>, <span class="dv">2</span>, <span class="dv">54</span>, <span class="dv">3</span>, <span class="dv">2</span>],</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"C"</span>:[<span class="dv">20</span>, <span class="dv">16</span>, <span class="dv">7</span>, <span class="dv">3</span>, <span class="dv">8</span>],</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"D"</span>:[<span class="dv">14</span>, <span class="dv">3</span>, <span class="dv">17</span>, <span class="dv">2</span>, <span class="dv">6</span>],</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the data frame</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>df</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<section id="sample-size" class="level2">
-<h2 class="anchored" data-anchor-id="sample-size">Sample Size</h2>
-<p>We want a replacement of Excel’s <code>=COUNT()</code> function to get the sample size n - we need to get the row count in the data frame. Pandas also has a <code>count()</code> function but we should use the first item in the shape property.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df.shape[<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<section id="pitfall" class="level3">
-<h3 class="anchored" data-anchor-id="pitfall">pitfall:</h3>
-<p><code>df.count()</code> will only return the count of non-NA/NaN rows for each column. ## Mean We want a replacement of Excel’s <code>=AVERAGE()</code> function to calculate the mean <span class="math inline">\bar X</span> according to: <span class="math display">\bar X = \frac{\sum X}{n}</span></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the data frame</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df.mean(axis <span class="op">=</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-</section>
-<section id="standard-deviation" class="level2">
-<h2 class="anchored" data-anchor-id="standard-deviation">Standard Deviation</h2>
-<p>We want a replacement of Excel’s <code>=STDEV()</code> function to calculate the mean <span class="math inline">\bar X</span> according to:</p>
-<p><span class="math display"> SD = \sqrt { \frac{\sum {(X-\bar X)^2}}{n-1}}</span></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df.std(axis <span class="op">=</span> <span class="dv">0</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="standard-error-of-the-mean" class="level2">
-<h2 class="anchored" data-anchor-id="standard-error-of-the-mean">Standard Error of the Mean</h2>
-<p>In this case there is no built in formula in excel for this. It would be calculated with an ugly formula that looks like: <code>=STDEV()\SQRT(COUNT())</code> to calculate the <span class="math inline">SE</span> according to: <span class="math display"> SE =  \frac{SD}{\sqrt{n}}</span></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># find standard error of the mean of all the columns</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>df.sem(axis <span class="op">=</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="col-margin">
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/C_GG5g38vLU" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=0s">Introduction to AI Harnesses</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=105s">Why we use harnesses: Reliability and control</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=180s">Defining an agent harness from first principles</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=272s">Key components of an agent harness (Tooling, Context, Guardrails)</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=359s">Starting the demo: Building a browser agent</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=420s">Inspecting the initial agent loop</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=492s">The problem: Agent failure and hallucination</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=620s">Adding guardrails and context management</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=714s">Refactoring into a formal harness</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=782s">Implementing a verify step to catch lies</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=936s">Implementing a login handler for programmatic access</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=1062s">Final demonstration: Successful autonomous upvoting</a></li>
+<li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=1114s">Summary and the future of dynamic harnesses</a></li>
+</ul>
+</div>
+<!-- todo: anyway to make this links work in this page - i.e. controll the video player from the links ? -->
+<p>I watched this talk by Tejas Kumar on harnesses in AI and I found it an accessible and insightful introduction to the topic.</p>
+<p>The demo builds a browser agent on GPT-3.5 Turbo (consciously choosing a VERY old model to show how good harness eng can improve it a lot) against Hacker News and layers in a harness without touching the prompt once. Guardrails cap iterations and compact context. A verify step reads the tool call history to catch the agent lying about what it did. A login handler watches the browser URL each loop and injects credentials programmatically when it hits the login page. By the end the cheap old model reliably logs in and upvotes the post.</p>
+<p>Tejas - Infoshare - <a href="https://www.linkedin.com/in/tejas-kumar/">linkedin</a> - <a href="https://github.com/TejasQ">github</a> - <a href="https://x.com/TejasKumar_">twitter</a></p>
 
 
-</section>
-</section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2021,
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2026,
   author = {Bochman, Oren},
-  title = {Excel 2019 for {Marketing} {Statistics} in Pandas},
-  date = {2021-09-24},
-  url = {https://orenbochman.github.io/posts/2021/2021-09-24-statistics-for-marketing-in-python/},
+  title = {Harnesses in {AI}},
+  date = {2026-05-17},
+  url = {https://orenbochman.github.io/posts/2026/05-17-harnesses-in-ai-a-deep-dive-tejas-kumar/},
   langid = {en}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2021" class="csl-entry quarto-appendix-citeas" role="listitem">
-Bochman, Oren. 2021. <span>“Excel 2019 for Marketing Statistics in
-Pandas.”</span> September 24. <a href="https://orenbochman.github.io/posts/2021/2021-09-24-statistics-for-marketing-in-python/">https://orenbochman.github.io/posts/2021/2021-09-24-statistics-for-marketing-in-python/</a>.
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+Bochman, Oren. 2026. <span>“Harnesses in AI.”</span> May 17. <a href="https://orenbochman.github.io/posts/2026/05-17-harnesses-in-ai-a-deep-dive-tejas-kumar/">https://orenbochman.github.io/posts/2026/05-17-harnesses-in-ai-a-deep-dive-tejas-kumar/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -3678,13 +3570,13 @@ Pandas.”</span> September 24. <a href="https://orenbochman.github.io/posts/202
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../../posts/2021/2021-04-25-bayesian-agent/index.html" class="pagination-link" aria-label="Bayesian agents">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Bayesian agents</span>
+      <a href="../../../posts/2026/01-19-kv-cache-efficiency/index.html" class="pagination-link" aria-label="KV Cache Efficiency &amp; Context Platform Engineering">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">KV Cache Efficiency &amp; Context Platform Engineering</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../../posts/2021/2021-04-07-ten-tips-to-improve-your-workflow/index.html" class="pagination-link" aria-label="10 Tips To Improve Your Workflow">
-        <span class="nav-page-text">10 Tips To Improve Your Workflow</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../../posts/2026/03-07-mixture-problems/index.html" class="pagination-link" aria-label="Mixture problems">
+        <span class="nav-page-text">Mixture problems</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

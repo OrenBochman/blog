@@ -1,5 +1,9 @@
 # Archive
 
+### [Harnesses in AI](posts/2026/05-17-harnesses-in-ai-a-deep-dive-tejas-kumar/index.llms.md)
+
+Sunday, May 17, 2026
+
 ### [ODSC AI 2026](posts/2026/04-30-ODSC-AI-2026-Day-3/index.llms.md)
 
 Thursday, April 30, 2026

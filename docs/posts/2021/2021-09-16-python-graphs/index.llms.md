@@ -1,0 +1,111 @@
+Some tricks collected from the SO and the web
+
+# Images
+
+## How to use an image as a background
+
+``` python
+import numpy as np
+import matplotlib.pyplot as plt
+np.random.seed(0)
+x = np.random.uniform(0.0,10.0,15)
+y = np.random.uniform(0.0,10.0,15)
+datafile = 'lena.png'
+img = plt.imread(datafile)
+plt.scatter(x,y,zorder=1)
+plt.imshow(img, zorder=0, extent=[0.5, 8.0, 1.0, 7.0])
+plt.show()
+```
+
+[![](index_files/figure-html/cell-2-output-1.png)](index_files/figure-html/cell-2-output-1.png)
+
+caveat This requires you know where the image corners need to be!
+
+sources:
+
+- [Plot over an image background in python](https://stackoverflow.com/questions/34458251/plot-over-an-image-background-in-python)
+- [Adding a background image to a plot with known corner coordinates](https://stackoverflow.com/questions/15160123/adding-a-background-image-to-a-plot-with-known-corner-coordinates)
+
+## Creating a pictogram
+
+``` python
+import matplotlib.pyplot as plt
+from pywaffle import Waffle
+data = {'Democratic': 48, 'Republican': 46, 'Libertarian': 3}
+fig = plt.figure(
+    FigureClass=Waffle, 
+    rows=5, 
+    values=data, 
+    colors=["#232066", "#983D3D", "#DCB732"],
+    legend={'loc': 'upper left', 'bbox_to_anchor': (1, 1)},
+    icons='child', 
+    font_size=12, 
+    icon_legend=True
+)
+plt.show()
+```
+
+[![](index_files/figure-html/cell-3-output-1.png)](index_files/figure-html/cell-3-output-1.png)
+
+note:
+
+PyWaffle supports Font Awesome icons in the chart. plotly is an alternative. Sources: - [How to make a pictogram / icon chart?](https://stackoverflow.com/questions/52908119/how-to-make-a-pictogram-icon-chart)
+
+## Add outline around flagged items in a `plotly` candlestick chart
+
+``` python
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.patches as mpatches
+import pandas as pd
+import plotly.graph_objects as go
+
+df = pd.DataFrame({"data_minu": ['30/10 09:00','30/10 09:05','30/10,09:10','30/10 09:15','30/10 09:20','30/10 09:25','30/10 09:30','30/10 09:35','30/10 09:40','30/10 09:45'],
+                   "Open":['10','17','23','20','8','22','24','25','29','22'],
+                   "High":['21','27','25','29','24','27','28','32','29','25'],
+                   "Low":['6','12','18','9','5','8','24','18','15','10'],
+                   "Close":['17','24','22','10','21','25','26','30','18','10'],
+                   "Flag": ['0','1','1','1','0','1','1','1','0','0']})     
+
+tickvals = [k*0.5 for k in range(len(df))]
+ticktext = list(df["data_minu"])
+
+fig = go.Figure(data=[go.Candlestick(x=tickvals,
+                open=df['Open'], high=df['High'],
+                low=df['Low'], close=df['Close'])
+                     ])  
+
+fig.update_layout(xaxis_rangeslider_visible=False, xaxis_tickvals=tickvals, xaxis_ticktext=ticktext) 
+
+for k, flag in enumerate(df['Flag']):
+    if int(flag):
+        fig.add_shape(dict(type='rect',
+                          xref='x', yref='y',
+                          layer='below', 
+                          x0=tickvals[k]-0.2, y0=float(df.loc[k, 'Low'])-1,
+                          x1=tickvals[k]+0.2, y1=float(df.loc[k, 'High'])+1,
+                          fillcolor='orange', #'RoyalBlue',
+                          opacity=0.35))
+
+fig.show()
+```
+
+[source](https://community.plotly.com/t/plotly-candlestick-in-python-with-flag/31154/3)
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2021,
+  author = {Bochman, Oren},
+  title = {Python {Graphs}},
+  date = {2021-08-29},
+  url = {https://orenbochman.github.io/posts/2021/2021-09-16-python-graphs/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2021. “Python Graphs.” August 29. <https://orenbochman.github.io/posts/2021/2021-09-16-python-graphs/>.

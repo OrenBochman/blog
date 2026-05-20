@@ -1,0 +1,132 @@
+As I progressed though the RL specialization I came to realize that the research is mostly about coming up with a new algorithm that works better. This is tricky and so in many cases what happens is that people end up considering some narrow setting better yet is it is new and so they can publish a paper claiming novelty. On the other hand almost all algorithms revolve around a rather small set of techniques. One might call these techniques ‘magic tricks’ to avoid the fact that they are also grounded in computer science and mathematics. Some researches show thier algorithms converge better.
+
+Outside academia RL is a tool. We don’t have quick simulators but we do have challenging examples. I notice that most people use a few algorithms rather than coding thier own from scratch. This makes a lot of sense if out problem is very similar to other problems that the algorithm has been tested on. But what if our problem is different? We can try a bunch of algorithms and see which one works best. But what if they are mediocre?
+
+Another approach which I consider continuing the approach espoused in ([Skiena 2020](#ref-skiena2020algorithm)) and ([Kleinberg and Tardos 2006](#ref-kleinberg2006algorithm)).
+
+- We have many bits and pieces of RL algorithms that do all sorts of magic tricks.
+- We have different problem settings that need different tricks to work and in which other tricks don’t work.
+
+I imagine a research algorithm that has all these tricks available in a modular way and that can adaptively reconfigure itself to the problem at hand.
+
+And one more thing it would then expose its hyperparameters to be tuned by Optuna or some other hyperparameter optimization tool …
+
+All this power suggest the one ring to rule them all so perhaps this might be the master algorithm.
+
+Magical Tricks:
+
+## From the domain of Bandits
+
+- \epsilon-greedy exploration
+- UCB upper confidence bound exploration
+- Thompson sampling exploration
+- Gittins index exploration
+- ‘stateless’ setting
+
+note: it appears we might want the setting to be a configuration parameter
+
+## MDPs
+
+- Bellman Equation for V Value Function
+
+- Bellman Equation for Q Action Value Function
+
+- Bellman Optimality Equation for V Value Function
+
+- Bellman Optimality Equation for Q Action Value Function
+
+- Bellman Equation for Average Reward
+
+- Bellman Optimality Equation for Average Reward
+
+- discounted rewards \gamma trick
+
+- average reward formulation
+
+- Exploration using
+
+  - Optimistic Initialization
+  - ε-greedy exploration
+  - UCB upper confidence bound exploration
+  - Thompson sampling exploration
+  - Gittins index exploration
+  - Curiosity
+  - Various decompositions
+
+- Algorithmic tricks
+
+  - Value iteration
+  - Policy iteration
+  - Generalized value iteration
+  - Generalized policy iteration
+
+- Tabular setting
+
+- Limited horizon setting
+
+- Infinite horizon setting
+
+## Montecarlo Methods
+
+- First visit Montecarlo
+- Every visit Montecarlo
+- Monte Carlo target
+- episodic setting
+- in the continuos setting Monte Carlo require an eligibility traces, a replay buffer or time limit i.e. temporal abstraction.
+
+## Temporal Difference Learning
+
+- td targets for V Value Function
+- td targets for Q Action Value Function
+- bootstrapping
+- SARSA
+- Q-Learning
+- Expected SARSA
+
+## Model Based RL
+
+- replay buffer
+- proretised replay buffer
+- prioritised sweeping
+- Dyna-Q
+- Dyna-Q+
+
+## Temporal Aggregation
+
+- SMDP (semi-markov decision processes)
+
+- options (temporal abstraction)
+
+- gvf (generalized value functions)
+
+- meta gradients - learning Rewards over multiple agent lifetime
+
+- ‘life long’ setting
+
+## Partial Observability
+
+- POMDPs
+
+### Multi-Agent RL
+
+Kleinberg, J., and É. Tardos. 2006. *Algorithm Design*. Alternative Etext Formats. Pearson/Addison-Wesley. <https://books.google.co.il/books?id=OiGhQgAACAAJ>.
+
+Skiena, S. S. 2020. *The Algorithm Design Manual*. Texts in Computer Science. Springer International Publishing. <https://books.google.co.il/books?id=S0QBEAAAQBAJ>.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Engineering {Reinforcement} {Learning} {Algorithms}},
+  date = {2024-01-10},
+  url = {https://orenbochman.github.io/posts/2025/2025-01-10-Engineering-RL-Algs/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2024. “Engineering Reinforcement Learning Algorithms.” January 10. <https://orenbochman.github.io/posts/2025/2025-01-10-Engineering-RL-Algs/>.

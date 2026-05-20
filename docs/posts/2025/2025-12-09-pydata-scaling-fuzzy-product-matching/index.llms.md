@@ -1,0 +1,249 @@
+[![pydata global](pydata_logo.png)](pydata_logo.png "pydata global")
+
+pydata global
+
+> **TIP:**
+>
+> Tired of exact matches failing on messy data?
+>
+> This talk showcases how [BM25](https://en.wikipedia.org/wiki/Okapi_BM25) [^1], a powerful fuzzy search algorithm, tackles the challenge of enriching massive datasets with noisy product names.
+>
+> We’ll compare practical, large-scale implementations using Python’s [bm25s](https://pypi.org/project/bm25s/) library (accelerated by GPUs) and [DuckDB’s](https://duckdb.org/) built-in full-text search.
+>
+> Join us to learn how to achieve fast, accurate data integration and discover the optimal tools for your fuzzy matching needs.
+
+## The problem at hand:
+
+Are you constantly battling messy, inconsistent product names across massive datasets?
+
+Traditional *exact matching* just doesn’t cut it when you’re trying to *integrate* data from various sources (like a 1-million-row internal catalog with a 3.8-million-row external one like [Open Food Facts](https://world.openfoodfacts.org/)).
+
+This talk addresses that exact problem: how to efficiently and accurately find fuzzy matches, saving you countless hours of manual reconciliation and enabling robust data enrichment. It’s crucial for anyone working with real-world, imperfect data at scale.
+
+## Is this talk for me?
+
+This talk is for data engineers, data scientists, and analytics professionals who work with large-scale datasets and face challenges with data integration, record linkage, or building robust search functionalities. A basic understanding of dataframes and SQL will be helpful, but no deep prior knowledge of search algorithms is required.
+
+This will be an informative and practical talk with a clear focus on real-world application. While we’ll briefly cover the “why” behind BM25, the emphasis will be on “how” to implement and optimize it. We’ll present concrete benchmarks and code examples, moving beyond theoretical concepts.
+
+> **TIP:**
+>
+> - Understand why BM25 is a superior choice for fuzzy matching noisy product names compared to traditional methods.
+> - See a practical, head-to-head comparison of implementing BM25 using Python libraries (specifically the optimized Cython bm25s) and DuckDB’s native full-text search.
+> - Gain insights into performance implications (speed and memory usage) for each approach on large datasets, including the benefits of GPU acceleration with Dask CuDF.
+> - Learn production tips for persisting indexes, handling bulk queries, and managing memory effectively.
+> - Be equipped to choose the most suitable BM25 implementation for your specific data enrichment and fuzzy matching needs, allowing you to build faster and more accurate data pipelines.
+
+> **TIP:**
+>
+> - A medium level background in python
+> - An introductory level information about DuckDB
+> - An introductory level information into how BM25 works would be bonus!
+
+> **IMPORTANT:**
+>
+> - [bm25s](https://pypi.org/project/bm25s/) - Fast BM25 implementation in Cython
+> - [cuDF](https://docs.rapids.ai/api/cudf/stable/) - GPU DataFrames for Python
+> - [Dask](https://dask.org/) - Parallel computing with task scheduling
+> - [DuckDB](https://duckdb.org/) = In-process SQL OLAP Database Management System
+
+[workshop repo](https://github.com/hugobowne/AI-for-SWEs)
+
+> **TIP:**
+
+## Outline
+
+[![Title](slide01.png)](slide01.png "Title")
+
+Title
+
+[![About the speaker](slide02.png)](slide02.png "About the speaker")
+
+About the speaker
+
+[![The Data Challenge](slide05.png)](slide05.png "The Data Challenge")
+
+The Data Challenge
+
+[![Back of the Envelope: The M x N Problem](slide06.png)](slide06.png "Back of the Envelope: The M x N Problem")
+
+Back of the Envelope: The M x N Problem
+
+[![The Messy reality of Product Names](slide08.png)](slide08.png "The Messy reality of Product Names")
+
+The Messy reality of Product Names
+
+[![Enter BM25: The Search Engine Secret](slide10.png)](slide10.png "Enter BM25: The Search Engine Secret")
+
+Enter BM25: The Search Engine Secret
+
+[![The BM\_{25} Formula](slide11.png)](slide11.png "The BM_{25} Formula")
+
+The BM\_{25} Formula
+
+BM\_{25}(q, d) = \sum\_{i=1}^{n} IDF(q_i) \cdot \frac{f(q_i, d) \cdot (k_1 + 1)}{f(q_i, d) + k_1 \cdot (1 - b + b \cdot \frac{\|d\|}{avgdl})}
+
+[![bm\_{25}’s ranking - the Native approach](slide12.png)](slide12.png "bm_{25}’s ranking - the Native approach")
+
+bm\_{25}’s ranking - the Native approach
+
+[![DuckDB the SQL Approach](slide13.png)](slide13.png "DuckDB the SQL Approach")
+
+DuckDB the SQL Approach
+
+[![bm\_{25}’s Eager Sparse Scoreing](slide14.png)](slide14.png "bm_{25}’s Eager Sparse Scoreing")
+
+bm\_{25}’s Eager Sparse Scoreing
+
+[![deep DiveL why is bm\_{25} so fast](slide15.png)](slide15.png "deep DiveL why is bm_{25} so fast")
+
+deep DiveL why is bm\_{25} so fast
+
+[![Dashboard](slide16.png)](slide16.png "Dashboard")
+
+Dashboard
+
+[![Watching it work](slide17.png)](slide17.png "Watching it work")
+
+Watching it work
+
+[![Search was only half the problem](slide18.png)](slide18.png "Search was only half the problem")
+
+Search was only half the problem
+
+[![Dask +cuDF: GPU Accelerated Enrichment](slide19.png)](slide19.png "Dask +cuDF: GPU Accelerated Enrichment")
+
+Dask +cuDF: GPU Accelerated Enrichment
+
+[![The Complete Pipeline](slide20.png)](slide20.png "The Complete Pipeline")
+
+The Complete Pipeline
+
+[![Performance Summary](slide21.png)](slide21.png "Performance Summary")
+
+Performance Summary
+
+[![What we Learned](slide22.png)](slide22.png "What we Learned")
+
+What we Learned
+
+## Reflections
+
+Product matching is a common yet challenging task in data science projects dealing with marketing pricing and logistics at scale.
+
+In a couple of places I worked we discussed building in-house solutions for doing this but I never got around to implementing them.
+
+This talks suggest a modern and practical approach to solving this problem using BM\_{25} algorithm and leveraging both Python and DuckDB implementations. It can then be integrated into LLM a tool using an MCP server.
+
+## Some code samples
+
+Install BM25S with extra dependencies:
+
+``` python
+# Install all extra dependencies
+pip install "bm25s[full]"
+
+# If you want to use stemming for better results, you can install a stemmer
+pip install PyStemmer
+
+# To speed up the top-k selection process, you can install `jax`
+pip install "jax[cpu]"
+```
+
+Bm25s quick start:
+
+``` python
+
+import bm25s
+import Stemmer  # optional: for stemming
+
+# Create your corpus here
+corpus = [
+    "a cat is a feline and likes to purr",
+    "a dog is the human's best friend and loves to play",
+    "a bird is a beautiful animal that can fly",
+    "a fish is a creature that lives in water and swims",
+]
+
+# optional: create a stemmer
+stemmer = Stemmer.Stemmer("english")
+
+# Tokenize the corpus and only keep the ids (faster and saves memory)
+corpus_tokens = bm25s.tokenize(corpus, stopwords="en", stemmer=stemmer)
+
+# Create the BM25 model and index the corpus
+retriever = bm25s.BM25()
+retriever.index(corpus_tokens)
+
+# Query the corpus
+query = "does the fish purr like a cat?"
+query_tokens = bm25s.tokenize(query, stemmer=stemmer)
+
+# Get top-k results as a tuple of (doc ids, scores). Both are arrays of shape (n_queries, k).
+# To return docs instead of IDs, set the `corpus=corpus` parameter.
+results, scores = retriever.retrieve(query_tokens, k=2)
+
+for i in range(results.shape[1]):
+    doc, score = results[0, i], scores[0, i]
+    print(f"Rank {i+1} (score: {score:.2f}): {doc}")
+
+# You can save the arrays to a directory...
+retriever.save("animal_index_bm25")
+
+# You can save the corpus along with the model
+retriever.save("animal_index_bm25", corpus=corpus)
+
+# ...and load them when you need them
+import bm25s
+reloaded_retriever = bm25s.BM25.load("animal_index_bm25", load_corpus=True)
+# set load_corpus=False if you don't need the corpus
+```
+
+for more BM25S examples including using HuggingFaceHub integration check the [bm25s documentation](https://pypi.org/project/bm25s/)
+
+------------------------------------------------------------------------
+
+### DuckDB is a fast database system
+
+1.  install DuckDB:
+
+``` bash
+pip install duckdb
+```
+
+2.  Example usage:
+
+``` python
+# Get the top-3 busiest train stations
+import duckdb
+duckdb.sql("""
+    SELECT station, count(*) AS num_services
+    FROM train_services
+    GROUP BY ALL
+    ORDER BY num_services DESC
+    LIMIT 3;
+    """)
+```
+
+Duck DB now has supports support for the [Apache Iceberg open table format](https://iceberg.apache.org/). Read about it [here](https://duckdb.org/docs/stable/core_extensions/iceberg/overview)
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {Scaling {Fuzzy} {Product} {Matching} with {BM25:} {A}
+    {Comparative} {Study} of {Python} and {Database} {Solutions}},
+  date = {2025-12-09},
+  url = {https://orenbochman.github.io/posts/2025/2025-12-09-pydata-scaling-fuzzy-product-matching/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2025. “Scaling Fuzzy Product Matching with BM25: A Comparative Study of Python and Database Solutions.” December 9. <https://orenbochman.github.io/posts/2025/2025-12-09-pydata-scaling-fuzzy-product-matching/>.
+
+[^1]: originally developed in the 1980s

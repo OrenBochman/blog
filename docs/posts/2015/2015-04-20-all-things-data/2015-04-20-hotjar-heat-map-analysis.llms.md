@@ -1,0 +1,33 @@
+# HotJar 
+
+What are Heatmaps
+
+The 3 types of heat maps : - Click and tap - Motion map - Scroll map
+
+The eight Use Case for UX analysis for  1. The link tests - what do people click on an item that is not clickable?  
+1. Don’t look like a button 1.  add anchor links to move round the page 1. Track click 2. Distractions  
+1. Remove content that  is a distraction 3. The information test  
+1. Expand add content above the fold 1. Ask a s pacific question 4. The device test let u know what fails Ina device  
+5. The depth test 1. Responsive 2. Tweak for high engagement on  5. The depth test  
+1. Eliminate false bottoms 1. Add an anchor list - a Johnson box (Toc that floats down) 6. Engagement test  
+7. The fold test  
+1. Avoid fake fold 2. Avoid headers that look like banner ads 8. The header test  
+1. How much of the page is header and footer 2. Reduce them to expand the usable page.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2016,
+  author = {Bochman, Oren},
+  title = {HotJar {Heat} {Map} {Analysis} - {Dr.} {David} {Darmanin}},
+  date = {2016-04-20},
+  url = {https://orenbochman.github.io/posts/2015/2015-04-20-all-things-data/2015-04-20-hotjar-heat-map-analysis.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2016. “HotJar Heat Map Analysis - Dr. David Darmanin.” April 20. <https://orenbochman.github.io/posts/2015/2015-04-20-all-things-data/2015-04-20-hotjar-heat-map-analysis.html>.

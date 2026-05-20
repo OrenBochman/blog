@@ -1,0 +1,102 @@
+In the last few dates I made some updates to the blog, cleaning things up but it broke down.
+
+Today it is back to speed and I think it might useful for other quarto bloggers to look at my current github action as I made a couple of changes to the initial script.
+
+``` yml
+on:
+  workflow_dispatch:
+  push:
+    branches: main
+
+name: Quarto Publish
+
+github action
+
+```yml
+on:
+  workflow_dispatch:
+  push:
+    branches: main
+
+name: Quarto Publish
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Install R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.5.1'
+
+      # Install system deps needed by R packages (curl in particular)
+      - name: Install system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            libxml2-dev \
+            libicu-dev \
+            zlib1g-dev \
+            pkg-config \
+            build-essential \
+            gfortran \
+            cmake
+
+      # # Install LaTeX for PDF output
+      # - name: Install latex
+      #   run: |
+      #     sudo apt-get install -y --no-install-recommends \
+      #       texlive-latex-recommended \
+      #       texlive-latex-extra \
+      #       texlive-fonts-recommended
+
+      - name: Install R Dependencies
+        uses: r-lib/actions/setup-renv@v2
+        with:
+          cache-version: 1
+
+      - name: Install Python and Dependencies
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.12'
+          cache: 'pip'
+      - run: pip install jupyter
+      - run: pip install -r requirements.txt
+
+      - name: Render and Publish
+        uses: quarto-dev/quarto-actions/publish@v2
+        with:
+          target: gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Where the latest addition are the Install system libraries section.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {Updates to the Github Action},
+  date = {2025-10-01},
+  url = {https://orenbochman.github.io/posts/2025/2025-10-01-Updates-to-the-github-action/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2025. “Updates to the Github Action.” October 1. <https://orenbochman.github.io/posts/2025/2025-10-01-Updates-to-the-github-action/>.

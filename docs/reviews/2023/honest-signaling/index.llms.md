@@ -1,0 +1,172 @@
+![](Peacock_Flying.jpg)
+
+The Handicap principle - The tail is too costly to fake
+
+![](Poison_Dart_Frog.jpg)
+
+Poison Dart Frog - Deception is advantageous to non poisonous frogs
+
+![](Wasps-facial-markings.jpg)
+
+Facial marking mark fighting prowess and deception is punished by social punishment i.e. a beat down by its peers
+
+![](chicks-begging.jpg)
+
+Deception by hungry chicks waiting for food can lead the parent to ignore the begging behavior
+
+\![\]
+
+> “Oh, what a tangled web we weave
+>
+> When first we practice to deceive!” – Sir Walter Scott
+
+I read about the handicap principle in the Selfish Gene by Richard Dawkins, c.f. ([Dawkins 1976](#ref-Dawkins1976Selfish)) and it has always intrigued me. The idea that animals might be honest in their communication because it is too costly to lie is fascinating. While it explains a number of phenomena, I am surprised that it was claimed to be the only explanation for honest signalling. Is this a bit of a stretch, propped up, only so it can be knocked down? I am excited to read this paper and find out.
+
+At a deeper level signaling is usually unlikely to arise in competitive conditions. And these are also the settings in which agent are rewarded for deceptive behavior. So I’m also interested in any research shedding light on ways that allows for honest signaling can emerge under such conditions.
+
+> **NOTE:**
+>
+> [![Honest Signaling in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Honest Signaling in a nutshell")
+>
+> Honest Signaling in a nutshell
+>
+> This academic paper delves into the theory of honest signalling in animal behavior, specifically examining the well-known [handicap hypothesis](https://en.wikipedia.org/wiki/Handicap_principle), which suggests that costly signals deter dishonesty. The authors clarify the handicap hypothesis and address recent criticisms that might wrongly lead researchers to dismiss it. They explain that while the handicap principle (the idea that all honest signalling is based on handicaps) is flawed, the handicap hypothesis remains a valid mechanism alongside other explanations for honest communication, such as differential benefits and indices. Ultimately, the paper advocates for a broader understanding of costly signalling theory and encourages empirical research to determine the prevalence of these different mechanisms in nature.
+
+Here is a lighthearted Deep Dive into the paper:
+
+### Abstract
+
+> Honest communication is a common phenomenon in animal behaviour, and is frequently explained by appeal to the so-called handicap hypothesis by which signal costs deter dishonesty. However, the handicap models commonly used to explain honest signalling have has been subject to several lines of criticism in recent literature. This trend may have led researchers outside of the field of animal communication to believe that the handicap hypothesis is logically invalid. That is untrue. Here we explain the handicap hypotheses and explore these critiques in non-mathematical terms in order to more widely disseminate a contemporary understanding of the theory of honest signalling. We address what is currently known and unknown in signalling theory, and suggest directions for future research
+>
+> — ([Chisausky et al. 2023](#ref-chisausky2023honest))
+
+## Glossary
+
+This paper uses some big terms, so let’s break these down so we can understand them better
+
+Signaller  
+An organism that produces a signal to influence the behavior of another organism.
+
+Receiver: An organism that detects and responds to a signal produced by another organism.
+
+Signal  
+A behavior or structure produced by a signaller that carries information and can influence the behavior of a receiver.
+
+Honest Signalling  
+A signalling system in which signals reliably convey information about the signaller’s quality, benefiting the receiver on average.
+
+Deceitful Signalling  
+A signal that misrepresents the signaller’s quality, potentially benefiting the signaller at the receiver’s expense.
+
+Handicap Hypothesis  
+A theory proposing that honest signalling is maintained because the signals are costly to produce, and these costs are differentially greater for lower-quality signallers.
+
+Differential Costs Model  
+A model of honest signalling where the cost of producing a signal varies depending on the signaller’s quality.
+
+Minimal Cost Signalling  
+A form of honest signalling where the cost of the honest signal paid at equilibrium is very low or zero, with honesty maintained by the potential cost of deception.
+
+Differential Benefits Model  
+A model of honest signalling where the benefit a signaller receives from a given receiver response varies depending on the signaller’s quality.
+
+Index (Unfakable Signal)  
+A signal whose magnitude is directly and physiologically constrained by an underlying quality of the signaller, making it impossible to fake.
+
+Signaller-Preferred Response  
+The response from a receiver that all signallers in a population would prefer to elicit.
+
+Consonant Signaller  
+A signaller whose interests align with those of the receiver in that the receiver benefits from giving the signaller-preferred response to signallers of that specific quality.
+
+Dissonant Signaller  
+A signaller whose interests diverge from those of the receiver, such that the receiver should not give the signaller-preferred response to signallers of that quality.
+
+Equilibrium  
+A stable state in a signalling system where neither signallers nor receivers can improve their payoff by changing their behavior.
+
+Signal Cost Function  
+The relationship that describes how the cost of sending a signal depends on the signaller’s quality and the signal strength.
+
+Signal Benefit Function  
+The relationship that describes the payoff a signaller receives from sending a signal of a given strength due to the receiver’s response.
+
+Marginal Cost  
+The change in cost resulting from a small increase in signal strength.
+
+Marginal Benefit  
+The change in benefit resulting from a small increase in signal strength.
+
+Handicap Principle  
+The (incorrect) assertion that all examples of honest signalling in nature involving costly signals must be handicap signals.
+
+Common Interest  
+A situation where the signaller and receiver have aligned preferences regarding the outcome of their interaction.
+
+Inclusive Fitness  
+The total effect an individual has on propagating its genes by producing its own offspring and by providing aid that enables other close relatives to increase the production of their offspring.
+
+Monotonicity (of functions)  
+A function that is either entirely non-increasing or entirely non-decreasing.
+
+## Outline
+
+- The Problem of Honesty in Animal Communication
+  - The paper addresses the fundamental question of how honesty is maintained in animal signaling systems where a conflict of interest exists between the signaller and the receiver. Signallers may benefit from deceiving receivers about their true quality, but receivers should only respond to signals if they provide reliable information.
+- The Handicap Hypothesis: A Mechanism for Honest Signaling
+  - The handicap hypothesis is a widely recognized explanation for honest signaling. It postulates that:
+  - If signals are costly to produce and more costly for less **consonant** signallers, then signallers will produce costly signals, and the strength of signals will be honest indicators of the signallers’ qualities.
+  - Here, “consonant” refers to signallers whose interests align with the receiver, while “dissonant” signallers benefit from deceiving the receiver. The handicap hypothesis suggests that costlier signals are more reliable because only high-quality individuals can afford to bear the cost of producing them.
+- Nuances and Corrections to the Handicap Hypothesis
+  - The paper delves into important nuances regarding the handicap hypothesis:
+  - **Minimal Cost Signaling**: Honest signaling can evolve even when the actual cost paid at equilibrium is minimal or even non-existent. The key factor is the potential cost of deception, which deters dishonest signaling.
+  - **Differential Benefits Model**: Honest signaling can also be maintained when costs are uniform but benefits differ based on signaller quality. Consonant signallers can afford stronger signals because they reap greater benefits from the receiver’s response.
+  - **Indices** (Unfakable Signals): Indices are signals inherently linked to a signaller’s quality, making them impossible to fake. However, the paper argues that most signals considered indices are likely fakable, but the cost of doing so is so high that it deters dishonest signaling.
+- Conditions on Cost and Benefit Functions
+  - The paper highlights the need to consider diverse cost and benefit functions when modeling honest signaling:
+  - **Non-monotonic Costs and Benefits**: Signals may become increasingly costly as they deviate from a naturally selected optimum, leading to non-monotonic cost functions. This phenomenon is particularly relevant for index-like signals.
+  - **Differential Costs and Benefits**: Realistic models should account for both differential costs and benefits, allowing for situations where consonant signallers may pay higher costs or receive lower benefits for certain signal strengths.
+- Common Interest and Partial Common Interest
+  - The paper explains that honest signaling is more readily achieved when:
+  - **Common Interest**: Both signaller and receiver benefit from honest communication, eliminating the incentive for dishonesty. This occurs in contexts like mate recognition and signaling between kin.
+  - **Partial Common Interest**: While some conflict of interest exists, considerations like inclusive fitness can modify the benefit function and promote honesty.
+- Invalidity of the Handicap Principle
+  - The paper emphasizes the crucial distinction between the handicap hypothesis, a viable explanation for honest signaling, and the handicap principle, which asserts that all honest signals must be handicaps. This principle is demonstrably false, as various alternative mechanisms can support honest signaling.
+- Recent Criticisms and a Modern Understanding
+  - The paper addresses recent criticisms of the handicap hypothesis, arguing that these criticisms primarily target the overgeneralized handicap principle rather than the core concept of differential costs. A modern understanding of honest signaling recognizes the handicap hypothesis as one of several potential mechanisms, alongside minimal cost signaling, differential benefits, and true indices.
+- Conclusion: A Call for Empirical Research
+  - The paper concludes with a call for empirical research to determine the relative prevalence of different mechanisms for honest signaling in various biological contexts. This research will guide future theoretical work and deepen our understanding of the complex interplay between costs, benefits, and honesty in animal communication.
+
+## Some thoughts
+
+This paper provides some insights about deception and honesty in signaling. The main point that agents/animals may have incentives to lie about thier traits. I think the different scenarios and mechanism might be a few baselines to considering how deception and or honesty might evolve in competitive environments.
+
+It seems that this can be explored in a sugarscape type simulation where agents know thier own traits but may wish to lie about them to thier mate to increase thier chances of mating. So deception might lead to a higher fitness in the short term but in the long term it might lead to a lower fitness.
+
+Since the different mechanism outlined in the paper are not mutually exclusive, it might be interesting to see how they interact in a simulation.
+
+## The paper
+
+paper
+
+Chisausky, Jacob, Carl Bergstrom, Kevin Zollman, and Graeme Ruxton. 2023. *Honest Signalling Made Simple*. https://doi.org/<https://doi.org/10.32942/X2H03D>.
+
+Dawkins, Richard. 1976. *The Selfish Gene*. Oxford University Press.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {🦚 {Honest} {Signalling} {Made} {Simple}},
+  date = {2024-03-14},
+  url = {https://orenbochman.github.io/reviews/2023/honest-signaling/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2024. “🦚 Honest Signalling Made Simple.” March 14. <https://orenbochman.github.io/reviews/2023/honest-signaling/>.

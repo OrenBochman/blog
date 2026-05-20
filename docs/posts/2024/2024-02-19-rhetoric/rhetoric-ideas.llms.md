@@ -1,0 +1,89 @@
+[![](.png)](.png)
+
+I recently have been annotating speeches following up on the edx a course on Rhetoric.
+
+The following NLP task emerge:
+
+## Rhetorical Tasks & a Loss function
+
+### The Goal
+
+- Extract and specify identify the goal of the speech as a single sentence — using `abstractive extraction`.
+- The goal is important as it set the context for the whole speech, and the subsequent tasks use this context as part of their definition.
+
+### Map the structure
+
+Structure is important
+
+- It helps the speaker engage the audience.
+- It helps to lay out the arguments in a sensible fashion.
+- by building interest and expectation in what would otherwise be torturous experience.
+- The order of the sections were often modified.
+
+Classical rhetoric uses the following top level parts of the oration.
+
+a classifier for each paragraph’s structural element.
+
+[TABLE]
+
+Table 1: main section used in classical oratory
+
+The speakers of antiquity went further by employing mnemonic devices by associate each section of the oration with the layout of the venue.
+
+The **task** here is **to maps/align the text to each established sections**.
+
+Cicero’s speech structure appears to be predicated on a legal oration in defense of a client.
+
+As our oration or essay diverges from this type of medium we will need to adapt our structure.
+
+Cicero also maps each section to an recommended mode of persuasion.
+
+However, most speakers tend to have sequences of small cluster with all three. (e.g. ethos, logos pathos).
+
+Thus I expect that classiing the sections would be deffered until additional features are identified.
+
+2.  for each phrase : classify the main mode of persuasion rough: logos, ethos, pathos fine: telos, mythos, nomos, okios,
+3.  for each sentence bin classifier for new bliss or problem.
+4.  
+5.  Cicero wrote about rhetoric in service of leagal defence - his forte. Political speeches can take other forms.
+
+- Is there a ontology for speeches ?
+- How important is understanding structure for writing good speeches.
+
+## A Generative approach
+
+Some of the hallmarks of good writing are:
+
+1.  Every part serves a purpose - given a goal we consider this goal when ever we write.
+2.  It is dense with patterns. By which I mean each part is often serving more than one purpose simultaneously
+3.  There us a unity of parts. In this case there is a structure
+4.  There are synergies - the whole is greater than the sum of its parts.
+
+A generative approach for getting this:
+
+1.  a plan - using frames or otherwise create a structure for the speech/discourse.
+
+- break these down into more detailed instructions perhaps using a language model - resulting in a tree of retorical specs
+- use these specs as prompts to generate the speech.
+
+2.  provide the model with a loss function - to measure how effective the generator is.
+
+- the loss function would be built on the above
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Rhetoric {NLP} {Tasks}},
+  date = {2024-02-17},
+  url = {https://orenbochman.github.io/posts/2024/2024-02-19-rhetoric/rhetoric-ideas.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2024. “Rhetoric NLP Tasks.” February 17. <https://orenbochman.github.io/posts/2024/2024-02-19-rhetoric/rhetoric-ideas.html>.

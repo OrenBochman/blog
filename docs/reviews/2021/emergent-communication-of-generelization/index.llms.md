@@ -1,8 +1,12 @@
-## TL;DR
-
-I think this is an amazing paper. I read it critically and made copious notes to see what I could learn from it. The paper point out some limitations of Lewis referential games^\[In this game the sender sees images, it needs to classify them into some representation and sends a message. The reciever gets the same or similar images + distractors, it needs to run a classifier and needs to select the correct one. Learning an image classifier per agent is expensive and requires access to both an an image classification is likely shared. This however presents a problem…. It allows the agents? \] and suggest a couple of extentions that can over come these limitations. There is
-
-([Mu and Goodman 2021](#ref-mu2022emergentcomms))
+> **NOTE:**
+>
+> [![Emergent Communication](images/in_a_nutshell.png)](images/in_a_nutshell.png "Emergent Communication")
+>
+> Emergent Communication
+>
+> I think this is an amazing paper. I read it critically and made copious notes to see what I could learn from it. The paper point out some limitations of Lewis referential games^\[In this game the sender sees images, it needs to classify them into some representation and sends a message. The receiver gets the same or similar images + distracts, it needs to run a classifier and needs to select the correct one. Learning an image classifier per agent is expensive and requires access to both an an image classification is likely shared. This however presents a problem…. It allows the agents?\] and suggest a couple of extensions that can over come these limitations. There is
+>
+> ([Mu and Goodman 2021](#ref-mu2022emergentcomms))
 
 ## Abstract
 

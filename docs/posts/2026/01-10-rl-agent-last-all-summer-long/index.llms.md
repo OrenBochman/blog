@@ -1,0 +1,73 @@
+Ever since learning about RL I’ve been thinking about how RL could play a role overcoming the weaknesses of Large Language Models where it comes to reasoning and planning.
+
+There are two big paths I’d like to explore at this time:
+
+1.  How to integrate an RL agent with an Large Language Model in a sense that we move from the unconstrained Next Word Prediction task to A smaller state space of higher level concepts and their actions. This might require reinterpreting the dance between the policy and value function in the so called generalized policy iteration framework.
+
+In this case we exploration would start by querying the Language Model for concepts, thier relations (composition, and orderings) and compatible actions. Then we would need to construct a Markov Decision Process (MDP) from these elements. Unlike the traditional MDPs these should be open to extension as new concepts and actions are discovered. This is generally frowned upon as it violates the stationarity assumption of MDPs but I think this is a necessary step if we want to build agents that can reason and plan over long time horizons.
+
+For high level reasoning one would need higher level abstractions like options or skills and temporal abstractions. Skill can encapsulate one part of the growth of the MDP. The other aspect of extending the MDP is to let a sequence of agents deal with the more complex versions of the MDPs.
+
+let’s make things a bit more concrete and follow one of [Polya’s problem solving strategies](https://en.wikipedia.org/wiki/How_to_Solve_It): “solve a simpler problem”.
+
+In developing a coding agent we might want to focus on a number of abstractions in coding
+
+1.  language mastery: using a restricted set of programming constructs (e.g. variables, loops, conditionals, functions)
+2.  functional coding: composing functions and using closures to achieve a goal
+3.  object oriented coding: using classes and objects to model real world entities and their interactions
+4.  design patterns and architecture: using established design patterns and architectural principles to build scalable and maintainable systems (gang of four as well as a plethora of other such manuals that handle coding/problem interface)
+5.  Problem solving (problem solving strategies from “Cracking the coding interview”,“How to solve it”, and the approach to innovation from [TRIZ](https://en.wikipedia.org/wiki/TRIZ))
+6.  Algorithm & Data structure expert. (alg and ds terminology, trade offs, complexity analysis, optimization c.f [Grokking Algorithms](https://www.manning.com/books/grokking-algorithms))
+7.  project planning agent (system design language)
+
+Each might be modeled as a separate MDP with its own state and action space. Though in reality these form a hierarchy with some over lap one might treat each agent as forming a prior for the next. This would allow us to define densible rewards for each
+
+A second aspect of this work is to derive small expert Small Language Models that are laser focused on coding and on the related languages. By avoiding knowing about “the price of Tea in China” we should be using much smaller models that are cheaper to run and easier to fine tune and need much less data to train. Perhaps a [coreset](https://en.wikipedia.org/wiki/Coreset) approach could be created for such models.
+
+These together with the agent hierarchy can help us with transfer learning in the sense that we can swap out the pieces that change from project to project or encapsulate them until we can come find an abstraction etc that leads to a general approach (i.e. agents that can handle multiple coding challenges)
+
+REPLs Rewards and Tracing
+
+Language models and RL models greatly benefit if they do good credit assignments (and backpropagation of rewards). In coding this is particularly challenging as bugs can be subtle and hard to detect. One approach is to use REPLs (Read Eval Print Loops) to test small pieces of code and get immediate feedback on their correctness. This can help the agent learn from its mistakes and improve its coding skills over time.
+
+different problems via games:
+
+1.  black jack
+2.  Chess
+3.  Nim
+4.  Backgammon
+5.  poker
+6.  nethack
+7.  sokoban
+
+note that how web apps work with service workers might also be a good model for breaking up complex agents into smaller cacheable pieces that can be updated independently and communicate via well defined interfaces.
+
+Coding rewards
+
+XP suggest :
+
+1.  don’t write code unless you have failing code
+2.  write the simplest code that can possibly work
+3.  refactor mercilessly
+
+using an RL coder we can actually consider an approach that is more onerous than for a human coder.
+
+e.g. ensuring coverage to higher levels, test for more edge cases etc. Here an LLM might be very helpful as unit tests are simple and thus easy to write but tedious for a human. (though there are many thing that are not easy to test (but usually they are not the low level unit)
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {RL {Agents} {Last} {All} {Summer} {Long}},
+  date = {2026-01-14},
+  url = {https://orenbochman.github.io/posts/2026/01-10-rl-agent-last-all-summer-long/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “RL Agents Last All Summer Long.” January 14. <https://orenbochman.github.io/posts/2026/01-10-rl-agent-last-all-summer-long/>.

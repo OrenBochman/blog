@@ -1,0 +1,134 @@
+## Deploying Multimodal AI at the Edge: Engineering Patterns for Real-World Performance
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Achyut Sarma Boggaram
+  - [LinkedIn](https://www.linkedin.com/in/achyutsarma//odsc_2026_multi_modal_edge_ml/)
+  - Torc Robotics
+  - Notebooks
+    - [Profiling](https://github.com/achbogga/odsc_2026_multi_modal_edge_ml/blob/main/01_profiling_bottlenecks.ipynb)
+    - [Export](https://github.com/achbogga/odsc_2026_multi_modal_edge_ml/blob/main/02_export_and_validate.ipynb)
+    - [Observability](https://github.com/achbogga/odsc_2026_multi_modal_edge_ml/blob/main/03_observability_canary_rollback.ipynb)
+
+> **NOTE:**
+>
+> - **Topic:** The talk is a workshop on real-world engineering deployment patterns for ml models on edge systems, such as robots, autonomous vehicles, and other devices that may run without reliable internet.
+>
+> - **Central problem:** Offline model performance often fails to translate into production performance because **real-world deployment introduces constraints** that are absent from validation notebooks.
+>
+> - **Major deployment failure modes:**
+>
+>   - Network failures, including internal vehicle or robot communication failures between sensors, compute units, and controllers.
+>   - Scaling failures when a system moves from a small test bench to thousands or millions of deployed devices.
+>   - Domain shift, where validation data fails to represent night, weather, snow, unusual environments, or other real-world conditions.
+>   - Latency, memory, sensor, preprocessing, and modality failures that are not captured by ordinary offline accuracy metrics.
+>
+> - **Edge deployment mindset:**
+>
+>   - Production systems must optimize for reliability, predictability, latency budgets, memory constraints, and graceful failure.
+>   - Accuracy alone is not sufficient; the model must behave acceptably under hardware limits, sensor failures, and distributional surprises.
+>
+> - **Multimodal model design:**
+>
+>   - The talk discusses early, middle, late, and hybrid fusion architectures.
+>   - Early fusion can give the model richer joint representations, but may be more expensive or fragile.
+>   - Late fusion can be more modular and resilient to modality failure, but may lose useful cross-modal interactions.
+>   - Hybrid fusion is presented as common in production because it balances representational power, latency, and robustness.
+>
+> - **Profiling and benchmarking:**
+>
+>   - The speaker emphasizes measuring inference properly rather than trusting naive timing code.
+>   - For GPU timing, `torch.cuda.synchronize()` is essential because GPU execution is asynchronous.
+>   - Benchmarks need sufficiently large sample sizes; otherwise latency measurements are too noisy to trust.
+>   - Models should be evaluated with `torch.eval()` and deterministic settings where possible.
+>
+> - **Latency analysis:**
+>
+>   - Production latency is not just model forward-pass time.
+>   - End-to-end latency includes preprocessing, model inference, postprocessing, memory movement, framework overhead, buffers, and sometimes network or sensor delays.
+>   - The talk distinguishes mean latency, P50, P90, P95, P99, and max latency.
+>   - P99 latency is especially important because it captures the tail behavior that affects real users or deployed devices.
+>
+> - **Profiler usage:**
+>
+>   - PyTorch Profiler is introduced as a way to identify bottleneck operations.
+>   - Profiling tells the engineer whether optimization should focus on the model architecture, preprocessing, postprocessing, memory transfer, or a specific operator.
+>
+> - **Model export decision:**
+>
+>   - Exporting a model is not always necessary or desirable.
+>   - If PyTorch on the target hardware already satisfies latency and memory budgets, exporting may add risk without benefit.
+>   - Export is justified when deployment hardware, runtime requirements, or performance budgets demand it.
+>
+> - **ONNX export workflow:**
+>
+>   - The talk walks through exporting a PyTorch model to Open Neural Network Exchange (ONNX).
+>   - Before export, the model should pass feasibility checks: clean forward pass, expected input/output shapes, no problematic non-tensor signatures, and no unsupported custom operations.
+>   - After export, the model should be checked structurally and visually; `Netron` is mentioned as a useful graph visualization tool.
+>
+> - **Export risks:**
+>
+>   - Dynamic control flow can confuse exported graph representations.
+>   - Unsupported custom `CUDA` or C++ operations may require plugins.
+>   - Data-dependent shapes can break or complicate export.
+>   - `ONNX opset` compatibility must be checked against the model and runtime.
+>   - Precision drift can occur when converting between floating-point or quantized formats, such as FP32 to INT8.
+>
+> - **Correctness validation after export:**
+>
+>   - Exported models must be validated against the original model.
+>   - The speaker recommends parity checks at output and layer levels.
+>   - Validation should use domain-appropriate tolerances, such as maximum absolute difference and maximum relative difference.
+>   - Classification, regression, radar, LiDAR, and other outputs may need different tolerance thresholds.
+>
+> - **Optimization levers:**
+>
+>   - Quantization.
+>   - Post-training quantization.
+>   - Quantization-aware training.
+>   - Model pruning.
+>   - Architecture simplification.
+>   - Backbone replacement.
+>   - Preprocessing optimization.
+>   - Fusion-design changes.
+>
+> - **Graceful degradation:**
+>
+>   - Real-world systems should keep functioning when a modality or sensor fails.
+>   - A robot or vehicle should not catastrophically fail because one camera, LiDAR stream, or preprocessing component is unavailable.
+>   - Resilience must be built into the model architecture and the production controller.
+>
+> - **Observability and rollout:**
+>
+>   - After deployment, teams must monitor latency, failures, traffic, model health, and output behavior.
+>   - The workshop introduces dashboards using tools such as Prometheus and Grafana.
+>   - Observability is used not just for inspection, but for automated rollout decisions.
+>
+> - **Service-level objectives and canary deployment:**
+>
+>   - The speaker explains Service-Level Objectives (SLOs) as explicit thresholds for acceptable production behavior.
+>   - A canary rollout gradually shifts traffic from model version V1 to V2.
+>   - The rollout may move through stages such as 0%, 10%, 25%, and eventually 100%.
+>   - If latency or failure metrics breach the SLO, the rollout controller should automatically roll back.
+>
+> - **Main takeaway:** Deploying machine-learning models on edge systems is an engineering discipline, not just a modeling exercise. A production-ready model must satisfy accuracy, latency, memory, exportability, observability, rollback, and resilience requirements under real-world operating conditions.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Deploying {Multimodal} {AI} at the {Edge}},
+  date = {2026-04-28},
+  url = {https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk10.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Deploying Multimodal AI at the Edge.” April 28. <https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk10.html>.

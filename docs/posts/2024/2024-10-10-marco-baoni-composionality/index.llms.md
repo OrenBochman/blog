@@ -1,0 +1,387 @@
+# An error occurred.
+
+Unable to execute JavaScript.
+
+Figure 1: Talk titled ‘Is compositionality overrated? The view from language emergence’ by Marco Baroni at the Deep Learning School on Jully 23 2030 at the Center for Brains Minds + Machines
+
+I came across this talk during my ongoing research into complex signaling systems. My point of view is one in which extends the work in ([Skyrms 2010](#ref-skyrms2010signals)). My notion is to discover the minimal modifications to the Lewis signaling game that lead to the emergence of complex signaling systems with various desirable properties. One thrust of my work is to consider how distributional semantics can arise in these systems. Another direction is the design or evolution of minimal grammars that supports aggregation of simple signals into complex signals.
+
+The papers covered in this talk includes a paper that also discusses extensions to the Lewis signaling game and is grounded in ideas from representation learning.
+
+This talk touches to some degree to some degree on the first idea and brings to bear some ideas that are similar to what I am exploring but also a number that I was unfamiliar with. I think this talk is rather vague in a number of places. However as time goes by I digested this material and updated this post I have at least been able to come up with better mental models of the notions I found elusive in this talk. I also think that some of the points made in this work don’t make much sense to me. This has led me to consider why I am unhappy with this research, identify its shortcomings and to consider how one might demonstrate these. Nit surprisingly this is a challenge. But overall it got me to focus on the direction I see most promising in this research area.
+
+> **NOTE:**
+>
+> [![Compositionality in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Compositionality in a nutshell")
+>
+> Compositionality in a nutshell
+>
+> In 2020 Marco Baroni gave a talk where in which he discussed the role of compositionality in his work on emergent languages. Unfortunately Baroni doesn’t come forth with what he considers to be the definition of compositionality. There seem to be a few definitions floating around and what the talk looks at is metrics like *Topographic Similarity*, *Pointwise Mutual Information*. And his group have been looking *Positional Disentanglement*, *Bag-of-symbols Disentanglement*.
+>
+> My interpretation of the The main idea is that in complex signaling systems a complex signal aka a phrase can have a meaning that is either an aggregation of simple signals e.g. *[barbed wire](https://en.wiktionary.org/wiki/barbed_wire)* or it can have a meaning that is not like *[kick the bucket](https://en.wiktionary.org/wiki/kick_the_bucket)* or “[bull session](https://en.wiktionary.org/wiki/bull_session)” which we call **idioms**.
+>
+> For a complex signaling system in which there is compositionality learning is reduced to coordination on the elementary signals and on the rules for combining them (the grammar). The alternative is to learn the semantics of each complex phrase individually. The difference is combinatorial in the number of simple signals.
+>
+> Natural languages have a high degree of compositionality as well as enough idioms to make learning them a challenge. In reality there are many languages where verbs or nouns are not compositional in the following sense: you need to learn a number of *dictionary forms* for words in order to learn thier morphology. For example phrasal verbs in English are often unpredictable and need to be learned individually.
+>
+> Given all this the question is whether compositionality is overrated seems odd - do agents that mostly learn non-compositional languages any better then agents that learn a simple signaling system? I.e. the only coordinate on a lexicon.
+>
+> Later in the session we will see that in many cases the emergent languages are small and if I understood are not signaling systems i.e. fail to contain one to one mappings between states and signals or display other properties that are undesirable for communication or for learning.
+>
+> It seems that as the designer of these agents the researchers don’t realize that they are not learning about emergent languages in general but only what they are designing. Without a lewis game there is no coordination and no emergent language. Without some additional design signaling systems are not likely to appear. These might arise due to the framing game or they might arise by what I call a design.
+>
+> I find research that finds a reductionist modification to the Lewis game etc more fruitful. e.g. work by ([Nowak and Krakauer 1999](#ref-nowak1999evolution)) And this type of work more in the spirit of ‘trial and error’ and ‘tinkering’. To make this more clear let me explain. In the lewis signaling game the agents are tasked with coordinating on a common convention for signaling state between them. Now the states can be a predator warnings or it might be a subset of binary strings with some image. If the states lack a structure there seems to be little reason for a the signaling system to have a structure. On the other hand if the states have a structure the signaling system that has a parallel structure may well be the more efficient then ones that diverge, though there are also some informational theoretic constraints that could be in play.
+>
+> So far I have come up with some state spaces that should give rise to a compositional signaling systems. However these still lack many aspects of Natural Languages. In fact it seems fascinating to find a minimal state space that is rich enough to give rise to a compositional signaling system that is rich enough for general use. Such a system may be a good starting point for developing a more general theory of language emergence as well as the basis for representing knowledge in a way that RL agents could use for transfer learning. I.e. this can be a way to allow agents to manipulate and translate between problems.
+>
+> This talk seems to be provoking the listeners with its outrageous title. Soon we find out that Baroni doesn’t really have a good definition of compositionality. But despite not really thinking things though he has conducted some research on language emergence. Finally we get to the real point of the talk - he has a paper and some results to share.
+>
+> Last but not least there is now a kit available for doing similar research on emergent languages! 👍
+
+Some criticsms of the talk are:
+
+- A few more but it doesn’t seem to be a major focus of his work or rather there isn’t a good outcome to report for measuring this.
+- In \[@\] idea is generlization is
+
+> **WARNING:**
+>
+> In th talk there is an example of the phrase “blue banana”. On the one hand there is a species of banana that is called the [blue Java banana](https://en.wikipedia.org/wiki/Blue_Java_banana), though it isn’t particularly blue. On the other hand we don’t have an issue with understanding what “blue banana” means in general since we know how to combine adjectives and nouns. Finally there is also a [discontinous urbanization zone](https://en.wikipedia.org/wiki/Blue_Banana) with this name though it has now the shape of a star and isn’t blue either. So this is either a great example of why compositionality is overrated or not.
+
+Now for the long form summary…
+
+Baroni presents recent work by his group at Facebook Research on language emergence in deep networks, where two or more networks are trained with a communication channel to solve a task jointly.
+
+Baroni argues that compositionality is not a necessary condition for good generalization in neural networks and suggests that focusing on enhancing generalization directly may be more beneficial than worrying about the compositionality of emergent neural network languages.
+
+This talk doesn’t provide us with an aristotelian definition of compositionality but a pragmatic one that Baroni used in investigation. His paper contains sevral more and it seems that
+
+The notion of language emergence in deep networks is a fascinating if rather overloaded with vagueries. There are many and papers making grandiose claims, or making a big deal out of nothing. While Marco Baroni is a solid researcher it can be hard to tell when he is being serious, being funny or just trying to provoke thought. With these caveats in mind there are a number of results that Baroni presents that are of interest.
+
+If I was initially critical of this talk and speaker I soon came to realize that this is just the kind of message that simulates thought and discussion. It is a good talk and I would recommend it to anyone interested in the topic of language emergence in deep networks. 👍
+
+> **NOTE:**
+>
+> My work on this subject shows that by adding compositionality to the lewis signaling game not only significantly increases the ratio of messages to simple signals but also renders the overall systems easier to master by making it more systematic and predictable. This is greatly affected by form of aggregation used for signal composition. e.g. using a simple template can create a morphology that is automatic and therefore easy to master.
+>
+> For example if we add a parameter to the game to penalize long signals and reward early decoding of the signal we can get a more efficient signaling system. This allows agents to learn a larger signaling system faster. It also has more subtle effects- perhaps the most important one is that the pooling equilibria in the lewis game which are far more common then the non-pooling equilibria which we call a signaling system can be allow us to learn more efficient signaling systems if we reinterpret these partial pooling equilibria as leading to categories of signals which are further refined within the complex signal but can lead to an early decoding of the signal.
+
+> **TIP:**
+>
+> In this subject we need to ask ourselves what are the main research questions and what are the main definitions we can make.
+>
+> - What is language emergence?
+> - What is compositionality
+> - How are Neural networks used here
+>   - how were they set up?
+>   - what was the task loss function?
+> - what is generalization in this task?
+>
+> The big question is will learning an emergent language aid agents to achieve better generalization? - There is also talk about compositionality in RL where transfer learning is challenging. - Hinton discussed the idea of capsules in neural networks as a way to encode compositional structure in neural networks.
+
+> **NOTE:**
+>
+> in page 16 of the slides we see that agents are using a learned signaling system to very effectively communicate about noise patches.
+>
+> skyryms has a couple of papers that can explain this using the idea of a template - this is where agents evolve a signaling systems under some regime (environment with a distribution of states assigned by nature) and under some new regime they can repurpose the old signaling system instead of learning a new signaling system from scratch.
+
+- does this mean they have not learned to signal - clearly not
+- does this mean their language is wierd - nope they language is just a lexicon with a 1:1 mapping between what I call the frame game.
+- so WTF ?
+  - Most people using the lewis referential game don’t really under stand the lewis game or game theory. e.g. deep RL algs only consider a single player game.
+
+  - Lewis game has four types of equilibria. There are N! The signaling systems giving the best payoffs, there are lots of suboptimal with homonyms called partial pooling that give lower payoffs. There are a N complete pooling solutions that lead to almost 0 solutions. and there are also an infinite number mixed equilibria that are a mixture distribution over the other solutions.
+
+  - Learning a good equilibrium is easy if the framing game has high fidelity. If the framing game can lead to mistakes in identifying th correct state then the RL algorithms may take longer to converge or may converge to a bad equilibrium.
+
+  - In most MARL cases researcher we don’t care about coordination sub-task by itself but about some other task.
+
+    - Lets call the lewis game I call the **coordination task**
+      - The Lewis game has a structure that leads to 1:1 mappings. If you want other mappings to be learned you need to do something else.
+      - Let’s call the other task I call the **frame task** and I tacitly assume it has a reward structure.
+        - The Framing game should not violate the payoff structure of the lewis game. I.e. lewis coordination games encode the incentive of agents too cooperate on coordination. If the symmetry of the payoffs is broken they will try to coordinate on different equilibria (c.f. battle of the sexes and the expected payoffs drop from 1 to 2/n!) and if payoffs structure is further eroded coordination the incentives for cooperation evaporate and we never learn a language.
+
+  - recall that rationality in game theory assumes that players’ decisions are the result of maximizing their own selfish payoff functions conditional on their beliefs about the other players’ optimal behavior. In evolutionary game theory we can restate it as the decisions that will result in the greatest expected progeny (aka fitness) again given the state and other agent’s optimal behavior.
+
+  - There are many ways rational agents can to learn to coordinate:
+
+    - If each agent has some shared knowledge that allows them to enumerate each state in the same order then they can use it to infer the same signaling system immediately.  
+    - if there is only one new action pair introduced then coordination only takes n-1 steps
+    - if they both know the distribution of states, and no two states are as likely, agents can infer an signaling system.
+      - this implies that if they can observe the state long enough they can suddenly signal with high fidelity.
+    - the sender can dictate a dictate a system that he knows and the receiver can learn from him or
+    - the receiver can dictate a system that he knows and the sender can learn from him
+    - they can also learn a system stochastically by trying signals and actions.
+
+  - Thus is they both have a pertained CLIP classifier, or they both learn the frame task using come classifier with shared weights they can simply send it random noise and many times and learn an empirical distribution of its categories which correspond to the state. They should have a very good signaling system at their disposal…
+
+  - unless you realty know what you are doing you won’t get extra structure from the lewis game.
+
+  - 
+
+  - in this case the frame game learning to classify an image into thier lexicon and
+- the lewis game is to send and recover the state i.e. pick the image with the same label
+
+If both agents share the same classifier the frame game is a no-brainer for this task.
+
+In the lewis game agents need to send N signals and recover the state from N possible options in the referential game they need to guess one of four. If the classifier is the same then there is a very good chance that the distractors are different from the signal so the agents
+
+> **NOTE:**
+>
+> In this slides we see work from ([Lazaridou et al. 2018](#ref-lazaridou2018emergence))
+
+> **NOTE:**
+>
+> > The meaning of a linguistic expression is a function of the meaning of its parts and the rules used to combine them (Boole, Frege, Montague, etc.)
+>
+> here the focus is on the meaning of the parts, thier combination are taken are take for granted.
+>
+> > A compositional language is one where it is easy to read out which parts of a linguistic expression refer to which components of the input
+>
+> In an emergent languages the composition is trivial e.g. just a concatenation of symbols. But the challenge is to discover what the atomic parts and thier meaning.
+>
+> This opens a can of worms.
+>
+> In human languages there is a lexicon and a grammar. The lexicon might also embody a grammar in the form of a morphology. What I think is that they are looking at a situations where their setup is able to learn a language without a lexicon or a grammar.
+>
+> 1.  It has perfect recall and
+> 2.  It can assign semantics to arbitrary long sequences of symbols.
+> 3.  The only restriction is that the agents coordinate on the assignment of the symbols to the states.
+> 4.  The agent might also not have any way to break down the state into parts like we do. i.e. Given a bitmap of a blue banana can you tell which bits are blue and which are banana?
+>
+> Many people also use images in Lewis reconstruction games. Here the agents are given a bitmap of a state and they need to send a signal that will allow the other agent to pick the same state from a set of distractors. This is what we see illustrated in the slides.
+>
+> 5.  The agents might be given a pretrained CLIP model. What is that?
+>     - It has a vision encoder like ResNet or ViT that converts images into a high dimensional latent space
+>     - It has a text encoder that converts deceptions or captions into a high dimensional latent space
+>     - Since both use the same high dimensional latent space and it can
+>     - Use a cosine similarity to compare the two.
+> 6.  CLIP is usually pretrained. So it might be fine tuned on the images and caption pairs as they evolve.
+>
+> - Images are great but I don’t know how an image of a man thinking about blue bannas and one thinking about pink apples is going to be classified by CLIP into different separable classes.
+> - Given all this I have an idea for RL agents. This is a so called RL grounding protocol. I think about ut as a In it we let the agent watch us setup the environment and give them captions as we do it.
+>
+> That a lots of inductive bias built into the CLIP model. I.e. the latent space already can or can’t separate states. Say we show it stuff that is out of distribution like a blue banana or single cell organisms. IT might do ok with the banana. It might not be able to classify the single cell organisms into 1000 different classes. But it might be able to classify them into 15 classes. With just enough classes it might be easy to get a moderate performance in a lewis game with two choices…
+>
+>     - If the states are not separable then the agents will have a hard time learning a signaling system.
+>     - If the states are separable then the agents will have an easy time learning a signaling system.
+>
+> The inductive bias is such that if the agents are given a pretrained cnn they have a bias towards seeing the state using classes that were determined in some way. E.g. using classes from imagenet. OR they might have learned using CLIP and have an inductive bias that is able to convert the images into long sequences of symbols. The point though is that these agents are going to be highly biased to see the world in a certain way. Their vision component is going to output something that is highly structured to the an encoder and the decoder will be able to decode based on what is in this compressed state.
+>
+> Given all that do you think it is likely to be able to decompose it into disentangled representations?
+>
+> On the other hand if it is trained using a curriculum - first atoms. Bananas of all colors. Then colors of all shape. And later putting them together. One would expect the agents to develop both visual neurons for the atomic concepts and a lexicon for the atomic concepts.
+>
+> Note that the agents are not learning to see the world in a way that is useful for communication. They are learning to see the world in a way that is useful for classification. The lewis game is also not a good way to learn to see the world in a way that is useful for communication. It is a good way to learn to see the world in a way that is useful for coordination.
+>
+> Lewis games are not a good way to evolve a complex language. For anything like that to happen you need a modification to the lewis game. So we come to the question of what is the right modification to the lewis game to allow for the emergence of a complex signaling system. Or better yet what is the minimal modification that will result in a signaling system with composable equilibria.
+>
+> If we know something about that we can perhaps come up with an neural agent architecture that is an optimal fit for this type of learning. Given that neural agent are highly capable they might have no problem in learning a complex signaling system with a vision classifier and a lewis game. These are clearly sufficient for certain states spaces.
+>
+> We should consider the inductive bias of the agents i.e. how they are learning to see, and communicate about the world.
+>
+> Can thier eyes separate color from shape. I.e. do they have a class for yellow and a class for blue things and a class for bananas? CAn they compose these classes into yellow bananas and blue bananas?
+>
+> This means that if we don’t learn a with a suitable loss function that can propagate the semantics to the vision we might miss the ability to decompose the state into meaningful parts.
+>
+> What I think he means is that thier agents don’t coordinate on a lexicon in which the meaning of the simple units are known, then they learn complex signals.
+
+> **NOTE:**
+>
+> This section explains naive compositionality.
+>
+> - “A L M” = Blue Banana
+>
+> | Representation | Description |
+> |----|----|
+> | \[ALM\] : Blue Banana | Not compositional |
+> | \[A L\] : Blue, \[M\] :Banana | Compositional |
+> | \[AL\] : Blue, \[LM\] :Banana | less compositional, but entangled representation. |
+>
+> - The idea is that tokenizing a sequential signals should yield independently semantics. A simillar notion is that when messages are aggregated like sets, that certain subsets have this property. (the definition is vague and I would call it entangled with the aggregation)
+>
+> What we would like are
+>
+> 1.  a definition of compositionality that takes a general notion of aggregation not just set and sequence. e.g. 
+>     - prefix, suffix, v: e.g. \[verb-prefix slot\] and \[slot, verb-inflection\] n: e.g. \[noun-prefix slot\] and \[slot, noun-inflection\] adj: e.g. \[adj-prefix slot\] and \[slot, adj-inflection\] adv: e.g. \[adv-prefix slot\] and \[slot, adv-inflection\]
+>     - one template, \[v s o\]
+>     - many templates:
+>       - n2: \[adj n\] \| n - is a noun phrase
+>       - v2: \[v adv\] \| v - is a verb phrase
+>       - s1: \[v\] - e.g. run
+>       - s2: \[v n2\] - e.g. hit intransitive
+>       - s3: \[v1\|v,n2,n2\] where v is a verb or a v2 , s and o are nouns either n or n2
+>       - s: s2 \| s3 \| v is a sentence
+>       - AND \[s, s\] - a conjunction
+>       - OR \[s, s\] - a disjunction
+>       - Not \[S\]
+>       - (templates can be just a prefix taking a fixed number of arguments).
+>       - templates prefix might be omitted if it can be inferred from the context.
+>     - two level templates (a morphological agregation a syntax aggregation)
+>       - in a marked template we can discard the morphological markers
+>       - there may even be a unmarked morphological form with a null prefix
+>       - the template marker can be ommited if it can be inferred from the context…
+>     - recursive templates.
+> 2.  a definition of compositionality that plays well with embeddings
+>     - simple lewis games don’t have embeddings
+>     - complex
+> 3.  a definition of compositionality adresses context sensitive grammars
+
+> **NOTE:**
+>
+> naive compositionality is indeed naieve. It does not capture basic aspects of what I considers to be compositionality.
+>
+> note that a sequence like:
+>
+> > OR ANDN A B C \] Z
+>
+> where OR Takes two arguments and ANDN takes different numbers of arguments, until it seees a closing bracket. This isn’t naively compositional as there are nested segments with different semantics. Also the \]
+>
+> the above is a rather efficent way to encode complex signals
+>
+> > A B C
+>
+> where A B and C are dense disjunctional embeddings (Or aggregation within the signal) and And to aggregate between signals. and that State1:3 are the most common perdation warning states out of 100 states.
+>
+> A = \[State 1, State 2, State 3\]
+>
+> B = \[State 1, Not State2, State 2\]
+>
+> C = \[State 1, State 2, Not State 3\]
+>
+> these might be considered less compositional as they are entangled
+>
+> however they have the advantage allowing early partial decoding.
+
+> **NOTE:**
+>
+> This section of the talk goes over the key results in ([Chaabouni et al. 2020](#ref-chaabouni-etal-2020-compositionality)) in Baroni’s group at Facebook AI Research. I haven’t read the paper at great depth.
+>
+> At this point I don’t think that the main results are particularly surprising not that the claims made are applicable to other framing games.
+>
+> > First, given sufficiently large input spaces, the emergent language will naturally develop the ability to refer to novel composite concepts.
+>
+> I believe that the right settings we may see compositionality emerge in small Lewis games whose states are endowed with a structure amenable to compositionality, and that by restricting the signal will drive this capability.
+>
+> > Second, there is no correlation between the degree of compositionality of an emergent language and its ability to generalize
+
+I believe that once a complex signaling system is learned it can be repurposed to solve other tasks. So that a signaling system learned that is highly composable is likely to generalize to other domains. I think that with some time this can be demonstrated as it requires lots of tinkering with the lewis game to get it to support such structures as well as new RL algorithms that can learn these structures quickly.
+
+This might also be a apples and oranges comparison as I may be thinking about the notions of generalization and compositionality in a different way than the authors of the paper and do not even see these as the top priorities in developing better signaling systems. (I think that they should be salient, learnable and transferable to other domains and translatable into a human readable forms.) Furthermore I don’t think the metrics used for compatibility are particularly useful. In liu of better ones is I listed all three metrics even though only the positional one is discussed in the talk. To come up with good metrics of novel ideas requires developing good intuition. I don’t have that yet for complex signaling systems.
+
+Off hand my best guess has to do with integrating the lewis game with a contrastive loss that operates on structural components. Keeping members with similar structures close and members with different structures far apart. This may also be in line with the notion of Topographic similarity shown below
+
+A second direction that seems to be promising is in ([Mu and Goodman 2022](#ref-mu2022emergentcommunicationgeneralizations)) is to use a framing games in which agents refernce sets of signals, or reference so called concepts which are more like equivilence classes over states.
+
+A third direction comes from ([Rita et al. 2022](#ref-rita2022emergentcommunicationgeneralizationoverfitting)) where the authors consider how signaling systems that fail to generalize are overfitting and that this can be mitigated by decomposing the a co-adaptation loss and a information loss.
+
+> Third, while compositionality is not necessary for generalization, it provides an advantage in terms of language transmission: The more compositional a language is, the more easily it will be picked up by new learners,
+
+Simple signaling systems require a large lexicon to be learned if there are many states. Complex signaling systems can reduce learning if the lexicon by allowing agents to use aggregates of simple symbols AKA a morphology. A systematic aggregation means you can learn a combinatorial explosion of possible signals. So it is no surprise that compositionality can makes signaling systems easier to learn. However this is only really helpful if the structure of the signaling systems is semantically a good match to the states… If it is not then the learner is just gets a massive list of words but needs to learn what each means.
+
+For example many languages have a gender system that likely originated from the group of nouns that were used to describe people. However it is perpetuated into almost all nouns and ends up an arbitrary and a confusing system that makes learning the language harder. Bantu languages like Ganda have 10 nouns classes c.f. [Languages by type of grammatical genders](https://en.wikipedia.org/wiki/List_of_languages_by_type_of_grammatical_genders) - clearly this is reuse of a template but not one that is the easiest to learn as now there are 7x arbitrary distinctions that need to be learned.
+
+in ([Chaabouni et al. 2020](#ref-chaabouni-etal-2020-compositionality)) the authors define the following metrics for compositionality:
+
+there are a three metrics:
+
+> **NOTE:**
+>
+> - Simple Compositionality - The idea that the meaning of a complex signal is an aggregation the meanings of its parts.
+> - Non compositionality - When each symbols or sequence is mapped to a full state.
+> - Naïve compositionality - the meaning of a bag of atomic symbols or sequence.
+> - Entanglement -
+
+- By the end of the talk he more or less concludes that the compositionality of emergent neural network languages is not a necessary condition for good generalization.
+
+, and there is no reason to expect deep networks to find compositional languages more “natural” than highly entangled ones. Baroni concludes that if fast generalization is the goal, we should focus on enhancing this property without worrying about the compositionality of emergent neural network languages.
+
+## Blurb from the talk
+
+Compositionality is the property whereby linguistic expressions that denote new composite meanings are derived by a rule-based combination of expressions denoting their parts. Linguists agree that compositionality plays a central role in natural language, accounting for its ability to express an infinite number of ideas by finite means.
+
+“Deep” neural networks, for all their impressive achievements, often fail to quickly generalize to unseen examples, even when the latter display a predictable composite structure with respect to examples the network is already familiar with. This has led to interest in the topic of compositionality in neural networks: can deep networks parse language compositionally? how can we make them more sensitive to compositional structure? what does “compositionality” even mean in the context of deep learning?
+
+I would like to address some of these questions in the context of recent work on language emergence in deep networks, in which we train two or more networks endowed with a communication channel to solve a task jointly, and study the communication code they develop. I will try to be precise about what “compositionality” mean in this context, and I will report the results of proof-of-concept and larger-scale experiments suggesting that (non-circular) compositionality is not a necessary condition for good generalization (of the kind illustrated in the figure). Moreover, I will show that often there is no reason to expect deep networks to find compositional languages more “natural” than highly entangled ones. I will conclude by suggesting that, if fast generalization is what we care about, we might as well focus directly on enhancing this property, without worrying about the compositionality of emergent neural network languages.
+
+## References
+
+- https://cs.stanford.edu/people/karpathy/cnnembed/,
+
+- https://www.inverse.com/article/12664-google-s-alphago-supercomputer-wins-second-go-match-vs-lee-sedol
+
+- https://hackernoon.com/deepmind-relational-networks-demystified-b593e408b643
+
+- Lazaridou et al. ICLR 2017 [Multi-Agent Cooperation and the Emergence of (Natural) Language](https://arxiv.org/abs/1612.07182)
+
+- Bouchacourt and Baroni ([2018](#ref-bouchacourt2018agents)) [How agents see things: On visual representations in an emergent language game](https://arxiv.org/pdf/1808.10696v2)
+
+Are emergent languages compositional?
+
+- Andreas ICLR 2019,
+- Choi et al ICLR 2018,
+- Havrylov & Titov NIPS 2017,
+- Kottur et al EMNLP 2017,
+- Mordatch & Abbeel AAAI 2018,
+- Resnick et al AAMAS 2020
+
+A compositional language is one where it is easy to read out which parts of a linguistic expression refer to which components of the input
+
+Naïve compositionality  
+a language is naïvely compositional if the atomic symbols in its expressions refer to single input elements, independently of either input or linguistic context
+
+- Chaabouni, Kharitonov et al. ACL 2020 [Compositionality and Generalization In Emergent Languages](https://aclanthology.org/2020.acl-main.407/)
+
+Quantifying (one type of) naïve compositionality
+
+**Positional disentanglement** measures strong form of naïve compositionality: to what extent do symbols in a certain position univocally refer to different values of the same attribute
+
+note - the paper has two other measures
+
+Do emergent languages support generalization?
+
+Is compositionality needed for generalization?
+
+- kind of obvious, particularly if parameters are shared not but is should help
+
+Lazaridou et al ICLR 2018
+
+- [EGG: Emergence of lanGuage in Games](https://github.com/facebookresearch/EGG)
+
+- Kharitonov and Baroni: Emergent Language Generalization and Acquisition Speed are not Tied to Compositionality [Emergent Language Generalization and Acquisition Speed are not tied to Compositionality](https://arxiv.org/abs/2004.03420)
+
+## Slides
+
+slides
+
+Bouchacourt, Diane, and Marco Baroni. 2018. “How Agents See Things: On Visual Representations in an Emergent Language Game.” *arXiv Preprint arXiv:1808.10696*.
+
+Chaabouni, Rahma, Eugene Kharitonov, Diane Bouchacourt, Emmanuel Dupoux, and Marco Baroni. 2020. “Compositionality and Generalization in Emergent Languages.” In *Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics*, edited by Dan Jurafsky, Joyce Chai, Natalie Schluter, and Joel Tetreault. Association for Computational Linguistics. <https://doi.org/10.18653/v1/2020.acl-main.407>.
+
+Lazaridou, Angeliki, Karl Moritz Hermann, Karl Tuyls, and Stephen Clark. 2018. *Emergence of Linguistic Communication from Referential Games with Symbolic and Pixel Input*. <https://arxiv.org/abs/1804.03984>.
+
+Mu, Jesse, and Noah Goodman. 2022. *Emergent Communication of Generalizations*. <https://arxiv.org/abs/2106.02668>.
+
+Nowak, Martin A, and David C Krakauer. 1999. “The Evolution of Language.” *Proceedings of the National Academy of Sciences* 96 (14): 8028–33.
+
+Rita, Mathieu, Corentin Tallec, Paul Michel, et al. 2022. *Emergent Communication: Generalization and Overfitting in Lewis Games*. <https://arxiv.org/abs/2209.15342>.
+
+Skyrms, Brian. 2010. “14512 Complex Signals and Compositionality.” In *Signals: Evolution, Learning, and Information*. Oxford University Press. <https://doi.org/10.1093/acprof:oso/9780199580828.003.0013>.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Is Compositionality Overrated? {The} View from Language
+    Emergence},
+  date = {2024-09-01},
+  url = {https://orenbochman.github.io/posts/2024/2024-10-10-marco-baoni-composionality/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2024. “Is Compositionality Overrated? The View from Language Emergence.” September 1. <https://orenbochman.github.io/posts/2024/2024-10-10-marco-baoni-composionality/>.

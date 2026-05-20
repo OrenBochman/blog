@@ -1,0 +1,242 @@
+# Scaling in financial prices: II. Multifractals and the star equation
+
+> **NOTE:**
+>
+> [![Scaling in financial prices in a nutshell](../../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../../images/in_the_nut_shell_coach_retouched.jpg "Scaling in financial prices in a nutshell")
+>
+> Scaling in financial prices in a nutshell
+>
+> In the paper “Scaling in financial prices: II. Multifractals and the star equation” ([Mandelbrot 2001](#ref-mandelbrot2001Scaling2)) Mandelbrot continus his exploration of financial price scaling. He focuses on refining and extending the mathematical model of Cauchy’s “star equation,” which describes the distribution of financial prices. The paper progresses from Cauchy’s original equation, limited to power-law distributions with an exponent α less than 2, to Mandelbrot’s multifractal generalization, allowing for 1 \< α \< ∞. This extension incorporates multifractal dependence, moving beyond the assumption of independence inherent in Cauchy’s model. The paper concludes by presenting a new model, Multifractal Products of Cylindrical Pulses (MPCP), offering a more realistic and flexible approach to modeling financial price fluctuations, and supporting the observation that financial data exhibit multifractal behavior.
+
+## Summary of the second paper
+
+### Main Themes:
+
+This paper reviews the evolution of Mandelbrot’s model for understanding financial price fluctuations, transitioning from his early work in 1963 based on stable distributions with independent increments to the more recent multifractal model with dependent increments.
+
+### Most Important Ideas/Facts:
+
+1.  **Limitations of the Gaussian Model and Stable Distributions**: Early models based on the Gaussian distribution (and later, stable distributions with α \< 2) fail to capture the observed high variability in financial data. Specifically, the restriction of α \< 2 for stable distributions cannot explain empirical findings of power-law distributions with exponents greater than 2.
+
+> “Many writers concluded that, whenever data yield α \> 2, scaling is inadequate and should be abandoned. My alternative proposal is to foresake independence and generalize scaling into multiscaling.”
+
+2.  **Introduction of Multifractality**: Mandelbrot proposes the multifractal model as a solution to the limitations of previous models. This model incorporates dependent increments and can generate power-law distributions with exponents α \> 2, aligning with empirical observations.
+
+\sum\_{n=1}^{b} W_n X_n \equiv \widetilde{W}(W_1, W_2, \ldots, W_b) X
+
+where ≡ denotes identity in distribution
+
+\varphi^n(s)= \varphi\[\widetilde{W}(n)s\]
+
+3.  **The Star Equation**: Both the Gaussian and the multifractal model can be represented by a “star equation,” a functional equation that describes the self-similarity and scaling properties of the underlying process. The key difference lies in the nature of the weights in the equation:
+
+    - Gaussian: Non-random weights, leading to α \< 2.
+    - Multifractal: Random weights, allowing for 1 \< α \< ∞.
+
+4.  **Cascades and the Multifractal Star Equation**: The concept of multiplicative cascades provides a concrete mechanism for generating multifractal measures. Within this framework, the “canonical” cascade, characterized by independent random weights, emerges as the most relevant for financial modeling.
+
+> “The canonical cascade can be rationalized by assuming that investigating a financial time series by itself amounts to extracting a linear cross section from that full system. As section 6 will elaborate, multiplication by a weight is meant to model the effects of a cause.”
+
+5.  **Beyond Cascades: MPCP (Multifractal Products of Cylindrical Pulses)**: Mandelbrot argues that the restriction to b-adic grids in cascade models is artificial. He introduces the MPCP model, where cylindrical pulses are distributed randomly, further generalizing the multifractal framework and reinforcing the prevalence of q\_{crit} \< ∞ (leading to power-law distributions with α \> 1).
+
+> “The sequence from ‘microcanonical’ to ‘canonical’ and on to MPCP, teaches several lessons. As the processes’ randomness becomes increasingly unconstrained, q\_{crit} \< ∞ becomes an increasingly general rule with increasingly special exceptions.”
+
+6.  **Empirical Validation**: Mandelbrot references empirical studies (Calvet and Fisher 2001, Mandelbrot, Calvet, and Fisher 1997) demonstrating the good fit of the multifractal model to financial data, particularly highlighting the multifractal nature of the Deutschmark/US Dollar exchange rate.
+
+7.  **Conclusion**: While acknowledging that the multifractal model is not definitive, Mandelbrot advocates for its potential in capturing the complexity and high variability observed in financial markets, offering a more realistic assessment of risk compared to traditional Brownian motion-based models. He also suggests that the concepts developed in finance, like the distinction between mild, slow, and wild randomness, could be valuable in other scientific domains.
+
+## Q&A
+
+1.  What is the “star equation” and why is it important in the context of financial models?
+
+    The star equation is a functional equation that describes how the distribution of a random variable changes when it is summed or multiplied by random weights. It plays a crucial role in understanding scaling properties in various phenomena, including financial price fluctuations. The solutions to the star equation can help us understand how asset returns are distributed, especially when those returns exhibit fat tails.
+
+2.  How does the Gaussian distribution relate to the star equation?
+
+    The Gaussian distribution is a solution to the star equation when the weights are non-random and independent. This implies that the sum of independent Gaussian random variables with non-random weights will also follow a Gaussian distribution. However, this solution only works when a key parameter, often labeled as α, is less than 2.
+
+3.  Why is the limitation of α \< 2 in traditional financial models a problem?
+
+    The restriction α \< 2 implies that price changes can only be modeled with distributions that have finite variance. However, empirical data from financial markets often show that price changes have fat tails, implying infinite variance and a higher probability of extreme events than predicted by a Gaussian distribution. This makes traditional models inadequate for accurately capturing market risks.
+
+4.  How do multifractals address the limitations of traditional models based on the Gaussian distribution?
+
+    Multifractals introduce random weights into the star equation, generalizing it to account for the complex dependencies and scaling properties observed in financial data. This generalization allows for solutions with α \> 2, capturing the fat tails and intermittent bursts of volatility characteristic of financial time series.
+
+5.  What is the key difference between “uniscaling” and “multiscaling” behavior?
+
+    - Uniscaling processes, like standard Brownian motion, exhibit the same scaling behavior across all time scales. Their statistical properties are self-similar, meaning they look the same when viewed at different zoom levels.
+
+    - Multiscaling processes, like financial time series, exhibit different scaling behaviors at different time scales. Their statistical properties are more complex and cannot be described by a single scaling exponent.
+
+6.  What is q\_{crit} and why is it significant in multifractal models?
+
+    q\_{crit} is a critical exponent that emerges in multifractal models when the function τ(q), which describes the scaling of moments of the distribution, becomes negative for values of q greater than q\_{crit}. This signifies a power law behavior in the distribution with an exponent related to q\_{crit}. The existence of a finite q\_{crit} indicates that the distribution has fat tails and infinite moments, consistent with the empirical observations of financial returns.
+
+7.  How does the concept of “cylindrical pulses” contribute to the development of multifractal models?
+
+    “Cylindrical pulses” offer a way to move beyond the limitations of traditional cascade models. By randomly distributing these pulses across various scales, the models can capture the intermittent and clustered nature of volatility in financial markets. This approach leads to a more flexible and realistic framework for modeling multifractal behavior.
+
+8.  What are the practical implications of using multifractal models in finance?
+
+    Multifractal models provide a more accurate representation of financial risks compared to traditional models. This can lead to better risk management strategies, more realistic pricing of financial instruments, and improved portfolio optimization techniques that account for the possibility of extreme market events.
+
+## A Study Guide
+
+### Quiz
+
+Instructions: Answer the following questions in 2-3 sentences each.
+
+> **NOTE:**
+>
+> What is the fundamental limitation of Cauchy’s star equation in relation to the scaling exponent α?
+>
+> > **NOTE:**
+> >
+> > Cauchy’s star equation, when combined with the assumption of independence, restricts the scaling exponent α to be less than 2. This limitation arises from the fact that the Fourier transform of the characteristic function for α \> 2 fails to be a valid probability density.
+
+> **NOTE:**
+>
+> Why did Mandelbrot propose moving beyond the Gaussian framework and introduce multifractals in financial modeling?
+>
+> > **NOTE:**
+> >
+> > Mandelbrot introduced multifractals to address the limitations of the Gaussian framework, specifically the restriction of α \< 2, which is often contradicted by empirical observations of financial data exhibiting higher scaling exponents. Multifractals allow for dependence and a broader range of scaling behaviors.
+
+> **NOTE:**
+>
+> Explain the concept of ‘base-bound’ vs. ‘base-free’ in the context of the star equation.
+>
+> > **NOTE:**
+> >
+> > A ‘base-bound’ star equation holds only for a specific base b, while a ‘base-free’ equation holds irrespective of the chosen base. The latter is preferable due to its greater generality, but the former is often easier to generalize in the context of multifractals.
+
+> **NOTE:**
+>
+> What is the key difference between the microcanonical and canonical multiplicative cascades?
+>
+> > **NOTE:**
+> >
+> > Microcanonical cascades strictly conserve mass at each stage, ensuring that the total mass remains constant. Canonical cascades, however, only conserve mass on average, allowing for greater flexibility and randomness in the distribution of mass within the cascade.
+
+> **NOTE:**
+>
+> Why is the quantity Ω (measure of the interval \[0, 1\]) significant in the context of multifractal cascades?
+>
+> > **NOTE:**
+> >
+> > Ω represents the total measure of the interval \[0, 1\] after the cascade process. It is significant because it can exhibit a power-law distribution with a critical exponent qcrit, indicating the presence of multifractality. The distribution of Ω provides insights into the scaling properties of the measure generated by the cascade.
+
+> **NOTE:**
+>
+> What condition leads to the existence of a finite critical exponent qcrit in multifractal cascades?
+>
+> > **NOTE:**
+> >
+> > The existence of a finite qcrit arises when the function τ(q) crosses zero for a value of q greater than 1. This condition implies that the moments of Ω become infinite for q \> qcrit, leading to a power-law distribution. This phenomenon is more likely in canonical cascades where the weights are not strictly bound.
+
+> **NOTE:**
+>
+> How does the concept of ‘cylindrical pulses’ help in extending the multifractal model beyond b-adic cascades?
+>
+> > **NOTE:**
+> >
+> > The special cases are:
+> >
+> > Cylindrical pulses offer a way to generalize multifractal models beyond the limitations of b-adic grids. By representing the multiplicative weights as pulses randomly distributed across the interval, the model becomes less restrictive and allows for more realistic scenarios where the number of influencing factors varies across different scales.
+
+> **NOTE:**
+>
+> What is the significance of the function τ(q) in characterizing multifractal measures?
+>
+> > **NOTE:**
+> >
+> > τ(q) is a key function in multifractal theory as it encapsulates the scaling properties of the measure. It relates the moments of the measure to the size of the intervals. The behavior of τ(q), particularly whether it becomes negative for certain values of q, determines the existence and value of the critical exponent qcrit.
+
+> **NOTE:**
+>
+> Why does Mandelbrot argue that the generic situation for financial time series is likely to be characterized by q\_{crit} \< ∞?
+>
+> > **NOTE:**
+> >
+> > Mandelbrot argues that financial time series are likely to exhibit qcrit \< ∞ because they represent a cross-section of a much larger and complex economic system. The lack of strict conservation of influences within this system makes the canonical cascade model with independent weights a more appropriate representation, leading to the possibility of qcrit \< ∞.
+
+> **NOTE:**
+>
+> What advantage does the multifractal model offer over the Brownian motion model in financial modeling?
+>
+> > **NOTE:**
+> >
+> > The multifractal model, particularly when incorporating fractional Brownian motion in multifractal time, provides a more realistic representation of financial market behavior compared to the Brownian motion model. It captures the observed long tails, volatility clustering, and scaling properties of price changes, leading to a better assessment of portfolio risks.
+
+### Essay Questions
+
+1.  Compare and contrast Cauchy’s star equation and the multifractal star equation. Discuss their underlying assumptions, solutions, and implications for modeling financial data.
+
+2.  Explain the concept of multifractality in detail. Discuss the different types of multiplicative cascades and their role in generating multifractal measures. Provide examples of how multifractality manifests in financial time series.
+
+3.  Analyze the significance of the critical exponent qcrit in multifractal models. Explain how the value of qcrit affects the distribution of the measure and its moments. Discuss the conditions under which qcrit is finite and its implications for understanding the behavior of financial markets
+
+4.  Discuss the limitations of b-adic cascade models and explain how the concept of cylindrical pulses helps in overcoming those limitations. Describe the Multifractal Product of Cylindrical Pulses (MPCP) process and its key properties. Explain how MPCP allows for a wider range of multifractal behavior compared to traditional cascade models.
+
+5.  Evaluate the strengths and weaknesses of using multifractal models to represent financial markets. Compare and contrast the multifractal approach with other alternative models. Discuss the empirical evidence supporting the use of multifractals in finance and the potential benefits they offer for risk management and portfolio optimization.
+
+### Glossary of Key Terms
+
+Scaling: A property of objects or processes where their statistical properties remain invariant under changes of scale.
+
+Multifractal  
+A generalization of fractals that exhibit different scaling properties at different scales.
+
+Star Equation  
+A functional equation that relates the distribution of a random variable to the sum of scaled and weighted copies of itself.
+
+Cauchy’s Star Equation  
+A base-free star equation that admits stable distributions with scaling exponents α between 0 and 2.
+
+Multifractal Star Equation  
+A generalized star equation that incorporates random weights and allows for scaling exponents α greater than 2.
+
+Multiplicative Cascade  
+A process that generates a multifractal measure by successively subdividing an interval and assigning random weights to each subinterval.
+
+Microcanonical Cascade  
+A type of multiplicative cascade that strictly conserves mass at each stage.
+
+Canonical Cascade  
+A type of multiplicative cascade that conserves mass on average, allowing for greater flexibility and randomness in the distribution of mass.
+
+Cylindrical Pulse  
+A function that is constant except in a specific interval, representing a localized multiplicative weight in a multifractal model.
+
+MPCP  
+Multifractal Product of Cylindrical Pulses, a generalization of cascade models that uses randomly distributed cylindrical pulses to generate multifractal measures with less restrictive scaling properties.
+
+τ(q)  
+The scaling exponent function that relates the moments of a multifractal measure to the size of the intervals. Its behavior determines the existence and value of the critical exponent
+
+q\_{crit}  
+The critical exponent that characterizes the power-law distribution of a multifractal measure. It indicates the point at which the moments of the measure become infinite.
+
+Fractional Brownian Motion  
+A generalization of Brownian motion that incorporates long-range dependence, leading to a wider range of scaling behaviors and a more realistic representation of certain natural phenomena, including financial markets.
+
+Mandelbrot, B. B. 2001. “Scaling in Financial Prices: II. Multifractals and the Star Equation.” *Quantitative Finance* 1 (1): 124–30. <https://doi.org/10.1080/713665540>.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Scaling in Financial Prices 2},
+  date = {2024-11-29},
+  url = {https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part2/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2024. “Scaling in Financial Prices 2.” November 29. <https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part2/>.

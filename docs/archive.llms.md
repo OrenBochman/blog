@@ -1,5 +1,19 @@
 # Archive
 
+### [S3 with boto3](posts/2023/s3-series/s3-boto3.llms.md)
+
+### [S3 with AWS S3 Tools](posts/2023/s3-series/s3-utils-python.llms.md)
+
+### [S3 with s3cmd](posts/2023/s3-series/s3cmd.llms.md)
+
+### [Prediction Bibliography](posts/2024/2024-03-20-predictioneering/index.llms.md)
+
+### [lewis game](posts/2024/2024-05-02-signaling-games-tikz/tikz-lewis-signaling-games.llms.md)
+
+### [Harnesses in AI](posts/2026/05-17-harnesses-in-ai-a-deep-dive-tejas-kumar/index.llms.md)
+
+Sunday, May 17, 2026
+
 ### [ODSC AI 2026](posts/2026/04-30-ODSC-AI-2026-Day-3/index.llms.md)
 
 Thursday, April 30, 2026
@@ -396,6 +410,10 @@ Wednesday, October 1, 2025
 
 Thursday, September 25, 2025
 
+### [Research note for the Complex Lewis Signaling Game - Part 1](posts/2025/2025-09-22-Complex-Lewis-Singaling-Game-Part-1/index.llms.md)
+
+Monday, September 22, 2025
+
 ### [FlexAttention: A Flexible Approach to Attention Mechanisms](posts/2025/2025-09-19-MOA/index.llms.md)
 
 Saturday, September 20, 2025
@@ -440,11 +458,19 @@ Wednesday, April 2, 2025
 
 Wednesday, April 2, 2025
 
+### [RL, Metamorphosis and Memory](posts/2025/2025-03-31-metamorphosis/index.llms.md)
+
+Monday, March 31, 2025
+
 ### [The roles of Partial pooling and mixed strategies in the Lewis signaling game](posts/2025/2025-03-11-partial-pooling/index.llms.md)
 
 Tuesday, March 11, 2025
 
 ### [Emergent Languages](posts/2025/2025-01-14-Desiderata-for-Emergent-Languages/index.llms.md)
+
+Tuesday, January 14, 2025
+
+### [Composition and Interpretation of Games with the Lewis Signaling Game](posts/2025/2025-03-09-game-composition/index.llms.md)
 
 Tuesday, January 14, 2025
 
@@ -461,6 +487,10 @@ Tuesday, January 14, 2025
 Saturday, January 11, 2025
 
 ### [Complex Signals Questions](posts/2025/2025-01-06-research-notes/index.llms.md)
+
+Monday, January 6, 2025
+
+### [Linkage](posts/2025/2025-01-09-linkage/index.llms.md)
 
 Monday, January 6, 2025
 
@@ -507,6 +537,14 @@ Friday, November 29, 2024
 ### [Scaling in financial prices 1](posts/2024/2024-11-28-misbahaviour-of-markets/part1/index.llms.md)
 
 Thursday, November 28, 2024
+
+### [Egg generator](posts/2024/2024-10-11-EGG-State-Space-Gen/index.llms.md)
+
+Friday, October 11, 2024
+
+### [Egg](posts/2024/2024-10-11-EGG/index.llms.md)
+
+Friday, October 11, 2024
 
 ### [Vitter’s Algorithm](posts/2024/2024-10-11-Vitter-alg/index.llms.md)
 
@@ -556,6 +594,10 @@ Tuesday, July 2, 2024
 
 Monday, July 1, 2024
 
+### [Lewis game further musings](posts/2024/2024-05-08-further-musing/index.llms.md)
+
+Saturday, June 29, 2024
+
 ### [Mesa & RL](posts/2024/2024-06-25-mesa-rl/mesa-rl.llms.md)
 
 Tuesday, June 25, 2024
@@ -572,6 +614,10 @@ Tuesday, June 18, 2024
 
 Thursday, June 13, 2024
 
+### [logic puzzles](posts/2024/2024-06-12-logic-puzzles/logic%20puzzles.llms.md)
+
+Wednesday, June 12, 2024
+
 ### [More Sugar please](posts/2024/2024-06-11-more-sugar-please/index.llms.md)
 
 Tuesday, June 11, 2024
@@ -579,6 +625,10 @@ Tuesday, June 11, 2024
 ### [Risk-constrained Markov decision processes](posts/2024/2024-06-11-risk-constrained-MDP/index.llms.md)
 
 Tuesday, June 11, 2024
+
+### [Bayesian Agents](posts/2024/2024-06-01-Bayesian-Agents/2024-06-01-Bayesian-Agents.llms.md)
+
+Saturday, June 1, 2024
 
 ### [Evolutionary Games and Population Dynamics Summary](posts/2024/2024-05-12-Evolutionary-games-and-population-dynamics/index.llms.md)
 
@@ -600,6 +650,10 @@ Sunday, May 5, 2024
 
 Thursday, May 2, 2024
 
+### [Bayesian Gaussian mixture model](posts/2024/2024-05-02-signaling-games-tikz/tikz-mixture-model.llms.md)
+
+Thursday, May 2, 2024
+
 ### [Urn models using Numpy](posts/2024/2024-05-03-urn-models/urn.llms.md)
 
 Thursday, May 2, 2024
@@ -607,6 +661,18 @@ Thursday, May 2, 2024
 ### [RAD REPL](posts/2024/2024-04-04-rad-repl/index.llms.md)
 
 Wednesday, May 1, 2024
+
+### [Tailwindcss & Quarto](posts/2024/2024-02-08-quarto-tailwindcss/index.llms.md)
+
+Sunday, April 7, 2024
+
+### [Focus](posts/2024/2024-04-03-focus/index.llms.md)
+
+Wednesday, April 3, 2024
+
+### [Gradio Apps](posts/2024/2024-03-23-prompts/index.llms.md)
+
+Sunday, March 31, 2024
 
 ### [Mesa](posts/2024/2024-03-31-mesa-lessons/index.llms.md)
 
@@ -620,6 +686,18 @@ Sunday, March 31, 2024
 
 Thursday, March 28, 2024
 
+### [braindump 03 2024](posts/2024/2024-03-26-march-brain-dump/index.llms.md)
+
+Tuesday, March 26, 2024
+
+### [RL MindMap](posts/2024/2024-03-25-rl-maps/index.llms.md)
+
+Monday, March 25, 2024
+
+### [Sugarscape Ad Astra](posts/2024/2024-03-24-sugar-ad-astra/index.llms.md)
+
+Sunday, March 24, 2024
+
 ### [Bayesian Agent](posts/2024/2024-03-21-bayesian-agents/index.llms.md)
 
 Thursday, March 21, 2024
@@ -631,6 +709,10 @@ Sunday, March 3, 2024
 ### [OCR - Brain Dump](posts/2024/2024-02-28-ocr-bd/index.llms.md)
 
 Sunday, February 25, 2024
+
+### [Text to IPA](posts/2024/2024-02-22-text-to-IPA/index.llms.md)
+
+Thursday, February 22, 2024
 
 ### [Rhetoric NLP Tasks](posts/2024/2024-02-19-rhetoric/rhetoric-ideas.llms.md)
 
@@ -651,6 +733,10 @@ Tuesday, January 30, 2024
 ### [Post With Code](posts/2024/2024-02-12-post-with-code/index.llms.md)
 
 Sunday, January 28, 2024
+
+### [Quarto 💖 Bootstrap 😁](posts/2024/2024-02-01-quarto_bootstrap/card.llms.md)
+
+Saturday, January 20, 2024
 
 ### [SuperLearner](posts/2024/2024-01-10-superlearner/index.llms.md)
 
@@ -692,6 +778,14 @@ Tuesday, April 11, 2023
 
 Wednesday, March 8, 2023
 
+### [braindump](posts/2023/03-01-braindump/2023-03-01-braindump.llms.md)
+
+Wednesday, March 1, 2023
+
+### [Spark & EMR](posts/2023/03-01-spark-emr/2023-03-01-spark-emr.llms.md)
+
+Wednesday, March 1, 2023
+
 ### [Text2topic - Leverage reviews data for multi-label topics classification in Booking.com](posts/2023/02-28-nlp-il-booking-meetup/NLP-IL-Booking%20Text2Topic.llms.md)
 
 Tuesday, February 28, 2023
@@ -704,6 +798,14 @@ Tuesday, February 28, 2023
 
 Wednesday, February 22, 2023
 
+### [nonlinear time series](posts/2023/02-20-ts-nonlinear/2023-02-20-ts-nonlinear.llms.md)
+
+Monday, February 20, 2023
+
+### [Q1 2023 Tasks](posts/2024/2023-02-16-learing-goals/index.llms.md)
+
+Friday, February 17, 2023
+
 ### [event generator](posts/2024/2023-03-16-events-generator/index.llms.md)
 
 Thursday, February 16, 2023
@@ -711,6 +813,10 @@ Thursday, February 16, 2023
 ### [entropy for uncertainty quantification](posts/2022/2022-09-22-entropy_for_uncertainty_quantification/2022-09-22-entropy_for_uncertainty_quantification.llms.md)
 
 Thursday, September 22, 2022
+
+### [Adaptive learning rates](posts/2022/2022-09-16-adaptive-learning-rate/2022-09-16-adaptive-learning-rate.llms.md)
+
+Monday, September 12, 2022
 
 ### [Robust Regression](posts/2022/2022-09-12-robust-regression/index.llms.md)
 
@@ -732,6 +838,14 @@ Thursday, May 5, 2022
 
 Thursday, May 5, 2022
 
+### [environments](posts/2021/2021-04-08-other-people-problems/index.llms.md)
+
+Monday, May 2, 2022
+
+### [Multi-armed bandits problem](posts/2022/2022-04-01-bandits/2022-04-01-bandits.llms.md)
+
+Monday, May 2, 2022
+
 ### [PDF extraction hacks](posts/2020/04-10-pdf-extraction/index.llms.md)
 
 Sunday, April 10, 2022
@@ -740,11 +854,19 @@ Sunday, April 10, 2022
 
 Thursday, December 30, 2021
 
+### [S3 with AWS S3 Tools](posts/2023/s3-series/s3-aws-s3-tools.llms.md)
+
+Sunday, October 10, 2021
+
 ### [Getting more from your agency ?](posts/2021/2021-09-27-getting-more-from-your-agency/index.llms.md)
 
 Monday, September 27, 2021
 
 ### [Excel 2019 for Marketing Statistics in pandas](posts/2021/2021-09-24-statistics-for-marketing-in-python/index.llms.md)
+
+Friday, September 24, 2021
+
+### [Notes from Computer Age Statistical Inference](posts/2021/2021-10-24-computer-age-statistical-inference-notes/index.llms.md)
 
 Friday, September 24, 2021
 
@@ -772,6 +894,10 @@ Thursday, September 2, 2021
 
 Sunday, August 29, 2021
 
+### [Marketing Research Models](posts/2021/2021-09-14-marketing-models/index.llms.md)
+
+Sunday, August 29, 2021
+
 ### [Python Graphs](posts/2021/2021-09-16-python-graphs/index.llms.md)
 
 Sunday, August 29, 2021
@@ -785,6 +911,14 @@ Sunday, August 29, 2021
 Friday, August 13, 2021
 
 ### [Inlining Citations for Wikipedia articles](posts/2021/2021-08-13-inlining-citations/index.llms.md)
+
+Friday, August 13, 2021
+
+### [Wikipedia Tea House chatbot](posts/2021/2021-08-13-tea-house-chatbot/index.llms.md)
+
+Friday, August 13, 2021
+
+### [Algorithmic Intuition](posts/2021/2021-08-17-algorithmic-intuition/index.llms.md)
 
 Friday, August 13, 2021
 
@@ -808,6 +942,10 @@ Tuesday, June 1, 2021
 
 Saturday, May 29, 2021
 
+### [Bayesian Betting](posts/2021/2021-05-18-bayesian-betting/index.llms.md)
+
+Tuesday, May 18, 2021
+
 ### [Multilevel Models](posts/2021/2021-05-16-mulitlevel-models/index.llms.md)
 
 Sunday, May 16, 2021
@@ -823,6 +961,14 @@ Saturday, April 24, 2021
 ### [Bayesian agents](posts/2021/2021-04-25-bayesian-agent/index.llms.md)
 
 Wednesday, April 14, 2021
+
+### [ml workfows](posts/2021/2021-11-08-advanced-ML-workflows/index.llms.md)
+
+Wednesday, April 14, 2021
+
+### [Lexical categories and their features](posts/2021/2021-04-11-lexical-and-semantic-features/index.llms.md)
+
+Sunday, April 11, 2021
 
 ### [Modeling Events](posts/2021/2021-04-09-modeling-events/index.llms.md)
 
@@ -900,9 +1046,17 @@ Monday, April 20, 2015
 
 Saturday, February 7, 2015
 
+### [Optimal bidding](posts/2015/2015-02-07-optimal-bidding/2015-02-07-optimal-bidding%20.llms.md)
+
+Saturday, February 7, 2015
+
 ### [SCROLLS - Standardized CompaRison Over Long Language Sequences](posts/2023/01-11-nlp-il-meetup-intuit/talk1.llms.md)
 
 Saturday, November 1, 2014
+
+### [Finn-tech meetup](posts/2014/2014-10-06-FinTech/2014-10-06-FinTech.llms.md)
+
+Monday, October 6, 2014
 
 ### [NLP IL F2F Meetup at Intuit](posts/2023/01-11-nlp-il-meetup-intuit/talk0.llms.md)
 
@@ -915,6 +1069,14 @@ Friday, June 7, 2013
 ### [NLP IL F2F Meetup at Intuit](posts/2023/01-11-nlp-il-meetup-intuit/index.llms.md)
 
 Thursday, November 1, 2012
+
+### [R todo list](posts/2011/2011-11-29-R-todo-list/index.llms.md)
+
+Tuesday, November 29, 2011
+
+### [Frames](posts/2011/2011-11-29-framer/index.llms.md)
+
+Tuesday, November 29, 2011
 
 ### [Text Mining With Python](posts/2011/2011-11-29-npl-python/index.llms.md)
 

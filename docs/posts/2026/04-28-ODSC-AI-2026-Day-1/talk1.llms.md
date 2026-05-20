@@ -1,0 +1,130 @@
+## Tensor Logic The Language of AI
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+Pedro Domingos
+
+[Wikipedia](https://en.wikipedia.org/wiki/Pedro_Domingos)
+
+[website](https://homes.cs.washington.edu/~pedrod/)
+
+[The Master Algorithm](https://www.hachettebookgroup.com/titles/pedro-domingos/the-master-algorithm/9780465061921/?lens=basic-books)
+
+[Markov Logic - An Interface Layer for Artificial Intelligence](https://link.springer.com/book/10.1007/978-3-031-01549-6)
+
+University of Washington
+
+[Tensor Logic](https://tensor-logic.org/)
+
+[slides](https://homes.cs.washington.edu/~pedrod/tls.pdf)
+
+TODO:
+
+read the a paper
+
+implement it as a blockly playground to understand.
+
+many talk about tensor logic with chat GPT.
+
+> **NOTE:**
+>
+> - **Central thesis**
+>   - AI still lacks a proper native language.
+>   - Existing candidates each solved only part of the problem:
+>     - **Lisp / Prolog:** good for symbolic reasoning, weak for learning.
+>     - **Graphical models / Bayesian networks:** useful for statistical AI, but inference did not scale well enough.
+>     - **Markov logic networks:** elegant neuro-symbolic/probabilistic logic, but computationally expensive.
+>     - **Python + NumPy / PyTorch / TensorFlow / JAX:** practical and scalable, but not intrinsically built for automated reasoning or symbolic knowledge.
+> - **What an AI language should provide**
+>   - Hide non-AI implementation details.
+>   - Incorporate domain knowledge naturally.
+>   - Support automatic reasoning.
+>   - Support automatic learning.
+>   - Produce transparent models.
+>   - Be reliable.
+>   - Scale efficiently, especially on modern hardware.
+> - **Domingos’s proposal: TensorLogic**
+>   - TensorLogic is presented as a unified language for AI.
+>   - It combines:
+>     - **Logic programming**, the mathematical basis of symbolic AI.
+>     - **Tensor algebra**, the mathematical basis of deep learning.
+>   - A TensorLogic program is essentially a **set of tensor equations**.
+> - **Logic programming refresher**
+>   - Logic programs consist of **facts** and **rules**.
+>   - Example facts: `parent(Bob, Chris)` or `ancestor(Alice, Bob)`.
+>   - Rules define relations, such as ancestry through parenthood.
+>   - Domingos emphasizes the database interpretation:
+>     - A rule corresponds to **joins** followed by **projection**.
+>     - This connects logic programming directly to relational query execution.
+>   - Inference can be done by:
+>     - **Forward chaining:** repeatedly apply rules until no new facts appear.
+>     - **Backward chaining:** start from a query and recursively prove its subgoals.
+> - **Tensor algebra refresher**
+>   - Tensors generalize scalars, vectors, and matrices.
+>   - They are defined by type and shape.
+>   - Core operations include tensor sum, tensor product, elementwise product, and contraction.
+>   - Domingos highlights **Einstein summation**, or **Einsum**, as the key operation:
+>     - Repeated indices imply summation.
+>     - Matrix multiplication, tensor contraction, and many neural-network computations can be expressed compactly this way.
+> - **How TensorLogic unifies the two**
+>   - A TensorLogic equation generalizes a Datalog rule numerically.
+>   - Logical joins become tensor products or contractions.
+>   - Logical projection becomes summation over indices.
+>   - This makes symbolic rules and neural computations instances of the same formalism.
+> - **Neural networks in TensorLogic**
+>   - Domingos argues that many standard architectures can be written compactly as tensor equations:
+>     - Multilayer perceptrons.
+>     - Recurrent neural networks.
+>     - Convolutional neural networks.
+>     - Transformers.
+>   - He claims a transformer can be represented in roughly a dozen equations, with attention layers expressed through matrix multiplications for queries, keys, and values.
+> - **Inference in TensorLogic**
+>   - TensorLogic supports both major logic-programming styles:
+>     - **Forward chaining:** execute tensor equations sequentially, computing values whose inputs are available.
+>     - **Backward chaining:** treat equations like functions and recursively evaluate only what is needed for a query.
+>   - The choice depends on the application.
+> - **Learning in TensorLogic**
+>   - Since the language has one central construct, the tensor equation, learning reduces to differentiating tensor equations.
+>   - Domingos argues that gradients of TensorLogic programs are themselves TensorLogic programs.
+>   - This enables gradient descent over both neural and symbolic structures.
+>   - He describes this as **backpropagation through structure**, a generalization of **backpropagation through time** for recurrent neural networks.
+>   - The idea is that different examples may instantiate different computation structures, but the derivatives can still be accumulated over shared parameters.
+> - **Symbolic AI in TensorLogic**
+>   - Because TensorLogic generalizes logic programming, existing Prolog- or Datalog-like programs can be imported naturally.
+>   - The goal is not merely to call symbolic code from neural code, but to represent both within one common language.
+>   - Domingos also suggests TensorLogic can express graphical models, kernel machines, and reasoning in embedding spaces.
+> - **Main claimed advantages**
+>   - One language for symbolic reasoning and statistical learning.
+>   - Reasoning and learning “out of the box.”
+>   - GPU-friendly computation through tensor operations.
+>   - More transparent models than ordinary deep-learning code.
+>   - Potentially simpler debugging and automatic generation of AI models.
+> - **Closing message**
+>   - TensorLogic is presented as a candidate for “one language for all of AI.”
+>   - Domingos frames it as combining the scalability and learnability of deep learning with the transparency, reliability, and reasoning capacity of symbolic AI.
+
+### Reflection
+
+- A first look at the paper helped me see a few new patterns
+- Using sparse attention + Forward/Backward chaining to systematically reduce ambiguity.
+- Using sparse attention + Forward/Backward chaining to create hierarchical discourse level summary *state*.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Tensor {Logic}},
+  date = {2026-04-28},
+  url = {https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk1.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Tensor Logic.” April 28. <https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk1.html>.

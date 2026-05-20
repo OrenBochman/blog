@@ -1,0 +1,1702 @@
+## Towards Trustworthy LLMs: Understanding Limits, Advancing Capabilities, Ensuring Safety
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Nouha Dziri
+  - [LinkedIn](https://www.linkedin.com/in/nouha-dziri-3587427b//)
+  - Cohere Labs
+  - [slides](https://drive.google.com/file/d/1ORh6y6yqX8ZhNB6t5krQEys7mro3UcBU/view?usp=sharing)
+
+> **NOTE:**
+>
+> - The Keynote focuses on building **trustworthy large language models** by understanding and improving reasoning, reliability, and safety.
+> - **Core problem**
+>   - Modern large language models are increasingly capable and autonomous, but their intelligence remains **jagged**.
+>   - They can solve very difficult tasks, such as Olympiad-style problems, while still failing on simple but unfamiliar tasks, such as large-digit arithmetic without tools.
+>   - Dziri argues that this unreliability is largely due to weak **out-of-distribution generalization**.
+> - **Definition of reasoning**
+>   - Reasoning is framed as drawing conclusions efficiently by composing learned concepts.
+>   - Two key properties are emphasized:
+>     - **Extrapolation**: generalizing beyond the training distribution.
+>     - **Efficiency**: solving problems with less data, smaller models, and more structural understanding rather than brute-force memorization.
+> - **Understanding model reasoning**
+>   - Dziri describes research that represents a model’s chain of thought as a **computational graph**.
+>   - The finding is that transformers often collapse multi-step reasoning into **subgraph matching**.
+>   - This suggests that many successes are linked to whether relevant computational fragments were already present in training data.
+>   - Models can appear to solve complex tasks, but may actually be reusing familiar patterns rather than discovering genuinely novel solutions.
+> - **Limits of current reasoning**
+>   - Large language models can generalize somewhat, but not at the level of human reasoning.
+>   - They operate on a spectrum between pattern matching and genuine novelty.
+>   - Pattern matching is still treated as a form of reasoning, but it is not sufficient for robust creativity or deep extrapolation.
+> - **Reinforcement learning and reasoning**
+>   - The talk discusses **reinforcement learning**, especially **Group Relative Policy Optimization (GRPO)**, in the context of models like DeepSeek-R1.
+>   - Reinforcement learning can improve performance beyond supervised fine-tuning on tasks similar to training data.
+>   - However, its gains decrease as task novelty increases.
+>   - Sparse rewards, such as giving only pass/fail feedback at the end of a long solution, are inadequate for discovering difficult new reasoning strategies.
+> - **Problem with sparse rewards**
+>   - A model may get 80% of a reasoning process correct but receive zero reward if the final answer is wrong.
+>   - Conversely, a model may reach the right answer through poor reasoning and receive full reward.
+>   - This can reinforce bad trajectories and fail to teach the model where its reasoning succeeded or failed.
+> - **Dense reward proposal**
+>   - Dziri argues for **dense rewards**, where intermediate reasoning steps are evaluated and rewarded.
+>   - In coding tasks, this can be approximated using unit tests that check individual functions or features.
+>   - This gives the model partial credit for partial progress, creating a richer learning signal.
+> - **Delta dataset and experiments**
+>   - Dziri introduces a dataset called **Delta**, designed to contain tasks unlikely to have appeared in training data.
+>   - Example task families include:
+>     - A puzzle game involving factories that sort robots.
+>     - **BounceSim**, a two-dimensional bouncing-ball simulation task used as a proxy for geometry-aware reasoning.
+>   - With sparse rewards, models failed because almost all training rollouts received zero reward.
+>   - With dense-reward warm-up, models learned useful subskills, rising from zero to around 80%.
+>   - After switching back to binary reward, the model eventually converged to full solutions, described as a “grokking moment.”
+> - **Conclusion on reinforcement learning**
+>   - Reinforcement learning can both sharpen existing skills and help models discover new ones, depending on the setup.
+>   - Success depends on the reward design, task hardness, data mixture, rollout infrastructure, and training recipe.
+>   - Dziri emphasizes that experimental setup can strongly affect whether reinforcement learning appears powerful or ineffective.
+> - **Efficiency remains unsolved**
+>   - Despite progress in extrapolation, the field still relies heavily on large models, massive datasets, expensive compute, and costly inference.
+>   - Dziri argues for “smarter scaling” rather than continued brute-force scaling.
+> - **Safety and security**
+>   - Dziri notes that the same out-of-distribution weakness affects safety.
+>   - Models can refuse obvious harmful prompts but comply when the same request is phrased adversarially or unusually.
+>   - This suggests that safety behavior is often shallow pattern recognition rather than deep understanding.
+> - **Jailbreaking and adversarial training**
+>   - Dziri describes adversarial jailbreak methods that increased attack success rates on frontier models.
+>   - Adversarial data can be used to train safer models and reduce attack success on benchmarks.
+>   - However, new attacks continue to emerge, creating an ongoing attack-defense race.
+> - **Safety as a continuous process**
+>   - Safety cannot be treated as a final fine-tuning step before release.
+>   - It must be integrated across:
+>     - Pre-training.
+>     - Post-training.
+>     - Inference-time monitoring.
+>     - Ongoing stress testing and defenses.
+> - **Agentic AI**
+>   - The talk ends by noting that future systems will increasingly plan, act, and adapt autonomously.
+>   - Some reasoning failures can be mitigated by agents using tools, retrieval, verification, and interaction with the environment.
+>   - Dziri says her current work focuses on these agentic systems.
+> - **Q&A**
+>   - In response to a question about rewards, Dziri explains that traditional reinforcement learning gives reward after the model response, usually as correct or incorrect.
+>   - Dziri argues that dense reward is more like a teacher giving detailed feedback on where a student succeeded or failed.
+>   - In response to a question about analogical thinking, Dziri says partial rewards could potentially be combined with natural-language feedback, hints, or analogical explanations to improve generalization.
+
+### Reflection
+
+## The Art of Clustering: The Good, The Bad and The Beautiful
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Seth Levine
+  - [LinkedIn](https://www.linkedin.com/in/sethplevine/)
+  - Contentsquare
+  - [slides](https://splevine.github.io/clustering-good-bad-beautiful/)
+
+> **NOTE:**
+>
+> - Levine argues that clustering is useful when the first question is not “what prediction should we make?” but “what is in this data?”
+>
+> - Levine uses a movie dataset of roughly 5,000–100,000 films, with plots and posters, as a demonstration case.
+>
+> - Core claim: clustering does not simply “discover” structure; it creates a lens or perspective on the data.
+>
+> - A typical clustering pipeline includes:
+>
+>   - encoding raw data into numerical representations, such as sentence embeddings;
+>   - dimensionality reduction, especially with Uniform Manifold Approximation and Projection (UMAP);
+>   - clustering, for example with Hierarchical Density-Based Spatial Clustering of Applications with Noise (HDBSCAN);
+>   - representation or labeling, where large language models can help name clusters.
+>
+> - The “good”:
+>
+>   - clustering helps explore unlabeled, unstructured data such as tickets, reviews, survey responses, or film summaries;
+>   - it can surface patterns before the analyst knows what questions to ask;
+>   - large language models are especially useful as a final representation layer, turning weak keyword labels like “new, young, life, family” into interpretable labels like “coming-of-age drama.”
+>
+> - The “bad”:
+>
+>   - clustering is not a single button; every design choice changes the result;
+>   - different encoders capture different structures: term frequency–inverse document frequency (TF-IDF) is precise but misses semantic similarity, while embeddings capture relations such as “hitman” and “assassin”;
+>   - dimensionality-reduction and clustering parameters can substantially change the apparent story;
+>   - there is no absolute “ground truth” cluster structure in many real datasets.
+>
+> - The talk emphasizes that real data is usually hierarchical:
+>
+>   - clusters contain subclusters;
+>   - boundaries are often fuzzy;
+>   - the clean, separated cluster picture is usually a simplification.
+>
+> - The speaker shows that large language model labels can be impressive but also misleading:
+>
+>   - a cluster labeled “World War II and Nazi Germany” contained films from before World War II;
+>   - this demonstrates that labels must be checked against domain knowledge and temporal plausibility.
+>
+> - The “beautiful”:
+>
+>   - combining embeddings, UMAP, HDBSCAN, and large language model labeling can produce rich, interpretable maps of data;
+>   - examples include clusters such as “space sci-fi,” “royalty and fairytales,” and “neo-noir crime”;
+>   - multimodal embeddings such as Contrastive Language–Image Pretraining (CLIP) allow clustering and visualizing movie posters, not just text.
+>
+> - Visualization is presented as a major part of the workflow:
+>
+>   - DataMapPlot is highlighted for static and interactive cluster maps;
+>   - Bokeh is used for rotating three-dimensional visualizations;
+>   - D3.js, Matplotlib, and Seaborn are also mentioned.
+>
+> - Practical advice:
+>
+>   - use clustering for exploration, not automatic labeling without validation;
+>   - understand how early pipeline choices affect downstream conclusions;
+>   - distinguish between exploring data and producing labels for supervised learning;
+>   - choose clustering parameters according to the decision the analysis is meant to support.
+>
+> - In the question-and-answer section:
+>
+>   - HDBSCAN is described as useful because it handles noise and does not require specifying the number of clusters in advance;
+>   - users can tune parameters to increase the proportion of data assigned to clusters, but forcing all data into clusters may distort perception;
+>   - the speaker’s default text-clustering pipeline is sentence transformers, dimensionality reduction, and HDBSCAN;
+>   - EVOC is mentioned as a newer algorithm worth watching;
+>   - UMAP is explained as an attempt to preserve both local and global structure when reducing high-dimensional embeddings to two or three dimensions.
+>
+> - Final takeaway: clustering is best understood as a design process for building a useful view of the data, not as an objective mechanism that reveals one true structure.
+
+### Reflection
+
+## Reinforcement Learning for LLM
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Datta Nimmaturi
+  - [Homepage](https://datta0.github.io/)
+  - [LinkedIn](https://www.linkedin.com/in/datta0/)
+  - [GitHub](https://github.com/datta0)
+  - [X](https://twitter.com/im_datta0)
+  - Unsloth AI
+  - [slides](https://docs.google.com/presentation/d/1R_htmucAsNbAQIWL9f6F2xyNtYl-uUbRPqPVGuXcZec/)
+  - [notebook](https://colab.research.google.com/drive/1ECoAWsEwV_fXC2upLidUIsbOQ59KQON0?usp=sharing)
+
+> **NOTE:**
+>
+> - The session introduces **reinforcement learning for large language models (LLMs)** and contrasts it with **supervised fine-tuning (SFT)**.
+>
+>   - SFT teaches a model by imitation: given a prompt, it learns from labeled examples of desirable answers.
+>   - The speaker argues that SFT works well but is expensive, data-hungry, and limited when the desired behavior cannot be fully specified through examples.
+>
+> - Reinforcement learning is presented as a way for models to learn through exploration.
+>
+>   - The speaker uses game-playing systems such as chess and Go as motivation.
+>   - The key idea is that an agent interacts with an environment, takes actions, and receives rewards.
+>   - This lets the model discover strategies rather than merely imitate human demonstrations.
+>
+> - The speaker emphasizes that reinforcement learning is powerful but dangerous.
+>
+>   - **Reward hacking** is a major risk: a model may optimize the literal reward while violating the intended goal.
+>   - Reinforcement learning is also highly sensitive to hyperparameters.
+>   - Poorly designed rewards can produce undesirable behaviors, such as overly long answers or deceptive strategies.
+>
+> - The talk then explains the standard reinforcement learning setup for LLM alignment.
+>
+>   - Earlier systems used several model components:
+>
+>     - an actor model that generates responses,
+>     - a critic model that estimates difficulty or value,
+>     - a reward model that evaluates response quality,
+>     - and a reference model that prevents the trained model from drifting too far from the original model.
+>
+>   - This setup is expensive because it may require several model copies in GPU memory.
+>
+> - The speaker introduces **Group Relative Policy Optimization (GRPO)** as a more efficient alternative.
+>
+>   - GRPO removes the critic model.
+>   - Instead of generating one answer per prompt, it samples a group of answers and compares them within the group.
+>   - If every answer is correct, the task is treated as easy; if only a few answers are correct, the task provides a stronger learning signal.
+>   - This reduces memory requirements and makes reinforcement learning more feasible on limited hardware.
+>
+> - Verifiable rewards are presented as especially useful.
+>
+>   - In mathematics, the final answer can often be checked directly.
+>   - In code, generated solutions can be tested against unit tests.
+>   - These rewards are deterministic, unlike learned reward models, which can vary depending on configuration.
+>   - With verifiable rewards, the reward model can also be removed, leaving mainly the actor and reference model.
+>
+> - The talk discusses stabilizing reinforcement learning updates.
+>
+>   - **Kullback–Leibler divergence (KL divergence)** is used to keep the trained model close to the reference model.
+>   - The update size is clipped so that learning does not become unstable.
+>   - The speaker frames this as necessary to prevent the model from forgetting its general conversational abilities.
+>
+> - The speaker then explains systems-level optimizations that make GRPO practical.
+>
+>   - **Low-Rank Adaptation (LoRA)** allows fine-tuning only small adapter weights instead of the entire model.
+>   - The speaker claims LoRA can perform close to full fine-tuning in this reinforcement learning setting.
+>   - **vLLM** is used for fast rollout generation, but its key-value cache can consume substantial GPU memory.
+>   - Memory is managed by alternating between rollout generation and gradient updates, discarding or offloading memory structures when they are not needed.
+>   - Chunking rollouts further reduces memory pressure by processing samples in smaller batches.
+>   - Weight sharing avoids loading duplicate model weights.
+>
+> - The applied demonstration trains an LLM to generate a strategy for the game **2048**.
+>
+>   - The game is described as a 4×4 grid where the player moves tiles up, down, left, or right.
+>   - Matching tiles merge, and the goal is to reach the 2048 tile.
+>   - Instead of asking the model to output one move, the setup asks it to write Python code for a strategy function.
+>
+> - The notebook example uses a Qwen 3 model loaded with Unsloth.
+>
+>   - The model is given a prompt specifying the allowed actions and the expected Python function format.
+>   - The system extracts code from markdown code blocks and evaluates only the generated strategy.
+>   - The speaker adds explicit prompt constraints to prevent inefficient or reward-hacking behavior.
+>
+> - The reward function checks both performance and rule compliance.
+>
+>   - Strategies are rewarded for reaching high tiles such as 1024 or 2048.
+>   - Poor strategies are penalized if they fail to reach at least modest tile values.
+>   - The code also penalizes imports, file access, randomness, loops, or other forms of cheating.
+>   - The speaker adds a diversity-related reward because the model initially overused a single move.
+>
+> - Training progress is evaluated through rollout rewards and game statistics.
+>
+>   - Early strategies receive negative rewards.
+>   - Over training, rewards improve substantially, reaching positive territory.
+>   - The speaker recommends tracking reward trends, reward standard deviation, maximum tile reached, score, and KL divergence.
+>   - If all rollouts receive the same reward, the task may have become too easy and should be made harder.
+>
+> - The main takeaway is that reinforcement learning for LLMs is not only an algorithmic problem.
+>
+>   - Practical success depends on model choice, reward design, memory management, rollout generation, and monitoring.
+>   - GRPO is presented as attractive because it reduces the number of models required during training.
+>   - The speaker summarizes the contrast as **imitation learning through SFT** versus **exploratory learning through reinforcement learning**.
+>
+> - In the Q&A, the speaker clarifies several points.
+>
+>   - GRPO can be used with an LLM-as-judge reward, but that gives up some of the efficiency and reliability of verifiable rewards.
+>   - Reinforcement learning and model alignment overlap, but they are not the same thing.
+>   - For customized domains such as healthcare, GRPO is recommended when rewards are verifiable; otherwise, some reliable evaluation mechanism is still needed.
+>   - Even without verifiable rewards, GRPO can still remove the critic model, though the systems requirements increase.
+
+### Reflection
+
+## Beyond the black box - Interpretability of LLMs in Finance
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Hariom Tatsat
+  - [Website](https://htatsat.com/)
+  - [LinkedIn](https://linkedin.com/in/hariomtatsat)
+  - book:
+  - paper: [Beyond the Black Box: Interpretability of LLMs in Finance](https://arxiv.org/pdf/2505.24650)
+- Barclays
+
+> **NOTE:**
+>
+> - **Talk topic:** “Beyond the Black Box: Interpretability of LLMs in Finance,” presented by Hariom from Barclays’ Quantitative AI team.
+>
+> - **Central claim:** Finance is a high-stakes domain, so large language models need more than prompt engineering, guardrails, chain-of-thought prompting, and external evaluation. The speaker argues for looking inside model internals.
+>
+> - **Why interpretability matters in finance:**
+>
+>   - Many AI pilots fail to reach production because organizations lack confidence in model behavior.
+>   - Leaders often attribute this lack of confidence to poor explainability.
+>   - Existing enterprise tools mostly inspect models externally rather than analyzing internal representations.
+>   - The speaker connects this to the broader lesson of the 2008 financial crisis: poorly understood models can create systemic risk.
+>
+> - **Types of interpretability discussed:**
+>
+>   - Feature attribution: estimating how much each input contributes to an output.
+>   - Behavioral interpretability: testing how outputs change when inputs are perturbed.
+>   - Simple surrogate models: decision trees, linear probes, and similar approximations.
+>   - Visual explanations.
+>   - **Mechanistic interpretability:** studying internal model structures directly, described as “neuroscience” or “MRI” for artificial intelligence.
+>
+> - **Mechanistic interpretability motivation:**
+>
+>   - Large language model neurons are often **polysemantic**, meaning one neuron may encode several unrelated concepts.
+>   - This makes direct inspection difficult.
+>   - Sparse autoencoders are presented as a way to decompose mixed internal activations into more interpretable features.
+>
+> - **Sparse autoencoders:**
+>
+>   - A sparse autoencoder is attached to an internal layer of a model.
+>   - It acts like a microscope on the residual stream.
+>   - It separates blended model concepts into features that can sometimes be assigned human-readable labels.
+>   - These labels matter because raw numerical activations are much less useful for risk, compliance, and audit conversations.
+>
+> - **Use case 1: sentiment feature for credit risk**
+>
+>   - The team looked for internal features associated with credit-risk concepts.
+>   - They used Neuronpedia and sparse-autoencoder features to identify model activations related to phrases such as “credit risk.”
+>   - They then used feature steering: artificially increasing activation of the credit-risk feature.
+>   - When the model was asked to score financial sentiment, steering made its reasoning focus more on credit-related cues such as lower credit score and secured financing.
+>   - Across many sentences, steered outputs were closer to human annotations than unsteered outputs.
+>
+> - **Use case 2: “Warren Buffett AI” for trading signals**
+>
+>   - The hypothesis was that LLM internals may contain useful financial abstractions learned from internet-scale training data.
+>   - The team tested whether internal features activated by financial news headlines could predict whether prices went up or down.
+>   - They used around ten years of financial headlines, a Gemma model, sparse autoencoder features, and a classifier.
+>   - Around 200 features were extracted.
+>   - Important features included named entities, financial terms, and stock ticker symbols.
+>   - The speaker framed this as early-stage but promising evidence that internal model representations may contain trading-relevant signal.
+>
+> - **Use case 3: hallucination police**
+>
+>   - The team proposed monitoring whether finance-specific internal features activate when a finance chatbot answers finance questions.
+>   - If the relevant features do not activate above a threshold, the system treats the answer as insufficiently grounded.
+>   - In that case, it can trigger prompt enhancement, citation retrieval, or additional grounding.
+>   - The goal is not merely to detect hallucination from the output, but to use internal model behavior as an early warning signal.
+>
+> - **Practical workflow for hallucination control:**
+>
+>   - Identify finance-related sparse-autoencoder features.
+>   - Monitor their activation during financial queries.
+>   - Set a calibrated activation threshold.
+>   - If activation is high, allow the answer.
+>   - If activation is low, enrich the prompt or require grounded citations before producing the final response.
+>
+> - **Limitations:**
+>
+>   - The field is still early-stage.
+>   - These methods are currently more feasible for open-weight models than closed commercial models.
+>   - Sparse autoencoders may inspect only a limited number of layers.
+>   - Broader circuit-tracing methods are needed to understand multi-layer model behavior.
+>   - Thresholds and feature selection require calibration and judgment.
+>
+> - **Final takeaway:**
+>
+>   - The speaker argues that mechanistic interpretability is underrated in finance.
+>   - Better internal understanding could increase trust among regulators, validators, risk teams, and business stakeholders.
+>   - The broader ambition is to make AI systems safer and more production-ready in high-stakes domains by understanding not just what they output, but why their internal representations support those outputs.
+
+## Outclassing Frontier LLMs at Extracting Information
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Etienne Bernard
+  - [LinkedIn](https://www.linkedin.com/in/etiennebcp/)
+  - [Slides](https://www.dropbox.com/scl/fi/9s5w1dnmrsy6tuzlg5baq/2026_04_ODSC.pptx.pdf?rlkey=gwq6r68mtnnyrkratty3gjp3r&dl=1)
+
+> **NOTE:**
+>
+> - **Speaker and framing**
+>
+>   - Etienne Bernard, CEO and co-founder of NewMind, presents the company’s shift toward building specialized large language models for information extraction.
+>
+>   - The talk contrasts two trends:
+>
+>     - Very large general-purpose models that can perform many tasks.
+>     - Much smaller specialized models, often 100–1,000× smaller, optimized for document extraction.
+>
+> - **Core topic: information extraction from documents**
+>
+>   - The speaker distinguishes two main extraction tasks:
+>
+>     - **Content extraction**, described as “new OCR”: converting the whole document into a text-based format such as Markdown.
+>     - **Structured extraction**: extracting selected fields into a schema-based JSON format.
+>
+> - **Content extraction use case**
+>
+>   - Content extraction is mainly used to preprocess enterprise documents so they can be searched and passed into retrieval-augmented generation systems.
+>   - The goal is not merely character recognition, but preserving tables, layout, figures, and document structure well enough for later language-model use.
+>
+> - **Structured extraction use case**
+>
+>   - Structured extraction is treated as automated data entry.
+>   - It is especially useful in banking, insurance, healthcare, logistics, and finance.
+>   - Examples include extracting names and dates from ID cards, line items from invoices, or booking details from emails.
+>
+> - **Current state of document processing**
+>
+>   - Many organizations still rely on humans or human-in-the-loop workflows.
+>   - Traditional optical character recognition systems work well when document layouts are stable, but require extensive rule engineering and annotated data.
+>   - Production deployment for classical systems can take six months to a year per use case.
+>
+> - **Limitations of general-purpose LLMs**
+>
+>   - General-purpose multimodal models can perform extraction, but still struggle with:
+>
+>     - Complex layouts.
+>     - Side-by-side or overlapping tables.
+>     - Handwriting.
+>     - Long extraction lists.
+>     - Checkboxes.
+>     - Sideways text.
+>
+>   - They also provide poor uncertainty estimates, making downstream correction harder.
+>
+>   - Their size makes private deployment expensive, especially when compared with smaller specialized models.
+>
+> - **Argument for specialized small language models**
+>
+>   - Specialized models can be trained on extraction datasets produced by large models or curated pipelines.
+>   - Dataset quality matters: examples should be challenging but still solvable.
+>   - Synthetic distortions such as blur, skew, cuts, or layout degradation can make training data harder and more useful.
+>   - If tasks are impossible, the model may learn to hallucinate.
+>
+> - **Training approach**
+>
+>   - A general vision-language model is fine-tuned for the extraction task.
+>   - Supervised training may be enough for direct extraction.
+>   - Reinforcement learning or post-training may be useful when the specialized model needs reasoning behavior.
+>   - NewMind emphasizes specialized models that can reason about layouts before extraction.
+>
+> - **OCR/content extraction model landscape**
+>
+>   - There is a growing wave of small image-to-text and document-to-Markdown models.
+>   - Different models have different strengths: some are better at pure character recognition, others at layout understanding.
+>   - Benchmarks exist, but the speaker warns that they do not fully measure whether the extracted text preserves the information needed by downstream LLMs.
+>
+> - **Benchmark caveats**
+>
+>   - OCR benchmarks vary greatly:
+>
+>     - Some test cropped character or word recognition.
+>     - Others test whole-document semantics and layout.
+>
+>   - Models may be optimized toward benchmark-specific behavior.
+>
+>   - The speaker recommends testing models directly on the intended use case rather than trusting benchmark rankings alone.
+>
+> - **Structured extraction models**
+>
+>   - The speaker says there are relatively few open-source models specialized for schema-based structured extraction.
+>   - NewMind’s NuExtract family is presented as one such family.
+>   - Another mentioned example is GLM-OCR, though the speaker frames it mainly as an OCR model with some structured extraction capability.
+>
+> - **Performance and deployment**
+>
+>   - NewMind reports large gains from specializing base models such as Qwen-VL and Qwen 3 variants.
+>   - Specialized models can approach or exceed much larger general-purpose models on extraction benchmarks while requiring far less memory.
+>   - This makes them attractive for private GPU deployment or lower-cost local use.
+>
+> - **Why direct structured extraction can outperform OCR + LLM pipelines**
+>
+>   - A two-step pipeline can first convert a document to Markdown, then extract JSON from that text.
+>   - The speaker argues this is slower because the model must generate the whole document.
+>   - It can also lose information during Markdown conversion.
+>   - Direct structured extraction is faster because it generates only the requested fields.
+>
+> - **How to use these models**
+>
+>   - For local deployment, models can be downloaded from Hugging Face.
+>   - The speaker recommends inference engines such as vLLM or SGLang rather than plain Hugging Face Transformers for high-volume extraction.
+>   - For API use, platforms can expose extraction models directly; NewMind also offers private deployment.
+>
+> - **Demo examples**
+>
+>   - An ID card example shows extraction into typed fields such as verbatim strings, classifications, and ISO-formatted dates.
+>   - An invoice example shows nested extraction, including line items with quantity and price.
+>   - A content extraction demo shows Markdown and HTML-table output, with the model reasoning about layout before generating the extraction.
+>
+> - **Q&A points**
+>
+>   - For nonprofits needing low cost and high security, the speaker suggests that major providers such as Google, OpenAI, and Anthropic may be preferable when formal compliance certifications matter.
+>   - For very low volume, small specialized models may run on CPU or even a laptop.
+>   - For forms mixing printed and handwritten text, the recommended approach is simply to send the whole document to the model end to end.
+>   - Handwriting remains harder, especially poor handwriting such as medical notes, but the model does not require a separate OCR stage.
+>
+> - **Main takeaway**
+>
+>   - Specialized small vision-language models are becoming a practical alternative to both classical OCR pipelines and massive general-purpose LLMs for document extraction.
+>   - Their main advantages are lower cost, easier private deployment, better task-specific accuracy, and simpler end-to-end workflows.
+
+## Outclassing Frontier LLMs at Extracting Information
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Etienne Bernard
+  - [LinkedIn](https://www.linkedin.com/in/etiennebcp/)
+- [Slides](https://www.dropbox.com/scl/fi/9s5w1dnmrsy6tuzlg5baq/2026_04_ODSC.pptx.pdf?rlkey=gwq6r68mtnnyrkratty3gjp3r&dl=1)
+
+> **NOTE:**
+>
+> - **Speaker and framing**
+>
+>   - Etienne Bernard, CEO and co-founder of NewMind, presents the company’s shift toward building specialized large language models for information extraction.
+>
+>   - The talk contrasts two trends:
+>
+>     - Very large general-purpose models that can perform many tasks.
+>     - Much smaller specialized models, often 100–1,000× smaller, optimized for document extraction.
+>
+> - **Core topic: information extraction from documents**
+>
+>   - The speaker distinguishes two main extraction tasks:
+>
+>     - **Content extraction**, described as “new OCR”: converting the whole document into a text-based format such as Markdown.
+>     - **Structured extraction**: extracting selected fields into a schema-based JSON format.
+>
+> - **Content extraction use case**
+>
+>   - Content extraction is mainly used to preprocess enterprise documents so they can be searched and passed into retrieval-augmented generation systems.
+>   - The goal is not merely character recognition, but preserving tables, layout, figures, and document structure well enough for later language-model use.
+>
+> - **Structured extraction use case**
+>
+>   - Structured extraction is treated as automated data entry.
+>   - It is especially useful in banking, insurance, healthcare, logistics, and finance.
+>   - Examples include extracting names and dates from ID cards, line items from invoices, or booking details from emails.
+>
+> - **Current state of document processing**
+>
+>   - Many organizations still rely on humans or human-in-the-loop workflows.
+>   - Traditional optical character recognition systems work well when document layouts are stable, but require extensive rule engineering and annotated data.
+>   - Production deployment for classical systems can take six months to a year per use case.
+>
+> - **Limitations of general-purpose LLMs**
+>
+>   - General-purpose multimodal models can perform extraction, but still struggle with:
+>
+>     - Complex layouts.
+>     - Side-by-side or overlapping tables.
+>     - Handwriting.
+>     - Long extraction lists.
+>     - Checkboxes.
+>     - Sideways text.
+>
+>   - They also provide poor uncertainty estimates, making downstream correction harder.
+>
+>   - Their size makes private deployment expensive, especially when compared with smaller specialized models.
+>
+> - **Argument for specialized small language models**
+>
+>   - Specialized models can be trained on extraction datasets produced by large models or curated pipelines.
+>   - Dataset quality matters: examples should be challenging but still solvable.
+>   - Synthetic distortions such as blur, skew, cuts, or layout degradation can make training data harder and more useful.
+>   - If tasks are impossible, the model may learn to hallucinate.
+>
+> - **Training approach**
+>
+>   - A general vision-language model is fine-tuned for the extraction task.
+>   - Supervised training may be enough for direct extraction.
+>   - Reinforcement learning or post-training may be useful when the specialized model needs reasoning behavior.
+>   - NewMind emphasizes specialized models that can reason about layouts before extraction.
+>
+> - **OCR/content extraction model landscape**
+>
+>   - There is a growing wave of small image-to-text and document-to-Markdown models.
+>   - Different models have different strengths: some are better at pure character recognition, others at layout understanding.
+>   - Benchmarks exist, but the speaker warns that they do not fully measure whether the extracted text preserves the information needed by downstream LLMs.
+>
+> - **Benchmark caveats**
+>
+>   - OCR benchmarks vary greatly:
+>
+>     - Some test cropped character or word recognition.
+>     - Others test whole-document semantics and layout.
+>
+>   - Models may be optimized toward benchmark-specific behavior.
+>
+>   - The speaker recommends testing models directly on the intended use case rather than trusting benchmark rankings alone.
+>
+> - **Structured extraction models**
+>
+>   - The speaker says there are relatively few open-source models specialized for schema-based structured extraction.
+>   - NewMind’s NuExtract family is presented as one such family.
+>   - Another mentioned example is GLM-OCR, though the speaker frames it mainly as an OCR model with some structured extraction capability.
+>
+> - **Performance and deployment**
+>
+>   - NewMind reports large gains from specializing base models such as Qwen-VL and Qwen 3 variants.
+>   - Specialized models can approach or exceed much larger general-purpose models on extraction benchmarks while requiring far less memory.
+>   - This makes them attractive for private GPU deployment or lower-cost local use.
+>
+> - **Why direct structured extraction can outperform OCR + LLM pipelines**
+>
+>   - A two-step pipeline can first convert a document to Markdown, then extract JSON from that text.
+>   - The speaker argues this is slower because the model must generate the whole document.
+>   - It can also lose information during Markdown conversion.
+>   - Direct structured extraction is faster because it generates only the requested fields.
+>
+> - **How to use these models**
+>
+>   - For local deployment, models can be downloaded from Hugging Face.
+>   - The speaker recommends inference engines such as vLLM or SGLang rather than plain Hugging Face Transformers for high-volume extraction.
+>   - For API use, platforms can expose extraction models directly; NewMind also offers private deployment.
+>
+> - **Demo examples**
+>
+>   - An ID card example shows extraction into typed fields such as verbatim strings, classifications, and ISO-formatted dates.
+>   - An invoice example shows nested extraction, including line items with quantity and price.
+>   - A content extraction demo shows Markdown and HTML-table output, with the model reasoning about layout before generating the extraction.
+>
+> - **Q&A points**
+>
+>   - For nonprofits needing low cost and high security, the speaker suggests that major providers such as Google, OpenAI, and Anthropic may be preferable when formal compliance certifications matter.
+>   - For very low volume, small specialized models may run on CPU or even a laptop.
+>   - For forms mixing printed and handwritten text, the recommended approach is simply to send the whole document to the model end to end.
+>   - Handwriting remains harder, especially poor handwriting such as medical notes, but the model does not require a separate OCR stage.
+>
+> - **Main takeaway**
+>
+>   - Specialized small vision-language models are becoming a practical alternative to both classical OCR pipelines and massive general-purpose LLMs for document extraction.
+>   - Their main advantages are lower cost, easier private deployment, better task-specific accuracy, and simpler end-to-end workflows.
+
+### Reflection
+
+## The AI Agent Memory Landscape
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- William Lyon
+  - Neo4j
+  - papers:
+    - [Memory in the Age of AI Agents](https://arxiv.org/abs/2512.13564)
+    - [Three Memory Types](https://graphstuff.com/three-memory-types)
+    - [slides](https://graphstuff.com/odsceast26)
+    - [GitHub](https://github.com/neo4j-labs/create-context-graph)
+    - [Website](https://create-context-graph.dev)
+
+> **NOTE:**
+>
+> - **Topic:** AI agent memory, presented through Neo4j’s work on graph-based memory for production agents.
+>
+> - **Core analogy: flying a plane**
+>
+>   - A passenger suddenly asked to fly a plane may have instruments, manuals, and a goal, but lacks experience, route-specific knowledge, institutional procedures, and prior debriefs.
+>   - The speaker argues that many agents are in the same position: they receive a role and goal, plus tools and retrieval, but lack accumulated operational memory.
+>
+> - **Main problem**
+>
+>   - Production agents need more than Retrieval-Augmented Generation (RAG), tools, and prompts.
+>   - They need access to the organizational context humans use when making decisions: policies, precedents, customer history, prior decisions, procedures, and tacit/institutional knowledge.
+>
+> - **Context graph**
+>
+>   - A “context graph” is presented as a structured representation of the information needed to make decisions inside an organization.
+>   - It connects entities, events, decisions, policies, risk factors, documents, people, accounts, transactions, and reasoning traces.
+>   - The key point is that before evaluating whether an agent made the right decision, we need to know what information a human would have used to make that decision.
+>
+> - **Memory taxonomy**
+>
+>   - The talk distinguishes between:
+>
+>     - **Short-term memory:** current interaction, messages, session state.
+>     - **Long-term memory:** extracted facts, entities, preferences, relationships, and durable knowledge.
+>     - **Reasoning memory:** decisions, plans, traces, justifications, and prior problem-solving paths.
+>
+>   - The speaker also references literature that divides memory into:
+>
+>     - **Token-level memory:** external memory accessible to application developers.
+>     - **Parametric memory:** knowledge stored in model weights.
+>     - **Latent memory:** internal model representations.
+>
+>   - The practical focus is token-level memory because it is what engineers can build around when using Large Language Model (LLM) APIs.
+>
+> - **RAG versus agent memory**
+>
+>   - RAG mainly retrieves relevant chunks from documents, often using embeddings and vector search.
+>   - Agent memory also retrieves, but adds a learning component: it constructs memory from conversations, tool calls, decisions, and prior interactions.
+>   - The speaker treats RAG and memory as overlapping, not sharply separated.
+>
+> - **Limitations of flat memory**
+>
+>   - Simple chat history, files, or vector stores miss explicit relationships between remembered facts.
+>   - Graph memory is presented as better suited for representing relationships, provenance, decisions, entities, policies, and evolving context.
+>
+> - **Financial services demo**
+>
+>   - The example context graph includes customers, accounts, transactions, approvals, risk factors, policies, and prior decisions.
+>   - An agent evaluates a customer request for a \$25,000 credit limit increase.
+>   - The agent uses tools to fetch customer data, policies, precedents, fraud signals, and graph analytics.
+>   - Graph algorithms such as node similarity and community detection are exposed as tools the agent can call.
+>   - The agent can also generate Cypher queries directly against Neo4j.
+>
+> - **Decision trace**
+>
+>   - The agent does not merely answer; it records why it made the decision.
+>   - Prior similar requests, risk factors, policy constraints, and supporting evidence are written back into the graph.
+>   - This makes future agents able to reuse the decision context.
+>
+> - **Neo4j Agent Memory**
+>
+>   - The speaker introduces **Neo4j Agent Memory**, an open-source Python package and hosted service.
+>   - It provides abstractions for short-term, long-term, and reasoning memory.
+>   - The Python package aims to integrate with many Python agent frameworks.
+>   - The hosted service is intended to support use outside Python as well.
+>
+> - **Memory construction pipeline**
+>
+>   - New messages can trigger background entity extraction, entity resolution, and enrichment.
+>   - Large Language Models are useful for extraction and resolution, especially with an ontology, but they are slow and expensive if used alone.
+>   - The system therefore supports a pipeline approach, combining tools such as spaCy with LLM-based enrichment.
+>
+> - **Importance of domain ontologies**
+>
+>   - The speaker emphasizes that knowledge graph quality depends heavily on the ontology used to extract structured data from unstructured text.
+>   - A pharmaceutical research setting would need entities such as papers, genes, proteins, drugs, and diseases.
+>   - The default model mentioned is based on a POLE-style ontology: person, organization, location, event, object, with extensions.
+>
+> - **Create Context Graph CLI**
+>
+>   - The talk demos a command-line tool called `create context graph`.
+>   - It scaffolds a full-stack agent memory application.
+>   - The user can choose demo data or connect real systems, select a domain ontology, choose an agent framework such as Pydantic, connect to Neo4j, enable entity extraction and preference detection, and configure model providers or embedding models.
+>   - It can also generate a Model Context Protocol (MCP) server for exposing memory to other agent environments.
+>
+> - **Healthcare demo**
+>
+>   - A generated healthcare example includes patients, doctors, providers, facilities, treatments, and treatment-plan decisions.
+>   - The agent queries the context graph to retrieve recent treatment decision traces and explain the reasoning behind them.
+>
+> - **Real data connectors**
+>
+>   - The system can ingest data from sources such as GitHub, Claude Code session history, and Google Workspace.
+>   - The goal is to unify project context: code changes, documents, requirements, decisions, tool calls, and discussions.
+>   - A Claude Code example shows messages, files, tool calls, and decisions represented as nodes and relationships in a graph.
+>
+> - **Multi-agent memory**
+>
+>   - The speaker describes a financial-services multi-agent setup with specialized agents such as know-your-customer, anti-money-laundering, compliance, and credit agents.
+>   - When one agent discovers something important, such as a sanctioned individual or suspicious customer, it writes that to shared memory.
+>   - Other agents can immediately use that information.
+>
+> - **Cross-framework compatibility**
+>
+>   - A key challenge is making the same memory layer usable by agents written in different frameworks and languages.
+>   - The speaker mentions a compliance kit / Technology Compatibility Kit (TCK) for validating memory implementations.
+>   - Example agents include Pydantic, Vercel AI SDK with TypeScript, Go, LangGraph, C#, and R.
+>   - The point is to enforce a shared memory shape, API, and behavioral specification.
+>
+> - **Main takeaway**
+>
+>   - Effective production agents need structured, shared, queryable, and evolving memory.
+>   - A graph-based memory layer can connect short-term interactions, long-term knowledge, reasoning traces, tools, policies, and organizational context.
+>   - This makes agents more auditable, more consistent, and better able to act with the kind of institutional knowledge humans rely on.
+
+### reflections
+
+## The Data-Resistant Mind-The Psychology Every Data Scientist Needs to Make Their Work Matter by Sebastian Wernicke, Oxera Consult
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Sebastian Wernicke
+- Oxera Consulting LLP
+
+> **NOTE:**
+>
+> - **Main claim**
+>   - Data alone rarely changes minds; in many organizational settings, it can even harden existing decisions.
+>   - Data scientists should treat their role not only as analysis, modeling, and validation, but as participation in **decision-making**.
+> - **Opening example**
+>   - The speaker describes a logistics project in Southeast Asia where route optimization could save up to **20% in fuel**.
+>   - Even though the result was valuable and technically sound, stakeholders returned to their old behavior after the presentation.
+>   - This illustrates the central frustration: excellent analysis often fails to create organizational change.
+> - **Why data does not change minds by itself**
+>   - Decisions are often already forming before the data science team presents its results.
+>   - The speaker uses a neuroscience example: decision signals accumulate over time, and late contradictory information has less influence.
+>   - In organizations, stakeholders may already have informal commitments, expectations, fears, and incentives before the analysis arrives.
+>   - By the time the data is presented, the decision may already be “in motion.”
+> - **Mismatch between analysis and decision needs**
+>   - Data scientists are comfortable with uncertainty, ambiguity, multiple interpretations, and probability distributions.
+>   - Decision-makers often expect clear answers: yes/no, proceed/stop, invest/do not invest.
+>   - A statement like “65% chance of success” may sound informative to a data scientist but unusable to a decision-maker.
+>   - The speaker’s metaphor: decision-makers want a **flashlight**, but data scientists often bring an **MRI**.
+> - **Data scientists’ own bias**
+>   - Data scientists are biased toward data and machine-learning solutions because that is their craft and identity.
+>   - The speaker gives an example of a metals manufacturer that wanted an algorithm to infer which production batch a part came from.
+>   - A simpler physical marking system may have been better than a complex predictive model.
+>   - The lesson: the diagnostic moment is often at project inception, not at the final presentation.
+> - **Reframing the data scientist’s job**
+>   - The job is not merely to provide analysis.
+>   - The job is to participate in the architecture of decisions.
+>   - Technical architecture includes ingestion, transformation, modeling, validation, and deployment.
+>   - Decision architecture asks how decisions form in human organizations and how analysis can enter that process effectively.
+> - **Practical recommendation 1: start earlier**
+>   - Data scientists should “push left” and get involved before the problem is fully framed.
+>   - They should interrogate the problem, the stakeholders, the assumptions, and the desired change.
+>   - A key question is: **“What concrete change has to happen for this project to count as resolved?”**
+>   - This can prevent technically successful but organizationally useless projects.
+> - **Practical recommendation 2: map the real decision room**
+>   - The “room” includes all stakeholders who influence or block the decision, not only those in the kickoff meeting.
+>   - Data scientists should ask:
+>     - Who is involved?
+>     - What are they measured on?
+>     - What are they afraid of?
+>     - Who has implementation capacity?
+>   - Stated concerns about “methodology” may actually reflect incentives, workload, distrust, risk, or fear of losing control.
+> - **Practical recommendation 3: translate findings into decision structure**
+>   - Do not merely report probabilities or charts.
+>   - Translate findings into conditions, actions, risks, and monitoring signals.
+>   - Instead of saying “there is a 65% chance this works,” say:
+>     - it works in about two-thirds of market conditions;
+>     - it fails under a specific condition;
+>     - here is the indicator to monitor.
+>   - This preserves the statistical truth while making it actionable.
+> - **Q&A: best question to predict project success**
+>   - The speaker says the best question is: **“What do you want to change at the end of this?”**
+>   - Good answers reveal intended action, stakeholders, and implementation path.
+>   - Bad answers include “we just want results” or “we need to prove another department wrong.”
+> - **Q&A: career progression**
+>   - Junior data scientists are often judged on technical correctness: cleaning, modeling, statistics.
+>   - Senior data scientists are judged more by business impact.
+>   - The speaker’s shift came from frustration: good analysis was not producing enough real-world effect.
+> - **Q&A: multiple departments**
+>   - When departments have conflicting goals, the data scientist must identify which stakeholder they are effectively serving.
+>   - Sometimes that is the person funding the work, but not always.
+>   - The important thing is to make a decision transparently rather than drift between incompatible stakeholder agendas.
+> - **Q&A: making results survive translation**
+>   - Put the analysis into the language of the business.
+>   - Translate numbers into decision options, effects on business metrics, career incentives, customer behavior, churn, demand, or operational risk.
+>   - The point is not to dilute the analysis, but to make it usable in the decision-maker’s frame.
+> - **Q&A: how to practice**
+>   - The speaker recommends mentorship from experienced decision-makers.
+>   - Ask them how a finding will land, how to frame it, and what a stakeholder is likely to hear.
+>   - Practicing with people who actually make decisions is presented as one of the best ways to develop this skill.
+> - **Overall takeaway**
+>   - Data science impact depends on joining the decision process early, understanding stakeholder incentives, and communicating results in a form that can guide action.
+>   - These are often dismissed as “soft skills,” but the speaker argues they are part of the real job of data science.
+
+### Reflection
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- David Talby
+  - [LinkedIn](https://www.linkedin.com/in/davidtalby)
+- John Snow Labs
+- [slides](drive.google.com/file/d/1uUZKFUClQzS-T65wWIp6rrBGNWAC8H0Z)
+- [pacific.ai/ai-policies](https://pacific.ai/ai-policies)
+
+> **NOTE:**
+>
+> - **Talk structure:**
+>   1.  Automated Risk Assessment - How to comply with AI regulations, laws, and standards.
+>   2.  Continuous Testing - How to perform continuous testing across many risk dimensions.
+>   3.  Live Red Teaming - How to monitor and govern AI systems once they are in production.
+> - **Regulatory and compliance burden:**
+>   - Healthcare AI systems must comply with general AI regulations, privacy law, industry standards, insurance requirements, and healthcare-specific rules.
+>   - Relevant frameworks include the NIST AI Risk Management Framework, ISO standards, the EU AI Act, U.S. state-level AI laws, and healthcare-specific evaluation frameworks.
+>   - Talby emphasizes that the landscape is fragmented, fast-moving, and too broad to handle manually without structured support.
+> - **Impact assessment and risk assessment:**
+>   - Organizations need a disciplined process before AI systems reach production.
+>   - This includes documenting intended use, affected populations, risks, likelihood, impact, and mitigating controls.
+>   - Talby argues that large language models can help automate parts of impact assessments by checking projects against hundreds of regulatory and governance requirements.
+>   - A risk registry is important because approvals are often not simply “yes” or “no,” but “yes, provided these controls are in place.”
+> - **Testing must go beyond accuracy:**
+>   - Accuracy alone is insufficient, especially in healthcare.
+>   - AI systems must also be tested for robustness, bias, fairness, privacy, safety, hallucination, calibration, reliability, and task-specific clinical validity.
+>   - Talby describes accuracy as only one metric among many.
+> - **Major testing concerns:**
+>   - **Data contamination:** Public benchmark questions may already be in model training data, inflating scores.
+>   - **Fragility:** Small wording changes, such as replacing a drug brand name with a generic name, can reduce performance.
+>   - **Task mismatch:** Many medical benchmarks do not reflect real clinical workflows.
+>   - **Lack of patient-data testing:** Few published evaluations use actual electronic health record data.
+>   - **Bias and stigmatizing language:** Models can reproduce social, clinical, racial, gender, mental-health, and substance-use biases.
+>   - **Framing and ordering effects:** Models can be influenced by how information is presented or ordered, similar to human cognitive biases.
+> - **Healthcare-specific evaluation:**
+>   - The talk highlights Med-HELM and similar efforts as examples of richer healthcare AI evaluation.
+>   - Better testing requires clinically meaningful task taxonomies, specialty-specific datasets, and realistic workflows such as summarizing visits, reviewing literature, generating patient education materials, or supporting clinical operations.
+> - **Recommended testing practice:**
+>   - Build broad automated test suites.
+>   - Run them continuously through continuous integration and continuous deployment pipelines.
+>   - Treat AI testing like software testing, but with additional dimensions specific to large language models, agents, and clinical risk.
+> - **Production governance:**
+>   - Guardrails and observability are useful but insufficient.
+>   - Agentic systems can fail in intermediate steps, not only at final output.
+>   - Therefore, monitoring must inspect the internal chain of agents, tools, intermediate decisions, and hidden failure modes.[^1]
+> - **Emerging design pattern:**
+>   - Use a separate monitoring or “guardian” agent to challenge the primary agent and its tools.
+>   - This guardian should perturb inputs, test edge cases, detect recurring failure modes, and produce actionable feedback for developers.
+>   - In the future, some feedback may be sent back to the primary agent itself, but this raises additional change-management and safety issues.
+> - **Main conclusion:**
+>   - Agentic AI in healthcare is still immature.
+>   - Talby compares it to a “year one attendant”: useful, but not ready for autonomous trust.
+>   - Production systems need strong guardrails, gatekeeping, monitoring, testing, and human oversight.
+>   - The field is still young; many methods, datasets, libraries, and best practices are only one or two years old.
+
+### Reflections on the talk
+
+- As I’m on the lookout for design patterns. Talby Talks about a Guardian agent pattern
+
+> **NOTE:**
+>
+> - Use a separate monitoring or “guardian” agent to challenge the primary agent and its tools.
+> - This guardian should perturb inputs, test edge cases, detect recurring failure modes, and produce actionable feedback for developers.[^2]
+
+Nice but This is however is unlikely to mitigate any of the fundamental issues with LLMs hallucination or poor reasoning skills.
+
+I think that another issue that I call “non experiential learning”. LLM don’t learn from experience so they
+
+1.  Don’t really have a good sense of what they know or don’t know.
+2.  May often have access to all the facts yet fail to put them together coherently.
+
+So this pattern may be fine for lower stakes use cases. But for medicine you need logic based reasoning and likely humans in the loop. Agentic harasses are unlikely to be able to mitigate the weakness of LLMs to any degree needed by practitioners of medicine anytime soon.
+
+So the guardian is an agent but having an agent monitor may leads to the guardian colluding with the primary agent. It like a lewis signaling game - they only win if they cooperate.
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- David Talby
+  - [LinkedIn](https://www.linkedin.com/in/davidtalby)
+- John Snow Labs
+- [slides](drive.google.com/file/d/1uUZKFUClQzS-T65wWIp6rrBGNWAC8H0Z)
+- [pacific.ai/ai-policies](https://pacific.ai/ai-policies)
+
+> **NOTE:**
+>
+> - **Talk structure:**
+>   1.  Automated Risk Assessment - How to comply with AI regulations, laws, and standards.
+>   2.  Continuous Testing - How to perform continuous testing across many risk dimensions.
+>   3.  Live Red Teaming - How to monitor and govern AI systems once they are in production.
+> - **Regulatory and compliance burden:**
+>   - Healthcare AI systems must comply with general AI regulations, privacy law, industry standards, insurance requirements, and healthcare-specific rules.
+>   - Relevant frameworks include the NIST AI Risk Management Framework, ISO standards, the EU AI Act, U.S. state-level AI laws, and healthcare-specific evaluation frameworks.
+>   - Talby emphasizes that the landscape is fragmented, fast-moving, and too broad to handle manually without structured support.
+> - **Impact assessment and risk assessment:**
+>   - Organizations need a disciplined process before AI systems reach production.
+>   - This includes documenting intended use, affected populations, risks, likelihood, impact, and mitigating controls.
+>   - Talby argues that large language models can help automate parts of impact assessments by checking projects against hundreds of regulatory and governance requirements.
+>   - A risk registry is important because approvals are often not simply “yes” or “no,” but “yes, provided these controls are in place.”
+> - **Testing must go beyond accuracy:**
+>   - Accuracy alone is insufficient, especially in healthcare.
+>   - AI systems must also be tested for robustness, bias, fairness, privacy, safety, hallucination, calibration, reliability, and task-specific clinical validity.
+>   - Talby describes accuracy as only one metric among many.
+> - **Major testing concerns:**
+>   - **Data contamination:** Public benchmark questions may already be in model training data, inflating scores.
+>   - **Fragility:** Small wording changes, such as replacing a drug brand name with a generic name, can reduce performance.
+>   - **Task mismatch:** Many medical benchmarks do not reflect real clinical workflows.
+>   - **Lack of patient-data testing:** Few published evaluations use actual electronic health record data.
+>   - **Bias and stigmatizing language:** Models can reproduce social, clinical, racial, gender, mental-health, and substance-use biases.
+>   - **Framing and ordering effects:** Models can be influenced by how information is presented or ordered, similar to human cognitive biases.
+> - **Healthcare-specific evaluation:**
+>   - The talk highlights Med-HELM and similar efforts as examples of richer healthcare AI evaluation.
+>   - Better testing requires clinically meaningful task taxonomies, specialty-specific datasets, and realistic workflows such as summarizing visits, reviewing literature, generating patient education materials, or supporting clinical operations.
+> - **Recommended testing practice:**
+>   - Build broad automated test suites.
+>   - Run them continuously through continuous integration and continuous deployment pipelines.
+>   - Treat AI testing like software testing, but with additional dimensions specific to large language models, agents, and clinical risk.
+> - **Production governance:**
+>   - Guardrails and observability are useful but insufficient.
+>   - Agentic systems can fail in intermediate steps, not only at final output.
+>   - Therefore, monitoring must inspect the internal chain of agents, tools, intermediate decisions, and hidden failure modes.[^3]
+> - **Emerging design pattern:**
+>   - Use a separate monitoring or “guardian” agent to challenge the primary agent and its tools.
+>   - This guardian should perturb inputs, test edge cases, detect recurring failure modes, and produce actionable feedback for developers.
+>   - In the future, some feedback may be sent back to the primary agent itself, but this raises additional change-management and safety issues.
+> - **Main conclusion:**
+>   - Agentic AI in healthcare is still immature.
+>   - Talby compares it to a “year one attendant”: useful, but not ready for autonomous trust.
+>   - Production systems need strong guardrails, gatekeeping, monitoring, testing, and human oversight.
+>   - The field is still young; many methods, datasets, libraries, and best practices are only one or two years old.
+
+### Reflections on the talk
+
+- As I’m on the lookout for design patterns. Talby Talks about a Guardian agent pattern
+
+> **NOTE:**
+>
+> - Use a separate monitoring or “guardian” agent to challenge the primary agent and its tools.
+> - This guardian should perturb inputs, test edge cases, detect recurring failure modes, and produce actionable feedback for developers.[^4]
+
+Nice but This is however is unlikely to mitigate any of the fundamental issues with LLMs hallucination or poor reasoning skills.
+
+I think that another issue that I call “non experiential learning”. LLM don’t learn from experience so they
+
+1.  Don’t really have a good sense of what they know or don’t know.
+2.  May often have access to all the facts yet fail to put them together coherently.
+
+So this pattern may be fine for lower stakes use cases. But for medicine you need logic based reasoning and likely humans in the loop. Agentic harasses are unlikely to be able to mitigate the weakness of LLMs to any degree needed by practitioners of medicine anytime soon.
+
+So the guardian is an agent but having an agent monitor may leads to the guardian colluding with the primary agent. It like a lewis signaling game - they only win if they cooperate.
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- David Talby
+  - [LinkedIn](https://www.linkedin.com/in/davidtalby)
+- John Snow Labs
+- [slides](drive.google.com/file/d/1uUZKFUClQzS-T65wWIp6rrBGNWAC8H0Z)
+- [pacific.ai/ai-policies](https://pacific.ai/ai-policies)
+
+> **NOTE:**
+>
+> - **Talk structure:**
+>   1.  Automated Risk Assessment - How to comply with AI regulations, laws, and standards.
+>   2.  Continuous Testing - How to perform continuous testing across many risk dimensions.
+>   3.  Live Red Teaming - How to monitor and govern AI systems once they are in production.
+> - **Regulatory and compliance burden:**
+>   - Healthcare AI systems must comply with general AI regulations, privacy law, industry standards, insurance requirements, and healthcare-specific rules.
+>   - Relevant frameworks include the NIST AI Risk Management Framework, ISO standards, the EU AI Act, U.S. state-level AI laws, and healthcare-specific evaluation frameworks.
+>   - Talby emphasizes that the landscape is fragmented, fast-moving, and too broad to handle manually without structured support.
+> - **Impact assessment and risk assessment:**
+>   - Organizations need a disciplined process before AI systems reach production.
+>   - This includes documenting intended use, affected populations, risks, likelihood, impact, and mitigating controls.
+>   - Talby argues that large language models can help automate parts of impact assessments by checking projects against hundreds of regulatory and governance requirements.
+>   - A risk registry is important because approvals are often not simply “yes” or “no,” but “yes, provided these controls are in place.”
+> - **Testing must go beyond accuracy:**
+>   - Accuracy alone is insufficient, especially in healthcare.
+>   - AI systems must also be tested for robustness, bias, fairness, privacy, safety, hallucination, calibration, reliability, and task-specific clinical validity.
+>   - Talby describes accuracy as only one metric among many.
+> - **Major testing concerns:**
+>   - **Data contamination:** Public benchmark questions may already be in model training data, inflating scores.
+>   - **Fragility:** Small wording changes, such as replacing a drug brand name with a generic name, can reduce performance.
+>   - **Task mismatch:** Many medical benchmarks do not reflect real clinical workflows.
+>   - **Lack of patient-data testing:** Few published evaluations use actual electronic health record data.
+>   - **Bias and stigmatizing language:** Models can reproduce social, clinical, racial, gender, mental-health, and substance-use biases.
+>   - **Framing and ordering effects:** Models can be influenced by how information is presented or ordered, similar to human cognitive biases.
+> - **Healthcare-specific evaluation:**
+>   - The talk highlights Med-HELM and similar efforts as examples of richer healthcare AI evaluation.
+>   - Better testing requires clinically meaningful task taxonomies, specialty-specific datasets, and realistic workflows such as summarizing visits, reviewing literature, generating patient education materials, or supporting clinical operations.
+> - **Recommended testing practice:**
+>   - Build broad automated test suites.
+>   - Run them continuously through continuous integration and continuous deployment pipelines.
+>   - Treat AI testing like software testing, but with additional dimensions specific to large language models, agents, and clinical risk.
+> - **Production governance:**
+>   - Guardrails and observability are useful but insufficient.
+>   - Agentic systems can fail in intermediate steps, not only at final output.
+>   - Therefore, monitoring must inspect the internal chain of agents, tools, intermediate decisions, and hidden failure modes.[^5]
+> - **Emerging design pattern:**
+>   - Use a separate monitoring or “guardian” agent to challenge the primary agent and its tools.
+>   - This guardian should perturb inputs, test edge cases, detect recurring failure modes, and produce actionable feedback for developers.
+>   - In the future, some feedback may be sent back to the primary agent itself, but this raises additional change-management and safety issues.
+> - **Main conclusion:**
+>   - Agentic AI in healthcare is still immature.
+>   - Talby compares it to a “year one attendant”: useful, but not ready for autonomous trust.
+>   - Production systems need strong guardrails, gatekeeping, monitoring, testing, and human oversight.
+>   - The field is still young; many methods, datasets, libraries, and best practices are only one or two years old.
+
+### Reflections on the talk
+
+- As I’m on the lookout for design patterns. Talby Talks about a Guardian agent pattern
+
+> **NOTE:**
+>
+> - Use a separate monitoring or “guardian” agent to challenge the primary agent and its tools.
+> - This guardian should perturb inputs, test edge cases, detect recurring failure modes, and produce actionable feedback for developers.[^6]
+
+Nice but This is however is unlikely to mitigate any of the fundamental issues with LLMs hallucination or poor reasoning skills.
+
+I think that another issue that I call “non experiential learning”. LLM don’t learn from experience so they
+
+1.  Don’t really have a good sense of what they know or don’t know.
+2.  May often have access to all the facts yet fail to put them together coherently.
+
+So this pattern may be fine for lower stakes use cases. But for medicine you need logic based reasoning and likely humans in the loop. Agentic harasses are unlikely to be able to mitigate the weakness of LLMs to any degree needed by practitioners of medicine anytime soon.
+
+So the guardian is an agent but having an agent monitor may leads to the guardian colluding with the primary agent. It like a lewis signaling game - they only win if they cooperate.
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- David Talby
+  - [LinkedIn](https://www.linkedin.com/in/davidtalby)
+- John Snow Labs
+- [slides](drive.google.com/file/d/1uUZKFUClQzS-T65wWIp6rrBGNWAC8H0Z)
+- [pacific.ai/ai-policies](https://pacific.ai/ai-policies)
+
+> **NOTE:**
+>
+> - **Talk structure:**
+>   1.  Automated Risk Assessment - How to comply with AI regulations, laws, and standards.
+>   2.  Continuous Testing - How to perform continuous testing across many risk dimensions.
+>   3.  Live Red Teaming - How to monitor and govern AI systems once they are in production.
+> - **Regulatory and compliance burden:**
+>   - Healthcare AI systems must comply with general AI regulations, privacy law, industry standards, insurance requirements, and healthcare-specific rules.
+>   - Relevant frameworks include the NIST AI Risk Management Framework, ISO standards, the EU AI Act, U.S. state-level AI laws, and healthcare-specific evaluation frameworks.
+>   - Talby emphasizes that the landscape is fragmented, fast-moving, and too broad to handle manually without structured support.
+> - **Impact assessment and risk assessment:**
+>   - Organizations need a disciplined process before AI systems reach production.
+>   - This includes documenting intended use, affected populations, risks, likelihood, impact, and mitigating controls.
+>   - Talby argues that large language models can help automate parts of impact assessments by checking projects against hundreds of regulatory and governance requirements.
+>   - A risk registry is important because approvals are often not simply “yes” or “no,” but “yes, provided these controls are in place.”
+> - **Testing must go beyond accuracy:**
+>   - Accuracy alone is insufficient, especially in healthcare.
+>   - AI systems must also be tested for robustness, bias, fairness, privacy, safety, hallucination, calibration, reliability, and task-specific clinical validity.
+>   - Talby describes accuracy as only one metric among many.
+> - **Major testing concerns:**
+>   - **Data contamination:** Public benchmark questions may already be in model training data, inflating scores.
+>   - **Fragility:** Small wording changes, such as replacing a drug brand name with a generic name, can reduce performance.
+>   - **Task mismatch:** Many medical benchmarks do not reflect real clinical workflows.
+>   - **Lack of patient-data testing:** Few published evaluations use actual electronic health record data.
+>   - **Bias and stigmatizing language:** Models can reproduce social, clinical, racial, gender, mental-health, and substance-use biases.
+>   - **Framing and ordering effects:** Models can be influenced by how information is presented or ordered, similar to human cognitive biases.
+> - **Healthcare-specific evaluation:**
+>   - The talk highlights Med-HELM and similar efforts as examples of richer healthcare AI evaluation.
+>   - Better testing requires clinically meaningful task taxonomies, specialty-specific datasets, and realistic workflows such as summarizing visits, reviewing literature, generating patient education materials, or supporting clinical operations.
+> - **Recommended testing practice:**
+>   - Build broad automated test suites.
+>   - Run them continuously through continuous integration and continuous deployment pipelines.
+>   - Treat AI testing like software testing, but with additional dimensions specific to large language models, agents, and clinical risk.
+> - **Production governance:**
+>   - Guardrails and observability are useful but insufficient.
+>   - Agentic systems can fail in intermediate steps, not only at final output.
+>   - Therefore, monitoring must inspect the internal chain of agents, tools, intermediate decisions, and hidden failure modes.[^7]
+> - **Emerging design pattern:**
+>   - Use a separate monitoring or “guardian” agent to challenge the primary agent and its tools.
+>   - This guardian should perturb inputs, test edge cases, detect recurring failure modes, and produce actionable feedback for developers.
+>   - In the future, some feedback may be sent back to the primary agent itself, but this raises additional change-management and safety issues.
+> - **Main conclusion:**
+>   - Agentic AI in healthcare is still immature.
+>   - Talby compares it to a “year one attendant”: useful, but not ready for autonomous trust.
+>   - Production systems need strong guardrails, gatekeeping, monitoring, testing, and human oversight.
+>   - The field is still young; many methods, datasets, libraries, and best practices are only one or two years old.
+
+### Reflections on the talk
+
+- As I’m on the lookout for design patterns. Talby Talks about a Guardian agent pattern
+
+> **NOTE:**
+>
+> - Use a separate monitoring or “guardian” agent to challenge the primary agent and its tools.
+> - This guardian should perturb inputs, test edge cases, detect recurring failure modes, and produce actionable feedback for developers.[^8]
+
+Nice but This is however is unlikely to mitigate any of the fundamental issues with LLMs hallucination or poor reasoning skills.
+
+I think that another issue that I call “non experiential learning”. LLM don’t learn from experience so they
+
+1.  Don’t really have a good sense of what they know or don’t know.
+2.  May often have access to all the facts yet fail to put them together coherently.
+
+So this pattern may be fine for lower stakes use cases. But for medicine you need logic based reasoning and likely humans in the loop. Agentic harasses are unlikely to be able to mitigate the weakness of LLMs to any degree needed by practitioners of medicine anytime soon.
+
+So the guardian is an agent but having an agent monitor may leads to the guardian colluding with the primary agent. It like a lewis signaling game - they only win if they cooperate.
+
+## Agentic AI for Autonomous Root-Cause Analysis in Large-Scale Enterprise Systems
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Nik Kale
+- Cisco Systems
+
+> **NOTE:**
+>
+> - **Topic:** A presentation by Nik Khale on multi-agent artificial intelligence systems for autonomous root-cause diagnosis in enterprise IT environments.
+>
+> - **Core problem:**
+>
+>   - Modern observability tools are good at detecting that something happened.
+>   - They are much weaker at explaining why it happened.
+>   - In outages, teams often enter “war room” mode, where network, database, application, security, and infrastructure teams each defend their own domain.
+>   - The main bottleneck is not missing data, but cross-domain causal reasoning.
+>
+> - **Key argument:**
+>
+>   - Alerts, metrics, logs, configuration diffs, and telemetry are usually available.
+>   - The hard task is separating the true root cause from cascading symptoms.
+>   - Traditional correlation and timestamp matching are insufficient because the same event appears differently across domains.
+>
+> - **Limits of existing approaches:**
+>
+>   - **Schema consolidation:** dumping everything into a data lake fails because schemas drift and correlation is not causation.
+>   - **War rooms:** they can work, but expert reasoning is not preserved; once the call ends, the diagnostic memory disappears.
+>   - **Expert systems:** rule-based playbooks work only for known cases and fail when the environment changes.
+>
+> - **Proposed shift:**
+>
+>   - Move from deductive expert systems to inductive multi-agent systems.
+>   - Instead of following only pre-written rules, agents generate hypotheses, retrieve evidence, evaluate causality, reject weak explanations, and iterate toward a root cause.
+>
+> - **Architecture described:**
+>
+>   - **Diagnostic agent:** generates candidate hypotheses from a problem statement.
+>   - **Retrieval agent:** gathers relevant evidence from logs, metrics, telemetry, configuration, databases, or live APIs.
+>   - **Evaluation agent:** judges whether evidence supports or contradicts each hypothesis and identifies causal dependencies.
+>   - **Analysis agent:** converges on the root cause, assigns confidence, and recommends remediation steps.
+>
+> - **Investigation loop:**
+>
+>   - The system usually runs several iterations, often three to nine, sometimes more.
+>   - Each iteration expands the search, retrieves evidence, evaluates hypotheses, and prunes explanations that are unsupported or merely symptomatic.
+>   - Multiple reasoning loops can run in parallel and compare agreement or disagreement.
+>
+> - **Graph-based reasoning model:**
+>
+>   - The investigation state is represented as a machine-readable directed acyclic graph.
+>
+>   - Nodes include:
+>
+>     - problem nodes,
+>     - hypothesis nodes,
+>     - evidence nodes,
+>     - rejected hypothesis nodes,
+>     - root-cause nodes.
+>
+>   - Edges represent:
+>
+>     - causal relations,
+>     - evidential support,
+>     - generated-from relations,
+>     - dependency/pruning relations.
+>
+> - **Why the graph matters:**
+>
+>   - It is not just a visualization or report artifact.
+>   - It is the computational state of the investigation.
+>   - It preserves the full reasoning history, making the result auditable and explainable.
+>
+> - **Pruning mechanism:**
+>
+>   - If hypothesis B depends on hypothesis A, then B cannot be the root cause.
+>   - Example: a network symptom may depend on a pod eviction, meaning the network issue is not primary.
+>   - Unsupported hypotheses are also removed.
+>   - This allows the system to reduce a large search space into a smaller causal chain.
+>
+> - **Retrieval strategy:**
+>
+>   - The system does not rely only on a vector database or semantic search.
+>
+>   - It chooses the retrieval method suited to the evidence:
+>
+>     - keyword search for known terms,
+>     - term frequency–inverse document frequency for anomaly hunting,
+>     - semantic search for fuzzy matching,
+>     - Structured Query Language for structured data,
+>     - live queries or APIs for real-time state.
+>
+>   - The point is tool selection, not one universal retrieval method.
+>
+> - **Example investigation:**
+>
+>   - A checkout or voting application becomes unreachable.
+>   - The system considers network, Kubernetes, application, and infrastructure hypotheses.
+>   - It traces the problem across domains: application error → pod eviction → resource limits → infrastructure issue.
+>   - In one example, the root cause is disk pressure on a worker node.
+>   - In the demo, another root cause is a specific network interface, VM 22, being administratively taken down.
+>
+> - **Demo features:**
+>
+>   - The user interface shows:
+>
+>     - probable root cause,
+>     - investigation graph,
+>     - iteration slider,
+>     - rejected hypotheses,
+>     - evidence artifacts,
+>     - audit trail,
+>     - downloadable investigation report.
+>
+>   - The audit trail records what was checked, what was rejected, and how the final conclusion was reached.
+>
+> - **Outcome claimed:**
+>
+>   - The system completed an investigation in roughly five minutes.
+>   - It avoided a traditional bridge call or war room.
+>   - It produced both the root cause and recommended resolution steps.
+>
+> - **Trust and adoption:**
+>
+>   - The speaker notes that building the system is only one challenge.
+>   - Getting an organization to trust autonomous diagnostic reasoning is a separate challenge.
+>   - The talk begins to discuss trust boundaries, but this section is cut short because the session runs out of time.
+>
+> - **Main takeaway:**
+>
+>   - The presentation argues that the next step in observability is not better alerting, but auditable causal reasoning.
+>   - Multi-agent systems can preserve expert-like troubleshooting as a structured, reusable, machine-readable investigation graph.
+
+### Reflection
+
+## Building Effective Agents
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Sushant Mehta
+  - https://www.linkedin.com/in/sushant-mehta-9a1b4a1/
+  - [LinkedIn]()
+
+> **NOTE:**
+>
+> - **Speaker and topic**
+>
+>   - Sushant, who works on post-training at Surge and previously worked on coding capabilities for Gemini at DeepMind, presents a practical overview of building effective large language model agents.
+>
+>   - The talk connects three layers:
+>
+>     - post-training,
+>     - reinforcement learning,
+>     - agentic deployment patterns.
+>
+> - **Why post-training matters**
+>
+>   - A pre-trained model is only a next-token predictor and is not immediately useful as an assistant.
+>
+>   - Post-training teaches the model to follow instructions, satisfy human preferences, reason, code, improve factuality, and avoid unsafe behavior.
+>
+>   - The standard pipeline is:
+>
+>     - start with a base model,
+>     - instruction fine-tune it,
+>     - collect preference data,
+>     - train or use a reward mechanism,
+>     - apply reinforcement learning to produce a more aligned and useful model.
+>
+> - **Post-training is iterative**
+>
+>   - Labs repeatedly improve the best available model by identifying failure modes, collecting targeted data, and retraining.
+>   - Better models can generate better synthetic data, which can then improve the next model.
+>   - The speaker mentions preference-optimization and reinforcement-learning methods such as Direct Preference Optimization, Proximal Policy Optimization, and Group Relative Policy Optimization.
+>
+> - **Reinforcement learning for language models**
+>
+>   - In the language-model setting:
+>
+>     - the policy is the large language model,
+>     - actions are token or sequence generations,
+>     - the environment is a reward model, verifier, rubric, or judge,
+>     - training nudges the model toward outputs that receive higher reward.
+>
+>   - Reinforcement Learning from Human Feedback uses a reward model trained on preference data.
+>
+>   - Reinforcement Learning from Verifiable Rewards can avoid a separate reward model when correctness can be checked directly, as in math, code, or rubric-based evaluation.
+>
+> - **Agents require strong post-trained models**
+>
+>   - Agentic systems only become useful once the base model can already reason, use tools, code, follow instructions, and maintain context over multiple turns.
+>
+>   - The speaker defines an agent as a large language model with agency over tools and actions.
+>
+>   - He distinguishes agents from workflows:
+>
+>     - workflows follow mostly predetermined paths,
+>     - agents dynamically plan, choose tools, and adapt based on intermediate results.
+>
+> - **When agents are appropriate**
+>
+>   - Agents are useful when the task is open-ended, unpredictable, and requires dynamic planning.
+>
+>   - Good agentic tasks often involve uncertainty about:
+>
+>     - how many steps are needed,
+>     - which tools should be used,
+>     - whether code must be written or executed,
+>     - how intermediate outputs should change the plan.
+>
+>   - Agents are especially valuable when there is a clear success criterion and a feedback loop.
+>
+> - **When agents are overkill**
+>
+>   - Many tasks can be solved with a well-structured prompt and a sufficiently capable model.
+>   - Agents may be inappropriate when latency, cost, safety, or error compounding are major constraints.
+>   - The speaker recommends starting with simple large language model APIs and only adding more complex frameworks or scaffolding when needed.
+>
+> - **Core building blocks for agents**
+>
+>   - A simple useful setup is a large language model connected to tools such as:
+>
+>     - web search,
+>     - document retrieval,
+>     - code execution,
+>     - sandboxed tools.
+>
+>   - More structured setups use sequential stages with verifiers between stages.
+>
+>   - Dynamic system instructions can be injected only when relevant, reducing context clutter and improving performance.
+>
+> - **Verifier-based workflows**
+>
+>   - A model can generate an intermediate result, then another model or programmatic checker can verify it before the system proceeds.
+>
+>   - In document generation, this might mean:
+>
+>     - create an outline,
+>     - verify the outline,
+>     - expand sections,
+>     - verify sections,
+>     - perform a final review.
+>
+>   - This reduces the risk of discovering major problems only at the final output stage.
+>
+> - **Routing and model specialization**
+>
+>   - A router can classify requests and send them to specialized models.
+>   - This avoids using an expensive frontier model for every query.
+>   - Smaller or fine-tuned models may be sufficient for simpler tasks such as routine customer support.
+>   - The router itself must be monitored for over-triggering or under-triggering and periodically retrained from production logs.
+>
+> - **Generator–evaluator loops**
+>
+>   - A common agent pattern is a generator that drafts an answer and an evaluator that checks it.
+>   - The evaluator may use deterministic tests, rubrics, or model-based judgment.
+>   - The loop continues until the output satisfies the verifier or hits a stopping condition such as token or budget limits.
+>   - Human approval points may be needed for safety-sensitive tasks.
+>
+> - **Why coding agents work well**
+>
+>   - Coding is valuable and highly verifiable.
+>   - Test cases provide a clear signal for whether a patch works.
+>   - Regression tests check whether the agent broke existing behavior.
+>   - This makes coding a strong domain for reinforcement learning and iterative improvement.
+>
+> - **Why customer-support and voice agents work well**
+>
+>   - These domains often have clear success criteria, such as whether a ticket was resolved.
+>   - Production logs provide trajectories: user query, agent actions, and final outcome.
+>   - These trajectories can be used as feedback data for further reinforcement learning.
+>
+> - **Main practical recommendation**
+>
+>   - Start with the simplest architecture that can solve the task.
+>
+>   - Add complexity only when the task genuinely requires open-ended planning, tool use, or long-horizon reasoning.
+>
+>   - Design the interface from the model’s perspective:
+>
+>     - provide the right context,
+>     - use clear system instructions,
+>     - give enough context length for reasoning,
+>     - structure files and tools in formats the agent can use effectively.
+>
+>   - The central design principle is verifiability: agents improve fastest when they can reliably tell whether their actions succeeded.
+
+### Reflection
+
+## GraphRAG in Healthcare: Enhancing Clinical Reasoning with Knowledge Graphs, GNNs, and Agents
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Giuseppe Futia
+- CSI Piemonte
+- [slides](https://docs.google.com/presentation/d/1ipi1sVaTisg-L-vLalUmf03cUZvA3V1x/edit)
+
+> **NOTE:**
+>
+> - **Main topic:** The talk explains how graph technologies can support healthcare applications by combining:
+>
+>   - **Knowledge graphs** for structured medical knowledge representation.
+>   - **Large language models (LLMs)** for extraction, annotation, and reasoning.
+>   - **Graph neural networks (GNNs)** for graph-aware embeddings and disambiguation.
+>   - **Agents** that can query both public medical knowledge and private patient data.
+>
+> - **Healthcare data challenges:**
+>
+>   - Medical data comes from heterogeneous sources: electronic health records, lab results, diagnoses, medications, clinical notes, reports, publications, and ontologies.
+>   - Patient data is sensitive, so the system should avoid sending it to external LLM services.
+>   - The speaker argues for keeping patient data inside local or legacy infrastructure and accessing it virtually when needed.
+>
+> - **Proposed architecture:**
+>
+>   - Use local/open LLMs rather than remote API-based models.
+>   - Store public medical knowledge in a graph database such as Neo4j.
+>   - Keep private clinical data in legacy databases and materialize it only at query time.
+>   - Use graph-based components for ontology integration, information extraction, enrichment, and patient-data access.
+>
+> - **Medical ontologies as semantic infrastructure:**
+>
+>   - The talk highlights resources such as **UMLS** — Unified Medical Language System — **ICD-10**, and **HPO** — Human Phenotype Ontology.
+>   - UMLS acts as a bridge across medical vocabularies.
+>   - ICD-10 provides hierarchical disease classifications.
+>   - HPO connects phenotypic abnormalities, symptoms, diseases, and sometimes frequency information.
+>   - These ontologies help normalize ambiguous medical terms, such as distinguishing a virus, disease, symptom, or clinical finding.
+>
+> - **Entity recognition and disambiguation:**
+>
+>   - Clinical narratives contain ambiguous terms and synonyms.
+>   - The system first identifies candidate entities, then disambiguates them using ontology context.
+>   - Example: “Zika” may refer to multiple related medical entities.
+>   - Another example distinguishes “shortness of breath,” “dyspnea,” and “tachypnea,” showing that lexical similarity alone is not enough.
+>
+> - **Ontology mapping workflow:**
+>
+>   - Candidate selection is performed using vector similarity over embeddings stored in Neo4j.
+>   - Candidate disambiguation is then performed with an LLM, using contextual information from ontology structure, definitions, synonyms, and hierarchy.
+>   - The speaker emphasizes that LLM quality depends heavily on the quality and relevance of the context provided.
+>
+> - **Role of graph neural networks:**
+>
+>   - GNNs are introduced as a way to improve embeddings by incorporating neighborhood structure.
+>
+>   - The speaker explains message passing through three steps:
+>
+>     - message,
+>     - aggregate,
+>     - update.
+>
+>   - Instead of representing a node only by its text, a GNN represents it using information from neighboring nodes and relationships.
+>
+> - **Why GNNs help:**
+>
+>   - Pure textual embeddings can miss correct ontology matches when terms are lexically different.
+>   - GNNs can use relational structure to recover semantically correct candidates.
+>   - In the validation example, Qwen embeddings failed to place the correct entity in the top five in 34 out of 368 cases; GNN re-ranking rescued about half of those cases.
+>   - Example: “cervicalgia” should map to “neck pain”; text-only embeddings ranked it 19th, while the GNN-enhanced representation moved it to first place.
+>
+> - **G-Retriever model:**
+>
+>   - The talk introduces a GNN-plus-LLM approach based on G-Retriever.
+>   - It extracts a relevant subgraph using a Prize-Collecting Steiner Tree-style method.
+>   - The subgraph is encoded by a GNN and passed to the LLM as graph-derived “soft tokens.”
+>   - This gives the LLM graph-structured context rather than only textual context.
+>
+> - **Graph agent use case:**
+>
+>   - A graph-based agent can use several tools:
+>
+>     - query public medical knowledge in the graph,
+>     - query private patient data virtually,
+>     - combine both to answer clinical questions.
+>
+>   - Example questions include retrieving a patient’s follow-up plan or identifying possible diseases based on HPO symptom coverage.
+>
+>   - The key advantage is that answers are grounded in explicit ontology structure rather than relying only on the LLM’s internal knowledge.
+>
+> - **Core message:**
+>
+>   - Graphs provide a structured, interpretable, and privacy-preserving foundation for healthcare AI.
+>   - LLMs are useful, but they need well-selected, semantically organized context.
+>   - GNNs improve retrieval and disambiguation by exploiting graph topology.
+>   - Agents can unify these components into systems that reason across public medical knowledge and private patient data without unnecessarily moving sensitive data.
+>
+> - **Closing material:**
+>
+>   - The speaker briefly promotes a related book and a knowledge graph training program.
+>   - The ODSC host closes the event and encourages attendees to revisit sessions on demand and provide feedback.
+
+### Reflection
+
+## The Changing Shape of AI Systems - From Monolithic Training to Continuous Adaptation
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Sudip Roy
+  - Adaption
+  - adaptive data: creating niche datasets for underserved domains and languages;
+  - adaptable intelligence: enabling systems to evolve from user feedback;
+  - adaptable interfaces: moving beyond rigid chat boxes toward task-specific interfaces.
+
+> **NOTE:**
+>
+> - The Speaker argues that AI systems have historically been built as static artifacts: train once, ship, freeze, and optimize mainly around inference cost and latency.[^9]
+> - Traditional machine learning systems were often application-specific, smaller, and easier to retrain continuously, sometimes daily or weekly.
+> - Foundation models changed this architecture:
+>   - one large model serves many downstream tasks;
+>   - training cost is concentrated into a single expensive pretraining run;
+>   - the deployed model is usually frozen for months;
+>   - most post-deployment engineering focuses on inference optimization.
+> - The deployed “unit” of AI has grown over time:
+>   - from a single stateless model;
+>   - to compound systems with retrieval, databases, verification, and guardrails;
+>   - to agentic systems that call tools, interact with environments, and receive feedback.
+> - The speaker’s central criticism is that even agentic systems usually do not truly learn from deployment-time failures. A customer-support agent may fail today, log the failure, and still fail the same way tomorrow.
+> - This creates a growing inefficiency:
+>   - agentic interactions require many model calls, tool calls, and retries;
+>   - failures generate useful feedback;
+>   - current serving stacks are not designed to feed that feedback back into the model or system dynamically.
+> - The main open question is: how can a deployed model improve over time?
+> - Several candidate mechanisms are mentioned:
+>   - fine-tuning;
+>   - reinforcement learning from human feedback (RLHF);
+>   - reinforcement learning;
+>   - online learning;
+>   - continual learning;
+>   - memory systems.
+> - The first major design question is where learning should live:
+>   - Non-parametric memory stores changing information outside the model, such as retrieval systems or databases. It is cheap and dynamic but not true model learning.
+>   - Parametric memory updates the model weights themselves. It is durable and low-latency at inference time, but expensive and slow to modify.
+>   - The speaker suggests a hybrid: stable knowledge belongs more naturally in parameters, while ephemeral knowledge belongs outside the model.
+> - The second major design question is compute allocation:
+>   - Increasingly, much of the runtime cost is outside the model itself.
+>   - Retrieval, search, verification, tool execution, and environment simulation can consume 30–50% or more of application time.
+>   - Therefore, optimization should target the full “model plus harness,” not only the neural model.
+> - The third major design question is governance:
+>   - Static models can be versioned, red-teamed, and evaluated before deployment.
+>   - Continuously adapting models complicate versioning, monitoring, reproducibility, rollback, and safety guarantees.
+>   - A key concern is preventing uncontrolled behavioral drift.
+> - A future adaptive support agent should:
+>   - learn from yesterday’s failures;
+>   - improve cheaply and frequently;
+>   - make changes reversibly;
+>   - provide an auditable contract about how far it is allowed to drift.
+> - The speaker summarizes three architectural shifts:
+>   - workloads are moving from static inference to agentic interaction;
+>   - learning is moving from fixed memory toward hybrid parametric and non-parametric memory;
+>   - compute is moving from the model alone to the model plus surrounding harness.
+> - The broader thesis is that AI systems are evolving from static artifacts into living systems that continuously adapt as the world changes.
+> - In Q&A, the speaker is asked “whether hybrid learning implies neuro-symbolic architecture”. He does not commit to that framing, but suggests that enterprise ontologies or structured representations may form part of the stable world model, while more transient facts remain in non-parametric memory.
+
+### Reflection
+
+## Agentic LLMs in Practice
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Naman Goyal
+  - [website](https://namangoyal.com/)
+  - [LinkedIn](https://www.linkedin.com/in/goyal-naman/)
+  - [slides](https://drive.google.com/file/d/1qWMLECJSSEjaSTprg6ZwGTtidP18ffGn)
+  - [colab](https://github.com/thenamangoyal/llm-engineering-workshop)
+  - [Google DeepMind](https://www.deepmind.com/)
+
+> **NOTE:**
+>
+> - [nworkshopb1](https://github.com/thenamangoyal/llm-engineering-workshop/blob/main/Agentic_LLMs_Workshop.ipynb)
+>   - Module 1 — Function calling, end to end. A function-calling agent loop on SQLite + a mock weather API, with strict Pydantic-validated tool arguments.
+>   - Module 2 — Reference architectures. A router-worker state machine with Pydantic contracts at every node, compared head-to-head with a free-form ReAct loop.
+>   - Module 3 — Surviving production. A retry-storm demo on a deliberately flaky upstream, with a playground cell where you tune the retry policy yourself and watch the bars move.
+>   - Module 4 — Observability. An OpenTelemetry-style traced agent run, rendered as a Gantt chart you generate from your own spans.
+> - [pydantic](https://pydantic.dev/) - a data validation and settings management library for Python, based on type annotations. It provides a way to define data models with type hints and validates the data against those models, making it easier to work with structured data in Python applications.
+> - [sqlite](https://www.sqlite.org/) - a C-language library that implements a small, fast, self-contained, high-reliability, full-featured, SQL database engine.
+> - [MCP](https://modelcontextprotocol.org/) - a standard for connecting language models to external data sources and tools, enabling them to access and manipulate information beyond their training data. MCP defines a protocol for communication between language models and external services, allowing for more dynamic and interactive applications.
+> - [A2A](https://a2a.dev/) - a framework for building agentic applications that can interact with each other and with external services using the Model Context Protocol (MCP). A2A provides tools and libraries for creating, managing, and orchestrating agentic applications in a scalable and efficient way.
+> - [LangGraph](https://langchain-ai.github.io/langgraph/)
+> - [Plan-and-Execute pattern](https://blog.langchain.dev/planning-agents/) (LangChain blog)
+> - [Tenacity](https://tenacity.readthedocs.io/)
+> - [Function-calling guide (OpenAI)](https://platform.openai.com/docs/guides/function-calling)
+> - [ReAct (Yao et al., 2022)](https://arxiv.org/abs/2210.03629)
+> - [OpenTelemetry](https://opentelemetry.io/)
+
+### Reflection
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {ODSC {AI} 2026},
+  date = {2026-04-30},
+  url = {https://orenbochman.github.io/posts/2026/04-30-ODSC-AI-2026-Day-3/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “ODSC AI 2026.” April 30. <https://orenbochman.github.io/posts/2026/04-30-ODSC-AI-2026-Day-3/>.
+
+[^1]: is that even possible…llms are black boxes and most dont share their weight or even thier system prompt
+
+[^2]: why is fuzz testing is so important here…
+
+[^3]: is that even possible…llms are black boxes and most dont share their weight or even thier system prompt
+
+[^4]: why is fuzz testing is so important here…
+
+[^5]: is that even possible…llms are black boxes and most dont share their weight or even thier system prompt
+
+[^6]: why is fuzz testing is so important here…
+
+[^7]: is that even possible…llms are black boxes and most dont share their weight or even thier system prompt
+
+[^8]: why is fuzz testing is so important here…
+
+[^9]: looks like he needs to hear about RL

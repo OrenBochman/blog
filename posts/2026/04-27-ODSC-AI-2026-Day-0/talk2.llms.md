@@ -1,0 +1,129 @@
+## Introduction to the Math Behind Transformers and LLMs
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- David Hoyle
+  - [LinkedIn](https://linkedin.com/in/davidchoyle?originalSubdomain=uk)
+  - [slides](https://docs.google.com/presentation/d/1w9VVtjgXcCSlTK2UNa4BQ6FUJDXIRhE2/edit?usp=sharing&ouid=107678147228131583519&rtpof=true&sd=true)
+  - [dunnhumby](https://www.dunnhumby.com/)
+
+> **NOTE:**
+>
+> - **Purpose of the talk**
+>   - David Hall explains the mathematics behind transformers and large language models in an accessible way.
+>   - The goal is not to train a full large language model, build chat bots, or teach prompting, but to reduce fear of the mathematical structure behind these systems.
+>   - The central modeling task is **next-word prediction**: given a partial sequence of words, predict the most likely next word.
+> - **Next-word prediction as the core idea**
+>   - A language model begins with a context, such as “The cat sat on the…”
+>   - It predicts the next word, appends that word to the sequence, and then repeats the process.
+>   - This recursive procedure can generate longer completions, poems, answers, or dialogue.
+>   - Systems such as ChatGPT and Claude can be understood, at a high level, as sophisticated next-token prediction systems.
+> - **Naive Markov model baseline**
+>   - Hoyle introduces a first-order Markov model using the phrase: “The more you know, the more you realize you don’t know.”
+>   - A Markov model predicts the next word using only the immediately preceding word.
+>   - Its transition probabilities can be represented as a matrix.
+>   - The model exposes two major problems:
+>     - It ignores most of the previous context.
+>     - It becomes impractical with large vocabularies because the transition matrix grows explosively.
+>   - It can also generate nonsensical sentences, illustrating why probabilistic language generation needs better structure.
+> - **Why embeddings are needed**
+>   - One-hot representations are too large and sparse for realistic vocabularies.
+>   - Large language models instead map tokens into lower-dimensional **embedding vectors**.
+>   - These vectors numerically encode semantic relationships between words.
+>   - Word2vec examples show that embeddings support meaningful operations, such as similarity comparison and analogy-like vector arithmetic.
+>   - Hoyle demonstrates cosine similarity and examples such as comparing related words or testing vector analogies.
+> - **Main intuition of transformers**
+>   - Transformers map tokens to embedding vectors, then transform those vectors so they become **context-aware**.
+>   - A word’s final vector should not merely represent the word itself; it should also encode relevant information from surrounding or preceding tokens.
+>   - Once context-aware vectors are obtained, a relatively standard classifier can predict the next token.
+> - **Attention mechanism**
+>   - Attention constructs a new vector for each token by taking a weighted combination of other token vectors.
+>   - The weights indicate how much each token should “pay attention” to other tokens.
+>   - Instead of averaging the original embeddings directly, the model first applies learned linear transformations to produce value vectors.
+> - **Self-attention**
+>   - Self-attention computes attention weights from the tokens themselves.
+>   - Tokens are transformed into **query** and **key** vectors.
+>   - The similarity between a query and a key, usually via an inner product, determines how much attention one token pays to another.
+>   - A softmax function converts these similarity scores into normalized attention weights.
+>   - Learned matrices produce the query, key, and value vectors.
+> - **Masking**
+>   - For next-token prediction, the model must not look ahead at future tokens.
+>   - Masking prevents later tokens from influencing the representation of earlier positions.
+>   - This is done by forcing unwanted attention scores to effectively become zero after softmax.
+>   - Decoder-style language models use masking so that each position only attends to previous tokens.
+> - **Multi-headed attention**
+>   - A single attention mechanism may not capture all relevant relationships between tokens.
+>   - Multi-headed attention uses several attention heads in parallel.
+>   - Different heads can specialize in different kinds of relationships or different parts of the embedding space.
+>   - Their outputs are combined, often by concatenation, to form a richer context-aware representation.
+> - **Transformer block structure**
+>   - A transformer block contains:
+>     - Multi-headed self-attention.
+>     - A neural network layer for nonlinear mixing of information.
+>     - Normalization layers for stable training.
+>     - Residual connections to preserve and stabilize information flow.
+>   - These blocks transform input embeddings into context-aware embeddings suitable for prediction.
+> - **Predicting the next word**
+>   - The model takes the final context-aware embedding vector in the sequence.
+>   - A softmax classifier maps that vector to a probability distribution over the vocabulary.
+>   - The next token can be chosen as the most probable word or sampled from the distribution for more variation.
+>   - The process repeats by appending the selected token and predicting again.
+> - **Training objective**
+>   - The model learns its parameters from large text corpora.
+>   - Training minimizes **[cross-entropy loss](https://en.wikipedia.org/wiki/Cross_entropy)**, which compares predicted token probabilities to the observed next token.
+>   - Since the correct observed word has probability one and all alternatives have probability zero, this becomes equivalent to maximizing the likelihood of the training data.
+>   - Large models need very large datasets because they contain many parameters.
+> - **Positional information**
+>   - Basic self-attention alone does not know word order.
+>   - If tokens are rearranged, attention based only on token identities may not distinguish the new order properly.
+>   - Transformers therefore add positional information to embeddings.
+>   - Positional encodings allow the model to represent not only which words occur, but where they occur in the sequence.
+> - **Types of transformer models**
+>   - **Decoder-only models**
+>     - Map context-aware vectors to predicted next tokens.
+>     - Used in systems such as ChatGPT and Claude.
+>     - Best suited for generative language modeling.
+>   - **Encoder-only models**
+>     - Map full token sequences into context-aware vectors without next-token generation.
+>     - Useful for representation tasks.
+>   - **Encoder-decoder models**
+>     - Use an encoder to represent an input sequence and a decoder to generate an output sequence.
+>     - Useful for tasks such as machine translation.
+> - **Code example**
+>   - Hoyle briefly shows how transformer operations can be implemented in PyTorch.
+>   - Key operations include matrix multiplication for query-key similarity, scaling by the square root of the vector dimension, masking, softmax, and multiplying attention weights by value vectors.
+>   - The point is that once high-level tensor operations are available, the mathematical structure of a transformer can be expressed compactly in code.
+> - **Q&A**
+>   - A [Markov model](https://en.wikipedia.org/wiki/Markov_model) cannot generate words outside its fixed vocabulary.
+>   - Transformer models also predict only from a fixed vocabulary, but modern vocabularies are large enough to cover most practical cases.
+>   - Infrequent or domain-specific words can be handled better through domain-specific fine-tuning.
+>   - Older or smaller embedding datasets may produce weaker similarity results than modern embeddings.
+>   - The main structural difference between encoder and decoder blocks is masking: decoders mask future tokens, while encoders generally do not.
+> - **Overall takeaway**
+>   - A large language model can be understood as a system that:
+>     - Converts tokens into vectors.
+>     - Uses attention to make those vectors context-aware.
+>     - Uses a classifier to predict the next token.
+>     - Repeats this process to generate text.
+>   - The mathematics is built from familiar components: vectors, matrices, inner products, softmax, probability, and loss minimization.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Introduction to the {Math} {Behind} {Transformers} and
+    {LLMs}},
+  date = {2026-04-27},
+  url = {https://orenbochman.github.io/posts/2026/04-27-ODSC-AI-2026-Day-0/talk2.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Introduction to the Math Behind Transformers and LLMs.” April 27. <https://orenbochman.github.io/posts/2026/04-27-ODSC-AI-2026-Day-0/talk2.html>.

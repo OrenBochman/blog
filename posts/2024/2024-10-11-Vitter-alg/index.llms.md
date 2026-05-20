@@ -1,0 +1,316 @@
+In this article I researched Vitter’s Algorithm. However the main point of this article is trying to place this algorithm as a component for planning for online learning and communication in multi-agent systems.
+
+## Online Learning of and Encoder decoder for complex states.
+
+We have demonstrated how agents can rapidly acquire adaptive signaling systems. We have looked at how they can use Bayesian urn models to infer an optimal permutation under changing conditions. Moving on seems like crossing a massive chasm. The next step is how to generalize from simple to complex states.
+
+Intuitively we want to see if the agents can learn to evolve a grammar for encoding and decoding a large body of messages based on a smaller code book. If we view this as an RL problem we might wonder if they can learn an optimal policy for encoding and decoding messages.
+
+One problem in evolving a grammar for complex states is that poor early choices have long lasting impact on the agent’s ability to communicate effectively.
+
+My way to view the such choices are as symmetry breakings i.e. we decide pick some subset of all complex signaling systems at every step. Some choices are lexical but other are structural (e.g. grammar or morphology) and they will require making consistent choices. This sounds like a classic planning problem in RL.
+
+## Planning
+
+The agents have goals beyond communications which require coordination these goals will likely shape the optimality of the language.
+
+I consider at this point I might consider four setting for complex languages:
+
+1.  All states and their distributions are known to sender and receiver (fully observable)
+2.  all states and their distributions are known to sender only (closed world)
+3.  state and their distributions are learned from experience (steady state partially observed life long learning)
+4.  states and their distributions evolve over time (partially observed non-stationary environment with life long learning)
+
+The fully observed setting are a bit deceptive here as the lewis signaling game is based on information asymmetry. The agents may have a prior knowledge of the continuum of states but only the sender sees the current states at any point. In the last two options the states might be modeled via a Hoffe urn process that can generate new states over time.
+
+In a bayesian view of such a world we are moving from parametric to non parametric world model. (For our language/state classifier the distinction is that for non-parametric the number of parameters in our tree is now potentially infinite though it may be easier to think of a tree that can always grow another branch or a restaurant that can always add another table or a stick that can always be broken further)
+
+But the main point here is that the first three setting are more likely have a DSL as thier optimal language. While the last setting which is typicaly bundled with multiple evolving goals. AKA is best handled by a GNL - Generalist Natural Language.
+
+However in terms of the outcome if sender and reciever don’t plan thier language they may still be optimal by luck. Also with an RL algorithm agents should be able to recover from poor choices eventually. More so if they use a bayesian belief system to revise thier value functions.
+
+### An algorithmic interlude
+
+Let’s take a little timeout and consider the problem of language planning.
+
+Suppose our states fit nicely in a table. We might think of a language that looks like a table.
+
+\<f_1,f_2,f_3,...f_n\> \to \<s_1,s_2,s_3,...s_n\>
+
+- where f are fields and s are words
+
+we would need unique symbols for each instance of s\in s_i or we could use lump them together as languages like german and turkish lump many words together so might do this
+
+\<f_1,f_2,f_3,...f_n\> \to s\_{\\1...n\\}
+
+This could reduce the number of symbols we need to learn substantially from the power set of product of sub-states to the number of states. Though if our table is big there may still be much to learn.
+
+The down side to this approach is that it would take a long time to learn this language by trial and error. The main issue here being that there are very many possible states and given s\_{\\1...n\\} might match. Also the student doesn’t have any real advantage from learning a subset of the language. This is in fact the classic lewis signaling game.
+
+So how can we do better? First we might be able to factor the table into smaller tables. Perhaps the first table might be correspond to NP and the second to VP.
+
+\<f_1,f_2,f_3,...f_n\> \to np\_{\\1...l\\},vp\_{\\l+1...k\\}
+
+and to complete the language we might require a grammar that aggregates
+
+s\_{\\1...n\\} \equiv \<np\_{\\1...l\\},vp\_{\\l+1...k\\}\>
+
+Now we have \|n_p\|\*\|v_p\| symbols but perhaps some n_p and v_p are very rare and better yet most combinations never come up. This means we only need to learn the top n_p and v_p and we can get an almost perfect score at the lewis game.
+
+But the main benefit is that we learned to top few n_p and v_p much sooner than the first s_i. What if we could do better? Isn’t there a decomposition for n_p and v_p?
+
+np\_{\\1...n\\} \equiv \<det_1,n_l\>
+
+and v_p \equiv \begin{cases} \<v_1\>-- & \text(intransitive) \\ \<v_1, n_2\> & \text(transitive) \\ \<v_1, v_2, n_2\> & \text(modal, etc) \end{cases}
+
+and we might continue by having rules for v_p and n_p with morphologies.
+
+While there is now more to learn we can learn it faster because we have to coordinate on much smaller set of sub-states, before we can (potentially) get any payoffs….
+
+In fact we can start to get the full benefits of this grammar once we have learned to use a few items from each slot. We might be so lucky that some of the slots like determiners have only two options and that there are only a handful of pronouns.
+
+And since we are planning a whole language we can make everything nice and regular and we can make semantics composable from a small set of semantic atoms we use to construct our lexicon.
+
+Ok so we have sketched a case for learning a language like english which decomposes any structured construct into the smallest factors.
+
+This has a potential for fantastic saving in the learning side of things. But to reap these benefits we might want to change the lewis game a bit.
+
+We want to keep its main form though: States are seen by the sender, rewards are symmetric. But we want to allow the sender to send simpler messages corresponding to a partial state. Actually we have seen this idea before in papers with multiple sends sensing a partial states and the receiver learning the full language.
+
+Now the sender might send a full state like s_a = \<det_1,n_2, v_3, n_4\> but instead he would send a bunch of messages drawn from the power set. In this case \<det_1\> would not get much reward say \frac{1}{10} as it is a syntax word and carries little semantics on its own. But \<n_2\> might get a third for \<v_3, n_4\> might get a half. We would of course need to normalize this to add to one. But we have actually done something useful in terms of RL we have allowed for rewards signals for partial success which as we wanted speeds up learning by allowing more frequent updates of the value function.
+
+The reward might be shaped on the saliency of the sub-states to the survival of the agents or more broadly by its likelihood of allowing the agents to achieve their shared tasks faster. This is harder to do. I think information theoretic scheme or even \frac{TF}{IDF} based scheme might be easy to implement and intuit about. (Here D refers to states.)
+
+Besides getting these partial rewards, the receiver might get an attempt to decode each of the partial states in turn. We might want to stop him on the first mistake but perhaps he should get to try all the partial states, this might maximize learning down the road, particularly if the agents track beliefs, perhaps via a TOM (theory of mind).
+
+Where f1 to fn are features of the state and s1 to sm are symbols in the language.
+
+1.  English vs Turkish
+2.  Language of Logic
+3.  Trial and error
+4.  Dreaming trial and error - MCMC with importance sampling
+5.  Equivalence classes of language - Markov Equivalence.
+6.  If Emergence is accelerated via learnability than it should be used to prioritize planning.
+7.  A causal view - of planning and learnability.
+8.  A theory of mind - ToM and planning in a bayesian setting.
+
+### Infinite use of finite means
+
+Natural languages are characterized as “making Infinite use of finite means”. This is a product of thier recursive structure.
+
+The communication task of agents in a lewis signaling games and often restricted to communicating a the current state of the world. S
+
+So we might consider that if the agents have seen some ‘sufficient’ set of states they might come up with a similar subset of possible language to coordinate on. One imagines that this might also be true if they have seen two non overlapping but compatible sufficient set of states.
+
+So if the agents can enumerate the emergent languages wrt their sufficient states subset the algorithm we need is one to coordinate on a subset of languages that are compatible for the current available space. An primitive RL alg here would just need to allow updating thier beliefs on the compatibility of rules and atoms. The rules are used more frequently so grammar should become synchronized faster and the atoms i.e. lexicon might be learned more slowly.
+
+### planning, evolution and minimalism.
+
+The grammar should allow a way to capture the The idea is that the agents should be able to learn some tricks
+
+When agent spontaneously create a complex signaling system perhaps the main problem they face is a how to convert the complex state into a linear sequence of atomic symbols that can be sent over a noisy channel and then recover the state on the other side. This is often called leaning a protocol.
+
+One path to solve this is to use a RNN. RNN are very powerful - they introduce orders of magnitude greater complexity into the problem than the actual coordination task
+
+This is best done using a prefix code and can be implemented with Huffman coding. However some issues arise in the real world that make the Huffman coding inadequate and require greater flexibility.
+
+1.  how can agents adapt to unseen sub-states without having to recalculate the entire code book which they have worked so hard to coordinate upon.
+2.  how can agents adapt to changes in the frequency distribution of states over time.
+
+This is **Vitter algorithm** - an algorithm for encoding and decoding messages based on using **Huffman prefix codes**. But it is a an adaptive version of the Huffman coding algorithm, which means that it can update the code book as it processes the message.
+
+This is useful when the frequency distribution of characters in the message changes over time.
+
+\begin{algorithm} \caption{Vitter's Adaptive Huffmaning algorithm}\begin{algorithmic} \Procedure{AdaptiveHuffmanEncode}{} \State Initialize \State readSymbol(\$X\$) \While{\$X \neq EOF\$} \If{firstReadOf(\$X\$)} \State output(code of ZERO) \State output(code of node \$X\$) \State create new node \$U\$ with next node ZERO and new node \$X\$ \State updateTree(\$U\$) \Else \State output(code of node \$X\$) \State updateTree(node \$X\$) \EndIf \State readSymbol(\$X\$) \EndWhile \EndProcedure \State \Procedure{updateTree}{\$U\$} \While{\$U \neq root\$} \State \$b :=\$ block of nodes preceding node \$U\$ \If{ ((\$U\$ is leaf) \and (\$b\$ is block of inner nodes) \and (value \$U\$ == value \$b\$)) \or ((\$U\$ is inner node) \and (\$b\$ is block of leaves) \and (value \$U\$ == value \$b - 1\$))} \State slide \$U\$ in front of block \$b\$ \State increment value of \$U\$ \If{\$U\$ is leaf} \State \$U := parent(U)\$ \Else \State \$U := parent(U \text{ before slide})\$ \EndIf \Else \State increment value \$U\$ \State \$U := parent(U)\$ \EndIf \EndWhile \State increment value \$U\$ \EndProcedure \end{algorithmic} \end{algorithm}
+
+Why and when does this confer a significant advantage?
+
+For complex lewis signaling games we need some way to convert the state of the world chosen by nature into a message that the sender can send to the receiver.
+
+Some options that came to mind are:
+
+1.  Enumeration base \|L\|, same as in the regular game but adjusted to the limitation of the alphabet - unfortunately this fails to capture any structure of the states.
+2.  Huffman coding using base 2. Many advantages but requires access to the entire message and the frequency distribution of the states. This generally not available in the Lewis signaling games where the states are chosen by nature and the distribution emerges over time from the interaction of the agents.
+3.  N-ary Huffman coding - this time we use base \|L\| for greater efficiency.
+4.  Adaptive Huffman coding - this is the Vitter algorithm.
+5.  Learn an encoder decoder using a neural network with LSTM or a transformer.
+6.  Learn a denoising autoencoder to correct for the noise in the message.
+
+My idea is that this can stand in as a default protocol for encoding and decoding messages in lewis signaling games with complex signals.
+
+The protocol gets updated as the agents play the game and distribution of states drifts over time.
+
+This algorithm support both encoding compositional codes by encoding just atomic symbols or if we **encode multiple symbols at a time it can be produce entangled codes**.
+
+A way to make this idea more concrete is if we designate certain sequences as an idiom i.e. we wish to encode the idiom as a single symbol since together they have a different meaning than thier literal meaning as atomic symbols. This may sound like an awkward idea but consider that there are many cases where such a sequence is dramatically more likely then any other sequence featuring it’s constituents.
+
+Given the higher frequency we might encode them as a single symbol. This way we can encode compositional codes and idioms in the same message. But you also avoid collisions between idioms and their atomic counter parts
+
+- “keep the wolf from the door” idiomatic version - in a 1 block of 6 symbols.
+- “keep the wolf from the door” atomic symbols - as a 6 symbols
+
+## Future work:
+
+1.  add an algorithm for adaptive arithmetic coding - which is more efficient than huffman coding.
+2.  add support for blocking - this is where we encode 4 or more characters at a time. This is useful when the message is very long and we want to reduce the overhead of encoding and decoding.
+    - Blocking seems to be counter productive for language evolution making semantics depend on the length and order of the block.  
+    - However both agents and Natural language can use entangled codes so we may want to support this.
+    - With the caveat that we may pad the block to avoid blocking beyond the end of the message or a semantic unit.
+3.  Integrate into an agent in the lewis petting zoo environment.
+
+``` python
+import heapq
+
+class Node:
+    def __init__(self, char, freq):
+        self.char = char
+        self.freq = freq
+        self.left = None
+        self.right = None
+
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+def build_huffman_tree(chars_freq):
+    """
+    Builds the Huffman tree for given character frequencies.
+
+    Args:
+        chars_freq: A dictionary of characters and their frequencies.
+
+    Returns:
+        The root of the Huffman tree.
+    """
+    nodes = []
+    for char, freq in chars_freq.items():
+        heapq.heappush(nodes, Node(char, freq))
+
+    while len(nodes) > 1:
+        left = heapq.heappop(nodes)
+        right = heapq.heappop(nodes)
+        parent = Node(None, left.freq + right.freq)
+        parent.left = left
+        parent.right = right
+        heapq.heappush(nodes, parent)
+
+    return nodes[0]
+
+def encode_char(root, char, code=''):
+    """
+    Encodes a character using Huffman codes.
+
+    Args:
+        root: The root of the Huffman tree.
+        char: The character to encode.
+        code: The current code (initially empty).
+
+    Returns:
+        The Huffman code for the character.
+    """
+    if root is None:
+        return ''
+
+    if root.char == char:
+        return code
+
+    left_code = encode_char(root.left, char, code + '0')
+    if left_code != '':
+        return left_code
+
+    right_code = encode_char(root.right, char, code + '1')
+    return right_code
+
+def decode_char(root, code):
+    """
+    Decodes a Huffman code to get the character.
+
+    Args:
+        root: The root of the Huffman tree.
+        code: The Huffman code to decode.
+
+    Returns:
+        The decoded character.
+    """
+    current = root
+    for bit in code:
+        if bit == '0':
+            current = current.left
+        else:
+            current = current.right
+
+    if current.char is not None:
+        return current.char
+
+def encode_message(root, message):
+    """
+    Encodes a message using Huffman codes.
+
+    Args:
+        root: The root of the Huffman tree.
+        message: The message to encode.
+
+    Returns:
+        The encoded message.
+    """
+    encoded_message = ''
+    for char in message:
+        encoded_message += encode_char(root, char)
+    return encoded_message
+
+def decode_message(root, encoded_message):
+    """
+    Decodes a Huffman-encoded message.
+
+    Args:
+        root: The root of the Huffman tree.
+        encoded_message: The encoded message.
+
+    Returns:
+        The decoded message.
+    """
+    decoded_message = ''
+    current = root
+    for bit in encoded_message:
+        if bit == '0':
+            current = current.left
+        else:
+            current = current.right
+
+        if current.char is not None:
+            decoded_message += current.char
+            current = root
+
+    return decoded_message
+
+# Example usage
+chars_freq = {'a': 45, 'b': 13, 'c': 12, 'd': 16, 'e': 9, 'f': 5}
+root = build_huffman_tree(chars_freq)
+
+message = "abcdef"
+encoded_message = encode_message(root, message)
+print("Encoded message:", encoded_message)
+
+decoded_message = decode_message(root, encoded_message)
+print("Decoded message:", decoded_message)
+```
+
+    Encoded message: 010110011111011100
+    Decoded message: abcdef
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Vitter’s {Algorithm}},
+  date = {2024-10-11},
+  url = {https://orenbochman.github.io/posts/2024/2024-10-11-Vitter-alg/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2024. “Vitter’s Algorithm.” October 11. <https://orenbochman.github.io/posts/2024/2024-10-11-Vitter-alg/>.

@@ -1,0 +1,347 @@
+Today I posit a couple of questions on the Lewis signaling game.
+
+1.  Are there useful[^1] interpretation of some equilibria in the Lewis signaling game that are not fully separable equilibria?
+2.  Are some partial pooling equilibria more useful than others?
+3.  Might agents prefer to employ partial pooling strategies over fully separable equilibria?
+4.  Might agents want to employ mixed strategies?
+
+These questions lead to an understanding of a mechanism that explains
+
+1.  How symmetry breaking may lead to a sub-optimal languages in terms of overall fitness.
+2.  How semantic categories may be encoded compactly
+3.  How distributional semantics arise in natural languages
+4.  A mechanism demonstrating use of unmarked and marked items in different classes[^2]
+5.  Partial pooling also explains another aspect of natural languages. Natural languages have low degree of ambiguity in the long tail but do tend to have ambiguity in the highest frequency words. This seems to fit with a the same mechanism at work but operating in a more contextual pattern. I.e. if we talked about \[category-prefix, disambiguate-suffix\] we can also consider that once a suffix becomes a morpheme it’s signal can be re-purposed as \[prefix-sense, context\] and more generally \[morpheme-sense, context\]. High frequency words tend to be short and reusing them increases compression, of the language.
+
+## Partial Pooling
+
+let’s imagine we have this signaling system
+
+``` python
+from IPython.display import Markdown
+from tabulate import tabulate
+
+lexicon = {}
+
+lexicon['falcon']  = '000 00'
+lexicon['hawk']    = '000 01'
+lexicon['eagle']   = '000 10'
+lexicon['panther'] = '111 00'
+lexicon['leopard'] = '111 01'
+lexicon['jaguar'] =  '111 11'
+
+# converting the lexicon to a table
+table = [[k, v] for k, v in lexicon.items()]
+
+
+Markdown(tabulate(
+  table, 
+  headers=["Pre-Linguistic- Object", "signal"]
+))
+```
+
+| Pre-Linguistic- Object | signal |
+|:-----------------------|:-------|
+| falcon                 | 000 00 |
+| hawk                   | 000 01 |
+| eagle                  | 000 10 |
+| panther                | 111 00 |
+| leopard                | 111 01 |
+| jaguar                 | 111 11 |
+
+Table 1: predators and their signals for tribe 1
+
+A spider monkey, the response for a raptor might be dealt with by descending from the top of trees to the second or third level of the canopy. A feline might be dealt with by moving to the top of the tree.
+
+Clearly though there is little time to waste. So the monkey should be moving with aleracticy as soon as it hears either ‘0’ or ‘1’.
+
+But ‘0’ and ‘1’ are not signals they are artifacts of the lexicon. Or are they?
+
+``` python
+lexicon = {}
+
+lexicon['raptor']  = '000 '
+lexicon['hawk']    = '000 '
+lexicon['eagle']   = '000 '
+lexicon['raptor']  = '000 '
+
+lexicon['feline']  = '111'
+lexicon['panther'] = '111'
+lexicon['leopard'] = '111'
+lexicon['jaguar']  = '111'
+
+# converting the lexicon to a table
+table = [[k, v] for k, v in lexicon.items()]
+
+Markdown(tabulate(
+  table, 
+  headers=["Pre-Linguistic- Object", "signal"]
+))
+```
+
+| Pre-Linguistic- Object | signal |
+|:-----------------------|-------:|
+| raptor                 |    000 |
+| hawk                   |    000 |
+| eagle                  |    000 |
+| feline                 |    111 |
+| panther                |    111 |
+| leopard                |    111 |
+| jaguar                 |    111 |
+
+Table 2: predators categories and their signals
+
+This is only a partial pooling equilibrium. It doesn’t allow the monkeys to distinguish between the different types of raptors or felines.
+
+We care about it because it can serve the monkeys as a starting point for more complex signaling systems like the one above that are compatible with the semantics captured in this one - that there are two groups with two urgent actions. The has an implicit prefix that is compatible with the semantics of the category. The prefix arises in part from choice of using prefix codes inspired by Huffman codes ([Huffman 1952](#ref-Huffman1952Method))
+
+If all the monkeys care about is the up down response the partial pooling equilibrium is all they need to learn. If they have benefits at distinguishing between the different types of predators, when they are at a distance, they would need to learn a more complex signaling system.
+
+But when threat is imminent, the partial pooling equilibrium is what they should be using both as sender and as receiver.
+
+Also it is conceivable that a number of signaling systems compatible with [Table 2](#tbl-predators-categories) might arise by further spontaneous symmetry breaking once this equilibrium is established. with [Table 1](#tbl-predators) being one such option.
+
+Now in most research on simple signaling system we often emphasize how signaling systems can arise via spontaneous symmetry breaking. Suppose the monkey learn the following signaling system.
+
+``` python
+from IPython.display import Markdown
+from tabulate import tabulate
+
+lexicon = {}
+
+lexicon['falcon']  = '000 00'
+lexicon['hawk']    = '111 00'
+lexicon['eagle']   = '000 10'
+lexicon['leopard'] = '111 01'
+lexicon['panther'] = '000 01'
+lexicon['jaguar']  = '111 11'
+
+# converting the lexicon to a table
+table = [[k, v] for k, v in lexicon.items()]
+
+
+Markdown(tabulate(
+  table, 
+  headers=["Pre-Linguistic- Object", "signal"]
+))
+```
+
+| Pre-Linguistic- Object | signal |
+|:-----------------------|:-------|
+| falcon                 | 000 00 |
+| hawk                   | 111 00 |
+| eagle                  | 000 10 |
+| leopard                | 111 01 |
+| panther                | 000 01 |
+| jaguar                 | 111 11 |
+
+Table 3: predators and their signals for tribe 2
+
+Here hawk and panther have been swapped. This system is no longer compatible with the structure of the partial pooling equilibrium. The prefix ‘0’, ‘1’ no longer map to the category. Now instead of being able to respond after 1 letter, the tribe need to listen five times before responding.
+
+The spider monkeys in this case might exhibit reduced fitness as a group as they have to hear the full signal before they can respond. If the two tribes lived in adjacent groves the predators would quickly notice that this second group is much slower to respond to threat and preferentially target its members.
+
+This can also lead to a break in communication. If the monkeys ignore anything after the first letter they will be correct 2/3 of the time. This would be acceptable if the delays leads to casualties due to predation more than 1/3 of the time.
+
+Another way out might be to use a mixed strategy. If they could alternate between two systems they can get the benefits of both.
+
+Here we might think of some mixture between [Table 3](#tbl-predators-incompatible) and [Table 1](#tbl-predators). The problem here is that in game theory we generally consider such a strategy as 20% of one and 80% of the other and some randomizer picking between the two. But what we want is to allow the choice to be deterministic. The problem is there is no way for the receivers to tell which system is being used even if the sender know.
+
+So the senders may notice the problem and since they are required to send long signals they are exposed to greater threats. They may take steps to remedy the shortcomings of the signaling systems. We could analyze this further in terms of a costly signal where cost for predators is a function of length and or number of ‘loud’ letters.
+
+Leaving aside the formal question we can see that on the path to learning a full signaling system agents may pass though many states in which they do not have a full signaling system and may be only equipped with partial pooling equilibria.
+
+Another view might be as follows:
+
+``` python
+from IPython.display import Markdown
+from tabulate import tabulate
+
+lexicon = {}
+
+lexicon['falcon']  = '000'
+lexicon['jaguar']  = '111'
+
+
+# converting the lexicon to a table
+table = [[k, v] for k, v in lexicon.items()]
+
+
+Markdown(tabulate(
+  table, 
+  headers=["Pre-Linguistic- Object", "signal"]
+))
+```
+
+| Pre-Linguistic- Object | signal |
+|:-----------------------|-------:|
+| falcon                 |    000 |
+| jaguar                 |    111 |
+
+Table 4: predators and their signals 3
+
+So how can we tell if a signaling system if better than another that arises the from a different spontaneous symmetry breaking?
+
+We need to test it for compatability with such a partial pooling equilibria. If we use these two codes as categories we can constrain new signals to conform to the hierarchy by using these codes as prefixes. Note that we could compose these in ways that would be much harder than with fully fleshed hieracies
+
+``` python
+from IPython.display import Markdown
+from tabulate import tabulate
+
+lexicon = {}
+lexicon['raptor']    = '000'
+lexicon['fruit']     = '001'
+lexicon['logic']     = '010' # suffix for not and or 
+lexicon['verbs']     = '011'
+lexicon['space']     = '100'
+lexicon['hierarchy'] = '101'
+lexicon['grammar']   = '110' # sufixes for grammarical words
+lexicon['feline']    = '111'
+
+# converting the lexicon to a table
+table = [[k, v] for k, v in lexicon.items()]
+
+
+Markdown(tabulate(
+  table, 
+  headers=["Pre-Linguistic- Object", "signal"]
+))
+```
+
+| Pre-Linguistic- Object | signal |
+|:-----------------------|-------:|
+| raptor                 |    000 |
+| fruit                  |    001 |
+| logic                  |    010 |
+| verbs                  |    011 |
+| space                  |    100 |
+| hierarchy              |    101 |
+| grammar                |    110 |
+| feline                 |    111 |
+
+Table 5: partial equilibria for many hierarcies
+
+This suggest a new insight into complex signaling systems.
+
+Hierarchies can learned early, perhaps based on the most common representative. This may be due to inductive bias of senders. IT might happen due to planning. Otherwise these structures would need to be learned by evolving/refining inferior systems. What is certain that using spontaneous symetry breaking is unlikely to be copatible with such systems. And that even if it is not possible to plan these in advance a good algorithem would revise the signaling system to be compatible with each detected hierarcies and the recivers would need a protocol letting them know that a known state/signals pairs are being reassigned.
+
+## Markedness
+
+Members of a class in a hierarchy are assigned unique suffices for the codes to follow the unmarked form which is assigned to the most common representative and used as a prefix. This is pattern is called markedness.
+
+``` python
+from IPython.display import Markdown
+from tabulate import tabulate
+
+lexicon = {}
+
+lexicon['raptor/falcon']  = '000'
+lexicon['hawk']    = '000 0'
+lexicon['eagle']   = '000 1'
+lexicon['feline/panther'] = '111'
+lexicon['leopard'] = '111 0'
+lexicon['jaguar'] =  '111 1'
+
+# converting the lexicon to a table
+table = [[k, v] for k, v in lexicon.items()]
+
+
+Markdown(tabulate(
+  table, 
+  headers=["Pre-Linguistic- Object", "signal"]
+))
+```
+
+| Pre-Linguistic- Object | signal |
+|:-----------------------|:-------|
+| raptor/falcon          | 000    |
+| hawk                   | 000 0  |
+| eagle                  | 000 1  |
+| feline/panther         | 111    |
+| leopard                | 111 0  |
+| jaguar                 | 111 1  |
+
+Table 6: predators their categories with markedness
+
+Note: that we could have used single digits prefix making these codes even shorter. I originally envisioned that there are also categories for forging etc and so the predators prefix might be longer than if the signaling systems was exclusively for these 6 terms.
+
+This pattern can arise from the way Huffman codes are constructed given suitable frequencies. However it might become ritualized into a rule. On the other hand if the tribe moves off to a new grove they might find that the new predators are not well represented by the suffixes and that falcons are now rare. The category might be kept and the falcon reassigned to a new signal with a longer suffix. This could happen with felines too resulting in a system like [Table 1](#tbl-predators). And we can interpret the prefix as a bound morpheme and the suffixes as a free morpheme.
+
+## Distributional Semantics
+
+What we demonstrated is how we rearranged unrelated signals into a categories. Using a template: \[category-prefix, designation-suffix\]. This split the semantics over multiple symbols, but the full semantics require multiple symbols to appear in proximity to each other. This is the basis of distributional semantics because now the probabilities of semantics in the languages are defined by joint distribution of the prefix and suffix. And if there are many birds of note they may get their own prefix by further splitting raptor into \[00,0\] and putting non raptor birds into \[001,designation-suffix\]
+
+This is clearly not the only way distributional semantics arises, but likely all the other mechanism are small variants and a future investigation should reveal that these may well have partial pooling equilibria as a basis[^3].
+
+Morphology can be setup using an ordered sequence of inflectional prefixes followed by a stem-suffix. verbs and nouns might even share some of these. verb := \[pos, number, person, gender, etc, stem\].
+
+Tense, Aspect and mood, modality might be be lexical as above or it might be grammatical e.g. the form \[verb,aux\] rather than verb := \[pos, number, person, aux, mood, etc, stem\]. if their usage is less frequent then other inflections or if the verb was established before these were introduced. In a future article I plan to consider this in greater detail using a hierarchial Bayesian models from cognitive psychology.
+
+Another way semantics might become distributed is due to agreement. i.e. \[X,number,gender, Z \] \[number,gender,A\] here we attach number to A to indicate their semantics are somewhat correlated and thus not quite independent. This requires a tricky mechanism.
+
+And more generally we can use templates like \[prefix-sense, context\] and even \[context, morpheme, context\] to create the highly ambiguous syntactical structures we often see in natural languages.
+
+This more general form may make more sense to receivers who see many rules and seek to streamline them further to the bare essentials by discarding information where it may be inferred from the joint distribution.
+
+## Conclusion
+
+Languages are works in progress today’s signaling system is just a partial pooling equilibrium for tommorow’s signaling system.
+
+This will become clearer once we formalize morphology and grammar in terms of function approximations. Function approximation means we will want to fit semantics for certain states better than others. Falcon nest v.s. Raptor!!!
+
+Morphology approximations will allow us to add for each new (suffix) a large but finite co-set of predictable semantics.
+
+Grammar approximations when recursive will allow us to combine the morphological form into infinite varieties.
+
+Even so we may missing some signals for as yet unseen states. We may be able to use our approximation (prefixes and categories) or we may need to be more specific by adding some new suffixes. We will also have signals in reserve for which we have potential semantics but no states assigned.
+
+## Further Work and Brain dump
+
+As time is short here are a bunch of points for further exploration
+
+1.  **The partial pooling equilibrium correspond to subsets of Bayesian senders.**
+2.  we show a category but we mean full hierarchies of categories. These are a preorder and thus imply a topological structure on the state space. This is the [Alexandrov Topology](https://en.wikipedia.org/wiki/Alexandrov_topology) (Topology from a Preorder)
+3.  we can learn hierarchies of categories by learning an representative. But learning a representative for each category is also the basis of a clarifier. A classifier is also a type of decision we want to carry out on states to determine the action we should take. In this sense we are talking about a process for rough to fine specification of semantics.
+4.  Each hierarchy of categories represents a **semantic symmetry**. Members share a rough semantic meaning but differ in the fine details.
+5.  We might also repurpose this idea for other symmetries like morphology and phonology.
+6.  If each category is imbued with a prefix we end up with many prefixes corresponding to atoms of discourse. If there are not too many we might build words from these prefixes.
+7.  As there is an increased fitness for languages with prefix and at least certain hierarchies of categories we can see that this may be a desiderata for the evolution of signaling systems. More so we might want an RL algorithm to step between a lattice of such partial pooling equilibria rather then learning by spontaneous symmetry breaking.
+8.  This is planning of hierarchies of categories. However in reality we inherit the hierarchies from the state space of from the prelinguistic objects.
+9.  Another form of using mixed strategies is code switching - where we switch between partial pooling equilibria - each learned for a specific sender. At certain points such a code switching receiver might become promoted to a sender and use the information in the partial pooling equilibria to infer/plan a full language from the different languages it ha learned. This is a form of transfer learning. The result might be a pidgin or a creole depending if the receiver uses a lexicon or a linear function approximate which is a generalization of a lexicon!
+10. In Natural Languages we do not see semantic categories encoded systematically as systems of prefixes or suffixes. Why not ? [^4] [^5] In fact they are only encoded in a very limited fashion using a suffix like great, greater, greatest. Numbers do tend to have a base 10 encoding but not as clean as a prefix code. Languages do have many hierarchies encoded into thesauri and wordnets. I think that at some level (e.g. semantic roles labeling) and phrase structure hierarchies can shape languages evolution.
+11. Why is this type of hierarchies absent from the lexicon of natural Languages?
+12. The quest for a perfectly regular interlingua might be shaped by an algorithm that learn to encode thesauri like hierarchies down into the phonetic stratum and via algorithms that jump between partial pooling equilibria. [^6]
+13. Another point I did not raise is that there are lots more partial equilibria than fully separating equilibria. This suggest that it should be easy for a language ‘planner’ to find nearly compatible partial pooling equilibria with an existing language. By switching around the incompatibilities the language can then gain a new categorical prefix and be easier to learn as well as require less processing going forward.
+
+Huffman, David A. 1952. “A Method for the Construction of Minimum-Redundancy Codes.” *Proceedings of the IRE* 40 (9): 1098–101. <https://doi.org/10.1109/JRPROC.1952.273898>.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2025,
+  author = {Bochman, Oren},
+  title = {The Roles of {Partial} Pooling and Mixed Strategies in the
+    {Lewis} Signaling Game},
+  date = {2025-03-11},
+  url = {https://orenbochman.github.io/posts/2025/2025-03-11-partial-pooling/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2025. “The Roles of Partial Pooling and Mixed Strategies in the Lewis Signaling Game.” March 11. <https://orenbochman.github.io/posts/2025/2025-03-11-partial-pooling/>.
+
+[^1]: for signaling agents
+
+[^2]: this kind of pattern once it develops in multiple categories may easily recognised from a few examples and become on of the cues used for creating rules for a grammar morphology/syntax.
+
+[^3]: Perhaps even a topological basis in the
+
+[^4]: might requires a planning with high algorithmic complexity?
+
+[^5]: without such planning, would necessitate frequent revisions of the semantics of large parts of the lexicon as frequency changes?
+
+[^6]: A language with rich yet fully pooling morphology and a thesaurus-like-lexicon

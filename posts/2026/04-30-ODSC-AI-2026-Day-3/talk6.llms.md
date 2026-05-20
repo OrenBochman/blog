@@ -1,0 +1,153 @@
+## Outclassing Frontier LLMs at Extracting Information
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Etienne Bernard
+  - [LinkedIn](https://www.linkedin.com/in/etiennebcp/)
+- [Slides](https://www.dropbox.com/scl/fi/9s5w1dnmrsy6tuzlg5baq/2026_04_ODSC.pptx.pdf?rlkey=gwq6r68mtnnyrkratty3gjp3r&dl=1)
+
+> **NOTE:**
+>
+> - **Speaker and framing**
+>
+>   - Etienne Bernard, CEO and co-founder of NewMind, presents the company’s shift toward building specialized large language models for information extraction.
+>
+>   - The talk contrasts two trends:
+>
+>     - Very large general-purpose models that can perform many tasks.
+>     - Much smaller specialized models, often 100–1,000× smaller, optimized for document extraction.
+>
+> - **Core topic: information extraction from documents**
+>
+>   - The speaker distinguishes two main extraction tasks:
+>
+>     - **Content extraction**, described as “new OCR”: converting the whole document into a text-based format such as Markdown.
+>     - **Structured extraction**: extracting selected fields into a schema-based JSON format.
+>
+> - **Content extraction use case**
+>
+>   - Content extraction is mainly used to preprocess enterprise documents so they can be searched and passed into retrieval-augmented generation systems.
+>   - The goal is not merely character recognition, but preserving tables, layout, figures, and document structure well enough for later language-model use.
+>
+> - **Structured extraction use case**
+>
+>   - Structured extraction is treated as automated data entry.
+>   - It is especially useful in banking, insurance, healthcare, logistics, and finance.
+>   - Examples include extracting names and dates from ID cards, line items from invoices, or booking details from emails.
+>
+> - **Current state of document processing**
+>
+>   - Many organizations still rely on humans or human-in-the-loop workflows.
+>   - Traditional optical character recognition systems work well when document layouts are stable, but require extensive rule engineering and annotated data.
+>   - Production deployment for classical systems can take six months to a year per use case.
+>
+> - **Limitations of general-purpose LLMs**
+>
+>   - General-purpose multimodal models can perform extraction, but still struggle with:
+>
+>     - Complex layouts.
+>     - Side-by-side or overlapping tables.
+>     - Handwriting.
+>     - Long extraction lists.
+>     - Checkboxes.
+>     - Sideways text.
+>
+>   - They also provide poor uncertainty estimates, making downstream correction harder.
+>
+>   - Their size makes private deployment expensive, especially when compared with smaller specialized models.
+>
+> - **Argument for specialized small language models**
+>
+>   - Specialized models can be trained on extraction datasets produced by large models or curated pipelines.
+>   - Dataset quality matters: examples should be challenging but still solvable.
+>   - Synthetic distortions such as blur, skew, cuts, or layout degradation can make training data harder and more useful.
+>   - If tasks are impossible, the model may learn to hallucinate.
+>
+> - **Training approach**
+>
+>   - A general vision-language model is fine-tuned for the extraction task.
+>   - Supervised training may be enough for direct extraction.
+>   - Reinforcement learning or post-training may be useful when the specialized model needs reasoning behavior.
+>   - NewMind emphasizes specialized models that can reason about layouts before extraction.
+>
+> - **OCR/content extraction model landscape**
+>
+>   - There is a growing wave of small image-to-text and document-to-Markdown models.
+>   - Different models have different strengths: some are better at pure character recognition, others at layout understanding.
+>   - Benchmarks exist, but the speaker warns that they do not fully measure whether the extracted text preserves the information needed by downstream LLMs.
+>
+> - **Benchmark caveats**
+>
+>   - OCR benchmarks vary greatly:
+>
+>     - Some test cropped character or word recognition.
+>     - Others test whole-document semantics and layout.
+>
+>   - Models may be optimized toward benchmark-specific behavior.
+>
+>   - The speaker recommends testing models directly on the intended use case rather than trusting benchmark rankings alone.
+>
+> - **Structured extraction models**
+>
+>   - The speaker says there are relatively few open-source models specialized for schema-based structured extraction.
+>   - NewMind’s NuExtract family is presented as one such family.
+>   - Another mentioned example is GLM-OCR, though the speaker frames it mainly as an OCR model with some structured extraction capability.
+>
+> - **Performance and deployment**
+>
+>   - NewMind reports large gains from specializing base models such as Qwen-VL and Qwen 3 variants.
+>   - Specialized models can approach or exceed much larger general-purpose models on extraction benchmarks while requiring far less memory.
+>   - This makes them attractive for private GPU deployment or lower-cost local use.
+>
+> - **Why direct structured extraction can outperform OCR + LLM pipelines**
+>
+>   - A two-step pipeline can first convert a document to Markdown, then extract JSON from that text.
+>   - The speaker argues this is slower because the model must generate the whole document.
+>   - It can also lose information during Markdown conversion.
+>   - Direct structured extraction is faster because it generates only the requested fields.
+>
+> - **How to use these models**
+>
+>   - For local deployment, models can be downloaded from Hugging Face.
+>   - The speaker recommends inference engines such as vLLM or SGLang rather than plain Hugging Face Transformers for high-volume extraction.
+>   - For API use, platforms can expose extraction models directly; NewMind also offers private deployment.
+>
+> - **Demo examples**
+>
+>   - An ID card example shows extraction into typed fields such as verbatim strings, classifications, and ISO-formatted dates.
+>   - An invoice example shows nested extraction, including line items with quantity and price.
+>   - A content extraction demo shows Markdown and HTML-table output, with the model reasoning about layout before generating the extraction.
+>
+> - **Q&A points**
+>
+>   - For nonprofits needing low cost and high security, the speaker suggests that major providers such as Google, OpenAI, and Anthropic may be preferable when formal compliance certifications matter.
+>   - For very low volume, small specialized models may run on CPU or even a laptop.
+>   - For forms mixing printed and handwritten text, the recommended approach is simply to send the whole document to the model end to end.
+>   - Handwriting remains harder, especially poor handwriting such as medical notes, but the model does not require a separate OCR stage.
+>
+> - **Main takeaway**
+>
+>   - Specialized small vision-language models are becoming a practical alternative to both classical OCR pipelines and massive general-purpose LLMs for document extraction.
+>   - Their main advantages are lower cost, easier private deployment, better task-specific accuracy, and simpler end-to-end workflows.
+
+### Reflection
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Towards {Trustworthy} {LLMs}},
+  date = {2026-04-28},
+  url = {https://orenbochman.github.io/posts/2026/04-30-ODSC-AI-2026-Day-3/talk6.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Towards Trustworthy LLMs.” April 28. <https://orenbochman.github.io/posts/2026/04-30-ODSC-AI-2026-Day-3/talk6.html>.

@@ -1,0 +1,124 @@
+# MCMC Algorithms
+
+- In this talk we will cover some common MCMC algorithms.
+
+------------------------------------------------------------------------
+
+## Metropolis-Hastings
+
+------------------------------------------------------------------------
+
+\begin{algorithm} \caption{Metropolis-Hastings algorithm} \begin{algorithmic} \Procedure{MetropolisHastings}{\$p(x), q(x,y), x_0, N\$} \State Initialize \$x_0\$ and set \$t=0\$. \While{\$t\<N\$} \State Generate a proposal \$y \sim q(x_t, \cdot)\$. \State Calculate the acceptance ratio \$r = \frac{p(y)q(x_t\|y)}{p(x_t)q(y\|x_t)}\$. \State Generate a random number \$u \sim U(0,1)\$. \If{\$u \< r\$} \State Accept the proposal: \$x\_{t+1} = y\$. \Else \State Reject the proposal: \$x\_{t+1} = x_t\$. \EndIf \State Increment \$t\$: \$t \leftarrow t+1\$. \EndWhile \State \textbf{return} \$(x_0, x_1, \ldots, x_N)\$ \EndProcedure \end{algorithmic} \end{algorithm}
+
+- The procedure `MetropolisHastings` takes as input :
+  - the target distribution p(x),
+  - the proposal distribution q(x,y),
+  - the initial sample x_0, and
+  - the total number of samples to generate N.
+- The procedure returns:
+  - the sequence of samples (x_0, x_1, \ldots, x_N).
+
+------------------------------------------------------------------------
+
+## Gibbs Sampling
+
+### Historical note
+
+Gibbs sampling was introduced in 1984 by the brothers Stuart and Donald Geman as a method for image restoration. It is particularly useful when the joint distribution is complex, but the conditional distributions are easier to sample from.
+
+Gibbs sampling is applicable when the joint distribution is difficult to sample from directly but we can sample from the conditional distribution of each variable. We sample from each of these in turn substituting the outcomes in the conditioning term of subsequent samples. It can be shown that such sequences of samples constitutes a Markov chain, and the stationary distribution of that Markov chain is the requires joint distribution.
+
+------------------------------------------------------------------------
+
+\begin{algorithm} \caption{Gibbs Sampling algorithm}\begin{algorithmic} \Procedure{GibbsSampling}{\$p(x,y), x^{(0)}, y^{(0)}, N\$} \State Initialize \$x_0 = x^{(0)}\$ and \$y_0 = y^{(0)}\$. \For{\$t=1\$ to \$N\$} \State Sample \$x_t \sim p(x\|y\_{t-1})\$. \State Sample \$y_t \sim p(y\|x_t)\$. \EndFor \State \textbf{return} \$(x_1, \ldots, x_N), (y_1, \ldots, y_N)\$ \EndProcedure \end{algorithmic} \end{algorithm}
+
+- The procedure `GibbsSampling` takes as input :
+  - the joint distribution p(x,y),
+  - the initial values for x and y
+  - (x^{(0)} and y^{(0)}), and
+  - the total number of samples to generate N.
+- The procedure returns:
+  - the sequences of samples for x and y, (x_1, \ldots, x_N) and (y_1, \ldots, y_N), respectively.
+
+## Limitations
+
+- There are two ways that Gibbs sampling can fail:
+  1.  When there are islands of high-probability states, with no paths between them.
+  2.  When all states have nonzero probability and there is only a single island of high-probability states
+
+------------------------------------------------------------------------
+
+## Inverse Sampling algorithm
+
+Inverse transform sampling is a method for generating random numbers from any probability distribution by using its inverse cumulative distribution function (CDF). The basic idea is to generate a uniform random number and then transform it using the inverse CDF to obtain a sample from the desired distribution.
+
+------------------------------------------------------------------------
+
+\begin{algorithm} \caption{Inverse Sampling algorithm} \begin{algorithmic} \Procedure{InverseSampling}{\$F^{-1}(u), U_1, \ldots, U_N\$} \For{\$i=1\$ to \$N\$} \State Generate a uniform random number \$u_i \sim U(0,1)\$. \State Compute \$x_i = F^{-1}(u_i)\$. \EndFor \State \textbf{return} \$(x_1, \ldots, x_N)\$ \EndProcedure \end{algorithmic} \end{algorithm}
+
+The procedure `InverseSampling` takes as input : - the inverse cumulative distribution function F^{-1}(u) and - the number of samples to generate N. The procedure generates N uniform random numbers u_1, \ldots, u_N and computes the corresponding samples x_1, \ldots, x_N using the inverse cumulative distribution function F^{-1}(u).
+
+The procedure returns: - the sequence of samples (x_1, \ldots, x_N). Note: that in this algorithm, we assume that the inverse cumulative distribution function F^{-1}(u) is available, and can be used to generate samples from a distribution with cumulative distribution function F(x).
+
+------------------------------------------------------------------------
+
+## EM algorithm for mixtures
+
+- The expectation-maximization algorithm, usually known as the EM algorithm, is a widely-used computational method for performing maximum likelihood method in statistical models which allows us to find point estimates of parameters.
+
+- Simple to code
+
+- Monotonic (every iteration increases the likelihood).
+
+- It is also often quick to find a “reasonably good” solution, although if a very precise solution is required then it can be slow.
+
+- Next we describe the EM algorithm for a particular problem – MLE of the mixture proportions, where it has a particularly simple and intuitive form.
+
+- This algorithm is not an MCMC algorithm.
+
+- And we can do inference on mixture models using MCMC methods.
+
+- However it can help us find point estimate for parameters e.g. the number of components in a mixture
+
+------------------------------------------------------------------------
+
+\begin{algorithm} \caption{EM for mixtures algorithm}\begin{algorithmic} \Procedure{EM}{\$X, K, \mu^{(0)}, \Sigma^{(0)}, \pi^{(0)}, \text{max\\iter}\$} \State Initialize parameters: \$\mu^{(0)}, \Sigma^{(0)}, \pi^{(0)}\$. \For{\$t=1\$ to \$\text{max\\iter}\$} \State \textbf{E-step:} Compute responsibilities \$r\_{nk}\$. \State \textbf{M-step:} Update parameters \$\mu, \Sigma, \pi\$. \EndFor \State \textbf{return} \$(\mu, \Sigma, \pi)\$ \EndProcedure \end{algorithmic} \end{algorithm}
+
+## Hamiltonian Monte Carlo algorithm
+
+Hamiltonian Monte Carlo or HMC is a Markov chain Monte Carlo (MCMC) algorithm that leverages concepts from physics to efficiently sample from complex probability distributions. It is particularly useful for high-dimensional spaces where traditional MCMC methods may struggle. Also the leapfrog method is used to simulate Hamiltonian dynamics which allow the algorithm to propose new states that are distant from the current state, reducing the random walk behavior and improving sampling efficiency.
+
+------------------------------------------------------------------------
+
+\begin{algorithm} \caption{Hamiltonian Monte Carlo algorithm}\begin{algorithmic} \Procedure{HamiltonianMC}{\$\pi(x), \nabla \log \pi(x), L, \epsilon, M\$} \State Initialize \$x_0\$. \For{\$m=1\$ to \$M\$} \State Sample momentum \$p_m \sim \mathcal{N}(0, I)\$. \State Set \$x = x\_{m-1}\$ and \$p = p_m\$. \State Sim. Hamiltonian dynamics for \$L\$ steps of size \$\epsilon\$: \For{\$l=1\$ to \$L\$} \State Update momentum: \$p \leftarrow p - \frac{\epsilon}{2} \nabla \log \pi(x)\$. \State Update position: \$x \leftarrow x + \epsilon p\$. \EndFor \State Flip the momentum: \$p \leftarrow -p\$. \State Calc. Metropolis-Hastings acceptance probability: \State \$\alpha = \min \left(1, \frac{\pi(x')}{\pi(x)} \frac{p(x\|x')}{p(x'\|x)} \right)\$, where \$x' = x\$ and \$p' = p\$ after the simulation. \State Accept or reject the proposal: \State With probability \$\alpha\$, set \$x_m = x'\$. \State With probability \$1-\alpha\$, set \$x_m = x\_{m-1}\$. \EndFor \State \textbf{return} \$(x_1, \ldots, x_M)\$ \EndProcedure \end{algorithmic} \end{algorithm}
+
+In this algorithm statement, the Hamiltonian Monte Carlo algorithm is encapsulated in a procedure called **HamiltonianMC**.
+
+- The procedure **HamiltonianMC** takes as input:
+  - the target distribution \pi(x),
+  - its gradient \nabla \log \pi(x),
+  - the number of steps to simulate Hamiltonian dynamics L,
+  - the step size \epsilon, and
+  - the total number of samples to generate M.
+- The procedure returns:
+  - the sequence of samples (x_1, \ldots, x_M).
+
+Note: that in this algorithm, we first sample a momentum variable p from a normal distribution, then simulate Hamiltonian dynamics for L steps using the leapfrog method. We then compute the Metropolis-Hastings acceptance probability based on the updated proposal, and accept or reject the proposal according to this probability. We repeat this process for M iterations to generate the desired samples.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2023,
+  author = {Bochman, Oren},
+  title = {MCMC Algorithms},
+  date = {2023-04-22},
+  url = {https://orenbochman.github.io/posts/2023/04-22-mcmc-algs/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2023. “MCMC Algorithms.” April 22. <https://orenbochman.github.io/posts/2023/04-22-mcmc-algs/>.

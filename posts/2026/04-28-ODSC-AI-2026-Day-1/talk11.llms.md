@@ -1,0 +1,147 @@
+## Architectural Patterns for Building and Governing Production-Grade Multi-Agent Systems
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- [Dr. Ali Arsanjani](https://www.linkedin.com/in/ali-arsanjani/)
+- [blogpost](https://dr-arsanjani.medium.com/the-anatomy-of-agentic-ai-0ae7d243d13c)
+
+> **NOTE:**
+>
+> - **Speaker and topic**
+>
+>   - Dr. Ali Arsanjani of Google Cloud presents architectural patterns for building, governing, and scaling production-grade multi-agent AI systems.
+>   - The talk focuses on agent maturity, orchestration, governance, self-improvement, security, cost control, and operational resilience.
+>
+> - **Basic agent architecture**
+>
+>   - Modern agents use a large language model as the reasoning core.
+>   - Agents sense or retrieve information from structured data, unstructured data, digital business systems, and sometimes physical devices.
+>   - Access to internal tools and resources is often handled through the **Model Context Protocol (MCP)**.
+>   - Agents receive broad goals rather than rigid robotic process automation-style workflows.
+>   - They reason, use memory, plan steps, call tools, and may coordinate with other agents through **agent-to-agent (A2A)** protocols.
+>
+> - **Agent maturity levels**
+>
+>   - Early systems use static function calls tied to a single large language model.
+>   - More advanced systems dynamically choose tools at runtime.
+>   - Single-agent systems may use reasoning-action-observation-reflection loops for iterative self-correction.
+>   - Multi-agent systems introduce specialized sub-agents coordinated by a root agent.
+>   - Higher maturity systems use a meta-agent to enforce policies, resolve conflicts, adjust plans, and govern behavior.
+>   - The most advanced systems are self-improving agent ecosystems with multi-agent learning and swarm-like feedback.
+>
+> - **Security and isolation**
+>
+>   - Open-source multi-agent frameworks can reduce integration overhead, but should not be deployed naively.
+>   - Production deployments need zero-trust infrastructure, sandboxing, identity controls, environment isolation, and defense across pre-action, in-action, and post-action phases.
+>   - Agents should be isolated by design, for example with Docker sandboxes and restricted host file-system access.
+>
+> - **Skills as modular agent behavior**
+>
+>   - Instead of loading huge prompts with many system instructions, agents can use modular “skills” defined in markdown files.
+>   - Skills allow agents to load only the procedural capabilities needed for a task.
+>   - This reduces prompt bloat and supports more maintainable agent behavior.
+>
+> - **Frameworks and deployment**
+>
+>   - The speaker highlights Google’s Agent Development Toolkit 2.0 as a strong framework for graph-based workflows, shared memory, and multi-agent development.
+>   - Other frameworks mentioned include LangGraph, LangChain, and CrewAI.
+>   - Agents may be deployed on Gemini Enterprise Agent Engine, Cloud Run, or Google Kubernetes Engine.
+>   - Enterprise-facing agents can be surfaced through Gemini Enterprise apps for broader organizational access.
+>
+> - **Memory architecture**
+>
+>   - Agents need both short-term and long-term memory.
+>   - Session memory supports current interactions.
+>   - A longer-term memory bank extracts salient topics from previous sessions and restores them later for personalization and continuity.
+>
+> - **Hybrid planner-scorer architecture**
+>
+>   - Self-improving systems benefit from separating generation from evaluation.
+>   - A planner generates candidate solutions, optimized for creativity and breadth.
+>   - A scorer evaluates those solutions using a quality rubric.
+>   - The scoring rubric acts as a contract between agents and defines what “good” means for the domain.
+>
+> - **Custom evaluation metrics**
+>
+>   - Generic benchmarks are insufficient for domain-specific work such as legal contracts, loan servicing, or regulated workflows.
+>   - Teams should define programmatic quality metrics tied to business, customer, and regulatory criteria.
+>   - A golden dataset and scoring function should be developed with domain experts.
+>   - These metrics function similarly to reward functions for continuous agent improvement.
+>
+> - **Preference-controlled synthetic data**
+>
+>   - When human-labeled examples are scarce, teams can generate preference pairs.
+>   - One output is produced under conditions likely to yield a good answer, another under weaker conditions.
+>   - These outputs can be labeled as chosen versus rejected and used to train scorers or preference models.
+>
+> - **Advanced tuning**
+>
+>   - The talk mentions supervised fine-tuning, parameter-efficient fine-tuning, Low-Rank Adaptation, and Direct Preference Optimization.
+>   - Preference-based tuning helps align model behavior with desired outputs rather than merely imitating examples.
+>
+> - **Co-evolved agent training**
+>
+>   - A static scorer may become obsolete as the planner improves.
+>   - The planner and scorer should improve together.
+>   - Planner outputs train a better scorer, and scorer feedback trains a better planner.
+>   - This creates a virtuous cycle that can compound system performance.
+>
+> - **Adversarial testing and red teaming**
+>
+>   - A dedicated red-team agent can probe the main system for jailbreaks, biases, edge cases, and failures.
+>   - This should be proactive rather than only reactive.
+>   - For critical tasks, adversarial testing may run on every task execution.
+>   - For lower-risk tasks, it can run periodically through scheduled sampling.
+>   - The resulting adversarial examples should feed back into preference datasets and co-evolution pipelines.
+>
+> - **Tokenomics and cost management**
+>
+>   - Self-improving systems can create runaway token costs if not controlled.
+>   - A system-level monitor should track token use across agents.
+>   - Agents should have iteration limits, budgets, and automatic pause or scale-down mechanisms.
+>   - Cost control must be balanced against measurable return on investment.
+>
+> - **Business value measurement**
+>
+>   - Agent systems should be evaluated not only by token cost or technical metrics but by business outcomes.
+>   - Relevant metrics include resolution rate, cost per incident, customer satisfaction, and first-call deflection.
+>   - Dashboards should link operational agent behavior to business key performance indicators.
+>   - Teams should start with one or two core metrics and expand gradually.
+>
+> - **Robustness and fault tolerance**
+>
+>   - Production systems need resilience against service failures, crashes, timeouts, and unreliable agents.
+>
+>   - Five robustness patterns are highlighted:
+>
+>     - **Adaptive retry:** measure successful retries after initial failures.
+>     - **Watchdog timeout:** track timeout violations per hour.
+>     - **Auto-healing:** log successful restarts after crashes.
+>     - **Trust decay:** track rolling failure rates per agent.
+>     - **Fallback model:** compare fallback-model accuracy against primary-model accuracy.
+>
+> - **Overall message**
+>
+>   - Production-grade multi-agent systems require more than orchestration.
+>   - They need governance, modular skills, secure deployment, memory, custom evaluation, adversarial testing, cost controls, business-value tracking, and fault-tolerance mechanisms.
+>   - The central architectural shift is from isolated agents toward governed, measurable, self-improving agent ecosystems.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Architectural {Patterns}},
+  date = {2026-04-28},
+  url = {https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk11.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Architectural Patterns.” April 28. <https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk11.html>.

@@ -1,0 +1,116 @@
+## TLDR:
+
+Some Tips about cultivating Discipline for studing in later life:
+
+## Motivation
+
+Recently I had a brief discussion about how I keep myself disciplined in my studies and personal growth by a friend. There is no one simple answer for this question. I said I would write a blog post about it.
+
+When I was younger it was not so hard to study, I just had to follow the rules set by my parents and teachers.
+
+Today being older there are many challenges that make it harder to focus on studying. I won’t go into these as they are either self evident or personal for each individual.
+
+## Perception
+
+0.  A big part of discipline is perception. It all starts with perception.
+
+1.  Socrates characterizes his main argument in the republic about how the being good leader is superior to being an evil tyrant as coming in (three) waves. I feel that when you are curious this too often manifests itself in waves that ebb and flow. When you learn to ride these waves you can enjoy a reap great benefit. By this I mean that there are several levels of knowing a subject and that each level of mastery offers smallers rewards with greater effort. It is therefore often best to stop at a certain level and learn something new rather than dive deeper and deeper into a single subject. I may often lost interest in a subject after digging very deep into it – however I know that there is a good chance that I will return to it later with a fresh perspective have solidified my understanding other subjects first that can be put together so that once again I can reap big benefits from a new collection of low hanging fruit.
+
+2.  Low hanging fruits change
+
+3.  Recognizing your learning style & communication is key to making progress. Both are significant in learning effectively and keeping motivated. This is also central to this post as I found it very hard to learn from sources unsuited to my learning style and I found it inefficent to take notes until I was able to
+
+The same goes for recognizing your communication style.
+
+which famous author wrote about?
+
+- the change in fortunes and communication styles by war world II general and the president Dwight D. Eisenhower. How he was great as a general but failed as president because he could not adapt his communication style to the different audience.
+- it was also written about by Dale Carnegie in his book “How to win friends and influence people” where he talks about the importance of adapting your communication style to the person you are talking to.
+
+4.  The intelligence trap - when you can just pass almost every exam and test but you find it very hard to get a high GPA. I was smart this way. I found it very hard to get high grades because I was not disciplined enough to study for long periods of time.
+
+5.  Find your pleasure where you can. It is highly beneficial if you can find pleasure in the process of learning. This statement is very abstract but I am talking about a practical approach that anyone who worked at a start up would understand. In an SU you keep finding small wins that keep you motivated. You must celebrate them with small rewards and with your team. Keeping morale high is one often keys to keeping a fast pace of learning and productivity.
+
+In an SU you may need to pivot or even start over once you realize the best laid plans for the product etc. cannot overcome the harsh realities of the market.
+
+## The basics of learning
+
+### Cultivating Habits - Though Effortless Mastery
+
+After I read effortless mastery by Josh Kaufman I started to understand the importance of cultivating good habbits. I was too lazy and undisciplined to become a great musician but I was certain that lest to my own devices I could learn to play an instrument, compise music and even perform at a decent level so long as I keept a consitent practice habbit going. In fact after a year or so of practicing jazz tunes I developed a better eat than my friend who could read music and learned at the conservatory. I made basic mistakes - but I could play and improvise on many jazz standards.
+
+However this isn’t my actual point – effortless mastery is a both a genious characterization of the approach of learning any skill through cultivating good habbits but also a misnomer because you regonize how hard you can push yourself and for how long. At first this is very little you are week and undisciplined. But if you keep pushing yourself for brief session of learning you will become stonger, you will get discipline, what was impossible today may be effortless in a week or a month. You may have to ascend many foothills before you reach the mountain top but each new height you can pause and look back at how far you have come and how much stronger you are now.
+
+### Writing Discipline - The Artist’s Way
+
+In the Artist’s Way, Julia Cameron talks about the importance of writing morning pages every day. This is a simple practice that can get you into the habit of writing and expressing yourself. It is a way to clear your mind and focus on your goals. It is the key tool to becoming a professional writer who can keep writing when other others might give up due to the infamous writer’s block.
+
+These are two lessons about discpline.
+
+Perhaps the next step is how to scale up what each of these can do for you.
+
+For playing drills on a musical instrument, learning a language it is often best to stop once you practice for 40 minutes or so. Doing more can make it less efficient next time. (your body might need to recover, the spaced repetition works best if you don’t lear too much new words at once.).
+
+For writing you can probably write for much longer periods of time once you get into the “flow state”.
+
+Julia Cameron has some other ideas about developing mental fortitude for creatives. I think that this is one of the real challenges for mental fortitude. The other is in Sales and Negotiation.
+
+### The Gym - Physical Discipline
+
+The gym is the best place to break your habit of laziness. Going to the gym day in and day out, working out to a sweat and pushing the body into pain will demonstrate to you that you are not a lazy person. Transforming the body requires far greater discipline than going to the gym. But a solid workout will make you tired enough to sleep well and rest early to get you into a routine. And routines are the key to suceess.
+
+The same is true in the gym, how hard should you wotk and how long. For me 60 minutes is optimal - anymore and I can’t work as hard. But in the session I don’t want to push myself so hard that I can’t recover for the next session.
+
+The gym has the power to break though a certain prediliction for laziness! The necessary attitude is to practice at working your hardest for next day recovery in the least amount of time. Track you callorie output, distance etc.
+
+### Meditation - Mental Discipline
+
+After the workout I make a point of taking a break for 30 minutes. Meditation is great for this. It can be sitting meditation, lying down, walking meditation etc if I need to burn more energy than I could in the gym. It can be drawing meditation. Anything that clears the mind and lets the heart and lungs get back to normal.
+
+I find though that Shavasana as well as walking meditation give an added benifits
+
+1.  the ability to hyperfocus on the problem of the day and breakthough mental blocks.
+2.  the ability to get a feel of mediatiation so that the effects of meditation and of yoga persist through the day.
+
+I think that breath control (pranayama) is perhaps one of the easist ways to build your concentration to a very high level.
+
+I find that when I am in the home office I frequently get very excited mentaly and physically. One indicator of this os that I start pacing up and down.
+
+I find that sitting in lotus position and doing pranayama calms me down and I more quickly can’t do another breating cycle and need to get back to work.
+
+### Diet - Physical & Mental Discipline
+
+Diet is another metaphor for mental discipline.
+
+This is an are I still struggle with. I think that once I master discipline in this area the rest of my life will fall into great order. But as of now it seems to be likely to be a life long stuggle. I have learned to cook however using many of the ideas presented here.
+
+## 7th of October Diet
+
+But I think that for the mind I have developed the 7th of October diet. This refers to the day that Israel was atacked by Hamas millitants. After this day the media coverage until January 2025 was relentless. The media shifted to 40% news coverage with endless coverage of the war and political scandals. Social media became very device and toxic. I found that I was prone to being angry and depressed most of the time. It quickly dawned on me that I must develop a mature approach to being informed but without letting nasty people and toxic media coverage affect my mental state. Unfortuantely tuning out was not an option for me at this point.
+
+It became clear to me that I must limit my exposure to news and social media. Not let the rec systems of these platforms manipulate my emotions and suck my time away from more productive pursuits.
+
+I saw that many people around me were not able to do this. They were addicted to the dopamine hits of social media and news. I realized that I must develop a diet for my mind that would let me stay informed but not let me get sucked into the toxic vortex of social media and news.
+
+I decided to try to change the way I interacted with social media. I decided about become more proactive about my consumption of the news. Identifing and mapping the roles of commentators would reduce some of the stess and to map the more insidious people appearing on TV.
+
+### Mental Fortitude
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {The {Art} of {Discipline:} {Mastering} {Self-Control} for a
+    {Fulfilling} {Life}},
+  date = {2026-01-21},
+  url = {https://orenbochman.github.io/posts/2026/01-21-Discipline/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “The Art of Discipline: Mastering Self-Control for a Fulfilling Life.” January 21. <https://orenbochman.github.io/posts/2026/01-21-Discipline/>.

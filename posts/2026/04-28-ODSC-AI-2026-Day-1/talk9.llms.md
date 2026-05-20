@@ -1,0 +1,108 @@
+## Using Model Context Protocol with Python: A Getting Started Guide for Data Scientists
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Ryan Day
+  - [LinkedIn](https://www.linkedin.com/posts/ryanday1_apis-ai-data-share-7326761077726150656-QfHO/)
+  - [CSBS](https://csbs.com/)
+  - No slides
+  - [FastAPI](https://fastapi.tiangolo.com/) FastAPI framework, high performance, easy to learn, fast to code, ready for production
+  - [Tips](https://tips.handsonapibook.com)
+
+> **NOTE:**
+>
+> - **Session topic:** “Using Model Context Protocol with Python: A Getting Started Guide for Data Scientists,” presented by Ryan Day.
+> - **Central question:** how to give AI agents real agency:
+>   - Provide them with more **context**, such as documentation, policies, API definitions, and domain knowledge.
+>   - Give them **actions**, so they can call APIs, run commands, create tickets, book resources, or modify systems rather than merely suggest text.
+> - **Why APIs matter:** the speaker argues that Representational State Transfer APIs, especially REST APIs, are now even more important because they expose machine-readable actions that agents can invoke.
+> - **Four ways agents can interact with systems:**
+>   - **Raw API access:** the agent receives an OpenAPI/Swagger specification, infers which endpoint to call, and executes a request, often using `curl`.
+>   - **Agent skills:** markdown instructions guide the agent on how to use an API, when to use endpoints, and how to combine them.
+>   - **Command-line interfaces:** agents use CLI tools, inspect `--help`, infer commands and parameters, and call APIs indirectly through the CLI.
+>   - **Model Context Protocol (MCP):** a protocol designed specifically for agent-tool interaction, tool discovery, and structured access to actions, resources, and prompts.
+> - **Raw API demo:**
+>   - GitHub Copilot in Visual Studio Code was given an OpenAPI specification for a fantasy football API.
+>   - The agent inspected the API, selected endpoints, asked for permission, ran `curl`, and retrieved details about [Patrick Mahomes](https://www.nfl.com/players/patrick-mahomes/).
+>   - It also queried another endpoint to return player counts.
+> - **Agent skills demo:**
+>   - A markdown skill file described how to use an air travel API.
+>   - The speaker asked the agent to retrieve 10 flights from American Airlines.
+>   - The agent used the skill instructions and returned raw JSON from the API.
+> - **CLI demo:**
+>   - The speaker built an `air travel` command-line tool using `Typer`.
+>   - The agent checked API health with the CLI and then inspected available commands with `--help`.
+>   - The main advantage is that agents are already strong at using shell commands and can infer usage from help text.
+> - **Model Context Protocol (MCP):**
+>   - MCP is presented as a standard protocol for connecting agents to tools, data, prompts, files, databases, and APIs.
+>   - MCP servers can expose three major things:
+>     - **Tools:** actions the agent can invoke.
+>     - **Resources:** static or semi-static content the agent can read.
+>     - **Prompts:** reusable prompt templates or task guidance.
+> - **How MCP differs from REST APIs:**
+>   - MCP uses JSON Remote Procedure Call rather than simple stateless HTTP request-response patterns.
+>   - MCP supports bidirectional, streaming client-server communication.
+>   - MCP includes runtime tool discovery, so an agent can ask a server what capabilities are available.
+>   - The protocol is agent-oriented rather than human/API-client-oriented.
+> - **MCP ecosystem and standardization:**
+>   - The speaker says MCP was initially proposed by Anthropic and later moved toward broader standardization through the Linux Foundation’s Agentic AI Foundation.
+>   - The goal is for MCP to become a common standard across large language model providers, tool vendors, and agent platforms.
+> - **Security warning:**
+>   - Users should verify that MCP servers are trustworthy.
+>   - The speaker warns that malicious or misleading MCP servers can impersonate legitimate providers.
+>   - Authentication, especially OAuth, is becoming more important for deployed MCP servers.
+> - **Using MCP in Visual Studio Code:**
+>   - MCP servers can be added through the VS Code command palette.
+>   - Servers may run over standard input/output or HTTP.
+>   - Once connected, GitHub Copilot can discover the server’s tools and decide which to invoke.
+>   - The agent still asks the user for permission before executing tool calls.
+> - **MCP demo:**
+>   - The speaker used an MCP server wrapping the Sports World Central football API.
+>   - The user asked, “How many teams are in Sports World Central?”
+>   - The agent discovered the available MCP tool, selected the count tool, requested permission, executed it, and returned that there were 20 teams.
+>   - The speaker emphasized validating backend logs to confirm that the agent actually used the intended MCP server.
+> - **Building MCP servers with Python:**
+>   - The speaker recommends FastMCP as a Python framework for creating MCP servers.
+>   - FastMCP handles tool publishing, server setup, JSON-RPC communication, and client discovery.
+>   - A tool can be created by defining a normal Python function and decorating it with an MCP tool decorator.
+>   - The implementation can call an underlying REST API using asynchronous HTTPX code.
+>   - Existing software development kits can often be reused inside MCP servers.
+> - **Response formatting for agents:**
+>   - Instead of returning raw JSON, an MCP server can format API responses into more readable strings for the agent.
+>   - This can make tool outputs easier for the agent to interpret and use.
+> - **Hosting MCP servers:**
+>   - The speaker hosted his MCP examples on Prefect Horizon, formerly FastMCP Cloud.
+>   - Prefect Horizon provides hosting, authentication, HTTP endpoints, and a test client for chatting with the server.
+>   - The speaker also mentions MCP registries, such as GitHub’s MCP registry.
+> - **Example MCP projects:**
+>   - A football API MCP server for Sports World Central.
+>   - An air travel MCP server that can retrieve airline flight information, including United Airlines flights.
+> - **Q&A takeaway:**
+>   - These methods are not limited to Visual Studio Code.
+>   - The speaker has seen similar workflows in Cursor, GitHub Desktop, Claude Code, ChatGPT-like interfaces, and enterprise agent environments.
+>   - The specific availability depends on the platform and its guardrails.
+> - **Overall conclusion:** MCP is positioned as a more agent-native alternative to raw APIs, markdown skills, and CLIs because it combines structured tool discovery, bidirectional communication, authentication, and reusable server-side abstractions for tools, resources, and prompts.
+
+### Reflection
+
+- This talk was a very practical introduction to the Model Context Protocol (MCP) and how it can be used to give AI agents real agency through structured tool access.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Using {Model} {Context} {Protocol} with {Python}},
+  date = {2026-04-28},
+  url = {https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk9.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Using Model Context Protocol with Python.” April 28. <https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk9.html>.

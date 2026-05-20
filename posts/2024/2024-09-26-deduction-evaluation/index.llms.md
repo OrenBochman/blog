@@ -1,0 +1,78 @@
+goal create a deduction data-set for evaluating reasoning capabilities of a man and machine.
+
+tasks:
+
+1.  learning graph based representation of arguments from a text
+2.  generating a text version of such a graph
+3.  identifying roles of relations in the graph such as
+
+- subject, predicate, copula, quantity, quality, distribution, figure, mood, opposition, conversion
+
+- common sense knowledge, counterfactuals, hypotheticals, conditionals, causality, modality, necessity, possibility, probability, uncertainty, vagueness, ambiguity, contradiction, paradox, tautology, fallacy, sophism, enthymeme, analogy, dilemma, aporia, syllogism, enthymeme, paradox, proposition, argument, inference, deduction, induction, abduction.
+
+- term, proposition, argument, inference, fallacy, tautology, contradiction, paradox, syllogism, enthymeme, sophism, paradox, aporia, dilemma, analogy, deduction, induction, abduction aporias, finding dilemmas
+
+- removing the ambiguity from a text by constructing a graph then rewriting the text to be more precise.
+
+- graph of categories (perhaps drawn from wikidata, or extracted from a text by an LLM)
+
+- statements can be formed generated from the graph using LLM (large language model)
+
+- we might prefer to generate statements these using unification with spacy operating on the graph
+
+- use the square of opposition to formulate statements and inferences from the graph
+
+- generate graded deductions based on sylogisms
+
+  - tautologies
+  - falaices with type of fallacy
+  - inferences with type of inference
+
+- each sylogism will need a template with designated parts of speech for each term in the sylogism
+
+- the arguments should be composable so that
+
+> All men are mortal. Socrates is a man. Therefore, Socrates is mortal.\[2\]
+
+P belongs to S P is predicated of S P is said of S
+
+There are four different types of categorical sentences: universal affirmative (A), universal negative (E), particular affirmative (I) and particular negative (O).
+
+A - A belongs to every B E - A belongs to no B I - A belongs to some B O - A does not belong to some B
+
+a = belongs to every e = belongs to no i = belongs to some o = does not belong to some
+
+Categorical sentences may then be abbreviated as follows:
+
+AaB = A belongs to every B (Every B is A) AeB = A belongs to no B (No B is A) AiB = A belongs to some B (Some B is A) AoB = A does not belong to some B (Some B is not A)
+
+the ten terms or parts of speech in a categorical sentence, drawn from the Organon are :
+
+1.  Subject
+2.  Predicate
+3.  Copula
+4.  Quantity
+5.  Quality
+6.  Distribution
+7.  Figure
+8.  Mood
+9.  Opposition
+10. Conversion
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Deduction {Evaluation}},
+  date = {2024-09-26},
+  url = {https://orenbochman.github.io/posts/2024/2024-09-26-deduction-evaluation/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2024. “Deduction Evaluation.” September 26. <https://orenbochman.github.io/posts/2024/2024-09-26-deduction-evaluation/>.

@@ -1,0 +1,170 @@
+> **TIP:**
+>
+> Sad to say, so far this is an attempt to make sense at a deep level of the three modes of convergence for random variables. So far though I can’t say I have been able to do so. I plan to remedy this situation but this is a work in progress and I recommend that you look else where for a more concise and clear explanation of these concepts.
+
+Is there an analog of convergence for a sequence of random variable X_n?
+
+i.e. \lim X_n = X where X_n are random variables?
+
+When we delve a little deeper into probability theory, than the usual introductory courses, we soon uncover three new modes of convergence for random variables: convergence in probability, almost sure convergence, and convergence in distribution. Each of these modes of convergence has its own unique characteristics and applications, and understanding the differences between them is crucial for a deeper comprehension of probability theory.
+
+Digging deeper we might uncover other modes of convergence like convergence in mean, mean square, L^p convergence etc. But the three modes mentioned above are the most commonly used and studied in probability theory and statistics.
+
+One hopes that knowing
+
+the definitions of each mode of convergence
+
+how to interpret the definitions
+
+how to sketch the geometry of the definitions
+
+understand the hierarchy of convergence
+
+provide some counter examples illustrating the differences
+
+provide some applications of each mode of convergence including theorems that use them like the law of large numbers and the central limit theorem.
+
+Would be a good path towards building an intuition, as well as an understanding and being able to use them effectively.
+
+It turns out that a technical note by Pharos Abad on almost sure convergence required 36 pages to to state most of the relevant theorems and definitions that we need to properly define and understand these modes of convergence. c.f. [almost sure convergence](https://github.com/PharosAbad/Analysis-of-Pure-Finance/blob/main/files/AlmostSure-en.pdf) it contains over 60 equivalent forms of almost sure convergence alone!
+
+Two reasons why this is confusing are that:
+
+1.  RVs are measurable functions from \Omega \to \mathbb{R} and as such start by inheriting all the complexity of convergence of a series of functions.
+2.  Random Variables appear to be deterministic functions but in probability theory we are interested in the behavior of these functions when their inputs are random outcomes of trials or experiments. Thus the deeper view is that we wish to understand to what extent convergence of the underlying functions is affected by the randomness of their inputs. And indeed one soon finds that the randomness itself is constrained in various ways as we consider larger and larger samples of IID RVs.
+
+We should perhaps start at the beginning and let’s first recap the convergence of a sequence. [Leibniz](https://en.wikipedia.org/wiki/Gottfried_Wilhelm_Leibniz) and [Newton](https://en.wikipedia.org/wiki/Isaac_Newton) used infinitesimals to reason about limits and convergence but their definitions lacked rigor and drew criticism from their contemporaries and later mathematicians. Eventually in the 18th Century [Bolzano](https://en.wikipedia.org/wiki/Bernard_Bolzano) and later [Weierstrass](https://en.wikipedia.org/wiki/Karl_Weierstrass) came up with a definition that did away with infinitesimals and only used real numbers and inequalities. This epsilon-delta definition became the standard for defining limits and convergence in calculus and real analysis.
+
+## Recap 1: Convergence of a Sequence
+
+A first course on Real analysis has two definitions of convergence for a sequence of real numbers (or more generally elements of a metric space):
+
+The first is due to Bolzano and Weierstrass and is the famous epsilon-delta definition:
+
+**Definition 1 (Bolzano-Weierstrass Convergence Criterion)** A sequence (a_n) converges to a limit L if \forall \varepsilon \> 0\\ \exists N : \forall n \geq N \implies \|a_n - L\| \< \varepsilon.
+
+**Intuitively** we are saying that the terms of the sequence get arbitrarily close to the limit L as n becomes large.
+
+We also learn the equivalent definition credited to cauchy which intuitively captures the idea that the terms of the sequence get arbitrarily close to each other once we disregard some initial segment of the sequence.
+
+**Definition 2 (Cauchy Convergence Criterion)** A sequence (a_n) is a cauchy sequence if for every \varepsilon \> 0, there exists an integer N such that for all m, n \geq N, \|a_n - a_m\| \< \varepsilon. In a complete metric space, every cauchy sequence converges to a limit.
+
+## What happens in topology?
+
+In point set topology we make the ideas from real analysis more abstract and this leads to much deeper insights into the fundamental ideas we explored in real analysis like convergence. For instance:
+
+We saw that the two convergence criteria are equivalent is a theorem in Real analysis. But in general the cauchy criterion is weaker than the epsilon-delta definition as it relies on the space not having holes (i.e. missing points at the limits of cauchy sequences). In the Bolzano-Weierstrass definition we explicitly state the limit L exists in the space so it rules out such holes.
+
+So there are equivalent for \mathbb{R} meaning that it has no such holes.
+
+A *counter-example* to cauchy convergence is the rational numbers \mathbb{Q} which is not complete thus a cauchy sequence of rationals approximating \sqrt{2} has no limit in \mathbb{Q}. However we view this failure as a “technicality” that we can fix by completing the space by adding the missing limits
+
+In topology we eventually give up the notion of a distance (metric) and we generalize the epsilon-delta definition to one using neighborhoods:
+
+3.  the neighborhood definition: A sequence (a_n) converges to a limit L if for every neighborhood U of L, there exists an integer N such that for all n \geq N, a_n \in U.
+
+another useful concepts for convergence in topology are accumulation points (or limit points). An accumulation point of a sequence is a point such that every neighborhood of that point contains infinitely many terms of the sequence. A sequence may have multiple accumulation points, but if it converges, it has exactly one limit point which is also an accumulation point. If a point in not an accumulation point then there exists a neighborhood around that point that contains only finitely many terms of the sequence.
+
+We also have a notion of separation which let us formalize the idea of distinct limits . A space is said to be Hausdorff if for any two distinct points, there exist disjoint neighborhoods around each point. In a Hausdorff space, limits of sequences are unique, meaning that if a sequence converges, it can only converge to one point. If it isn’t Hausdorff then we can have sequences with multiple limits.
+
+There are many other results on convergence of sequences because these definitions are hard to work with directly. For example the monotone convergence theorem states that every bounded monotone sequence converges. Another useful result is the squeeze theorem which states that if a sequence is “squeezed” between two converging sequences with the same limit, then it also converges to that limit.
+
+## Recap 2: Convergence of a Function
+
+Functions are more challenging because they might be composed of a different sequence at every point in their domain.
+
+Now let’s recap the convergence of a function:
+
+A sequence of functions (f_n) converges to a function f in various ways:
+
+1.  **Pointwise Convergence**: A sequence of functions (f_n) converges pointwise to a function f on a set D if for every x \in D and for every \varepsilon \> 0, there exists an integer N such that for all n \geq N, \|f_n(x) - f(x)\| \< \varepsilon. This means that for each fixed point x, the sequence of function values converges to the function value at that point.
+
+*intuitively* **pointwise convergence** means that if we pick any point x in the domain and look at the sequence of function values f_i(x) we see it converges at that point according to the usual definition of convergence of a sequence we just reviewed above. However the speed of convergence may vary from point to point in the domain and so we cannot say much of anything about the convergence behavior across the entire domain.
+
+Clearly if we place some restrictions on the functions we can get well behaved functions for which convergence at a point implies say consider convergence in some neighborhood of a point and then we could extend this to the entire domain.
+
+2.  **Uniform Convergence**: A sequence of functions (f_n) converges uniformly to a function f on a set D if for every \varepsilon \> 0, there exists an integer N such that for all n \geq N and for all x \in D, \|f_n(x) - f(x)\| \< \varepsilon.
+
+*intuitively* **uniform convergence** means that the convergence is uniform across the entire domain, not just at individual points.
+
+3.  **Almost Everywhere Convergence**: A sequence of functions (f_n) converges almost everywhere to a function f on a measure space (X, \mathcal{A}, \mu) if the set of points where the sequence does not converge to f has measure zero. In other words, for almost every point x \in X, the sequence of function values converges to the function value at that point.
+
+Let’s quickly recall that an RV is measurable function that maps outcomes of a random process to numerical values. For example, rolling a die can be represented as an RV that maps each face of the die to its corresponding number (1 through 6). If we can randomly sample from the outcomes (i.e. simulate or sample an experiment for some distribution) the RV translates these into numerical values. (The term measurable refers to measure theoretical details guaranteeing that we can if we associate probabilities with these real values we maintain probability distribution over these values that is consistent with the original random process.)
+
+When we are thinking there are two things that may be a source of divergence. The first is the deterministic mapping that maps outcomes to numerical values, when we say the RVs are IID we are fixing this mapping to be the same for all the RVs. This then leaves the second and more interesting source of divergence: the randomness of the outcomes themselves. What we shall see is that even randomness must obey certain patterns and constraints as we consider larger and larger samples of IID RVs and cannot help but converge in certain ways.
+
+About convergence of random variables we might be thinking are the deterministic functions that map the RVs converging to some limit function. When we say the RVs are IID we are already fixing the mapping to be the same for all the RV so they are converging to the same function. In this case we are then considering how the randomness of the RVs itself is constrained by some pattern.
+
+Let’s quickly define these modes of convergence in terms of increasing strength:
+
+## Convergence of Random Variables
+
+We would like to extend the notion of convergence of functions to random variables. Is that so much to ask for, after all random variables are just measurable real values functions over the sample space.
+
+Note that we there are other modes of convergence like convergence in mean, mean square, L^p
+
+### Convergence in Distribution
+
+**Definition 3 (Convergence in Distribution)** A sequence of random variables X_n converges in distribution to a random variable X if the cumulative distribution functions (CDFs) of X_n converge to the CDF of X at all points where the CDF of X is continuous.
+
+This mode of convergence is particularly useful in the context of the Central Limit Theorem and is often used when dealing with asymptotic distributions.
+
+The reason Convergence in Distribution is weaker than Convergence in Probability is that it only requires the distributions of the random variables to converge, not the actual values of the random variables themselves. Thus, two sequences of random variables can have the same limiting distribution but behave very differently in terms of their actual values.
+
+### Convergence in Probability
+
+**Definition 4 (Convergence in Probability AKA weak convergence)** A sequence of random variables X_n converges in probability to a random variable X if for every \varepsilon \> 0, the probability that the absolute difference between X_n and X exceeds \varepsilon approaches zero as n approaches infinity. Formally, this is expressed as: P(\|X_n - X\| \geq \varepsilon) \to 0 \quad \text{as } n \to \infty.
+
+Unfortunately this definition is not easy to interpret from the statement of the definition.
+
+Here is a form that perhaps makes it easier to understand:
+
+P(X_n \in \[X - \varepsilon, X + \varepsilon\]) \to 1 \quad \text{as } n \to \infty.
+
+This mode of convergence is often used in statistical estimation and is a key concept in the Weak Law of Large Numbers.
+
+### Almost Sure Convergence
+
+**Definition 5 (Almost Sure Convergence)** A sequence of random variables X_n converges almost surely to a random variable X if the probability that X_n converges to X as n approaches infinity is equal to one. In other words, for almost every outcome in the sample space, the sequence X_n will eventually get arbitrarily close to X.
+
+This is a stronger form of convergence than convergence in probability and is often used in the context of stochastic processes.
+
+The reason Almost Sure Convergence is stronger than Convergence in Probability is that it requires the convergence to happen for almost every outcome in the sample space, whereas Convergence in Probability only requires that the probability of large deviations i.e. divergences goes to zero after some finite number of trials.
+
+### Relationships Between the Modes of Convergence
+
+The three modes of convergence are related in the following way:
+
+Almost sure convergence \implies convergence in probability \implies convergence in distribution.
+
+### some thought
+
+- Convergence is a topological concept. Probability theory is based on measure theory. There is a certain mismatch between these two mathematical frameworks that makes it difficult to understand the different modes of convergence for random variables.
+
+- I think that in measure theoretic probability we have extra machinery that allows us to assign a topology for random variables and this view of things may makes it easier to understand the different modes of convergence at least in some technical sense.
+
+- What I want is to better understand what each if these modes means.
+
+- Once view that is fairly simple to grasp is that each convergence mode is related to one of the main limit theorems in probability.
+
+  - The Strong Law gives almost sure convergence of sample averages
+  - The Weak Law gives convergence in probability of sample averages
+  - The Central Limit Theorem gives convergence in distribution of the normalized sample-average error.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Three Modes of Convergence of Random Variables},
+  date = {2026-01-09},
+  url = {https://orenbochman.github.io/posts/2026/01-09-convergence-of-RVs/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Three Modes of Convergence of Random Variables.” January 9. <https://orenbochman.github.io/posts/2026/01-09-convergence-of-RVs/>.

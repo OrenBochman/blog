@@ -1,0 +1,172 @@
+## Harness Engineering: Practical Patterns for Agent-First Software Development
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Ryan Lopopolo
+  - [LinkedIn](https://www.linkedin.com/in/ryanlopopolo/)
+  - [GitHub](https://github.com/lopopolo)
+  - [slides]()
+
+> **NOTE:**
+>
+> - **Core thesis:** Modern coding agents can produce substantial software end-to-end, but their effectiveness depends less on raw model capability and more on the surrounding engineering harness: context, feedback loops, tests, documentation, review workflows, and operational constraints.
+>
+> - **Speaker’s experiment:**
+>
+>   - Over roughly six months in 2025, the speaker’s team used coding agents to build an internal productivity agent.
+>   - The product reached beta with about 200 internal users.
+>   - The team aimed to have agents produce essentially all code, with minimal direct human editing.
+>   - Human engineers shifted from writing code to designing, staffing, guiding, and validating the “code factory.”
+>
+> - **Why traditional software workflows change:**
+>
+>   - If code generation becomes cheap, teams no longer need to optimize primarily around human coding throughput.
+>   - Human attention becomes the scarce resource.
+>   - Agent context and attention are also scarce: broader tasks dilute agent performance.
+>   - Work should therefore be decomposed into tightly scoped agent sessions.
+>
+> - **Main bottlenecks:**
+>
+>   - **Human attention:** humans should not repeatedly provide the same synchronous feedback.
+>   - **Model context:** agents need the right information at the right time, not every possible instruction upfront.
+>   - **Model attention:** the more unrelated context an agent sees, the less reliable it becomes.
+>
+> - **Harness engineering:**
+>
+>   - Harness engineering means designing systems that deliver the right context to agents at the right stage of work.
+>   - Code review comments are treated as evidence of missing context: if a human repeatedly comments on an issue, that requirement should be encoded into the harness.
+>   - The goal is to move feedback earlier in the process so the agent avoids predictable mistakes before review.
+>
+> - **Context as the central mechanism:**
+>
+>   - Agents receive context from prompts, `agents.md`, repository structure, documentation, tests, linters, tool outputs, and reviews.
+>   - Non-functional requirements should be written down explicitly: reliability, performance, typography, architecture, testing expectations, security, and code style.
+>   - Since agents start “fresh” on every task, they do not accumulate tacit team knowledge the way humans do through onboarding and repeated review.
+>
+> - **The codebase is part of the prompt:**
+>
+>   - Agents inspect nearby files and imitate local patterns.
+>   - Homogeneous repository structure helps agents generalize from one file or module to another.
+>   - Good existing code improves future agent output because it becomes useful in-context evidence.
+>
+> - **Use `agents.md` as a map, not a manual:**
+>
+>   - A short `agents.md` with pointers to deeper documentation worked better than a huge file containing everything.
+>   - The speaker contrasts a roughly 300-line map-like file with a 3,000-line overloaded file.
+>   - The agent should be told where to look depending on task type, such as frontend architecture, numerical analysis, reliability, or performance.
+>
+> - **Front-of-process techniques:**
+>
+>   - Provide compact, discoverable documentation for agent personas and engineering expectations.
+>   - Maintain documents such as:
+>     - how to write reliable production code,
+>     - how to write performant TypeScript,
+>     - how to structure frontend architecture,
+>     - how to use internal libraries,
+>     - how to validate user journeys.
+>   - Encode common operational lessons, such as requiring network calls to have timeouts and retries.
+>
+> - **Middle-of-process techniques:**
+>
+>   - Use fast tests, builds, and linters so agents can hill-climb toward correct solutions.
+>   - Linters should check not only syntax but also repository structure, package boundaries, configuration consistency, and architectural rules.
+>   - High-quality linter failure messages should explain the remediation in human-readable prose.
+>   - These tool outputs become just-in-time prompts for the agent.
+>
+> - **Repository architecture for agents:**
+>
+>   - The team used many small package boundaries in a monorepo to help agents reason locally.
+>   - The speaker mentions around 500 local NPM packages.
+>   - The architecture was intentionally over-partitioned, even without deploying true microservices.
+>   - This allowed agents and humans to restrict the relevant context for a change.
+>
+> - **Static constraints and schema discipline:**
+>
+>   - The team used tools such as [Zod](https://github.com/colinhacks/zod) and [Pydantic](https://pydantic-docs.helpmanual.io/) to validate data at boundaries.
+>   - They tried to eliminate unknown, untyped, or overly loose internal data structures.
+>   - This reduced the agent tendency to generate redundant validation or dead code deep inside the system.
+>
+> - **End-of-process techniques:**
+>
+>   - Treat agents like teammates rather than tools that must be watched continuously.
+>   - Require a proof of work from agents:
+>     - tests run,
+>     - quality assurance plan,
+>     - logs inspected,
+>     - screenshots or videos,
+>     - evidence that the ticket requirements were met.
+>   - Agents were taught to attach media and validation artifacts to pull requests.
+>
+> - **Review agents:**
+>
+>   - The team distilled patterns from hundreds of human-reviewed pull requests.
+>   - Reviewer agents were created to catch common mistakes before the human reviewer.
+>   - Review personas included reliability, security, performance, frontend architecture, modularity, and quality assurance.
+>   - These reviewers used the same guardrail documents given to implementation agents.
+>
+> - **Important reviewer-agent design choice:**
+>
+>   - Review agents must be biased toward merging, not endlessly blocking.
+>   - Without that bias, reviewer agents can continuously “heckle” implementation agents and prevent convergence.
+>   - The review job was framed as identifying sufficiently important issues, such as P2-and-above concerns.
+>
+> - **Shift-left feedback loop:**
+>
+>   - The speaker’s recurring theme is to move review feedback, production feedback, and operational feedback earlier into the agent workflow.
+>   - Repeated human interventions should become documentation, skills, tests, or linters.
+>   - Every human correction is a candidate for automation or prompt injection.
+>
+> - **Team productivity effect:**
+>
+>   - The team moved from roughly 3.5 pull requests per day to 5–10 pull requests per day.
+>   - The limiting factor became how much parallel agent work the team could schedule, not how much code humans could personally write.
+>   - Each new engineer improved the shared harness by adding their own view of “what good looks like.”
+>
+> - **Handling production failures:**
+>
+>   - The team initially lacked normal production observability because humans were not directly doing the work.
+>   - They used agents to build observability tooling as code.
+>   - Dashboards and alerts were defined in JSON and YAML.
+>   - Agents could inspect metrics, logs, and dashboards, then propose missing instrumentation or alerting.
+>   - The speaker notes that they still used humans for release branches and smoke testing; continuous deployment was not fully automated.
+>
+> - **Agent personas in practice:**
+>
+>   - Personas were coarse-grained and horizontal across the software development lifecycle.
+>
+>   - Examples:
+>
+>     - reliability reviewer,
+>     - security reviewer,
+>     - performance reviewer,
+>     - frontend architecture reviewer,
+>     - package layering reviewer,
+>     - quality assurance reviewer.
+>
+>   - Each persona was given a small set of relevant documents and asked to evaluate a diff from that role.
+>
+> - **Key takeaway:**
+>
+>   - Code is becoming cheap, but attention, context, and validation remain expensive.
+>   - The highest-leverage work is to build harnesses that encode team judgment into documents, tests, linters, review agents, and fast feedback loops.
+>   - The role of the human engineer shifts from producing code to designing systems that let agents produce acceptable code reliably.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Harness {Engineering}},
+  date = {2026-04-28},
+  url = {https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk7.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Harness Engineering.” April 28. <https://orenbochman.github.io/posts/2026/04-28-ODSC-AI-2026-Day-1/talk7.html>.

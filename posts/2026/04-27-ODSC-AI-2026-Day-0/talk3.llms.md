@@ -1,0 +1,157 @@
+## Introduction to Machine Learning: From Theory to Application
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Michael Galarnyk
+  - [Website](https://mgalarnyk.github.io/)
+  - Georgia Institute of Technology
+  - [GitHub](https://github.com/mGalarnyk/MLModelsScikit-Learn/tree/main/powerpoints)
+
+> **NOTE:**
+>
+> - **Topic: Introduction to machine learning with [scikit-learn](https://scikit-learn.org/)**
+>
+>   - The talk introduces machine learning from both theory and practical application.
+>   - Galarnyk uses a GitHub repository with slides and notebooks so participants can follow along.
+>   - The focus is on basic-to-intermediate machine learning concepts, especially as they apply to Python and [scikit-learn](https://scikit-learn.org/).
+>
+> - **Prerequisites and setup**
+>
+>   - Participants are expected to know basic Python: strings, numbers, conditionals, loops, lists, tuples, and dictionaries.
+>   - Some familiarity with *linear regression* is helpful.
+>   - Galarnyk recommends using Anaconda or Google Colab to manage Python environments and dependencies.
+>   - Core libraries discussed include `NumPy`, `Pandas`, `Matplotlib`, and `scikit-learn`.
+>
+> - **Why fundamentals still matter in the age of large language models**
+>
+>   - Even though large language models can generate code, users still need enough understanding to debug mistakes.
+>   - Models are better at generating text and code than at generating precise diagrams or visual explanations.
+>   - A model may confidently provide incorrect output, so users need enough theory to evaluate whether the result is valid.
+>   - Popular libraries such as `scikit-learn` are easier for A.I. tools to assist with because they have abundant examples, documentation, and community usage.
+>
+> - **Basic machine learning concepts**
+>
+>   - Machine learning is presented as giving computers the ability to learn from data without being explicitly programmed.
+>   - The talk distinguishes between:
+>     - **Features**: the input variables used to make predictions.
+>     - **Target**: the value or class the model tries to predict.
+>     - **Regression**: predicting continuous values, such as home prices.
+>     - **Classification**: predicting categories, such as flower species.
+>   - The Iris dataset is used as an example of a small classification dataset.
+>
+> - **Working with notebooks and debugging**
+>
+>   - Galarnyk emphasizes running [Jupyter notebooks](https://jupyter.org/) sequentially from top to bottom.
+>   - A common error discussed is using a variable before it has been defined.
+>   - Users are encouraged to inspect variable types, array shapes, and intermediate outputs.
+>   - Errors are divided into:
+>     - **Coding errors**, such as missing variables or malformed data.
+>     - **Understanding errors**, such as applying a regression model to a classification problem.
+>
+> - **Data preparation**
+>
+>   - The talk covers loading data into [Pandas](https://pandas.pydata.org/) and identifying feature matrices and target vectors.
+>   - Missing values are discussed, including simple removal as a practical shortcut.
+>   - Galarnyk notes that missingness itself can sometimes be predictive and may be converted into a feature.
+>
+> - **Linear regression**
+>
+>   - Linear regression is introduced through the slope-intercept form, y = mx + b.
+>   - Galarnyk explains the role of an intercept and how adding parameters can improve model fit.
+>   - R^2 is introduced as a basic performance metric, where higher values generally indicate better fit.
+>   - Visualizing the regression line is emphasized as important for communicating results to stakeholders.
+>
+> - **Train-test split and overfitting**
+>
+>   - Galarnyk explains why data should be split into training and testing sets.
+>   - The model learns from the training set and is evaluated on unseen test data.
+>   - Testing on the same data used for training rewards overly complex models that memorize the dataset.
+>   - The common 75/25 train-test split is discussed, though modern systems may use much larger training proportions.
+>   - `random_state` is used to make random splits reproducible.
+>
+> - **Decision trees**
+>
+>   - Decision trees are introduced as interpretable models that make predictions by asking a sequence of questions.
+>   - For a housing-price example, the tree may split mainly on square footage if that feature is most predictive.
+>   - Galarnyk stresses that giving a model many features does not guarantee it will use all of them.
+>   - Tree depth is discussed as a hyperparameter controlling how many questions the tree may ask.
+>
+> - **Model interpretability**
+>
+>   - Interpretability is especially important in high-stakes domains such as healthcare and finance.
+>   - Users need to understand not only whether a model predicts correctly, but how it reaches its predictions.
+>   - Understanding model logic helps identify likely error patterns and evaluate whether the model is using appropriate signals.
+>
+> - **Hyperparameter tuning**
+>
+>   - Hyperparameters are settings chosen before or during training, such as maximum tree depth.
+>   - Galarnyk demonstrates trying multiple values and comparing performance.
+>   - The goal is not to maximize training performance but to find settings that generalize well to validation or test data.
+>   - Repeatedly tuning on the same test set can leak test-set knowledge into the model-selection process.
+>
+> - **Bias-variance tradeoff**
+>
+>   - High-bias models, such as simple linear regression, may *underfit* by imposing too simple a structure.
+>   - High-variance models, such as overly deep trees, may *overfit* by memorizing the training data.
+>   - Traditional machine learning often seeks a middle ground between underfitting and overfitting.
+>   - Galarnyk notes that modern deep learning complicates the classical picture because very large models can sometimes improve again at massive scale.
+>
+> - **Random forests**
+>
+>   - Random forests are introduced as ensembles of decision trees.
+>   - They reduce overfitting by combining many trees trained on varied samples and feature subsets.
+>   - Galarnyk explains bagging and the use of random feature subsets to prevent every tree from relying on the same dominant feature.
+>   - Random forests are described as combining many “specialists” into a stronger aggregate predictor.
+>
+> - **Local versus cloud computation**
+>
+>   - Running models locally can reduce latency and simplify data transfer to the machine or GPU.
+>   - Local execution may be limited by compute, memory, and hardware constraints.
+>   - Cloud tools such as Google Colab reduce setup friction but depend on external services and policies.
+>   - Galarnyk briefly discusses parallel and distributed computing as ways to speed up model training and inference.
+>
+> - **Privacy and personally identifiable information**
+>
+>   - A participant asks about protecting personally identifiable information when using cloud or artificial intelligence tools.
+>   - Galarnyk frames this as an active and unresolved issue.
+>   - One mitigation strategy mentioned is limiting tool access so models can query only the minimum information needed.
+>
+> - **Using artificial intelligence tools effectively**
+>
+>   - Galarnyk recommends giving models specific context, code, errors, and goals rather than vague requests.
+>   - A better prompt explains what was attempted, what failed, and what the desired outcome is.
+>   - Screenshots and exact error messages can help models debug code.
+>   - Users should still understand the code well enough to judge whether the model’s fix is correct.
+>
+> - **Recommended next steps**
+>
+>   - Continue practicing with notebooks and small datasets.
+>   - Learn how to diagnose errors, inspect data, and evaluate models.
+>   - Read reliable books and documentation rather than relying only on large language models.
+>   - Suggested resources include hands-on machine learning books, by[Christopher Bishop](https://www.microsoft.com/en-us/research/people/cmbishop/), and [Sebastian Raschka](https://sebastianraschka.com/).
+>
+> - **Main takeaway**
+>
+>   - The talk argues that machine learning fundamentals remain essential, even when artificial intelligence tools can generate code.
+>   - Effective users need to understand the data, the model, the evaluation procedure, and the limits of automation.
+>   - The practical goal is not just to run a model, but to know whether it is appropriate, interpretable, reliable, and useful.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Introduction to {Machine} {Learning}},
+  date = {2026-04-27},
+  url = {https://orenbochman.github.io/posts/2026/04-27-ODSC-AI-2026-Day-0/talk3.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Introduction to Machine Learning.” April 27. <https://orenbochman.github.io/posts/2026/04-27-ODSC-AI-2026-Day-0/talk3.html>.

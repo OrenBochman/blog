@@ -1,0 +1,102 @@
+I have been thinking about Lewis Signaling games recently, and I had come up with a couple of questions that I wanted to answer.
+
+Questions:
+
+1.  How can we initialize the Lewis signaling game in an optimal or less naive way?
+2.  How can we accelerate learning in the Lewis signaling game using multiple agents?
+3.  How can we model the Lewis signaling game from a Bayesian perspective?
+
+## Better Initialization
+
+First has to do with initializing the algorithm in some optimal way. Like the battle of the sexes there is no easy way to initialize the algorithm unless the agents can coordinate on a single equilibrium. If the state are unevenly distributed, or if they can listen to some prior signal, then they can coordinate on a permutation ordered by frequency for the signals and its inverse for the actions. Otherwise the agents will have to learn the equilibrium through trial and error which is the essence of the game.
+
+However the idea of a prior remained and the complexity of specifying it kept bugging me since I had failed to find a way to do it.
+
+> **IMPORTANT:**
+>
+> I think that this issue is best viewed like the symmetries of polygons like equilateral and the isosceles triangle.
+>
+> We tend to see all signaling systems as equilateral triangles with a perfect symmetry born from invariance under reordering of the signals. For signaling games these are often big symmetries.
+>
+> I think that the symmetries which matter more are perhaps more like the symmetries of the isosceles triangle. It just has a reflection. The same reflection is also available within the equilateral triangle which has three such symmetries in it’s permutation group. They are however easier to see on the isosceles. This analogy though is not perfect so let’s explain further.
+>
+> Semantics, grammar, morphology and syntax require structure and induce orders and other relations. They are substructures that need to work together for the language to work.
+>
+> In terms of language emergence they might co-evolve together. In deep learning a revolutionary approach called adversarial models allows two networks to compete and learn from each other. This may be a way to model the co-evolution of structure and semantics. It seems promising but presents a challenge. The reward structure of the lewis game is cooperative yet adversarial models are based on competition.
+>
+> Another way that these structures might co-evolve though is through analogies. Analogies have been shown to manifest in language models
+>
+> To sum up
+>
+> 1.  The big symmetry group for the permutations of all the signaling system should be built from many smaller symmetry groups that embody smaller sub-structures like phonology, and morphology, and syntax.
+> 2.  These smaller symmetry groups should be allowed to co-evolve via an adversarial interaction or
+
+Adversarial modeling in this context seems very promising if one could work out a compatible reward structure.
+
+## Accelerating Learning using Multiple Agents
+
+A second question that I had was not covered in the literature. I wanted to know if the multiple agents were signaling to each other, in a visible way, would the agents be able to coordinate on a single equilibrium significantly faster just a pair of agents.
+
+One obvious point is that move by nature would slow down the process is agents are unlucky. For optimal signaling the same state would be remain until agents could coordinate and would not reoccur until the agents had coordinate on all the other states. So for multiple agents some agents would be closer to this optimum and may learn faster then the others. Secondly since matching signal action pairs are rare, (1/k\\2) for a k state game, having between k to k\\2 should significantly increase.
+
+Expectation of a matching signal-action pair. So this could speed things up. But this also raises the issue of differential signaling systems arising if by chance some two or more pairs learned different signal/action pairs. The learning process would need to break such ties (Skyrms might call it spontaneous symmetry breaking) But it could slow down the learning process.
+
+Actually such a state of affairs could lead to a partial pooling equilibrium, where all the agents had learned a synonym. This would be a suboptimal equilibrium, but it will provide a maximal payoff for all the agents if there are no homonyms.
+
+Some ideas on how to break the symmetry would be: 1. the group might defer to seniority i.e. the sender with the lowest id. - (takes no extra time).
+
+1.  agents could vote at random for a signal. (would take just one more step if we ignore one draw if the votes are tied)
+
+2.  ask the other agents to vote who likes signal a and who likes signal b. if the sender or receiver match the sender/receiver they like it so there would be 0 1 or 2 votes for each signal. the might be draws too and each agent would need to pick a new permutation and vote again. - (would take a few more steps)
+
+3.  the senders might pick a pair of at random until they both pick the same one. - (would take a few more steps)
+
+Any way you look at it there are many advantages to consider learning by multiple senders. They seem necessary for complex signaling as well. However I was pretty certain that the analysis would keep getting more complex as we considered more options like learning grammar, contexts or a noisy environment….
+
+## Bayesian Perspective
+
+I had already implemented learning using different algorithms and to explore the Gittin’s index from ([Sutton and Barto 2018](#ref-sutton2018reinforcement)) I had already implemented a Beta-Bernulli contextual bandit with Gittin’s index and with Thompson sampling.
+
+I was already thinking how to improve it but I did not have a very good idea regarding the prior. I had a fairly efficient algorithm for the learning but I wanted a better way to model the updating and the right prior. My idea of using a Multinomial-Dirichlet conjugate pair had not worked and would probably take a while to trouble shoot and fix, and it was not really the full solution I was looking for.
+
+More so I was coming to terms that I could likely come up with Bayesian updating schemes that were novel and I would quickly find myself deep in uncharted territory. This had some attraction - it was not the first time I came a cross a problem that did not seem to have a conjugate prior pair to fit with prior knowledge I wanted to bring to bear in the model, but Bayesian updating is just one aspect of Bayesian methodology and I was worried of getting to a dead end because of working with a new type of distributions.
+
+## The Model
+
+At a fundamental level the Lewis signaling game of coordination. Sender and receiver are trying to learn a mapping between states and signals. The mappings need to be inverse of one another and to have a maximal reward the mappings need to preserve the messages - synonyms are ok by homonyms are not. And if these number of states and signals and actions are the same then the mappings need to be one to one and onto.
+
+So in such a case synonyms are not allowed and the mappings need to be not just permutation but rather cycles of length k. This is something I had understood intuitively but I had ot been very clear about.
+
+I was now thinking about distribution over groups - something I had not considered before. However it dawned on me that the two other aspects of the complex signaling game being grammar and context might be modeled additional group structures. And if we could learn cycles efficiently then we might generalize to more complex signaling systems in a reductionist way intimated in chapter 12 of ([Skyrms 2010](#ref-skyrms2010signals)).
+
+The point is that cycles are not the simplest structure in this problem either. What we are looking at each state of Nature is a pair of transpositions that cancel each other out. A transposition is a very simple structure but it is also a base element of a permutation. The Cayley theorem tells us that any group is isomorphic to a group of permutations. If we can define our prior using transpositions then we can define a prior over permutations or general on any group.
+
+Another point in favor of transpositions is that they have one operation, their composition just a product and since probabilities are multiplicative too the two seem to be a good fit.
+
+So I had three point to consider.
+
+1.  Constructing the prior for cycles based on transpositions.
+2.  Updating the prior using based on moves in the Lewis signaling game.
+3.  Implement it as an rl/Bayesian model say using Thompson sampling.
+
+Skyrms, Brian. 2010. “14512 Complex Signals and Compositionality.” In *Signals: Evolution, Learning, and Information*. Oxford University Press. <https://doi.org/10.1093/acprof:oso/9780199580828.003.0013>.
+
+Sutton, Richard S., and Andrew G. Barto. 2018. *Reinforcement Learning: An Introduction*. Second. The MIT Press. <http://incompleteideas.net/book/the-book-2nd.html>.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Lewis {Game} from a {Bayesian} {Perspective}},
+  date = {2024-02-12},
+  url = {https://orenbochman.github.io/posts/2024/2024-05-06-bayesian-perspective/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2024. “Lewis Game from a Bayesian Perspective.” February 12. <https://orenbochman.github.io/posts/2024/2024-05-06-bayesian-perspective/>.

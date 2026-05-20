@@ -1,0 +1,154 @@
+## Agentic AI for Autonomous Root-Cause Analysis in Large-Scale Enterprise Systems
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Nik Kale
+- Cisco Systems
+
+> **NOTE:**
+>
+> - **Topic:** A presentation by Nik Khale on multi-agent artificial intelligence systems for autonomous root-cause diagnosis in enterprise IT environments.
+>
+> - **Core problem:**
+>
+>   - Modern observability tools are good at detecting that something happened.
+>   - They are much weaker at explaining why it happened.
+>   - In outages, teams often enter “war room” mode, where network, database, application, security, and infrastructure teams each defend their own domain.
+>   - The main bottleneck is not missing data, but cross-domain causal reasoning.
+>
+> - **Key argument:**
+>
+>   - Alerts, metrics, logs, configuration diffs, and telemetry are usually available.
+>   - The hard task is separating the true root cause from cascading symptoms.
+>   - Traditional correlation and timestamp matching are insufficient because the same event appears differently across domains.
+>
+> - **Limits of existing approaches:**
+>
+>   - **Schema consolidation:** dumping everything into a data lake fails because schemas drift and correlation is not causation.
+>   - **War rooms:** they can work, but expert reasoning is not preserved; once the call ends, the diagnostic memory disappears.
+>   - **Expert systems:** rule-based playbooks work only for known cases and fail when the environment changes.
+>
+> - **Proposed shift:**
+>
+>   - Move from deductive expert systems to inductive multi-agent systems.
+>   - Instead of following only pre-written rules, agents generate hypotheses, retrieve evidence, evaluate causality, reject weak explanations, and iterate toward a root cause.
+>
+> - **Architecture described:**
+>
+>   - **Diagnostic agent:** generates candidate hypotheses from a problem statement.
+>   - **Retrieval agent:** gathers relevant evidence from logs, metrics, telemetry, configuration, databases, or live APIs.
+>   - **Evaluation agent:** judges whether evidence supports or contradicts each hypothesis and identifies causal dependencies.
+>   - **Analysis agent:** converges on the root cause, assigns confidence, and recommends remediation steps.
+>
+> - **Investigation loop:**
+>
+>   - The system usually runs several iterations, often three to nine, sometimes more.
+>   - Each iteration expands the search, retrieves evidence, evaluates hypotheses, and prunes explanations that are unsupported or merely symptomatic.
+>   - Multiple reasoning loops can run in parallel and compare agreement or disagreement.
+>
+> - **Graph-based reasoning model:**
+>
+>   - The investigation state is represented as a machine-readable directed acyclic graph.
+>
+>   - Nodes include:
+>
+>     - problem nodes,
+>     - hypothesis nodes,
+>     - evidence nodes,
+>     - rejected hypothesis nodes,
+>     - root-cause nodes.
+>
+>   - Edges represent:
+>
+>     - causal relations,
+>     - evidential support,
+>     - generated-from relations,
+>     - dependency/pruning relations.
+>
+> - **Why the graph matters:**
+>
+>   - It is not just a visualization or report artifact.
+>   - It is the computational state of the investigation.
+>   - It preserves the full reasoning history, making the result auditable and explainable.
+>
+> - **Pruning mechanism:**
+>
+>   - If hypothesis B depends on hypothesis A, then B cannot be the root cause.
+>   - Example: a network symptom may depend on a pod eviction, meaning the network issue is not primary.
+>   - Unsupported hypotheses are also removed.
+>   - This allows the system to reduce a large search space into a smaller causal chain.
+>
+> - **Retrieval strategy:**
+>
+>   - The system does not rely only on a vector database or semantic search.
+>
+>   - It chooses the retrieval method suited to the evidence:
+>
+>     - keyword search for known terms,
+>     - term frequency–inverse document frequency for anomaly hunting,
+>     - semantic search for fuzzy matching,
+>     - Structured Query Language for structured data,
+>     - live queries or APIs for real-time state.
+>
+>   - The point is tool selection, not one universal retrieval method.
+>
+> - **Example investigation:**
+>
+>   - A checkout or voting application becomes unreachable.
+>   - The system considers network, Kubernetes, application, and infrastructure hypotheses.
+>   - It traces the problem across domains: application error → pod eviction → resource limits → infrastructure issue.
+>   - In one example, the root cause is disk pressure on a worker node.
+>   - In the demo, another root cause is a specific network interface, VM 22, being administratively taken down.
+>
+> - **Demo features:**
+>
+>   - The user interface shows:
+>
+>     - probable root cause,
+>     - investigation graph,
+>     - iteration slider,
+>     - rejected hypotheses,
+>     - evidence artifacts,
+>     - audit trail,
+>     - downloadable investigation report.
+>
+>   - The audit trail records what was checked, what was rejected, and how the final conclusion was reached.
+>
+> - **Outcome claimed:**
+>
+>   - The system completed an investigation in roughly five minutes.
+>   - It avoided a traditional bridge call or war room.
+>   - It produced both the root cause and recommended resolution steps.
+>
+> - **Trust and adoption:**
+>
+>   - The speaker notes that building the system is only one challenge.
+>   - Getting an organization to trust autonomous diagnostic reasoning is a separate challenge.
+>   - The talk begins to discuss trust boundaries, but this section is cut short because the session runs out of time.
+>
+> - **Main takeaway:**
+>
+>   - The presentation argues that the next step in observability is not better alerting, but auditable causal reasoning.
+>   - Multi-agent systems can preserve expert-like troubleshooting as a structured, reusable, machine-readable investigation graph.
+
+### Reflection
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Agentic {AI} for {Autonomous} {Root-Cause} {Analysis}},
+  date = {2026-04-28},
+  url = {https://orenbochman.github.io/posts/2026/04-30-ODSC-AI-2026-Day-3/talk10.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Agentic AI for Autonomous Root-Cause Analysis.” April 28. <https://orenbochman.github.io/posts/2026/04-30-ODSC-AI-2026-Day-3/talk10.html>.

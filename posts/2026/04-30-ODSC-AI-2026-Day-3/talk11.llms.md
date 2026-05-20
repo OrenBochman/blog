@@ -1,0 +1,173 @@
+## Building Effective Agents
+
+Play
+
+![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
+
+- Sushant Mehta
+  - https://www.linkedin.com/in/sushant-mehta-9a1b4a1/
+  - [LinkedIn]()
+
+> **NOTE:**
+>
+> - **Speaker and topic**
+>
+>   - Sushant, who works on post-training at Surge and previously worked on coding capabilities for Gemini at DeepMind, presents a practical overview of building effective large language model agents.
+>
+>   - The talk connects three layers:
+>
+>     - post-training,
+>     - reinforcement learning,
+>     - agentic deployment patterns.
+>
+> - **Why post-training matters**
+>
+>   - A pre-trained model is only a next-token predictor and is not immediately useful as an assistant.
+>
+>   - Post-training teaches the model to follow instructions, satisfy human preferences, reason, code, improve factuality, and avoid unsafe behavior.
+>
+>   - The standard pipeline is:
+>
+>     - start with a base model,
+>     - instruction fine-tune it,
+>     - collect preference data,
+>     - train or use a reward mechanism,
+>     - apply reinforcement learning to produce a more aligned and useful model.
+>
+> - **Post-training is iterative**
+>
+>   - Labs repeatedly improve the best available model by identifying failure modes, collecting targeted data, and retraining.
+>   - Better models can generate better synthetic data, which can then improve the next model.
+>   - The speaker mentions preference-optimization and reinforcement-learning methods such as Direct Preference Optimization, Proximal Policy Optimization, and Group Relative Policy Optimization.
+>
+> - **Reinforcement learning for language models**
+>
+>   - In the language-model setting:
+>
+>     - the policy is the large language model,
+>     - actions are token or sequence generations,
+>     - the environment is a reward model, verifier, rubric, or judge,
+>     - training nudges the model toward outputs that receive higher reward.
+>
+>   - Reinforcement Learning from Human Feedback uses a reward model trained on preference data.
+>
+>   - Reinforcement Learning from Verifiable Rewards can avoid a separate reward model when correctness can be checked directly, as in math, code, or rubric-based evaluation.
+>
+> - **Agents require strong post-trained models**
+>
+>   - Agentic systems only become useful once the base model can already reason, use tools, code, follow instructions, and maintain context over multiple turns.
+>
+>   - The speaker defines an agent as a large language model with agency over tools and actions.
+>
+>   - He distinguishes agents from workflows:
+>
+>     - workflows follow mostly predetermined paths,
+>     - agents dynamically plan, choose tools, and adapt based on intermediate results.
+>
+> - **When agents are appropriate**
+>
+>   - Agents are useful when the task is open-ended, unpredictable, and requires dynamic planning.
+>
+>   - Good agentic tasks often involve uncertainty about:
+>
+>     - how many steps are needed,
+>     - which tools should be used,
+>     - whether code must be written or executed,
+>     - how intermediate outputs should change the plan.
+>
+>   - Agents are especially valuable when there is a clear success criterion and a feedback loop.
+>
+> - **When agents are overkill**
+>
+>   - Many tasks can be solved with a well-structured prompt and a sufficiently capable model.
+>   - Agents may be inappropriate when latency, cost, safety, or error compounding are major constraints.
+>   - The speaker recommends starting with simple large language model APIs and only adding more complex frameworks or scaffolding when needed.
+>
+> - **Core building blocks for agents**
+>
+>   - A simple useful setup is a large language model connected to tools such as:
+>
+>     - web search,
+>     - document retrieval,
+>     - code execution,
+>     - sandboxed tools.
+>
+>   - More structured setups use sequential stages with verifiers between stages.
+>
+>   - Dynamic system instructions can be injected only when relevant, reducing context clutter and improving performance.
+>
+> - **Verifier-based workflows**
+>
+>   - A model can generate an intermediate result, then another model or programmatic checker can verify it before the system proceeds.
+>
+>   - In document generation, this might mean:
+>
+>     - create an outline,
+>     - verify the outline,
+>     - expand sections,
+>     - verify sections,
+>     - perform a final review.
+>
+>   - This reduces the risk of discovering major problems only at the final output stage.
+>
+> - **Routing and model specialization**
+>
+>   - A router can classify requests and send them to specialized models.
+>   - This avoids using an expensive frontier model for every query.
+>   - Smaller or fine-tuned models may be sufficient for simpler tasks such as routine customer support.
+>   - The router itself must be monitored for over-triggering or under-triggering and periodically retrained from production logs.
+>
+> - **Generator–evaluator loops**
+>
+>   - A common agent pattern is a generator that drafts an answer and an evaluator that checks it.
+>   - The evaluator may use deterministic tests, rubrics, or model-based judgment.
+>   - The loop continues until the output satisfies the verifier or hits a stopping condition such as token or budget limits.
+>   - Human approval points may be needed for safety-sensitive tasks.
+>
+> - **Why coding agents work well**
+>
+>   - Coding is valuable and highly verifiable.
+>   - Test cases provide a clear signal for whether a patch works.
+>   - Regression tests check whether the agent broke existing behavior.
+>   - This makes coding a strong domain for reinforcement learning and iterative improvement.
+>
+> - **Why customer-support and voice agents work well**
+>
+>   - These domains often have clear success criteria, such as whether a ticket was resolved.
+>   - Production logs provide trajectories: user query, agent actions, and final outcome.
+>   - These trajectories can be used as feedback data for further reinforcement learning.
+>
+> - **Main practical recommendation**
+>
+>   - Start with the simplest architecture that can solve the task.
+>
+>   - Add complexity only when the task genuinely requires open-ended planning, tool use, or long-horizon reasoning.
+>
+>   - Design the interface from the model’s perspective:
+>
+>     - provide the right context,
+>     - use clear system instructions,
+>     - give enough context length for reasoning,
+>     - structure files and tools in formats the agent can use effectively.
+>
+>   - The central design principle is verifiability: agents improve fastest when they can reliably tell whether their actions succeeded.
+
+### Reflection
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Building {Effective} {Agents}},
+  date = {2026-04-28},
+  url = {https://orenbochman.github.io/posts/2026/04-30-ODSC-AI-2026-Day-3/talk11.html},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Building Effective Agents.” April 28. <https://orenbochman.github.io/posts/2026/04-30-ODSC-AI-2026-Day-3/talk11.html>.

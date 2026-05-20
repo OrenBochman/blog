@@ -1,0 +1,132 @@
+[![The Multifractal Landscape](./cover.webp)](./cover.webp "The Multifractal Landscape")
+
+The Multifractal Landscape
+
+One of the most popular books for quants is “The (Mis)behaviour of Markets” ([Mandelbrot and Hudson 2010](#ref-mandelbrot2010mis)). This is more a popular science book than a technical tome with relatively less math and some fascinating figures. The book was his last book published in 2004 and is based on lots of research. As far as I can tell the most pertinent was a paper titled Scaling in financial markets that came out in four parts just three years before the book in 2001. The papers are:
+
+1.  [Scaling in financial prices: I. Tails and dependence](../../../posts/2024/2024-11-28-misbahaviour-of-markets/part1/index.llms.md)
+2.  [Scaling in financial prices: II. Multifractals and the star equation](../../../posts/2024/2024-11-28-misbahaviour-of-markets/part2/index.llms.md)
+3.  [Scaling in financial prices: III. Cartoon Brownian motions in multifractal time](../../../posts/2024/2024-11-28-misbahaviour-of-markets/part3/index.llms.md)
+4.  [Scaling in financial prices: VI. Multifractal concentration](../../../posts/2024/2024-11-28-misbahaviour-of-markets/part4/index.llms.md)
+5.  [The (Mis)behaviour of Markets](part5/index.qmd)
+
+These are very interesting papers but like much of Mandelbrot’s work they are not easy to read. Mandelbrot was a maverick polymath whose work jumps from physicist to finance. The unifying themes are often his own innovations in fractal geometry. Mandelbrot tends to quote liberally from his earlier papers while ignoring the literature by his contemporaries. This not only annoyed many of his contemporaries, but makes these papers harder to follow. It basically Mandelbrot sets all the way down…. This is exacerbated by the fact that the papers are not easy to find and are behind paywalls or that the papers frequently avoid spelling out the models in detail like they are written for readers who are already familiar with the material.
+
+I have read them and will try to summarize them in a way that is more accessible. I will also try to provide some context and background to the papers and provide a few lighthearted podcasts that discuss the papers and the book.
+
+Also I was interested in reproducing some of the work from the book but instead I think I can make use of some code released by others. That came out in the last few year since I read the book. The point is that these ideas can be applied to time series modeling.
+
+So what are multifractals? Although multifractals are rooted in probability, much of the related literature comes from the physics and mathematics arena. Here is one definition:
+
+> A multifractal system is a generalization of a fractal system in which a single exponent (the fractal dimension) is not enough to describe its dynamics; instead, a continuous spectrum of exponents (the so-called singularity spectrum) is needed. — ([Harte 2001](#ref-harte2001multifractals))
+
+## The development of the multifractal model for financial prices
+
+``` mermaid
+timeline
+    title The Multifractal Model Timeline
+    1853: Augustin-Louis Cauchy introduces the base-free star equation
+    1896: Vilfredo Pareto observes and analyzes power-law distributions in income & wealth
+    1900: Louis Bachelier proposes the first model of price variation using Brownian motion, essentially a "coin-tossing" model.
+    1925: Paul Lévy expands upon Cauchy's work by providing a comprehensive solution to the star equation, including asymmetric distributions
+    1960s: Benoit B. Mandelbrot challenges the adequacy of the Brownian motion model.
+    1962: Benoit Mandelbrot early work on cotton prices
+    1963: Eugene F. Fama publishes papers analyzing stock price variations
+        : Mandelbrot's "M 1963" uses Lévy stable processes to handle long-tailed distributions in price changes.
+    1965: Mandelbrot's "M 1965" model used fractional Brownian motions to handle long-range dependence in price fluctuations.
+    1967: Mandelbrot and Taylor pioneer the concept of subordination in finance.
+    1972: Mandelbrot's limit log-normal multifractals
+    1974: Mandelbrot's multifractal star equation, 
+    1997: Mandelbrot's "M1972/97 model," AKA BMMT <br> combines fractional Brownian motion & multifractal time <br> captures both long-tailed distributions & long-range dependence in financial price variations.
+    2000: Jean Barral and Mandelbrot introduce Multifractal Products of Cylindrical Pulses (MPCP).
+    2001: Mandelbrot's "cartoon" representations of BMMT <br> a simple recursive constructions to illustrate its key features. It places BMMT within the context of earlier models.
+```
+
+## Cast of Characters:
+
+Multifractal models in financial markets were developed by a diverse cast of characters. Their research challenged conventional wisdom and revolutionized the way we understand the complex dynamics of asset price movements.
+
+[![Augustin-Louis Cauchy](https://upload.wikimedia.org/wikipedia/commons/d/d1/Augustin_Louis_Cauchy_Litho_%28cropped%29.jpg)](https://upload.wikimedia.org/wikipedia/commons/d/d1/Augustin_Louis_Cauchy_Litho_%28cropped%29.jpg "Augustin-Louis Cauchy")
+
+Augustin-Louis Cauchy
+
+Augustin-Louis Cauchy (1789-1857): A French mathematician known for his significant contributions to analysis, number theory, and mathematical physics. In 1853, he introduced a functional equation (later termed the “star equation”) that implicitly linked scaling behavior to power-law distributions, paving the way for later advancements in multifractal modeling.
+
+------------------------------------------------------------------------
+
+[![Paul Lévy](https://upload.wikimedia.org/wikipedia/commons/a/a8/Paul_Pierre_Levy_1886-1971.jpg)](https://upload.wikimedia.org/wikipedia/commons/a/a8/Paul_Pierre_Levy_1886-1971.jpg "Paul Lévy")
+
+Paul Lévy
+
+Paul Lévy (1886-1971): A prominent French mathematician specializing in probability theory. In ([Lévy 1925](#ref-lévy1925calcul)) he builds upon Cauchy’s work. Lévy provided a comprehensive solution to the star equation, including asymmetric distributions. He formalized the concept of stable distributions, which are essential in modeling financial prices and other phenomena exhibiting heavy tails.
+
+------------------------------------------------------------------------
+
+[![Vilfredo Pareto](https://upload.wikimedia.org/wikipedia/commons/f/fd/Vilfredo_Pareto_1870s2.jpg)](https://upload.wikimedia.org/wikipedia/commons/f/fd/Vilfredo_Pareto_1870s2.jpg "Vilfredo Pareto")
+
+Vilfredo Pareto
+
+Vilfredo Pareto (1848-1923): An Italian engineer, sociologist, economist, and philosopher renowned for his observations on income distribution and his contributions to the development of microeconomics, see ([Pareto 1896](#ref-pareto1896cours)). He identified the Pareto distribution, a power-law function that accurately described the unequal distribution of wealth in society.
+
+------------------------------------------------------------------------
+
+[![Benoit B. Mandelbrot](https://upload.wikimedia.org/wikipedia/commons/e/e9/Benoit_Mandelbrot_mg_1804-d.jpg)](https://upload.wikimedia.org/wikipedia/commons/e/e9/Benoit_Mandelbrot_mg_1804-d.jpg "Benoit B. Mandelbrot")
+
+Benoit B. Mandelbrot
+
+Benoit B. Mandelbrot (1924-2010): A Polish-born French-American mathematician recognized as the father of fractal geometry. He revolutionized the understanding of financial markets by introducing fractal and multifractal models to capture their complex, non-Gaussian behavior. His work challenged the traditional reliance on Brownian motion and provided a new framework for risk assessment and portfolio management.
+
+------------------------------------------------------------------------
+
+[![Eugene F. Fama](https://upload.wikimedia.org/wikipedia/commons/b/b0/DIMG_7519_%2811253479133%29.jpg)](https://upload.wikimedia.org/wikipedia/commons/b/b0/DIMG_7519_%2811253479133%29.jpg "Eugene F. Fama")
+
+Eugene F. Fama
+
+Eugene F. Fama (1939-present): An American economist known for his empirical analysis of asset prices and his contributions to the efficient-market hypothesis. His research on stock price variations, including his test of Mandelbrot’s stable Paretian hypothesis, ignited discussions on the appropriate statistical models for financial markets.
+
+------------------------------------------------------------------------
+
+[![Laurent Calvet](https://upload.wikimedia.org/wikipedia/commons/f/fd/Laurent_E._Calvet.jpg)](https://upload.wikimedia.org/wikipedia/commons/f/fd/Laurent_E._Calvet.jpg "Laurent Calvet")
+
+Laurent Calvet
+
+Laurent Calvet: An economist who, along with Adlai Fisher, collaborated with Mandelbrot in the late 1990s to further develop and apply the multifractal model to financial data. Their work provided crucial empirical evidence and expanded the theoretical understanding of multifractal time subordination in financial markets.
+
+------------------------------------------------------------------------
+
+Adlai Fisher: An economist who partnered with Laurent Calvet and Benoit Mandelbrot to advance the application of multifractal models to financial data analysis. Their joint research focused on empirically validating the model and exploring its implications for risk management.
+
+------------------------------------------------------------------------
+
+Jean Barral: A French mathematician who collaborated with Mandelbrot in the late 1990s and early 2000s to develop the Multifractal Products of Cylindrical Pulses (MPCP). Their work generalized the multifractal framework by moving beyond b-adic cascades and introduced a more flexible model capable of capturing complex multiscaling behavior.
+
+------------------------------------------------------------------------
+
+Peter Clark: Author of a 1973 paper that explored a specific type of “subordinated” process for modeling price variation. Mandelbrot critiqued this work for its reliance on independent increments, which failed to capture the observed dependence in price data.
+
+Harte, D. 2001. *Multifractals: Theory and Applications*. CRC Press. <https://www.routledge.com/Multifractals-Theory-and-Applications/Harte/p/book/9780367455200>.
+
+Lévy, P. 1925. *Calcul Des Probabilités*. PCMI Collection. Gauthier-Villars. <https://books.google.co.il/books?id=8_FLAAAAMAAJ>.
+
+Mandelbrot, B. B., and R. L. Hudson. 2010. *The (Mis)behaviour of Markets: A Fractal View of Risk, Ruin and Reward*. Profile. <https://books.google.co.il/books?id=zg91TAIs6bgC>.
+
+Pareto, V. 1896. *Cours d’economie Politique Professe a l’universite de Lausanne*. F. Rouge. <https://books.google.co.il/books?id=KjnhnQAACAAJ>.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2024,
+  author = {Bochman, Oren},
+  title = {Misbehavior of {Markets} and {Scaling} in Financial Prices
+    1-4},
+  date = {2024-12-02},
+  url = {https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2024. “Misbehavior of Markets and Scaling in Financial Prices 1-4.” December 2. <https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/>.

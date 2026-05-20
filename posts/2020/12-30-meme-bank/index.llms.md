@@ -1,0 +1,223 @@
+> **NOTE:**
+>
+> [![memes in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "memes in a nutshell")
+>
+> memes in a nutshell
+>
+> Introduced in ([Dawkins 1976](#ref-dawkins1976selfish)), a meme is an idea, behavior, style, or usage that spreads from person to person within a culture. A meme bank would be a zoo for cataloging and breeding memes.
+
+## Meme bank
+
+Disrupting innovation - using brainstorming, TRIZ, Mcluhan’s tetrad ([McLuhan 1988](#ref-mcluhan1988understanding)), and so on.
+
+Creating a bank of memes seems almost like an idea out of science fiction. Sure there are ontologies and so on, but memes are supposed to be alive, so this is as much a project about algorithms as it is about creating artificial life.
+
+Could a meme bank be used in a procedures like TRIZ to come up with new solutions to open problems or to improve existing ones. Could they be used with Marshal Mcluhan’s tetrad to try and predict change and even disruptions of new media and technology?
+
+## Use cases
+
+1.  attacking a problem
+2.  approaching creativity using generate-and-test
+3.  choosing an approach
+4.  identifying similarity and difference between algorithms etc.
+5.  genetic programming
+6.  generalizing in mathematics
+
+## What constitutes a meme?
+
+For the meme bank one might want to collect memes from the wild but also to perhaps establish a meritocracy and allocate resources to memes that seem to be more useful. In science ideas are often formalized as theories. This statement and behavior of theories have been studied and later formalized using the interrelated mathematical branches of formal languages, logic, set theory and category theory. In other domain like fashion or popular culture we may lack such rigor.
+
+The more formally stated a meme is the fewer minds it can inhabit. But perhaps could
+
+## Are memes alive ?
+
+Memes have a number of properties:
+
+- Birth:
+  - Memes, must originate with someone
+- Spreading:
+  - The then gain traction over time.
+- Decline:
+  - Many ideas can also lose traction and become discredited or supplanted by more powerful ideas.
+- Can they evolve?
+  - If memes are alive can they breed !?
+  - How should memes be represented ?
+
+Meme’s don’t have DNA, but they often have a complex genealogy. This suggests that emergent memes contain some aspects of simpler memes that may have vanished from our minds. Why should we care about such basic ideas? It would seem that having a more basic idea is going to be easier to work with. At least in the sense that a simple meme might be easier to utilize or generalize or combine than a complex one.
+
+## Specialized type of memes.
+
+- Words (have etymologies)
+- Scientific theories
+- Data structure
+- Frames.
+- Scripts.
+- Classes.
+- Algorithm.
+- Design Patterns.
+- Religion.
+- Media
+- Art Clearly we would treat words algorithms differently.
+
+## Algorithmic memes:
+
+### Problems
+
+If you want to collect memes you should look at problems, as memes we often present as parts of the solutions.
+
+## A bank
+
+### Mathematical:
+
+- axioms
+
+- sets
+
+- grammar
+
+- [morphism](https://en.wikipedia.org/wiki/Morphism)
+
+- [relation](https://en.wikipedia.org/wiki/Relation)
+
+  - [equivalence relation](https://en.wikipedia.org/wiki/Equivalence_relation)
+
+- [mapping](https://en.wikipedia.org/wiki/Mapping_(mathematics))
+
+  - identity
+  - order
+  - reflexive
+  - transitive
+
+- topology.
+
+        - continuity
+        - compactness
+        - distance
+        - metric
+        - convergence
+        - connectedness
+
+- maximum and minimum
+
+- matrix
+
+- group
+
+- probability distribution
+
+- FSM
+
+  - deterministic
+  - non-deterministic
+
+- Markov chain
+
+- Gaussian process
+
+- game
+
+  - cooperative
+  - non-cooperative
+    - zero-sum
+
+## Logic
+
+- proof
+- completeness
+- deduction
+- causality
+- correlation
+- syllogism
+- normal forms.
+  - conjunctive,
+  - disjunctive,
+  - prenex,
+  - negation normal form
+- [Skolemization](https://en.wikipedia.org/wiki/Skolemization)
+- completeness
+- induction
+
+## Cognitive
+
+- generate-and-test  
+- sample
+  - stratified
+  - snowball
+- optimization
+- filtering
+- smoothing
+- search
+  - Depth first search
+  - Breadth first search
+  - Beam search
+  - MCMC search ?
+  - Adversarial search ?
+  - AB search
+- Space filling curves
+  - Hilbert, Peano, Lebesgue, Moore, Sierpinski.
+- Space filling trees
+- Similarity and distances
+
+## Data Structures:
+
+- sets
+- categories
+- graphs
+  - trees
+- lists
+- linked lists
+- array
+  - tables
+- dictionary
+- state space
+- topology
+
+## In my bank:
+
+- decomposing PCA into its constituents
+- [Viterbi algorithm](https://en.wikipedia.org/wiki/Viterbi_algorithm) - converting it to boolean view of transitions + a likelihood for one happening
+- is an analysis sing using there is a solution to one with none
+- variational autoencoder + gan =
+- sampling + a space filling curve
+- error propagation though sampling ?
+- propagating error gradients through a sampling step ?
+- are there other reparametrization tricks we can
+- spacewise-separable convolutional layers - can we represent larger
+- convolutions as products of 2 or 3 matrices
+- negative sampling
+- inverse sampling
+- follow the leader
+- follow the regularized leader
+- regret
+- recursive matrix alg
+- non-negative matrix factorization
+- widen dataframe from wikidata
+
+## References
+
+- Steven S. Skiena - [The Algorithm Design Manual 2nd Edition](https://www.algorist.com/)
+- Thomas Kuhn - [The Structure of Scientific Revolutions](https://en.wikipedia.org/wiki/The_Structure_of_Scientific_Revolutions)
+- Christopher Alexander - [The Timeless Way of Building](https://en.wikipedia.org/wiki/The_Timeless_Way_of_Building)
+- John E. Hopcroft and Jeffrey D. Ullman - [Introduction to Automata Theory, Languages, and Computation](https://en.wikipedia.org/wiki/Introduction_to_Automata_Theory,_Languages,_and_Computation), Addison-Wesley Publishing, Reading Massachusetts, 1979. ISBN 81-7808-347-7.
+
+Dawkins, R. 1976. *The Selfish Gene*. Oxford University Press, Oxford, UK.
+
+McLuhan, Marshall. 1988. *Understanding Media : The Extensions of Man*. New American Library. <http://www.worldcat.org/search?qt=worldcat_org_all&q=0451624963>.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2021,
+  author = {Bochman, Oren},
+  title = {Meme Bank},
+  date = {2021-12-30},
+  url = {https://orenbochman.github.io/posts/2020/12-30-meme-bank/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2021. “Meme Bank.” December 30. <https://orenbochman.github.io/posts/2020/12-30-meme-bank/>.

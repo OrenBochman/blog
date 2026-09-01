@@ -26,7 +26,7 @@ At a deeper level signaling is usually unlikely to arise in competitive conditio
 
 > **NOTE:**
 >
-> [![Honest Signaling in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Honest Signaling in a nutshell")
+> [![Honest Signaling in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Honest Signaling in a nutshell")
 >
 > Honest Signaling in a nutshell
 >

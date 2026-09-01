@@ -34,7 +34,7 @@ However once I came across some talks by Jeshua Tenenbaum I realized that he and
 
 > **NOTE:**
 >
-> [![ShapeHD in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "ShapeHD in a nutshell")
+> [![ShapeHD in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "ShapeHD in a nutshell")
 >
 > ShapeHD in a nutshell
 >

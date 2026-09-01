@@ -6,7 +6,7 @@ cover
 
 > **NOTE:**
 >
-> [![Inductive Learning in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Inductive Learning in a nutshell")
+> [![Inductive Learning in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Inductive Learning in a nutshell")
 >
 > Inductive Learning in a nutshell
 >

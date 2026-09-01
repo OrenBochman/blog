@@ -18,7 +18,7 @@ For me this was a like getting into a time machine and going back to the days of
 
 > **NOTE:**
 >
-> [![Diversity in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Diversity in a nutshell")
+> [![Diversity in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Diversity in a nutshell")
 >
 > Diversity in a nutshell
 >

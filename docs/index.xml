@@ -15,17 +15,148 @@
 <link>https://orenbochman.github.io/</link>
 </image>
 <generator>quarto-1.9.36</generator>
-<lastBuildDate>Thu, 15 Jul 2027 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 02 Jun 2026 21:00:00 GMT</lastBuildDate>
 <item>
-  <title></title>
+  <title>All the Good Prompts</title>
   <dc:creator>Oren Bochman</dc:creator>
-  <link>https://orenbochman.github.io/reviews/2017/self-assembling-games/</link>
-  <description><![CDATA[ undefined ]]></description>
-  <category>draft</category>
-  <category>review</category>
-  <guid>https://orenbochman.github.io/reviews/2017/self-assembling-games/</guid>
-  <pubDate>Thu, 15 Jul 2027 21:00:00 GMT</pubDate>
-  <media:content url="https://orenbochman.github.io/images/lit-review-cover.jpg" medium="image" type="image/jpeg"/>
+  <link>https://orenbochman.github.io/posts/2026/06-01-good-prompts/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<ul>
+<li>The reality is that LLM were not very good at following instructions. OpenAI and other vendors have ignored the harm this is causing and frequently making the problem worse by making models appear more certain and authoritative than they really are.</li>
+<li>Even today when they have improved, we still get plenty of issues with them not following instructions, hallucinating, or just not doing what we want. This is harder to see since when a session starts the LLM is more likely to behave and only later does it become more likely to go off the rails. Some of the innovations that have led to the improvements are:
+<ul>
+<li>Reinforcement learning from human feedback (RLHF) - which also makes the models overconfident and less likely to admit when they are wrong.</li>
+<li>Chain of thought - agents have a budget of tokens to think before they create the final answer. This was one of the common techniques originally used in prompt engineering.</li>
+<li>Tool use - giving the model access to tools (e.g.&nbsp;search, code execution, calculator, etc.) for task that Models are not good at but there are tools that are better at this.</li>
+<li>Coding - agents may be weak at counting and statistics but they are good at writing code that can do this.</li>
+<li>Steering - giving the model instructions after the prompt to steer it to do what we want if a chain of thought seems to be going astray.</li>
+</ul></li>
+<li>In the end LLMs are black box models meaning that none can ever know what is causing them to act out as they do.</li>
+<li>Unfortunately there is lots of (mis)information out there on prompting. I think the term “prompt engineering” is a nasty kind of misnomer to draw attention prompting it is an art and that it makes us work hard to mitigate the issues that LLM vendors have not been addressing in their quest to become solvent before they destroy the world…</li>
+<li>All we really had for a long time is an apocrypha of advice on how to write prompts and interact with the LLM to get the best results.</li>
+<li>Today we can try and do better by taking over the harness and using programmatic mitigation to many of the challenges of working with LLMs.</li>
+<li>Recently I viewed an extensive presentation in an OSDS conference by Sheamus McGovern <a href="https://docs.google.com/presentation/d/1g_WHYFRsuiy-Fz87GCY805Sl837Lt_GB-q1xXsRCnHc/edit?slide=id.g346a7c1fee0_0_41#slide=id.g346a7c1fee0_0_41">Prompt Design &amp; Engineering Course</a>. The long presentation gave me a time out to rethink the topic. I had taken a course online on Andrew Ng’s platform and most of what that has suggested is still relevant. And now we are in an age where LLMs are now being used in agentic forms for ever more complex workflows.</li>
+</ul>
+<p>And I came across a page I had in an old project called “good prompts” I decided to share it here in updated form. What is becoming clear is that as we want to get LLM to work for us in more complex and predictable ways we need to figure out how to work out many of the kinks the LLM vendors are not addressing. Also it is become increasingly expensive to work with LLMs in projects that create real value. This has led the industry to save thier prompts in version control systems and treat them more like small programs that need QA and checks to ensure they do not break or regress as the LLMs vendors downgrade or use more radical cost cutting measures to make their models more profitable.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>TLDR;
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="../../../images/in_the_nut_shell_gemeni.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="good-prompts in a nutshell"><img src="https://orenbochman.github.io/images/in_the_nut_shell_gemeni.png" class="img-fluid figure-img" alt="good-prompts in a nutshell"></a></p>
+<figcaption>good-prompts in a nutshell</figcaption>
+</figure>
+</div>
+<ul>
+<li>How do we mitigate the issues of working with LLMs and get them to do what we want?</li>
+<li>To some extent we can write prompts.</li>
+<li>For tasks thar LLMs are unsuited we should outsource to tools.</li>
+<li>For more structured output we should use prompt chaining.</li>
+<li>For complex workflows we should use orchestration tools for the prompt chaining.</li>
+</ul>
+</div>
+</div>
+<p>This is a minimal checklist for writing good prompts and evaluating them. Some of this material comes from a talk called <a href="https://www.youtube.com/watch?v=G2B0YWuJUgI">the prompting playbooks</a>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>A Prompting Paybooks
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol start="0" type="1">
+<li>Start by keeping your prompt in *.prompt.md files and in version control. This lets you keep track of mitigation and improvements to the prompt over time.</li>
+<li>start with a minimal prompt
+<ul>
+<li>role</li>
+<li>data/documents (few-shot examples, relevant documents, RAG).</li>
+<li>task</li>
+<li>output shape</li>
+</ul></li>
+<li>run evaluations and look at failure modes
+<ul>
+<li>for failures aim for a fix that generalizes beyond the specific test case</li>
+</ul></li>
+<li>add to the prompt only to address failures
+<ul>
+<li>prefer structure (field, tool, criterion) over exhortation (NEVER, ALWAYS, CRITICALLY)</li>
+<li>avoid long bans lists</li>
+</ul></li>
+<li>When structure handling is needed (classify-then-act, plan-then-execute) move to prompt-chaining, a system with multiple model calls rather than numbered steps in a single prompt.
+<ul>
+<li><p>via programmatic prompt chaining (Python/Pydantic/baml) for linear chains of thought and tool use.</p></li>
+<li><p>via orchestration tools <a href="https://smith.langchain.com/">LangSmith</a>, <a href="https://www.langflow.org/">LangFlow</a>, <a href="https://www.langchain.com/">LangChain</a>, <a href="https://www.langchain.com/langgraph">LangGraph</a>, <a href="https://python.useinstructor.com/">Instructor</a> <a href="https://temporal.io/">Temporal</a> etc. for more complex structures and branching.</p></li>
+<li><p>note that we can also think about RL here i.e.&nbsp;learning a policy to from experience to improve the prompt structure to avoid failures, reduce tokens and latency.</p></li>
+</ul></li>
+<li>Testing dimensions (what goes in a testing dashboard)
+<ul>
+<li>check: LLM as a Judge v.s Deterministic checkers</li>
+<li>Model used (models change over long term and short term and different task need different model capabilities so think: fast, thinking, coding, multimodal, etc.)</li>
+<li>number of runs/violations</li>
+<li>pass/fail counts</li>
+<li>tokens,</li>
+<li>latency</li>
+</ul></li>
+<li>Asking for user input
+<ul>
+<li>when to ask for user input</li>
+<li>how to ask for user input (what format, how to use it in the prompt)</li>
+</ul></li>
+<li>Referencing tool use in the body
+<ul>
+<li>#tool:<tool-name></tool-name></li>
+<li>#tool:browser</li>
+<li>#tool:vscode/askQuestion</li>
+<li>${input:variableName}</li>
+<li>${input:variableName:placeholder}</li>
+</ul></li>
+<li>use built in variables</li>
+<li>converting prompts to <code>tmx</code> form to work on models with different limited context windows</li>
+<li>checking output compliance using <a href="https://pydantic-docs.helpmanual.io/">pydantic</a> or <a href="https://baml.readthedocs.io/">baml</a> schemas.</li>
+<li>checking using another model. LLM as a judge.</li>
+</ol>
+</div>
+</div>
+<!-- 
+TODO: code examples of good and bad prompts, and how to fix them.  
+-->
+{{&lt; import _code_ollama_local.qmd &gt;}}
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {All the {Good} {Prompts}},
+  date = {2026-06-03},
+  url = {https://orenbochman.github.io/posts/2026/06-01-good-prompts/},
+  langid = {en}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bochman2026" class="csl-entry quarto-appendix-citeas">
+Bochman, Oren. 2026. <span>“All the Good Prompts.”</span> June 3. <a href="https://orenbochman.github.io/posts/2026/06-01-good-prompts/">https://orenbochman.github.io/posts/2026/06-01-good-prompts/</a>.
+</div></div></section></div> ]]></description>
+  <category>prompt engineering</category>
+  <guid>https://orenbochman.github.io/posts/2026/06-01-good-prompts/</guid>
+  <pubDate>Tue, 02 Jun 2026 21:00:00 GMT</pubDate>
+  <media:content url="https://orenbochman.github.io/images/calabi_yau_manifold.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 <item>
   <title>Harnesses in AI</title>
@@ -38,7 +169,7 @@
 
 
 
-<div class="col-margin">
+<div id="vid-tejas-kumar" class="col-margin">
 <div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/C_GG5g38vLU" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 <ul>
 <li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=0s">Introduction to AI Harnesses</a></li>
@@ -56,9 +187,12 @@
 <li><a href="https://www.youtube.com/watch?v=C_GG5g38vLU&amp;t=1114s">Summary and the future of dynamic harnesses</a></li>
 </ul>
 </div>
-<!-- todo: anyway to make this links work in this page - i.e. controll the video player from the links ? -->
-<p>I watched this talk by Tejas Kumar on harnesses in AI and I found it an accessible and insightful introduction to the topic.</p>
-<p>The demo builds a browser agent on GPT-3.5 Turbo (consciously choosing a VERY old model to show how good harness eng can improve it a lot) against Hacker News and layers in a harness without touching the prompt once. Guardrails cap iterations and compact context. A verify step reads the tool call history to catch the agent lying about what it did. A login handler watches the browser URL each loop and injects credentials programmatically when it hits the login page. By the end the cheap old model reliably logs in and upvotes the post.</p>
+<!-- todo: anyway to make this links work in this page - i.e. control the video player from the links ? -->
+<p>I watched this talk by Tejas Kumar on harnesses in AI and I found it an accessible and entertaining introduction to the topic.</p>
+<p>The demo builds a browser agent on GPT-3.5 Turbo (consciously choosing a VERY old model to show how good harness eng can improve it a lot) against Hacker News and layers in a harness without touching the prompt once. Guardrails cap iterations and compact context.</p>
+<p>A verify step reads the tool call history to catch the agent lying about what it did.</p>
+<p>A login handler watches the browser URL each loop and injects credentials programmatically when it hits the login page.</p>
+<p>By the end the cheap old model reliably logs in and upvotes the post.</p>
 <p>Tejas - Infoshare - <a href="https://www.linkedin.com/in/tejas-kumar/">linkedin</a> - <a href="https://github.com/TejasQ">github</a> - <a href="https://x.com/TejasKumar_">twitter</a></p>
 
 

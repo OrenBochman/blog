@@ -24,7 +24,7 @@ This book is Wasserman’s follow up to “All of Statistics”. This one covers
 
 > **NOTE:**
 >
-> ![](../../images/in_the_nut_shell_coach_retouched.jpg)
+> ![](../../images/in_the_nut_shell_gemeni.png)
 >
 > Nonparametrics in a nutshell
 >

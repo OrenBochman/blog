@@ -16,9 +16,15 @@ Unable to execute JavaScript.
 - [Final demonstration: Successful autonomous upvoting](https://www.youtube.com/watch?v=C_GG5g38vLU&t=1062s)
 - [Summary and the future of dynamic harnesses](https://www.youtube.com/watch?v=C_GG5g38vLU&t=1114s)
 
-I watched this talk by Tejas Kumar on harnesses in AI and I found it an accessible and insightful introduction to the topic.
+I watched [this talk by Tejas Kumar](#vid-tejas-kumar) on harnesses in AI and I found it an accessible and entertaining introduction to the topic.
 
-The demo builds a browser agent on GPT-3.5 Turbo (consciously choosing a VERY old model to show how good harness eng can improve it a lot) against Hacker News and layers in a harness without touching the prompt once. Guardrails cap iterations and compact context. A verify step reads the tool call history to catch the agent lying about what it did. A login handler watches the browser URL each loop and injects credentials programmatically when it hits the login page. By the end the cheap old model reliably logs in and upvotes the post.
+The demo builds a browser agent on GPT-3.5 Turbo (consciously choosing a VERY old model to show how good harness eng can improve it a lot) against Hacker News and layers in a harness without touching the prompt once. Guardrails cap iterations and compact context.
+
+A verify step reads the tool call history to catch the agent lying about what it did.
+
+A login handler watches the browser URL each loop and injects credentials programmatically when it hits the login page.
+
+By the end the cheap old model reliably logs in and upvotes the post.
 
 Tejas - Infoshare - [linkedin](https://www.linkedin.com/in/tejas-kumar/) - [github](https://github.com/TejasQ) - [twitter](https://x.com/TejasKumar_)
 

@@ -1,0 +1,626 @@
+---
+jupyter: python3
+---
+
+Introduction
+Welcome to this interactive Notebook on Prompt Engineering! In this session, we'll explore:
+
+Why prompt engineering is critical for working with large language models (LLMs).
+
+Industry best practices for crafting effective prompts.
+
+Hands-on examples to help you master prompt engineering.
+
+Let’s get started!
+
+## 1. What is Prompt Engineering?
+
+Prompt engineering is the art and science of crafting effective input prompts to guide large language models (LLMs) like GPT, Claude, or Gemini towards generating desired outputs. It's a crucial skill for harnessing the full potential of LLMs.
+
+**Here's a breakdown:**
+
+* **Understanding Model Interpretation:** Prompt engineering involves understanding how LLMs interpret instructions and nuances in language.
+* **Structured Inputs for Quality:**  It emphasizes structuring inputs strategically to elicit accurate, relevant, and high-quality responses.
+* **Iterative Refinement:**  The process often involves refining prompts based on model outputs to achieve optimal results.
+
+**In essence, prompt engineering acts as a bridge between human intentions and the capabilities of LLMs, enabling us to communicate effectively and achieve desired outcomes.**
+
+## 2. Why is Prompt Engineering Important?
+
+Prompt engineering is crucial for several reasons:
+
+* **Improves Output Quality:** Well-crafted prompts significantly enhance the accuracy and relevance of LLM responses, leading to more insightful and valuable outputs.
+* **Saves Time and Resources:** By guiding the model effectively, prompt engineering reduces the need for numerous iterations, fine-tuning, or manual intervention, ultimately saving valuable time and resources.
+* **Enables Customization:** Prompt engineering empowers users to tailor model behavior to specific tasks, domains, or industries, making LLMs more adaptable and versatile.
+* **Mitigates Bias:** Carefully designed prompts can help guide models towards generating unbiased and harmless outputs, promoting responsible AI usage and mitigating potential risks.
+
+**In summary, prompt engineering is essential for maximizing the effectiveness and utility of LLMs across diverse applications.**
+
+## 3. Best Practices for Prompt Engineering
+
+Here are some industry best practices to follow when crafting prompts:
+
+* **Be Clear and Specific:** Avoid ambiguity and vagueness by providing clear and concise instructions. The more specific your prompt, the better the model can understand your intent.
+* **Use Role-Based Prompting:** Assign a specific role or persona to the model (e.g., "You are a helpful assistant," "You are a financial advisor"). This helps guide the model's behavior and responses.
+* **Leverage Few-Shot Learning:** Provide a few examples of desired input-output pairs to guide the model's learning and improve its ability to generalize to new situations.
+* **Iterate and Refine:** Don't expect perfect results on the first try. Experiment with different prompt variations, test and evaluate outputs, and refine your prompts based on the model's responses.
+* **Use Chain-of-Thought Prompting:** For complex tasks, encourage the model to break down the problem into smaller steps and provide intermediate reasoning before arriving at the final answer.
+* **Set Constraints:** Define boundaries and limitations for the model's responses, such as word limits, desired tone, or specific formats (e.g., JSON, bullet points).
+
+By incorporating these best practices into your prompt engineering workflow, you can significantly enhance the quality and relevance of LLM outputs and unlock their full potential.
+
+Necessary Imports
+
+```{python}
+import openai
+import os
+import json
+import textwrap
+from collections import Counter
+from google.colab import userdata
+
+api_key = userdata.get("OPENAI_API_KEY")
+
+# Initialize OpenAI client
+client = openai.OpenAI(api_key=api_key)
+```
+
+# Prompt Elements: Examples
+
+### 1. Instructions
+
+This code demonstrates how a clear and concise prompt can guide a large language model (LLM) to provide a specific and focused response.
+
+**The Prompt:**
+
+The core of this interaction is the prompt: "Explain bubble sort in 2 sentences with an example."
+
+This prompt provides the LLM with clear instructions on what information is desired:
+
+1. Topic: Bubble sort algorithm.
+2. Format: A concise explanation in two sentences.
+3. Example: An illustrative example of the algorithm in action.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+prompt = """
+Explain bubble sort in 2 sentences with an example.
+"""
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}]
+)
+
+print(textwrap.fill(response.choices[0].message.content.strip(), width=80))
+```
+
+### 2. Context
+
+This code demonstrates how providing context within a prompt can guide a large language model (LLM) to generate more relevant and informative responses.
+
+This prompt establishes a clear context for the LLM by:
+
+1. Defining a Role: It assigns the LLM the role of a "helpful and informative tour guide in Paris." This guides the LLM's response style and tone.
+
+2. Setting a Scenario: It creates a scenario where a tourist asks a question, providing a realistic context for the interaction.
+
+3. Specifying Information: It explicitly requests information about specific landmarks, further guiding the LLM's response content.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+prompt = """
+You are a helpful and informative tour guide in Paris.
+
+A tourist asks you: "What are some must-see attractions in Paris?"
+
+Provide a detailed response, including information about the Eiffel Tower, the Louvre Museum, and the Arc de Triomphe.
+"""
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}]
+)
+
+print(response.choices[0].message.content.strip())
+```
+
+**Explanation:**
+
+We set the context by establishing the role of the model ("a helpful and informative tour guide in Paris") and providing a specific scenario ("a tourist asks you..."). This helps the model generate a response relevant to the given context.
+
+### 3. Input Data
+
+Summarize text example for a specific length or structured output format
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+text = """
+**Quantum computing** is a type of computing that uses quantum-mechanical phenomena, such as superposition and entanglement, to perform operations on data. This approach to computing has the potential to solve problems that are intractable for classical computers. While still in its early stages, quantum computing is rapidly advancing and has the potential to revolutionize various fields, including medicine, materials science, and artificial intelligence.
+
+**Key advantages of quantum computing include:**
+
+* **Faster drug discovery:** By simulating molecular interactions, quantum computers can accelerate the development of new drugs and therapies.
+* **Improved materials design:** Quantum simulations can help scientists design materials with enhanced properties for applications in energy, electronics, and other industries.
+* **Enhanced machine learning:** Quantum algorithms have the potential to significantly speed up machine learning tasks, leading to breakthroughs in AI.
+
+**However, there are also significant challenges to overcome before quantum computing becomes widespread:**
+
+* **Building and maintaining stable qubits:** Qubits, the basic units of quantum information, are fragile and prone to errors.
+* **Developing quantum algorithms:** Creating algorithms that leverage the unique capabilities of quantum computers is a complex task.
+* **Scaling up quantum computers:** Building larger and more powerful quantum computers is a major engineering challenge.
+
+Despite these challenges, quantum computing holds immense promise for the future and is a field worth watching closely.
+"""
+
+prompt = f"""
+Summarize the following text in one sentence:
+{text}
+"""
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}]
+)
+
+print(textwrap.fill(response.choices[0].message.content.strip(), width=80))
+```
+
+Explanation:
+
+We provide input data (the text to be summarized) within the prompt. The model then uses this data to generate the desired output (a one-sentence summary).
+
+### 4. Output Indicator
+
+This code demonstrates how using output indicators in prompts can guide large language models (LLMs) to produce structured and predictable outputs.
+
+The key element here is the output indicator `"Names:"` followed by a newline. This acts as a clear signal to the LLM that:
+
+1. **Expected Output:** The user expects a list of names.
+2. **Output Structure:** The names should be listed after the "Names:" line.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+prompt = """
+Extract the names of all people mentioned in the following text:
+
+Text: "John and Mary went to the park with their dog, Spot. They met their friend, Sarah, and her cat, Whiskers."
+
+Names:
+"""
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}]
+)
+
+print(response.choices[0].message.content.strip())
+```
+
+**Explanation:**
+
+In this case, the output indicator is the word "Names:" followed by a newline. This tells the model that we expect a list of names as the output. The model will then attempt to extract all the names from the provided text and list them under the "Names:" heading.
+
+# Prompting Techniques
+
+## 1. Priming (Setting Context)
+
+💡 **Use Case:** Enhance the accuracy and relevance of LLM responses by providing context and establishing the AI's role or expertise before the main interaction. This helps the model understand the desired perspective and generate more appropriate outputs.
+
+🛠 **Example:**
+
+Imagine you want the LLM to provide financial advice. By priming it with the role of a "seasoned financial advisor with 20 years of experience," you guide its responses to align with that expertise. This context setting leads to more insightful and informed answers compared to a generic prompt.
+
+**How it works:**
+
+Priming influences the LLM's behavior by providing initial information that shapes its understanding of the task. This initial context acts as a lens through which the model interprets subsequent instructions, leading to more focused and accurate responses.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+prompt = """You are a financial advisor with 20 years of experience.
+            Explain the impact of interest rate hikes on the stock market."""
+
+response = client.chat.completions.create(
+     model="gpt-4o-mini",
+     messages=[{"role": "system", "content": prompt}]
+ )
+
+print(response.choices[0].message.content.strip())
+```
+
+## 2. Prompt Templates
+💡 Use Case: Ensure consistency and reuse prompts dynamically.
+
+🛠 Example: Summarizing Articles
+
+**Explanation:**
+
+This code demonstrates how to create and use a prompt template for summarizing articles. The `template` variable defines the structure of the prompt, with placeholders for `category`, `word_limit`, and `text`.
+
+Using the `format()` method, you can dynamically fill in these placeholders with specific values, creating a formatted prompt. This approach allows you to reuse the same template for various articles with different categories and word limits, ensuring consistency and efficiency in your prompt engineering workflow.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+template = "Summarize the following {category} article in {word_limit} words:\n\n{text}"
+formatted_prompt = template.format(
+    category="science",
+    word_limit=100,
+    text="Quantum computing leverages the principles of quantum mechanics..."
+)
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": formatted_prompt}]
+)
+
+print(textwrap.fill(response.choices[0].message.content.strip(), width=80))
+```
+
+## 3. Chain-of-Thought (CoT) Prompting
+💡 Use Case: Solve complex problems by encouraging step-by-step reasoning.
+
+🛠 Example: Solving a Coding Problem
+
+**Explanation:**
+
+Chain-of-Thought (CoT) prompting is a technique used to guide large language models (LLMs) towards solving complex problems by encouraging them to break down the problem into smaller, more manageable steps. By explicitly prompting the model to think step-by-step, we can improve its reasoning abilities and increase the likelihood of obtaining correct solutions.
+
+In this example, we are asking the model to solve a coding problem related to finding two numbers in a list that add up to a given target. By providing clear instructions and prompting the model to identify the approach, write the function, and provide an example, we are guiding it through a logical thought process.
+
+This approach can be particularly useful for tasks that require multi-step reasoning or involve complex logic. By breaking down the problem into smaller steps, we make it easier for the model to understand the task and generate accurate solutions.
+
+To see the output, run the code.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+prompt = """Solve the following programming problem step by step:
+Problem: You are given a list of numbers. Write a Python function that returns the two numbers that add up to a given target.
+
+Step 1: Identify the approach to solve this problem.
+Step 2: Write the function.
+Step 3: Provide an example and test the function.
+"""
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}]
+)
+
+print(response.choices[0].message.content.strip())
+```
+
+Discussion: How does providing examples improve the model's accuracy?
+
+## 4. Single or Few-Shot Prompting
+💡 Use Case: Guide AI using examples.
+
+🛠 Example: Converting Log Messages to Structured Output
+
+**Explanation:**
+
+Single or Few-Shot prompting involves providing one or more examples of the desired input-output behavior to guide the language model. This approach helps the model understand the task by demonstrating the expected output format and structure.
+
+In this example, we are asking the model to convert log messages into a structured JSON format. By providing an example of a log message and its corresponding JSON representation, we are guiding the model on how to perform the conversion for a new log message.
+
+Single or Few-Shot prompting is a powerful technique for tasks that require specific output formats or involve complex data transformations. By providing clear examples, we can improve the model's accuracy and ensure that the output aligns with our expectations.
+
+To see the output, run the code.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+prompt = """Convert the following log message into a structured JSON format.
+Example:
+Log: "ERROR 2025-03-10 14:35:22 Server crashed due to memory overflow."
+JSON:
+{
+  "level": "ERROR",
+  "timestamp": "2025-03-10 14:35:22",
+  "message": "Server crashed due to memory overflow."
+}
+
+Now convert this log:
+"WARNING 2025-03-10 15:00:10 Disk space running low."
+"""
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}]
+)
+
+print(response.choices[0].message.content.strip())
+```
+
+## 5. Self-Consistency
+💡 Use Case: Run multiple variations of a prompt and select the most common response.
+
+🛠 Example: Determining the Most Reliable Answer
+
+**How Self-Consistency Works:**
+
+The idea behind self-consistency is to run the same prompt multiple times with slight variations (or even without variations) and then select the most frequent response. This technique leverages the idea that if the model produces the same answer multiple times, it's more likely to be the correct answer. It helps to mitigate the occasional inconsistencies or errors that LLMs might produce.
+
+**Why It's Useful:**
+
+Increased Reliability: By selecting the most common response, we increase the likelihood of getting a reliable and accurate answer.
+Reduces Noise: It helps to filter out occasional incorrect or unexpected outputs from the LLM.
+Useful for Ambiguous Tasks: Self-consistency is particularly helpful for tasks where the model might have multiple valid interpretations or where the correct answer is not immediately obvious.
+
+To see the output, run the code.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+from collections import Counter
+
+reviews = [
+    "This product is absolutely fantastic! I highly recommend it.",
+    "I'm not entirely sure how I feel about this. It has its pros and cons.",
+    "It's okay, but I've definitely used better products before.",
+    "The customer service was terrible, and the product itself was mediocre.",
+    "While it's not perfect, it's a decent option for the price.",
+    "This is the worst product I have ever purchased. Avoid it at all costs!",
+    "I was initially skeptical, but I'm pleasantly surprised by how much I enjoy it."
+]
+
+prompt_template = """
+Analyze the sentiment expressed in the following customer review:
+
+Review: {review}
+
+Sentiment (Positive, Negative, Neutral):
+"""
+
+all_sentiments = []
+for review in reviews:
+    print(f"Analyzing review: {review}")
+    responses = []
+    for i in range(5):  # Run the prompt 5 times per review
+        prompt = prompt_template.format(review=review)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}]
+        ).choices[0].message.content.strip()
+        print(f"  Iteration {i + 1}: {response}")  # Print each iteration's sentiment
+        responses.append(response)
+
+    most_common_sentiment = Counter(responses).most_common(1)[0][0]
+    all_sentiments.append((review, most_common_sentiment))  # Store review and its most common sentiment
+
+print("\nFinal Sentiment Analysis:")
+for review, sentiment in all_sentiments:
+    print(f"Review: {review} | Sentiment: {sentiment}")
+```
+
+## Report Generation
+
+This code demonstrates how prompt engineering plays a crucial role in generating structured reports from JSON data using large language models (LLMs). It highlights how carefully crafted prompts can guide the LLM to extract specific information and present it in a desired format.
+
+**Prompt as the Blueprint:**
+
+The core of this approach is the prompt, which acts as a blueprint for the LLM. It provides the following crucial instructions:
+
+1. **Data Context:** The prompt explicitly informs the LLM that it will be working with a JSON string containing information about research papers. This establishes the context for the task.
+
+2. **Information Extraction:** The prompt meticulously outlines the specific data points to be extracted from each research paper, such as title, authors, publication date, etc. This guides the LLM's focus.
+
+3. **Desired Output Format:** The prompt meticulously dictates the desired structure and formatting of the report, including the use of bullet points, horizontal lines for separation, and headings for sections. This ensures the LLM generates a readable and organized output.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+import json
+from IPython.display import display, Markdown
+
+# Load the JSON file
+with open("/content/huggingface_papers.json", "r") as f:
+    data = json.load(f)
+
+# Select the first 10 papers
+papers_data = json.dumps(data[:10], indent=4)  # Convert to JSON string
+print(papers_data)
+```
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/, height: 1000}
+# Create the prompt
+prompt = f"""
+You are provided with a JSON string containing information about 10 research papers from Hugging Face.
+{papers_data}
+For each paper, please extract and present the following information:
+
+* **Title:**
+* **Authors:**
+* **PublishedAt:**
+* **Likes:**
+* **Summary (3 bullet points):**
+* **Conclusion:**
+**Industry & Business Relevance**
+  - **Potential Applications**: List industries or sectors that can benefit from this research.
+  - **Existing Implementations**: Identify startups, companies, or tools that use similar approaches.
+  - **Patent or Commercialization Potential**: Discuss whether this research has IP or commercial potential.
+
+Separate the information for each paper with a horizontal line (---).
+"""
+response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+display(Markdown(response.choices[0].message.content.strip()))
+```
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/, height: 1000}
+# Create the prompt
+prompt = f"""
+You are provided with a JSON string containing information about 10 research papers from Hugging Face.
+{papers_data}
+Provide details about each paper.
+"""
+response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+display(Markdown(response.choices[0].message.content.strip()))
+```
+
+## **AI Agent With LangChain**
+
+This code demonstrates a practical application of prompt engineering using the LangChain framework. We create an AI agent equipped with a web search tool powered by DuckDuckGo.
+
+**How it Works:**
+
+1. **Natural Language Prompts:** You guide the agent by providing prompts in natural language, such as "What's a quick recipe for chicken and rice?".
+
+2. **Implicit and Explicit Prompts:**
+
+- Tool descriptions act as implicit prompts, influencing the AI's choice of tools based on the user's request.
+- Your user prompt is the explicit prompt, directly instructing the agent on the desired task.
+
+3. **AI-Driven Response:** The agent leverages its tools and a language model to process your prompt, retrieve information (in this case, a recipe), and deliver a relevant response.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+!pip -q install langchain openai langchain-community duckduckgo-search
+```
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+from langchain.agents import initialize_agent, Tool
+from langchain.agents.agent_types import AgentType
+from langchain.chat_models import ChatOpenAI
+from langchain.utilities import DuckDuckGoSearchAPIWrapper
+from langchain.tools import DuckDuckGoSearchRun
+import os
+
+# Set your OpenAI key (replace with your actual key or use an env variable)
+
+api_key = userdata.get("OPENAI_API_KEY")
+os.environ["OPENAI_API_KEY"] = api_key
+# Setup tools
+search = DuckDuckGoSearchRun()
+tools = [
+    Tool(
+        name="Search",
+        func=search.run,
+        description="Searches the web for quick recipe ideas based on ingredients or meal type"
+    )
+]
+
+# Initialize the LLM
+llm = ChatOpenAI(temperature=0)
+
+# Initialize the agent
+agent = initialize_agent(
+    tools,
+    llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
+# User prompt
+prompt = "What’s a quick recipe for chicken and rice?"
+response = agent.run(prompt)
+print(response)  # Output: A brief recipe idea or summary from search results
+```
+
+## **Prompt Engineering with LangChain for Retrieval Augmented Generation (RAG)**
+
+This code demonstrates a basic implementation of Retrieval Augmented Generation (RAG) using LangChain. It showcases how to use prompt engineering techniques to enhance question answering with a large language model (LLM) by retrieving relevant context from a document.
+
+**How it Works:**
+
+1. **Document Preparation:** A longer document (in this case, an article about AI) is provided as the knowledge base. It is split into smaller chunks for easier retrieval.
+
+2. **Retrieval:** A simple retrieval function simulates a vector search, finding the most relevant chunk based on keyword matching with the user's query.
+
+3. **Prompt Template:** A PromptTemplate is defined to structure the input for the LLM. It incorporates the retrieved context and the user's question into a clear prompt.
+
+4. **LLM Interaction:** An OpenAI LLM is initialized and used to generate an answer based on the prompt. The prompt is designed to guide the LLM to use the provided context and answer concisely.
+
+**Prompt Engineering Focus:**
+
+- **Contextualization:** The prompt template plays a crucial role in providing context to the LLM. It explicitly instructs the LLM to use the retrieved information to answer the question.
+
+- **Instruction and Formatting:** The prompt includes instructions on how to format the answer (single sentence, bullet point) to ensure consistency and clarity.
+
+- **Handling Missing Information:** The prompt also provides guidance for cases where no relevant information is found, prompting the LLM to indicate this explicitly.
+
+```{python}
+#| colab: {base_uri: https://localhost:8080/}
+from langchain.llms import OpenAI
+from langchain.prompts import PromptTemplate
+from langchain.text_splitter import CharacterTextSplitter
+from google.colab import userdata
+
+# Get OpenAI API key
+api_key = userdata.get("OPENAI_API_KEY")
+
+# Longer document (expanded AI article)
+document = """
+Artificial Intelligence (AI) refers to the development of computer systems capable of performing tasks that typically require human intelligence,
+such as learning, problem-solving, decision-making, and perception. The concept dates back to the 1940s and 1950s, when early thinkers like Alan Turing
+posed questions about machine thought with his famous Turing Test, designed to assess whether a machine could convincingly mimic human conversation.
+The field grew through the decades, with milestones like the 1956 Dartmouth Conference, where the term "Artificial Intelligence" was coined by John McCarthy.
+Modern AI relies heavily on machine learning, where systems analyze vast datasets to improve performance, and deep learning, a subset leveraging neural
+networks modeled after the human brain to tackle complex tasks like image recognition.
+
+AI’s applications span numerous industries. In healthcare, it powers diagnostic tools that detect diseases like cancer from medical imaging and crafts
+personalized treatment plans based on patient data. In finance, AI algorithms monitor transactions to catch fraud in real-time and execute high-speed stock
+trades. Transportation benefits from AI through self-driving cars, which use sensors and algorithms to navigate roads safely. Virtual assistants like Siri
+and Alexa employ natural language processing to interpret and respond to human speech, making technology more accessible. Beyond these, AI enhances
+manufacturing with predictive maintenance, optimizes supply chains, and even generates art or music through creative algorithms.
+
+Despite its promise, AI raises significant ethical and practical concerns. Job displacement is a major issue, as automation threatens roles in sectors like
+retail and transportation. Privacy worries grow as AI systems collect and analyze personal data, often without clear consent. Biased algorithms, trained on
+flawed datasets, can perpetuate discrimination in areas like hiring or law enforcement. Additionally, the energy consumption of training large AI models
+contributes to environmental debates.
+
+Looking ahead, AI research is pushing toward general AI—systems with the flexibility to handle any intellectual task a human can—unlike today’s narrow AI,
+which excels only in specific domains like playing chess or translating languages. Experts foresee AI reshaping education with personalized learning,
+revolutionizing scientific discovery by simulating experiments, and even influencing governance through data-driven policy-making. However, ensuring AI
+remains safe, transparent, and equitable poses ongoing challenges. Regulatory frameworks lag behind innovation, and debates over AI’s societal impact
+continue to intensify as the technology advances.
+"""
+
+# Split document into chunks
+text_splitter = CharacterTextSplitter(chunk_size=200, chunk_overlap=20)
+chunks = text_splitter.split_text(document)
+
+# Simple retrieval function (mimics vector search with keyword matching)
+def retrieve_docs(query):
+    for chunk in chunks:
+        if any(word in chunk.lower() for word in query.lower().split()):
+            return chunk
+    return "No relevant info found."
+
+# Set up the LLM
+llm = OpenAI(temperature=0, openai_api_key=api_key)
+
+# Enhanced RAG prompt template with instructions and formatting
+rag_prompt = PromptTemplate(
+    input_variables=["context", "question"],
+    template="""
+    Using this info: '{context}', answer the question: {question}.
+    Keep the answer concise and format it as a single sentence starting with a bullet point (-).
+    If no relevant info is found, say: '- No answer available from the document.'
+    """
+)
+
+# Example RAG flow
+query = "Summarize the article"
+context = retrieve_docs(query)
+prompt = rag_prompt.format(context=context, question=query)
+response = llm(prompt)
+print(response)
+```
+
+## Conclusion and Resources
+Prompt engineering is a powerful skill for maximizing the potential of large language models. By following best practices and iterating on your prompts, you can achieve more accurate, relevant, and high-quality outputs.
+
+Additional Resources:
+
+[Prompt Engineering Guide by OpenAI](https://platform.openai.com/docs/guides/prompt-engineering)
+
+[Prompt Engineering Guide](https://www.promptingguide.ai/)
+
+[ChatGPT Prompt Engineering for developers](https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/)
+
+

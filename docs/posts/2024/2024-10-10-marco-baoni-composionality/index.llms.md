@@ -12,7 +12,7 @@ This talk touches to some degree to some degree on the first idea and brings to 
 
 > **NOTE:**
 >
-> [![Compositionality in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Compositionality in a nutshell")
+> [![Compositionality in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Compositionality in a nutshell")
 >
 > Compositionality in a nutshell
 >

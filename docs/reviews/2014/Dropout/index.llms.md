@@ -1,6 +1,6 @@
 > **NOTE:**
 >
-> [![Dropout in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Dropout in a nutshell")
+> [![Dropout in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Dropout in a nutshell")
 >
 > Dropout in a nutshell
 >

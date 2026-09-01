@@ -20,7 +20,7 @@ In a a companion working paper, “[The Many Path To A Signaling System](../2025
 
 > **TIP:**
 >
-> [![Emergent Languages in a Nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Emergent Languages in a Nutshell")
+> [![Emergent Languages in a Nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Emergent Languages in a Nutshell")
 >
 > Emergent Languages in a Nutshell
 >

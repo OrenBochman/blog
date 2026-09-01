@@ -14,7 +14,7 @@ To generalize though beyond tabular methods presents a number of challenges that
 
 > **NOTE:**
 >
-> [![Probabilistic inference in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Probabilistic inference in a nutshell")
+> [![Probabilistic inference in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Probabilistic inference in a nutshell")
 >
 > Probabilistic inference in a nutshell
 >

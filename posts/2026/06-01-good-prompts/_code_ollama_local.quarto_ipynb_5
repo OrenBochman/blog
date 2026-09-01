@@ -1,0 +1,864 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Introduction\n",
+        "\n",
+        "- Welcome to this interactive Notebook on Prompt Engineering! In this session, we'll explore:\n",
+        "- Why prompt engineering is critical for working with large language models (LLMs).\n",
+        "- Industry best practices for crafting effective prompts.\n",
+        "- Hands-on examples to help you master prompt engineering.\n",
+        "\n",
+        "Let’s get started!\n",
+        "\n",
+        "## 1. What is Prompt Engineering?\n",
+        "\n",
+        "Prompt engineering is the art and science of crafting effective input prompts to guide large language models (LLMs), including local models served by Ollama, towards generating desired outputs. It's a crucial skill for harnessing the full potential of LLMs.\n",
+        "\n",
+        "**Here's a breakdown:**\n",
+        "\n",
+        "* **Understanding Model Interpretation:** Prompt engineering involves understanding how LLMs interpret instructions and nuances in language.\n",
+        "* **Structured Inputs for Quality:**  It emphasizes structuring inputs strategically to elicit accurate, relevant, and high-quality responses.\n",
+        "* **Iterative Refinement:**  The process often involves refining prompts based on model outputs to achieve optimal results.\n",
+        "\n",
+        "**In essence, prompt engineering acts as a bridge between human intentions and the capabilities of LLMs, enabling us to communicate effectively and achieve desired outcomes.**\n",
+        "\n",
+        "## 2. Why is Prompt Engineering Important?\n",
+        "\n",
+        "Prompt engineering is crucial for several reasons:\n",
+        "\n",
+        "* **Improves Output Quality:** Well-crafted prompts significantly enhance the accuracy and relevance of LLM responses, leading to more insightful and valuable outputs.\n",
+        "* **Saves Time and Resources:** By guiding the model effectively, prompt engineering reduces the need for numerous iterations, fine-tuning, or manual intervention, ultimately saving valuable time and resources.\n",
+        "* **Enables Customization:** Prompt engineering empowers users to tailor model behavior to specific tasks, domains, or industries, making LLMs more adaptable and versatile.\n",
+        "* **Mitigates Bias:** Carefully designed prompts can help guide models towards generating unbiased and harmless outputs, promoting responsible AI usage and mitigating potential risks.\n",
+        "\n",
+        "**In summary, prompt engineering is essential for maximizing the effectiveness and utility of LLMs across diverse applications.**\n",
+        "\n",
+        "## 3. Best Practices for Prompt Engineering\n",
+        "\n",
+        "Here are some industry best practices to follow when crafting prompts:\n",
+        "\n",
+        "* **Be Clear and Specific:** Avoid ambiguity and vagueness by providing clear and concise instructions. The more specific your prompt, the better the model can understand your intent.\n",
+        "* **Use Role-Based Prompting:** Assign a specific role or persona to the model (e.g., \"You are a helpful assistant,\" \"You are a financial advisor\"). This helps guide the model's behavior and responses.\n",
+        "* **Leverage Few-Shot Learning:** Provide a few examples of desired input-output pairs to guide the model's learning and improve its ability to generalize to new situations.\n",
+        "* **Iterate and Refine:** Don't expect perfect results on the first try. Experiment with different prompt variations, test and evaluate outputs, and refine your prompts based on the model's responses.\n",
+        "* **Use Chain-of-Thought Prompting:** For complex tasks, encourage the model to break down the problem into smaller steps and provide intermediate reasoning before arriving at the final answer.\n",
+        "* **Set Constraints:** Define boundaries and limitations for the model's responses, such as word limits, desired tone, or specific formats (e.g., JSON, bullet points).\n",
+        "\n",
+        "By incorporating these best practices into your prompt engineering workflow, you can significantly enhance the quality and relevance of LLM outputs and unlock their full potential.\n",
+        "\n",
+        "Necessary Imports\n",
+        "\n",
+        "This version uses a local Ollama server through its OpenAI-compatible endpoint. Set `OLLAMA_MODEL` to the model you have pulled locally."
+      ],
+      "id": "6455a6f1"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from openai import OpenAI\n",
+        "import os\n",
+        "import json\n",
+        "import textwrap\n",
+        "from collections import Counter\n",
+        "\n",
+        "# Ollama exposes an OpenAI-compatible API at /v1 by default.\n",
+        "# Start it with: ollama serve\n",
+        "# Pull the model first, for example: ollama pull qwen2.5-coder:7b\n",
+        "OLLAMA_BASE_URL = os.getenv(\"OLLAMA_BASE_URL\", \"http://localhost:11434\")\n",
+        "MODEL = os.getenv(\"OLLAMA_MODEL\", \"qwen2.5-coder:7b\")\n",
+        "\n",
+        "client = OpenAI(\n",
+        "    base_url=OLLAMA_BASE_URL,\n",
+        "    api_key=\"ollama\",  # required by the OpenAI SDK, ignored by Ollama\n",
+        ")\n",
+        "\n",
+        "print(f\"Using local Ollama endpoint: {OLLAMA_BASE_URL}\")\n",
+        "print(f\"Using model: {MODEL}\")"
+      ],
+      "id": "20153e86",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Prompt Elements: Examples\n",
+        "\n",
+        "### 1. Instructions\n",
+        "\n",
+        "This code demonstrates how a clear and concise prompt can guide a large language model (LLM) to provide a specific and focused response.\n",
+        "\n",
+        "**The Prompt:**\n",
+        "\n",
+        "The core of this interaction is the prompt: \"Explain bubble sort in 2 sentences with an example.\"\n",
+        "\n",
+        "This prompt provides the LLM with clear instructions on what information is desired:\n",
+        "\n",
+        "1. Topic: Bubble sort algorithm.\n",
+        "2. Format: A concise explanation in two sentences.\n",
+        "3. Example: An illustrative example of the algorithm in action."
+      ],
+      "id": "d4be86b4"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "prompt = \"\"\"\n",
+        "Explain bubble sort in 2 sentences with an example.\n",
+        "\"\"\"\n",
+        "\n",
+        "response = client.chat.completions.create(\n",
+        "    model=MODEL,\n",
+        "    messages=[{\"role\": \"user\", \"content\": prompt}]\n",
+        ")\n",
+        "\n",
+        "print(textwrap.fill(response.choices[0].message.content.strip(), width=80))"
+      ],
+      "id": "b935b3cd",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### 2. Context\n",
+        "\n",
+        "This code demonstrates how providing context within a prompt can guide a large language model (LLM) to generate more relevant and informative responses.\n",
+        "\n",
+        "This prompt establishes a clear context for the LLM by:\n",
+        "\n",
+        "1. Defining a Role: It assigns the LLM the role of a \"helpful and informative tour guide in Paris.\" This guides the LLM's response style and tone.\n",
+        "\n",
+        "2. Setting a Scenario: It creates a scenario where a tourist asks a question, providing a realistic context for the interaction.\n",
+        "\n",
+        "3. Specifying Information: It explicitly requests information about specific landmarks, further guiding the LLM's response content."
+      ],
+      "id": "a6520054"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "prompt = \"\"\"\n",
+        "You are a helpful and informative tour guide in Paris.\n",
+        "\n",
+        "A tourist asks you: \"What are some must-see attractions in Paris?\"\n",
+        "\n",
+        "Provide a detailed response, including information about the Eiffel Tower, the Louvre Museum, and the Arc de Triomphe.\n",
+        "\"\"\"\n",
+        "\n",
+        "response = client.chat.completions.create(\n",
+        "    model=MODEL,\n",
+        "    messages=[{\"role\": \"user\", \"content\": prompt}]\n",
+        ")\n",
+        "\n",
+        "print(response.choices[0].message.content.strip())"
+      ],
+      "id": "f59a62c7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "**Explanation:**\n",
+        "\n",
+        "We set the context by establishing the role of the model (\"a helpful and informative tour guide in Paris\") and providing a specific scenario (\"a tourist asks you...\"). This helps the model generate a response relevant to the given context.\n",
+        "\n",
+        "### 3. Input Data\n",
+        "\n",
+        "Summarize text example for a specific length or structured output format"
+      ],
+      "id": "8f92d0e2"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "text = \"\"\"\n",
+        "**Quantum computing** is a type of computing that uses quantum-mechanical phenomena, such as superposition and entanglement, to perform operations on data. This approach to computing has the potential to solve problems that are intractable for classical computers. While still in its early stages, quantum computing is rapidly advancing and has the potential to revolutionize various fields, including medicine, materials science, and artificial intelligence.\n",
+        "\n",
+        "**Key advantages of quantum computing include:**\n",
+        "\n",
+        "* **Faster drug discovery:** By simulating molecular interactions, quantum computers can accelerate the development of new drugs and therapies.\n",
+        "* **Improved materials design:** Quantum simulations can help scientists design materials with enhanced properties for applications in energy, electronics, and other industries.\n",
+        "* **Enhanced machine learning:** Quantum algorithms have the potential to significantly speed up machine learning tasks, leading to breakthroughs in AI.\n",
+        "\n",
+        "**However, there are also significant challenges to overcome before quantum computing becomes widespread:**\n",
+        "\n",
+        "* **Building and maintaining stable qubits:** Qubits, the basic units of quantum information, are fragile and prone to errors.\n",
+        "* **Developing quantum algorithms:** Creating algorithms that leverage the unique capabilities of quantum computers is a complex task.\n",
+        "* **Scaling up quantum computers:** Building larger and more powerful quantum computers is a major engineering challenge.\n",
+        "\n",
+        "Despite these challenges, quantum computing holds immense promise for the future and is a field worth watching closely.\n",
+        "\"\"\"\n",
+        "\n",
+        "prompt = f\"\"\"\n",
+        "Summarize the following text in one sentence:\n",
+        "{text}\n",
+        "\"\"\"\n",
+        "\n",
+        "response = client.chat.completions.create(\n",
+        "    model=MODEL,\n",
+        "    messages=[{\"role\": \"user\", \"content\": prompt}]\n",
+        ")\n",
+        "\n",
+        "print(textwrap.fill(response.choices[0].message.content.strip(), width=80))"
+      ],
+      "id": "a27cc921",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Explanation:\n",
+        "\n",
+        "We provide input data (the text to be summarized) within the prompt. The model then uses this data to generate the desired output (a one-sentence summary).\n",
+        "\n",
+        "### 4. Output Indicator\n",
+        "\n",
+        "This code demonstrates how using output indicators in prompts can guide large language models (LLMs) to produce structured and predictable outputs.\n",
+        "\n",
+        "The key element here is the output indicator `\"Names:\"` followed by a newline. This acts as a clear signal to the LLM that:\n",
+        "\n",
+        "1. **Expected Output:** The user expects a list of names.\n",
+        "2. **Output Structure:** The names should be listed after the \"Names:\" line."
+      ],
+      "id": "d879ed3d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "prompt = \"\"\"\n",
+        "Extract the names of all people mentioned in the following text:\n",
+        "\n",
+        "Text: \"John and Mary went to the park with their dog, Spot. They met their friend, Sarah, and her cat, Whiskers.\"\n",
+        "\n",
+        "Names:\n",
+        "\"\"\"\n",
+        "\n",
+        "response = client.chat.completions.create(\n",
+        "    model=MODEL,\n",
+        "    messages=[{\"role\": \"user\", \"content\": prompt}]\n",
+        ")\n",
+        "\n",
+        "print(response.choices[0].message.content.strip())"
+      ],
+      "id": "01f03f33",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "**Explanation:**\n",
+        "\n",
+        "In this case, the output indicator is the word \"Names:\" followed by a newline. This tells the model that we expect a list of names as the output. The model will then attempt to extract all the names from the provided text and list them under the \"Names:\" heading.\n",
+        "\n",
+        "# Prompting Techniques\n",
+        "\n",
+        "## 1. Priming (Setting Context)\n",
+        "\n",
+        "💡 **Use Case:** Enhance the accuracy and relevance of LLM responses by providing context and establishing the AI's role or expertise before the main interaction. This helps the model understand the desired perspective and generate more appropriate outputs.\n",
+        "\n",
+        "🛠 **Example:**\n",
+        "\n",
+        "Imagine you want the LLM to provide financial advice. By priming it with the role of a \"seasoned financial advisor with 20 years of experience,\" you guide its responses to align with that expertise. This context setting leads to more insightful and informed answers compared to a generic prompt.\n",
+        "\n",
+        "**How it works:**\n",
+        "\n",
+        "Priming influences the LLM's behavior by providing initial information that shapes its understanding of the task. This initial context acts as a lens through which the model interprets subsequent instructions, leading to more focused and accurate responses."
+      ],
+      "id": "49fdcc62"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "prompt = \"\"\"You are a financial advisor with 20 years of experience.\n",
+        "            Explain the impact of interest rate hikes on the stock market.\"\"\"\n",
+        "\n",
+        "response = client.chat.completions.create(\n",
+        "     model=MODEL,\n",
+        "     messages=[{\"role\": \"system\", \"content\": prompt}]\n",
+        " )\n",
+        "\n",
+        "print(response.choices[0].message.content.strip())"
+      ],
+      "id": "10440e1e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## 2. Prompt Templates\n",
+        "💡 Use Case: Ensure consistency and reuse prompts dynamically.\n",
+        "\n",
+        "🛠 Example: Summarizing Articles\n",
+        "\n",
+        "**Explanation:**\n",
+        "\n",
+        "This code demonstrates how to create and use a prompt template for summarizing articles. The `template` variable defines the structure of the prompt, with placeholders for `category`, `word_limit`, and `text`.\n",
+        "\n",
+        "Using the `format()` method, you can dynamically fill in these placeholders with specific values, creating a formatted prompt. This approach allows you to reuse the same template for various articles with different categories and word limits, ensuring consistency and efficiency in your prompt engineering workflow."
+      ],
+      "id": "f259ce9b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "template = \"Summarize the following {category} article in {word_limit} words:\\n\\n{text}\"\n",
+        "formatted_prompt = template.format(\n",
+        "    category=\"science\",\n",
+        "    word_limit=100,\n",
+        "    text=\"Quantum computing leverages the principles of quantum mechanics...\"\n",
+        ")\n",
+        "\n",
+        "response = client.chat.completions.create(\n",
+        "    model=MODEL,\n",
+        "    messages=[{\"role\": \"user\", \"content\": formatted_prompt}]\n",
+        ")\n",
+        "\n",
+        "print(textwrap.fill(response.choices[0].message.content.strip(), width=80))"
+      ],
+      "id": "c3ced295",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## 3. Chain-of-Thought (CoT) Prompting\n",
+        "💡 Use Case: Solve complex problems by encouraging step-by-step reasoning.\n",
+        "\n",
+        "🛠 Example: Solving a Coding Problem\n",
+        "\n",
+        "**Explanation:**\n",
+        "\n",
+        "Chain-of-Thought (CoT) prompting is a technique used to guide large language models (LLMs) towards solving complex problems by encouraging them to break down the problem into smaller, more manageable steps. By explicitly prompting the model to think step-by-step, we can improve its reasoning abilities and increase the likelihood of obtaining correct solutions.\n",
+        "\n",
+        "In this example, we are asking the model to solve a coding problem related to finding two numbers in a list that add up to a given target. By providing clear instructions and prompting the model to identify the approach, write the function, and provide an example, we are guiding it through a logical thought process.\n",
+        "\n",
+        "This approach can be particularly useful for tasks that require multi-step reasoning or involve complex logic. By breaking down the problem into smaller steps, we make it easier for the model to understand the task and generate accurate solutions.\n",
+        "\n",
+        "To see the output, run the code."
+      ],
+      "id": "5d992b45"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "prompt = \"\"\"Solve the following programming problem step by step:\n",
+        "Problem: You are given a list of numbers. Write a Python function that returns the two numbers that add up to a given target.\n",
+        "\n",
+        "Step 1: Identify the approach to solve this problem.\n",
+        "Step 2: Write the function.\n",
+        "Step 3: Provide an example and test the function.\n",
+        "\"\"\"\n",
+        "\n",
+        "response = client.chat.completions.create(\n",
+        "    model=MODEL,\n",
+        "    messages=[{\"role\": \"user\", \"content\": prompt}]\n",
+        ")\n",
+        "\n",
+        "print(response.choices[0].message.content.strip())"
+      ],
+      "id": "57c66f2b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Discussion: How does providing examples improve the model's accuracy?\n",
+        "\n",
+        "## 4. Single or Few-Shot Prompting\n",
+        "💡 Use Case: Guide AI using examples.\n",
+        "\n",
+        "🛠 Example: Converting Log Messages to Structured Output\n",
+        "\n",
+        "**Explanation:**\n",
+        "\n",
+        "Single or Few-Shot prompting involves providing one or more examples of the desired input-output behavior to guide the language model. This approach helps the model understand the task by demonstrating the expected output format and structure.\n",
+        "\n",
+        "In this example, we are asking the model to convert log messages into a structured JSON format. By providing an example of a log message and its corresponding JSON representation, we are guiding the model on how to perform the conversion for a new log message.\n",
+        "\n",
+        "Single or Few-Shot prompting is a powerful technique for tasks that require specific output formats or involve complex data transformations. By providing clear examples, we can improve the model's accuracy and ensure that the output aligns with our expectations.\n",
+        "\n",
+        "To see the output, run the code."
+      ],
+      "id": "61386fe5"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "prompt = \"\"\"Convert the following log message into a structured JSON format.\n",
+        "Example:\n",
+        "Log: \"ERROR 2025-03-10 14:35:22 Server crashed due to memory overflow.\"\n",
+        "JSON:\n",
+        "{\n",
+        "  \"level\": \"ERROR\",\n",
+        "  \"timestamp\": \"2025-03-10 14:35:22\",\n",
+        "  \"message\": \"Server crashed due to memory overflow.\"\n",
+        "}\n",
+        "\n",
+        "Now convert this log:\n",
+        "\"WARNING 2025-03-10 15:00:10 Disk space running low.\"\n",
+        "\"\"\"\n",
+        "\n",
+        "response = client.chat.completions.create(\n",
+        "    model=MODEL,\n",
+        "    messages=[{\"role\": \"user\", \"content\": prompt}]\n",
+        ")\n",
+        "\n",
+        "print(response.choices[0].message.content.strip())"
+      ],
+      "id": "ce21cdee",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## 5. Self-Consistency\n",
+        "💡 Use Case: Run multiple variations of a prompt and select the most common response.\n",
+        "\n",
+        "🛠 Example: Determining the Most Reliable Answer\n",
+        "\n",
+        "**How Self-Consistency Works:**\n",
+        "\n",
+        "The idea behind self-consistency is to run the same prompt multiple times with slight variations (or even without variations) and then select the most frequent response. This technique leverages the idea that if the model produces the same answer multiple times, it's more likely to be the correct answer. It helps to mitigate the occasional inconsistencies or errors that LLMs might produce.\n",
+        "\n",
+        "**Why It's Useful:**\n",
+        "\n",
+        "Increased Reliability: By selecting the most common response, we increase the likelihood of getting a reliable and accurate answer.\n",
+        "Reduces Noise: It helps to filter out occasional incorrect or unexpected outputs from the LLM.\n",
+        "Useful for Ambiguous Tasks: Self-consistency is particularly helpful for tasks where the model might have multiple valid interpretations or where the correct answer is not immediately obvious.\n",
+        "\n",
+        "To see the output, run the code."
+      ],
+      "id": "0ff79df5"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "from collections import Counter\n",
+        "\n",
+        "reviews = [\n",
+        "    \"This product is absolutely fantastic! I highly recommend it.\",\n",
+        "    \"I'm not entirely sure how I feel about this. It has its pros and cons.\",\n",
+        "    \"It's okay, but I've definitely used better products before.\",\n",
+        "    \"The customer service was terrible, and the product itself was mediocre.\",\n",
+        "    \"While it's not perfect, it's a decent option for the price.\",\n",
+        "    \"This is the worst product I have ever purchased. Avoid it at all costs!\",\n",
+        "    \"I was initially skeptical, but I'm pleasantly surprised by how much I enjoy it.\"\n",
+        "]\n",
+        "\n",
+        "prompt_template = \"\"\"\n",
+        "Analyze the sentiment expressed in the following customer review:\n",
+        "\n",
+        "Review: {review}\n",
+        "\n",
+        "Sentiment (Positive, Negative, Neutral):\n",
+        "\"\"\"\n",
+        "\n",
+        "all_sentiments = []\n",
+        "for review in reviews:\n",
+        "    print(f\"Analyzing review: {review}\")\n",
+        "    responses = []\n",
+        "    for i in range(5):  # Run the prompt 5 times per review\n",
+        "        prompt = prompt_template.format(review=review)\n",
+        "        response = client.chat.completions.create(\n",
+        "            model=MODEL,\n",
+        "            messages=[{\"role\": \"user\", \"content\": prompt}]\n",
+        "        ).choices[0].message.content.strip()\n",
+        "        print(f\"  Iteration {i + 1}: {response}\")  # Print each iteration's sentiment\n",
+        "        responses.append(response)\n",
+        "\n",
+        "    most_common_sentiment = Counter(responses).most_common(1)[0][0]\n",
+        "    all_sentiments.append((review, most_common_sentiment))  # Store review and its most common sentiment\n",
+        "\n",
+        "print(\"\\nFinal Sentiment Analysis:\")\n",
+        "for review, sentiment in all_sentiments:\n",
+        "    print(f\"Review: {review} | Sentiment: {sentiment}\")"
+      ],
+      "id": "cddb617c",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Report Generation\n",
+        "\n",
+        "This code demonstrates how prompt engineering plays a crucial role in generating structured reports from JSON data using large language models (LLMs). It highlights how carefully crafted prompts can guide the LLM to extract specific information and present it in a desired format.\n",
+        "\n",
+        "**Prompt as the Blueprint:**\n",
+        "\n",
+        "The core of this approach is the prompt, which acts as a blueprint for the LLM. It provides the following crucial instructions:\n",
+        "\n",
+        "1. **Data Context:** The prompt explicitly informs the LLM that it will be working with a JSON string containing information about research papers. This establishes the context for the task.\n",
+        "\n",
+        "2. **Information Extraction:** The prompt meticulously outlines the specific data points to be extracted from each research paper, such as title, authors, publication date, etc. This guides the LLM's focus.\n",
+        "\n",
+        "3. **Desired Output Format:** The prompt meticulously dictates the desired structure and formatting of the report, including the use of bullet points, horizontal lines for separation, and headings for sections. This ensures the LLM generates a readable and organized output."
+      ],
+      "id": "cb090c34"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "import json\n",
+        "from IPython.display import display, Markdown\n",
+        "\n",
+        "# Load the JSON file\n",
+        "with open(\"/content/huggingface_papers.json\", \"r\") as f:\n",
+        "    data = json.load(f)\n",
+        "\n",
+        "# Select the first 10 papers\n",
+        "papers_data = json.dumps(data[:10], indent=4)  # Convert to JSON string\n",
+        "print(papers_data)"
+      ],
+      "id": "972bc747",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 1000
+        }
+      },
+      "source": [
+        "# Create the prompt\n",
+        "prompt = f\"\"\"\n",
+        "You are provided with a JSON string containing information about 10 research papers from Hugging Face.\n",
+        "{papers_data}\n",
+        "For each paper, please extract and present the following information:\n",
+        "\n",
+        "* **Title:**\n",
+        "* **Authors:**\n",
+        "* **PublishedAt:**\n",
+        "* **Likes:**\n",
+        "* **Summary (3 bullet points):**\n",
+        "* **Conclusion:**\n",
+        "**Industry & Business Relevance**\n",
+        "  - **Potential Applications**: List industries or sectors that can benefit from this research.\n",
+        "  - **Existing Implementations**: Identify startups, companies, or tools that use similar approaches.\n",
+        "  - **Patent or Commercialization Potential**: Discuss whether this research has IP or commercial potential.\n",
+        "\n",
+        "Separate the information for each paper with a horizontal line (---).\n",
+        "\"\"\"\n",
+        "response = client.chat.completions.create(\n",
+        "        model=MODEL,\n",
+        "        messages=[{\"role\": \"user\", \"content\": prompt}]\n",
+        "    )\n",
+        "display(Markdown(response.choices[0].message.content.strip()))"
+      ],
+      "id": "44665365",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 1000
+        }
+      },
+      "source": [
+        "# Create the prompt\n",
+        "prompt = f\"\"\"\n",
+        "You are provided with a JSON string containing information about 10 research papers from Hugging Face.\n",
+        "{papers_data}\n",
+        "Provide details about each paper.\n",
+        "\"\"\"\n",
+        "response = client.chat.completions.create(\n",
+        "        model=MODEL,\n",
+        "        messages=[{\"role\": \"user\", \"content\": prompt}]\n",
+        "    )\n",
+        "display(Markdown(response.choices[0].message.content.strip()))"
+      ],
+      "id": "ca763fb9",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## **AI Agent With LangChain**\n",
+        "\n",
+        "This code demonstrates a practical application of prompt engineering using the LangChain framework. We create an AI agent equipped with a web search tool powered by DuckDuckGo.\n",
+        "\n",
+        "**How it Works:**\n",
+        "\n",
+        "1. **Natural Language Prompts:** You guide the agent by providing prompts in natural language, such as \"What's a quick recipe for chicken and rice?\".\n",
+        "\n",
+        "2. **Implicit and Explicit Prompts:**\n",
+        "\n",
+        "- Tool descriptions act as implicit prompts, influencing the AI's choice of tools based on the user's request.\n",
+        "- Your user prompt is the explicit prompt, directly instructing the agent on the desired task.\n",
+        "\n",
+        "3. **AI-Driven Response:** The agent leverages its tools and a language model to process your prompt, retrieve information (in this case, a recipe), and deliver a relevant response."
+      ],
+      "id": "703e82a4"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "!pip -q install openai langchain langchain-community langchain-openai duckduckgo-search"
+      ],
+      "id": "99a69129",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "from langchain.agents import initialize_agent, Tool\n",
+        "from langchain.agents.agent_types import AgentType\n",
+        "from langchain_openai import ChatOpenAI\n",
+        "from langchain.utilities import DuckDuckGoSearchAPIWrapper\n",
+        "from langchain.tools import DuckDuckGoSearchRun\n",
+        "import os\n",
+        "\n",
+        "# Reuse the local Ollama endpoint configured above.\n",
+        "# Setup tools\n",
+        "search = DuckDuckGoSearchRun()\n",
+        "tools = [\n",
+        "    Tool(\n",
+        "        name=\"Search\",\n",
+        "        func=search.run,\n",
+        "        description=\"Searches the web for quick recipe ideas based on ingredients or meal type\"\n",
+        "    )\n",
+        "]\n",
+        "\n",
+        "# Initialize the LLM\n",
+        "llm = ChatOpenAI(model=MODEL, temperature=0, base_url=OLLAMA_BASE_URL, api_key=\"ollama\")\n",
+        "\n",
+        "# Initialize the agent\n",
+        "agent = initialize_agent(\n",
+        "    tools,\n",
+        "    llm,\n",
+        "    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,\n",
+        "    verbose=True\n",
+        ")\n",
+        "\n",
+        "# User prompt\n",
+        "prompt = \"What’s a quick recipe for chicken and rice?\"\n",
+        "response = agent.run(prompt)\n",
+        "print(response)  # Output: A brief recipe idea or summary from search results"
+      ],
+      "id": "93b74637",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## **Prompt Engineering with LangChain for Retrieval Augmented Generation (RAG)**\n",
+        "\n",
+        "This code demonstrates a basic implementation of Retrieval Augmented Generation (RAG) using LangChain. It showcases how to use prompt engineering techniques to enhance question answering with a large language model (LLM) by retrieving relevant context from a document.\n",
+        "\n",
+        "**How it Works:**\n",
+        "\n",
+        "1. **Document Preparation:** A longer document (in this case, an article about AI) is provided as the knowledge base. It is split into smaller chunks for easier retrieval.\n",
+        "\n",
+        "2. **Retrieval:** A simple retrieval function simulates a vector search, finding the most relevant chunk based on keyword matching with the user's query.\n",
+        "\n",
+        "3. **Prompt Template:** A PromptTemplate is defined to structure the input for the LLM. It incorporates the retrieved context and the user's question into a clear prompt.\n",
+        "\n",
+        "4. **LLM Interaction:** An Ollama-backed LLM is initialized through an OpenAI-compatible endpoint and used to generate an answer based on the prompt. The prompt is designed to guide the LLM to use the provided context and answer concisely.\n",
+        "\n",
+        "**Prompt Engineering Focus:**\n",
+        "\n",
+        "- **Contextualization:** The prompt template plays a crucial role in providing context to the LLM. It explicitly instructs the LLM to use the retrieved information to answer the question.\n",
+        "\n",
+        "- **Instruction and Formatting:** The prompt includes instructions on how to format the answer (single sentence, bullet point) to ensure consistency and clarity.\n",
+        "\n",
+        "- **Handling Missing Information:** The prompt also provides guidance for cases where no relevant information is found, prompting the LLM to indicate this explicitly."
+      ],
+      "id": "aaa1641d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "source": [
+        "from langchain_openai import ChatOpenAI\n",
+        "from langchain.prompts import PromptTemplate\n",
+        "from langchain.text_splitter import CharacterTextSplitter\n",
+        "\n",
+        "# Longer document (expanded AI article)\n",
+        "document = \"\"\"\n",
+        "Artificial Intelligence (AI) refers to the development of computer systems capable of performing tasks that typically require human intelligence,\n",
+        "such as learning, problem-solving, decision-making, and perception. The concept dates back to the 1940s and 1950s, when early thinkers like Alan Turing\n",
+        "posed questions about machine thought with his famous Turing Test, designed to assess whether a machine could convincingly mimic human conversation.\n",
+        "The field grew through the decades, with milestones like the 1956 Dartmouth Conference, where the term \"Artificial Intelligence\" was coined by John McCarthy.\n",
+        "Modern AI relies heavily on machine learning, where systems analyze vast datasets to improve performance, and deep learning, a subset leveraging neural\n",
+        "networks modeled after the human brain to tackle complex tasks like image recognition.\n",
+        "\n",
+        "AI’s applications span numerous industries. In healthcare, it powers diagnostic tools that detect diseases like cancer from medical imaging and crafts\n",
+        "personalized treatment plans based on patient data. In finance, AI algorithms monitor transactions to catch fraud in real-time and execute high-speed stock\n",
+        "trades. Transportation benefits from AI through self-driving cars, which use sensors and algorithms to navigate roads safely. Virtual assistants like Siri\n",
+        "and Alexa employ natural language processing to interpret and respond to human speech, making technology more accessible. Beyond these, AI enhances\n",
+        "manufacturing with predictive maintenance, optimizes supply chains, and even generates art or music through creative algorithms.\n",
+        "\n",
+        "Despite its promise, AI raises significant ethical and practical concerns. Job displacement is a major issue, as automation threatens roles in sectors like\n",
+        "retail and transportation. Privacy worries grow as AI systems collect and analyze personal data, often without clear consent. Biased algorithms, trained on\n",
+        "flawed datasets, can perpetuate discrimination in areas like hiring or law enforcement. Additionally, the energy consumption of training large AI models\n",
+        "contributes to environmental debates.\n",
+        "\n",
+        "Looking ahead, AI research is pushing toward general AI—systems with the flexibility to handle any intellectual task a human can—unlike today’s narrow AI,\n",
+        "which excels only in specific domains like playing chess or translating languages. Experts foresee AI reshaping education with personalized learning,\n",
+        "revolutionizing scientific discovery by simulating experiments, and even influencing governance through data-driven policy-making. However, ensuring AI\n",
+        "remains safe, transparent, and equitable poses ongoing challenges. Regulatory frameworks lag behind innovation, and debates over AI’s societal impact\n",
+        "continue to intensify as the technology advances.\n",
+        "\"\"\"\n",
+        "\n",
+        "# Split document into chunks\n",
+        "text_splitter = CharacterTextSplitter(chunk_size=200, chunk_overlap=20)\n",
+        "chunks = text_splitter.split_text(document)\n",
+        "\n",
+        "# Simple retrieval function (mimics vector search with keyword matching)\n",
+        "def retrieve_docs(query):\n",
+        "    for chunk in chunks:\n",
+        "        if any(word in chunk.lower() for word in query.lower().split()):\n",
+        "            return chunk\n",
+        "    return \"No relevant info found.\"\n",
+        "\n",
+        "# Set up the LLM through the local Ollama OpenAI-compatible endpoint\n",
+        "llm = ChatOpenAI(model=MODEL, temperature=0, base_url=OLLAMA_BASE_URL, api_key=\"ollama\")\n",
+        "\n",
+        "# Enhanced RAG prompt template with instructions and formatting\n",
+        "rag_prompt = PromptTemplate(\n",
+        "    input_variables=[\"context\", \"question\"],\n",
+        "    template=\"\"\"\n",
+        "    Using this info: '{context}', answer the question: {question}.\n",
+        "    Keep the answer concise and format it as a single sentence starting with a bullet point (-).\n",
+        "    If no relevant info is found, say: '- No answer available from the document.'\n",
+        "    \"\"\"\n",
+        ")\n",
+        "\n",
+        "# Example RAG flow\n",
+        "query = \"Summarize the article\"\n",
+        "context = retrieve_docs(query)\n",
+        "prompt = rag_prompt.format(context=context, question=query)\n",
+        "response = llm.invoke(prompt).content\n",
+        "print(response)"
+      ],
+      "id": "28efcd20",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Conclusion and Resources\n",
+        "\n",
+        "Prompt engineering is a powerful skill for maximizing the potential of large language models. By following best practices and iterating on your prompts, you can achieve more accurate, relevant, and high-quality outputs.\n",
+        "\n",
+        "Additional Resources:\n",
+        "\n",
+        "[Prompt Engineering Guide by OpenAI](https://platform.openai.com/docs/guides/prompt-engineering)\n",
+        "\n",
+        "[Prompt Engineering Guide](https://www.promptingguide.ai/)\n",
+        "\n",
+        "[ChatGPT Prompt Engineering for developers](https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/)\n"
+      ],
+      "id": "f6c2f1f2"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/home/oren/.local/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

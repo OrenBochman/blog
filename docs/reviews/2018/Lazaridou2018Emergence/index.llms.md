@@ -18,7 +18,7 @@ In ([Lazaridou et al. 2018](#ref-lazaridou2018emergence)) the authors look emerg
 
 > **NOTE:**
 >
-> [![Emergence of Linguistic Communication in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Emergence of Linguistic Communication in a nutshell")
+> [![Emergence of Linguistic Communication in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Emergence of Linguistic Communication in a nutshell")
 >
 > Emergence of Linguistic Communication in a nutshell
 >

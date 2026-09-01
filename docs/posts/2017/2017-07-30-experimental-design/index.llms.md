@@ -4,7 +4,7 @@ A/B Testing
 
 > **NOTE:**
 >
-> [![A/B Testing in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "A/B Testing in a nutshell")
+> [![A/B Testing in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "A/B Testing in a nutshell")
 >
 > A/B Testing in a nutshell
 >

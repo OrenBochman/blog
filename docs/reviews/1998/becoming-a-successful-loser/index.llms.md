@@ -4,7 +4,7 @@ I tracked this paper due to it being highlighted in ([Skyrms 2010](#ref-Skyrms20
 
 > **TIP:**
 >
-> [![On Learning to become a successful loser in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "On Learning to become a successful loser in a nutshell")
+> [![On Learning to become a successful loser in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "On Learning to become a successful loser in a nutshell")
 >
 > On Learning to become a successful loser in a nutshell
 >

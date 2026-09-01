@@ -1,9 +1,5 @@
 ## Introduction to Machine Learning: From Theory to Application
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Michael Galarnyk
   - [Website](https://mgalarnyk.github.io/)
   - Georgia Institute of Technology

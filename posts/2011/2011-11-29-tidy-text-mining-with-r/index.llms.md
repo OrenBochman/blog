@@ -16,7 +16,7 @@ list n-grams
 
 generate word clouds
 
-mine TDF it for collocations  
+mine TDF it for collocations\
 
 similarity
 
@@ -106,7 +106,6 @@ require_install(libs=c('SnowballC','tidytext','dplyr','wordcloud','janeaustenr',
     - Installing tokenizers ...                     OK [built from source and cached in 7.4s]
     - Installing tidytext ...                       OK [built from source and cached in 4.9s]
     Successfully installed 11 packages in 50 seconds.
-
 
     Attaching package: 'dplyr'
 
@@ -54955,7 +54954,6 @@ ggplot(frequency, aes(x = proportion, y = `Jane Austen`,
   cor.test(data = frequency[frequency$author == "Brontë Sisters",], ~ proportion + `Jane Austen`)
 ```
 
-
         Pearson's product-moment correlation
 
     data:  proportion and Jane Austen
@@ -54971,7 +54969,6 @@ ggplot(frequency, aes(x = proportion, y = `Jane Austen`,
 cor.test(data = frequency[frequency$author == "H.G. Wells",], 
          ~ proportion + `Jane Austen`)
 ```
-
 
         Pearson's product-moment correlation
 

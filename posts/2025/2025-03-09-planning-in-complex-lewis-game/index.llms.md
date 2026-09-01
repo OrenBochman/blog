@@ -30,7 +30,7 @@ Before we consider how a sophisticated language evolves in the complex signaling
 >
 > The trivial formulation and its as follows:
 >
-> 1.  The Sender enumerates the states. 1,\ldots,\|S\|. As there are \|S\|! ways to enumerate the states. This enumeration may seem like a choice that sender can defer to when each state appears but the Lords of Entropy will not allow this - he must decide ahead of time on a strategy and that means a signal for each state must be chosen.  
+> 1.  The Sender enumerates the states. 1,\ldots,\|S\|. As there are \|S\|! ways to enumerate the states. This enumeration may seem like a choice that sender can defer to when each state appears but the Lords of Entropy will not allow this - he must decide ahead of time on a strategy and that means a signal for each state must be chosen.\
 >     In the bayesian view The enumeration is predetermined by Nature. We might further imagine that the sender is assigned a lexicon of states to signals, but perhaps there is just a barcode reader that scans a state and returns a number.
 > 2.  The sender converts the enumeration to base in \[2,\ldots,\|L\|\], we could assume he picks the largest.
 > 3.  The sender transliterates each digit to a signal in L\* by converting each digit to a signal in the alphabet \mathbb{L}. He again as a L! ways to do this but again the Gods of entropy, require that he must pick them ahead of time. In the bayesian view he might be provided by a decoder ring to do this… ex-ante. But if he subscribes to the frequentest orthodoxy he might toss aside the decoder and pick the mapping at random the first time he transliterates each digit.

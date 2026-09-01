@@ -1,9 +1,5 @@
 ## Book Author: AI Agents with MCP
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Kyle Stratis
   - [Homepage](https://kylestratis.com/) Very interesting!!
   - [LinkedIn](https://www.linkedin.com/in/kylestratis/)

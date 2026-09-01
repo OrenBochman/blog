@@ -4,7 +4,7 @@
 
 > **NOTE:**
 >
-> [![Scaling in financial prices in a nutshell](../../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../../images/in_the_nut_shell_coach_retouched.jpg "Scaling in financial prices in a nutshell")
+> [![Scaling in financial prices in a nutshell](../../../../images/in_the_nut_shell_gemeni.png)](../../../../images/in_the_nut_shell_gemeni.png "Scaling in financial prices in a nutshell")
 >
 > Scaling in financial prices in a nutshell
 >
@@ -34,7 +34,7 @@
 
 5.  The promise of multifractals: Mandelbrot proposed a model combining fractional Brownian motion and multifractal trading time to capture both long-range dependence and scale invariance in financial prices. This model has the potential to address the limitations of earlier models and provide a more accurate representation of financial market dynamics.
 
-> “I disagree that non-stationarity is obvious and do my best to avoid it.” [^1]{.aside}
+> “I disagree that non-stationarity is obvious and do my best to avoid it.” ^This quote reflects Mandelbrot’s stance on the misleading emphasis on non-stationarity in financial data, advocating for the search for generalized forms of stationarity and corresponding models.
 
 What are the key limitations of existing financial models?
 
@@ -255,5 +255,3 @@ BibTeX citation:
 For attribution, please cite this work as:
 
 Bochman, Oren. 2024. “Scaling in Financial Prices 1.” November 28. <https://orenbochman.github.io/posts/2024/2024-11-28-misbahaviour-of-markets/part1/>.
-
-[^1]: This quote reflects Mandelbrot’s stance on the misleading emphasis on non-stationarity in financial data, advocating for the search for generalized forms of stationarity and corresponding models.

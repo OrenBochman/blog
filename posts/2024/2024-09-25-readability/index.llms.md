@@ -49,7 +49,7 @@ learning to write from:
     - The Birth of the Clinic
     - The Order of Things
     - The Archaeology of Knowledge
-    - Madness and Civilization  
+    - Madness and Civilization\
 
   - Leonard Susskind
     - Theoretical Minimum

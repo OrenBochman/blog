@@ -1,9 +1,5 @@
 ## Agentic AI for Autonomous Root-Cause Analysis in Large-Scale Enterprise Systems
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Nik Kale
 - Cisco Systems
 

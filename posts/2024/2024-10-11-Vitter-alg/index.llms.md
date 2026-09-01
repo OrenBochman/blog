@@ -153,7 +153,7 @@ Given the higher frequency we might encode them as a single symbol. This way we 
 
 1.  add an algorithm for adaptive arithmetic coding - which is more efficient than huffman coding.
 2.  add support for blocking - this is where we encode 4 or more characters at a time. This is useful when the message is very long and we want to reduce the overhead of encoding and decoding.
-    - Blocking seems to be counter productive for language evolution making semantics depend on the length and order of the block.  
+    - Blocking seems to be counter productive for language evolution making semantics depend on the length and order of the block.\
     - However both agents and Natural language can use entangled codes so we may want to support this.
     - With the caveat that we may pad the block to avoid blocking beyond the end of the message or a semantic unit.
 3.  Integrate into an agent in the lewis petting zoo environment.

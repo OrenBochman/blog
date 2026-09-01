@@ -12,7 +12,7 @@ This talk touches to some degree to some degree on the first idea and brings to 
 
 > **NOTE:**
 >
-> [![Compositionality in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Compositionality in a nutshell")
+> [![Compositionality in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Compositionality in a nutshell")
 >
 > Compositionality in a nutshell
 >
@@ -104,7 +104,7 @@ If I was initially critical of this talk and speaker I soon came to realize that
 
   - There are many ways rational agents can to learn to coordinate:
 
-    - If each agent has some shared knowledge that allows them to enumerate each state in the same order then they can use it to infer the same signaling system immediately.  
+    - If each agent has some shared knowledge that allows them to enumerate each state in the same order then they can use it to infer the same signaling system immediately.\
     - if there is only one new action pair introduced then coordination only takes n-1 steps
     - if they both know the distribution of states, and no two states are as likely, agents can infer an signaling system.
       - this implies that if they can observe the state long enough they can suddenly signal with high fidelity.

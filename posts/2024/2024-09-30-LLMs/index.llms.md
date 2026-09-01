@@ -8,7 +8,7 @@ I later came across an account of David Mackay who also looked at Deep Language 
 
 [![One of a million IID monkeys at a typewriter credit](Chimpanzee_seated_at_typewriter.jpg)](Chimpanzee_seated_at_typewriter.jpg "One of a million IID monkeys at a typewriter   credit")
 
-One of a million [IID](https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables) monkeys at a typewriter  
+One of a million [IID](https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables) monkeys at a typewriter\
 [credit](https://commons.wikimedia.org/wiki/File:Chimpanzee_seated_at_typewriter.jpg)
 
 One point to make is that the monkeys might have a higher probability of generating the text then the researcher’s model - but that is a different story.

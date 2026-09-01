@@ -1,7 +1,3 @@
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - David Talby
   - [LinkedIn](https://www.linkedin.com/in/davidtalby)
 - John Snow Labs

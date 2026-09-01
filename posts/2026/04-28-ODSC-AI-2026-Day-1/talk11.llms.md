@@ -1,9 +1,5 @@
 ## Architectural Patterns for Building and Governing Production-Grade Multi-Agent Systems
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - [Dr. Ali Arsanjani](https://www.linkedin.com/in/ali-arsanjani/)
 - [blogpost](https://dr-arsanjani.medium.com/the-anatomy-of-agentic-ai-0ae7d243d13c)
 

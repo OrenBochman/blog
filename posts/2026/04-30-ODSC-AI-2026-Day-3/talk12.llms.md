@@ -1,9 +1,5 @@
 ## GraphRAG in Healthcare: Enhancing Clinical Reasoning with Knowledge Graphs, GNNs, and Agents
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Giuseppe Futia
 - CSI Piemonte
 - [slides](https://docs.google.com/presentation/d/1ipi1sVaTisg-L-vLalUmf03cUZvA3V1x/edit)

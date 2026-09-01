@@ -1,6 +1,6 @@
 > **NOTE:**
 >
-> [![memes in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "memes in a nutshell")
+> [![memes in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "memes in a nutshell")
 >
 > memes in a nutshell
 >
@@ -139,7 +139,7 @@ If you want to collect memes you should look at problems, as memes we often pres
 
 ## Cognitive
 
-- generate-and-test  
+- generate-and-test\
 - sample
   - stratified
   - snowball

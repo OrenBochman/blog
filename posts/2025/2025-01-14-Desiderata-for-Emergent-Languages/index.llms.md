@@ -1,7 +1,7 @@
-> \[coordinate decision making\], this is a difficult problem, because:  
-> Firstly, most coordination problems cannot be solved in polynomial time.  
-> Secondly, it’s difficult because as we decentralized our systems we need to know who, what, and when we want to communicate, right?  
-> And thirdly, it’s difficult because it’s not at all clear what strategy we want to follow when things don’t actually work as expected  
+> \[coordinate decision making\], this is a difficult problem, because:\
+> Firstly, most coordination problems cannot be solved in polynomial time.\
+> Secondly, it’s difficult because as we decentralized our systems we need to know who, what, and when we want to communicate, right?\
+> And thirdly, it’s difficult because it’s not at all clear what strategy we want to follow when things don’t actually work as expected\
 > – ([Today 2021](#ref-RoboticsToday_2021)) Amanda Prorok
 
 ## Introduction
@@ -20,7 +20,7 @@ In a a companion working paper, “[The Many Path To A Signaling System](../2025
 
 > **TIP:**
 >
-> [![Emergent Languages in a Nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Emergent Languages in a Nutshell")
+> [![Emergent Languages in a Nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Emergent Languages in a Nutshell")
 >
 > Emergent Languages in a Nutshell
 >
@@ -501,7 +501,7 @@ Languages change over time but not the core structure of the language. This is a
 1.  mappings between states and signals
 
     1.  morpho-syntax mappings preserve partial states (Homomorphism of normal subgroups)
-    2.  mappings preserve semantic topologies (if a is close to b then f(a) should be close to f(b))  
+    2.  mappings preserve semantic topologies (if a is close to b then f(a) should be close to f(b))\
 
 2.  Stability
 

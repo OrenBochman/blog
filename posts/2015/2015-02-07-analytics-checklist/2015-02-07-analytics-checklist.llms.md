@@ -66,7 +66,7 @@ Title
 
 Description
 
-Keywords  
+Keywords\
 
 Favicon
 
@@ -74,15 +74,15 @@ Form
 
 Input
 
-Input Hebrew Placeholder  
+Input Hebrew Placeholder\
 
-Required  
+Required\
 
 Validation
 
 # Special Integration
 
-3rd Party Integration  
+3rd Party Integration\
 
 Comments
 

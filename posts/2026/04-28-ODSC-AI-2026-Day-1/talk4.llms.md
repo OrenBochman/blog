@@ -1,9 +1,5 @@
 ## The Verifier–Compiler Loop: Turning Human Preferences into Production Agent Judgment
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Ruslan Belkin
   - [LinkedIn](https://www.linkedin.com/in/rbelkin/)
   - Inflection AI

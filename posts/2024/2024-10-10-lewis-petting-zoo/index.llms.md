@@ -206,7 +206,7 @@ What would be nice is to:
     3.  Bochman fastest coordination
     4.  Bochman belief based coordination
     5.  Bochman adaptive huffman coding coordination
-    6.  Bochman adaptive arithmetic coding coordination  
+    6.  Bochman adaptive arithmetic coding coordination\
     7.  Tabular Monte Carlo RL
     8.  Policy Gradient or Gradient Bandit
 
@@ -230,7 +230,7 @@ What would be nice is to:
     2.  structured - group action for feature morphology
     3.  structured and simple (generate atomic states, then combinations)
     4.  trees - atoms and trees of atoms based on a one rule grammar.
-    5.  problem space - states and actions from an MDP.  
+    5.  problem space - states and actions from an MDP.\
 
 10. have multiple recievers that share information to speed up learning
 

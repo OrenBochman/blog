@@ -218,7 +218,7 @@ P (s \in S \vert F_1 ... F_k) = \frac{ \displaystyle \prod\_{j \in J} P (F_j \ve
 
 ## Maximum Entropy Classification
 
-- Introduced in ([Osborne 2002](#ref-Osborne2002UsingME))  
+- Introduced in ([Osborne 2002](#ref-Osborne2002UsingME))\
 - Maximum entropy models are performing better than Naive Bayes approach
 
 ------------------------------------------------------------------------

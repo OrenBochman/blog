@@ -19,7 +19,7 @@ If our features are built from such embeddings, we learn weights that correspond
 
 A second point is that in different contexts we might need to use different features. This is much easier to see in RL and NLP. Building a embedding that is localized to a just some features and some observations/states might allow the model to get good generalization then by considering all the features at once. This is an analogue of the idea of factoring a distribution into a product of marginals, particularly in the case of a much larger bayesian network. In this case though we might be talking about using two such factorizations, with some discriminator selecting the observations that are used in different contexts.
 
-We might think of a neural network as evolving system of that learns to bifurcate the distributed representation of the features of the data set in the input into any number of  
+We might think of a neural network as evolving system of that learns to bifurcate the distributed representation of the features of the data set in the input into any number of\
 smaller and more localized subspaces. The more Localized subspaces are more likely to be linearly separable and thus easier to learn.
 
 However all this happens by breaking symmetries using the random aspects of the learning algorithm. Minibatches present many random samples which carry different payloads of information. Certain such payloads may reinforce the current network weights, while the next may require a bifurcation of the representation into two to minimize the loss. Another might require many bifurcations and may not lead to any new bifurcations or reinforcements. Drop out breaks symmetries by shutting down parts of the network temporarily.
@@ -35,9 +35,9 @@ On other problems with generalization in RL and in NLP might be resolved using l
   - could we let all other nodes in the network have a residual connection to the feature?
 - if we wanted to further refine a representation of a localized subspace of verbs to intransitive verbs how would we do that?
   - we would like to lean a discriminator that can tell the difference between transitive and intransitive verbs and then use it to gate the input to the verb feature.
-  - however we might prefer to do better than that and learn a better representation of the  
+  - however we might prefer to do better than that and learn a better representation of the\
     transitive and intransitive verbs. This would need learning different weights for the different verbs. This means we want to bifurcate the verb feature subnetwork into two replicates but add the discriminator as a gate to the input of the two sub-networks.
-  - another point worth considering is that once we have learned a good representation of both  
+  - another point worth considering is that once we have learned a good representation of both\
     the transitive and intransitive verbs we can use these as features in the next layers of the network. We should be able to combine them to get a better representation than just the original verb.
   - I recon this happens many times in LLMs. What we might want is to have some way for the model to attend to all the subspaces it has learned and use them to guide its learning.
   - The challenge seems to be in identification of the subspaces. We may be using different basis for each subspace etc which may lead to difficulty in reusing them.

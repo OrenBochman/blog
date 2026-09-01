@@ -1,7 +1,7 @@
 # Dynamic net
 
-One paradgm is that the network could be dynamic. For such a model we want to be able to add and remove nodes. This could be an issue for networks that are engineered to scale up and down to a certain size. E.g. cnn. If we drop we may like to either rescale pad or introduce a new node. Also dynamic nets should be engineered to handle differnt size of input and still work ok. If a node vanishes drop it.  
-Also drop any other nodes that are in its product zero. If a node explodes dup it and enforce refularization using drip out at  
+One paradgm is that the network could be dynamic. For such a model we want to be able to add and remove nodes. This could be an issue for networks that are engineered to scale up and down to a certain size. E.g. cnn. If we drop we may like to either rescale pad or introduce a new node. Also dynamic nets should be engineered to handle differnt size of input and still work ok. If a node vanishes drop it.\
+Also drop any other nodes that are in its product zero. If a node explodes dup it and enforce refularization using drip out at\
 Also use renormalization to reduce infinities Use an infintessimal rep vanshing nodes We apply a contraction mapping Another idea is that we have a minimumn and maximum weight settings and we renormelize. The weights after propergating the errors.
 
 # Game layers

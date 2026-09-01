@@ -43,7 +43,7 @@ When a the agents needs to navigate a complex landscape to gather resources surv
   - For deserts: Snakes, scorpions and spiders
   - For forests: Wolves and deer and rabbits
   - For swamps: Alligators and frogs and flies
-  - For caves: Bats and insects  
+  - For caves: Bats and insects\
   - For volcanoes: Lava and rocks
   - For plains: Lions and wildebeest
   - For Savannah: Elephants and antelopes

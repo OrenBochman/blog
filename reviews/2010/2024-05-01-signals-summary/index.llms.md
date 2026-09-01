@@ -32,12 +32,12 @@ Besides a summary I also want to try to implement some of the keystone models in
 
 ## Sender-Receiver
 
-> There are two players, the sender and the receiver.  
-> Nature chooses a state at random and the sender observes the state chosen.  
-> The sender then sends a signal to the receiver, who cannot observe the state directly but does observe the signal.  
-> The receiver then chooses an act, the outcome of which affects them both, with the payoff depending on the state.  
-> Both have pure common interest—they get the same payoff—and there is exactly one “correct” act for each state.  
-> In the correct act-state combination they both get positive payoff; otherwise payoff is zero.  
+> There are two players, the sender and the receiver.\
+> Nature chooses a state at random and the sender observes the state chosen.\
+> The sender then sends a signal to the receiver, who cannot observe the state directly but does observe the signal.\
+> The receiver then chooses an act, the outcome of which affects them both, with the payoff depending on the state.\
+> Both have pure common interest—they get the same payoff—and there is exactly one “correct” act for each state.\
+> In the correct act-state combination they both get positive payoff; otherwise payoff is zero.\
 > The simplest case is one where there are the same number of states, acts, and signals.
 
 A separating equilibrium is called a signaling system
@@ -53335,13 +53335,13 @@ for i in range(steps):
 
 ## Some thoughts
 
-1.  learning in the original Lewis language games is exponential in the size of the lexicon. It would seem that some complex signals systems should have orders of magnitude advantage in learning rates compared to the original variants. Lets consider a Lewis signaling system with 27 signals.  
+1.  learning in the original Lewis language games is exponential in the size of the lexicon. It would seem that some complex signals systems should have orders of magnitude advantage in learning rates compared to the original variants. Lets consider a Lewis signaling system with 27 signals.\
     The learning is O(e^{27})\propto5\times10^{12}
 
-2.  Under a conjunctive structure with three messages a lexicon of 9 messages would be required.  
+2.  Under a conjunctive structure with three messages a lexicon of 9 messages would be required.\
     The learning is O(e^{9})\propto 8.1\times10^{3}
 
-3.  Under Say we have a VSO complex signal with 3 signals per a positional POS category. This leads to 27 signal lexicon under the original lexicon. Using the complex system only 3 three signals need to be learned.  
+3.  Under Say we have a VSO complex signal with 3 signals per a positional POS category. This leads to 27 signal lexicon under the original lexicon. Using the complex system only 3 three signals need to be learned.\
     So that learning is O(e^{3}) \propto 20
 
     If we factor learning time as part of the costs of signaling we should expect complex signaling systems to emerge quickly. Also if we consider learning as part of In this case partial pooling states are acceptable and even desirable each signal now has three meaning depending on its position.
@@ -53442,6 +53442,6 @@ For attribution, please cite this work as:
 
 Bochman, Oren. 2024. “Signals: Signals: Evolution, Learning, and Information.” May 1. <https://orenbochman.github.io/reviews/2010/2024-05-01-signals-summary/>.
 
-[^1]: I think that we should consider a lewis hierarchy of games based on lewis games with  
-    a. logic  
+[^1]: I think that we should consider a lewis hierarchy of games based on lewis games with\
+    a. logic\
     b. conjunctive signals

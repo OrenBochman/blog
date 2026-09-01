@@ -123,7 +123,6 @@ Listing 6: model review
     [37] "SL.stepAIC"          "SL.svm"              "SL.template"        
     [40] "SL.xgboost"         
 
-
     All screening algorithm wrappers in SuperLearner:
 
     [1] "All"
@@ -179,7 +178,6 @@ sl_lasso
 ```
 
 Listing 9: fit lasso
-
 
     Call:  
     SuperLearner(Y = y_train, X = x_train, family = binomial(), SL.library = "SL.glmnet") 
@@ -306,7 +304,6 @@ sl_rf = SuperLearner(Y = y_train, X = x_train, family = binomial(), SL.library =
 sl_rf
 ```
 
-
     Call:  
     SuperLearner(Y = y_train, X = x_train, family = binomial(), SL.library = "SL.ranger") 
 
@@ -324,7 +321,6 @@ sl
 ```
 
 Listing 17: lst fit multiple models
-
 
     Call:  
     SuperLearner(Y = y_train, X = x_train, family = binomial(), SL.library = c("SL.mean",  
@@ -460,7 +456,6 @@ system.time({
 summary(cv_sl)
 ```
 
-
     Call:  
     CV.SuperLearner(Y = y_train, X = x_train, V = 3, family = binomial(), SL.library = c("SL.mean",  
         "SL.glmnet", "SL.ranger")) 
@@ -480,7 +475,6 @@ summary(cv_sl)
 # Review the distribution of the best single learner as external CV folds.
 table(simplify2array(cv_sl$whichDiscreteSL))
 ```
-
 
     SL.ranger_All 
                 3 
@@ -823,7 +817,6 @@ cv_sl = CV.SuperLearner(Y = y_train, X = x_train, family = binomial(), V = 3,
 summary(cv_sl)
 ```
 
-
     Call:  
     CV.SuperLearner(Y = y_train, X = x_train, V = 3, family = binomial(), SL.library = c("SL.mean",  
         "SL.glmnet", "SL.rf.better", "SL.ranger")) 
@@ -889,7 +882,6 @@ cv_sl = CV.SuperLearner(Y = y_train, X = x_train, family = binomial(),
 # Review results.
 summary(cv_sl)
 ```
-
 
     Call:  
     CV.SuperLearner(Y = y_train, X = x_train, V = 3, family = binomial(), SL.library = c("SL.mean",  
@@ -987,7 +979,6 @@ cv_sl = CV.SuperLearner(Y = y_train, X = x_train,
 summary(cv_sl)
 ```
 
-
     Call:  
     CV.SuperLearner(Y = y_train, X = x_train, V = 3, family = binomial(), SL.library = c("SL.mean",  
         "SL.glmnet", learners$names, "SL.ranger")) 
@@ -1061,7 +1052,6 @@ system.time({
 # Review results.
 summary(cv_sl)
 ```
-
 
     Call:  
     CV.SuperLearner(Y = y_train, X = x_train, V = 3, family = binomial(), SL.library = c("SL.mean",  
@@ -1137,7 +1127,6 @@ system.time({
 summary(cv_sl)
 ```
 
-
     Call:  
     CV.SuperLearner(Y = y_train, X = x_train, V = 3, family = binomial(), SL.library = c("SL.mean",  
         "SL.glmnet", learners$names, "SL.ranger"), parallel = cluster) 
@@ -1173,7 +1162,6 @@ set.seed(1, "L'Ecuyer-CMRG")
 (sl = mcSuperLearner(Y = y_train, X = x_train, family = binomial(),
                     SL.library = c("SL.mean", "SL.glmnet", learners$names, "SL.ranger")))
 ```
-
 
     Call:  
     mcSuperLearner(Y = y_train, X = x_train, family = binomial(), SL.library = c("SL.mean",  
@@ -1236,7 +1224,6 @@ parallel::clusterSetRNGStream(cluster, 1)
                       cluster = cluster,
                       SL.library = c("SL.mean", "SL.glmnet", learners$names, "SL.ranger")))
 ```
-
 
     Call:  
     snowSuperLearner(cluster = cluster, Y = y_train, X = x_train, family = binomial(),  
@@ -1322,7 +1309,6 @@ listWrappers()
     [37] "SL.stepAIC"          "SL.svm"              "SL.template"        
     [40] "SL.xgboost"         
 
-
     All screening algorithm wrappers in SuperLearner:
 
     [1] "All"
@@ -1362,7 +1348,6 @@ cv_sl = CV.SuperLearner(Y = y_train, X = x_train, family = binomial(),
 summary(cv_sl)
 ```
 
-
     Call:  
     CV.SuperLearner(Y = y_train, X = x_train, V = 3, family = binomial(), SL.library = list("SL.mean",  
         "SL.glmnet", c("SL.glmnet", "screen.corP")), parallel = "multicore") 
@@ -1395,7 +1380,6 @@ cv_sl = CV.SuperLearner(Y = y_train, X = x_train, family = binomial(),
 ## Loading required package: cvAUC
 summary(cv_sl)
 ```
-
 
     Call:  
     CV.SuperLearner(Y = y_train, X = x_train, V = 3, family = binomial(), SL.library = list("SL.mean",  
@@ -1479,7 +1463,6 @@ system.time({
 # Review results.
 summary(cv_sl)
 ```
-
 
     Call:  
     CV.SuperLearner(Y = y_train, X = x_train, V = 3, family = binomial(), SL.library = c("SL.mean",  

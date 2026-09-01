@@ -87,7 +87,7 @@ Here are the key takeaways from the video:
   - **Simulations Aren’t Always Necessary**: For analytically solvable problems like Monty Hall, simulations might be overkill.
   - **Effective Visualizations**: A well-designed visual can effectively explain complex concepts and persuade.
   - **Multiple Solutions**: Problems can be solved in various ways.
-  - **Embrace Ignorance and Humility**: Even experts can be wrong, emphasizing the importance of humility in data science.  
+  - **Embrace Ignorance and Humility**: Even experts can be wrong, emphasizing the importance of humility in data science.\
 - **Real-World Applications**: Kazin explores potential real-world analogies for the Monty Hall problem, distinguishing between qualitative and quantitative analogies, and cautions against oversimplification. He offers adaptive tutoring as a possible valid quantitative analogy.
 
 ## Reflections

@@ -13,7 +13,7 @@ This is coverage of the second talk in the meetup
 ## KV Cache Efficiency + Context “Platform” Engineering
 
 - [Valentin Vercovici](https://www.linkedin.com/in/valentinbercovici/)
-- [Callan Fox](https://www.linkedin.com/in/callanfox/)  
+- [Callan Fox](https://www.linkedin.com/in/callanfox/)\
 - [WekaIO](https://www.weka.io/)
 
 This presentation will include demos and code with a focus on improving KV-cache hit rates as well as introducing a methodology called Context “Platform” Engineering to design and optimize AI infrastructure for Agent Swarm Context at scale. Context Platform Engineering was recently featured in the CES2026 keynote by Jensen Huang, CEO of NVIDIA. This presentation is related to a recent [AIE CODE Summit talk](https://www.ai.engineer/code) in December 2025.

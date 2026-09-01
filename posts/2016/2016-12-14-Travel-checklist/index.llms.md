@@ -10,7 +10,7 @@ break in walking shoes 3 weeks before travel
 
 Check if you need vaccinations
 
-book hotels and travel  
+book hotels and travel\
 
 Correct power cable and transformer
 

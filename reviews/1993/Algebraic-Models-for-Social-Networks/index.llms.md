@@ -16,7 +16,7 @@ Figure 2: [source](https://en.wikipedia.org/wiki/Pip_Pattison#/media/File:Pip_P
 
 > **NOTE:**
 >
-> [![Algebraic Models in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Algebraic Models in a nutshell")
+> [![Algebraic Models in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Algebraic Models in a nutshell")
 >
 > Algebraic Models in a nutshell
 >

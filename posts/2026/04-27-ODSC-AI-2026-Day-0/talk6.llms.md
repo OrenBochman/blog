@@ -1,9 +1,5 @@
 ## Building Responsible AI Agents with Open Source
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Olivia Buzek
   - [linkedin](https://www.linkedin.com/in/olivia-buzek/)
   - [slides](https://obuzek.github.io/ai-agents-workshop/slides/#/title)

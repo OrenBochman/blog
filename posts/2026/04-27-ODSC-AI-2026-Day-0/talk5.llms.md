@@ -1,9 +1,5 @@
 ## Introduction to the Agent2Agent (A2A) Protocol
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Holt Skinner
   - [LinkedIn](https://www.linkedin.com/in/holt/)
   - [Videos](https://goo.gle/holt-videos)

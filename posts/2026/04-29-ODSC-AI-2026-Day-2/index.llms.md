@@ -1,9 +1,5 @@
 ## Your MCP Server is Bad (and You Should Feel Bad)
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - [slides](https://drive.google.com/file/d/1XkVpRrt5ZKWdvv3tAUXPjfuKtaiqHQmU/view)
 - [Jeremiah Lowin](https://www.linkedin.com/in/jlowin/)
 
@@ -12,10 +8,6 @@ Play
 - One key takeaway is that search tool can keep the MCP costs in check by removing the need for giving the llm a full list of MCP servers.
 
 ## The Spectrum of Agentic Coding: From Vibe Coding to High-quality Software Engineering
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Y.K. Sugi
   - [LinkedIn](https://www.linkedin.com/in/ykdojo/)
@@ -107,10 +99,6 @@ Play
 > - **Practical takeaway:** Master all levels of agentic coding and choose the right level for the task. Use vibe coding for speed when risk is low; use disciplined, test-heavy, interactive review workflows when correctness, maintainability, or safety matters.
 
 ## Using Personal AI in 2026(OpenClaw)
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - [Brian Turcotte]()
 - [Brendan O\`Leary]()
@@ -247,10 +235,6 @@ Play
 
 ## From Model Security to Mission Security: Why AI Fails in 2026
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Parthasarathi Chakraborty
   - [LinkedIn](https://www.linkedin.com/in/infosec-exec-partha/)
 - Varun Agaskar
@@ -345,10 +329,6 @@ Play
 - agents live in a tension between high risk and low effort. It is hard to dedicate an environment with minimal risk and friction for an agent to operate in for small insignificant tasks, yet without autonomy and higher levels of prvilage we are unlikely to get the full benefits of agents.
 
 ## Enhancing Context Engineering with Agentic Integration into Vector Database Queries
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - [Scott Askinosie](https://www.linkedin.com/in/scott-askinosie/)
 - Contextual AI
@@ -499,10 +479,6 @@ Play
 
 ## Implementing a Self-service Data Platform
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Andrew Jones
 - [Slides](https://docs.google.com/presentation/d/1rHKRY2LozyAQHIGtlPLBZG3MqXtQA0LQ/)
 
@@ -614,10 +590,6 @@ Play
 
 ## Efficient Language Models via Quantization
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - [Tim Dettmers](https://www.linkedin.com/in/timdettmers/)
 - CMU
 - Ai2
@@ -721,10 +693,6 @@ Play
 If one could just quantize all the weights to 1 bit then everyone would. This is something that people have been talking about for a long time. However it doesn’t just work and Demmers explains a bit about why. Intuitively, numeric analysis teaches us how approximating matrix multiplications leads to compounding errors when the matrix is near singular. Also outliers play a role because they can dominate the output of a layer, so if they are quantized too coarsely, the model’s behavior can change drastically.
 
 ## Building Evaluation Systems for AI Coding Agents at Scale
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Building Evaluation Systems for AI Coding Agents at Scale by
 - [Karen Zhou](https://www.linkedin.com/in/karenzhou0/),
@@ -843,10 +811,6 @@ Play
 
 ## Driving Data Quality with Data Contracts
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Andrew Jones
 - Book: Driving Data Quality with Data Contracts
 
@@ -876,10 +840,6 @@ Play
 > - Andrew’s core claim is that reliable data must be improved at the source, by treating data with the same seriousness, ownership, documentation, and change management as software APIs.
 
 ## The Ralph Wiggum Phenomenon Evolving Agentic Coding
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - [Ray Myers](linkedin.com/in/cadrlife)
 - OpenHands
@@ -962,10 +922,6 @@ Play
 ## Solo to Production: End-to-End Ownership with AI
 
 ------------------------------------------------------------------------
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - [Solo to Production-End-to-End Ownership with AI]()
 - [Brian Turcotte]()
@@ -1074,10 +1030,6 @@ Play
 > - The main takeaway is that individuals can now build, review, ship, and maintain real software much faster and with broader scope than was previously feasible alone
 
 ## Build, Test, and Debug dbt Faster with Claude
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - [Bruno Souza de Lima](linkedin.com/in/brunoszdl)
 - phData

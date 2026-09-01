@@ -1,9 +1,5 @@
 ## Using Model Context Protocol with Python: A Getting Started Guide for Data Scientists
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Ryan Day
   - [LinkedIn](https://www.linkedin.com/posts/ryanday1_apis-ai-data-share-7326761077726150656-QfHO/)
   - [CSBS](https://csbs.com/)

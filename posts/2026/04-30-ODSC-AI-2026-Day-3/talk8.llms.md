@@ -1,9 +1,5 @@
 ## The Data-Resistant Mind-The Psychology Every Data Scientist Needs to Make Their Work Matter by Sebastian Wernicke, Oxera Consult
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Sebastian Wernicke
 - Oxera Consulting LLP
 

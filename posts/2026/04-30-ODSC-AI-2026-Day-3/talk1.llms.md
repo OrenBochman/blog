@@ -1,9 +1,5 @@
 ## Towards Trustworthy LLMs: Understanding Limits, Advancing Capabilities, Ensuring Safety
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Nouha Dziri
   - [LinkedIn](https://www.linkedin.com/in/nouha-dziri-3587427b//)
   - Cohere Labs

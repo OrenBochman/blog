@@ -56,7 +56,7 @@ At some point, I started to hear about the consensus view from sources X, Y, and
 ### Reasoning summary
 
 1.  Almost all of my prompts lead to long reasoning chains. I started peeking at these messages. I was skeptical of these, as in many cases, these were made-up outputs with mostly coincidental relation to the actual chat session.
-2.  I don’t really know at this point if there is any better relevance to these notes or not. In the back of my mind, I suspect that this is primarily a trick to slow down queries or to make users wait for a much slower GPU allocation.  
+2.  I don’t really know at this point if there is any better relevance to these notes or not. In the back of my mind, I suspect that this is primarily a trick to slow down queries or to make users wait for a much slower GPU allocation.\
 3.  What is clear from reading just a few plans:
     1.  GPT_5 consistently claims it can’t access the pages I give it (but only in the plan in the chat session, this failure is not mentioned, leading to a *zero support hallucination*. The reasoning summary can bridge the gap before wasting time on iterating on a hallucination.
     2.  GPT_5 states its assumptions about my prompt. These are often not what I had in mind in two ways. Correcting a misconception or adding a missing fact is good practice - one of the advantages of a GPT\_? is to get you to train to think more precisely.

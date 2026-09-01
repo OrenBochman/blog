@@ -1,9 +1,5 @@
 ## The Art of Clustering: The Good, The Bad and The Beautiful
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Seth Levine
   - [LinkedIn](https://www.linkedin.com/in/sethplevine/)
   - Contentsquare

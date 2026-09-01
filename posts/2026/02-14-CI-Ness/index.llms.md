@@ -191,7 +191,7 @@ Towards causal inference with latent variable models and programs
 questions:
 
 - Can we use our probabilistic programming models to make causal inferences?
-- How can we construct our models so that we can apply formal methods from causal inference?  
+- How can we construct our models so that we can apply formal methods from causal inference?\
 - Can we use the native abstractions of our models in causal reasoning, or do we have to explicitly model something called a potential outcome?
 - Can we use the generative explanatory nature of our models or are we limited to doing Bayesian inference on potential outcomes as if it were a missing data problem?
 - How can we do causal inference from data when many of the variables in our model are not observed in the data?

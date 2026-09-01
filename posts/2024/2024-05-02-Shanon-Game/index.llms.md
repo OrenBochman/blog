@@ -46,7 +46,7 @@ So in the abstraction one way that a emergent communications might arise is usin
 3.  a Chomsky game to model development of a shared grammar for complex signals.
 
     - A trivial version is to use concatenation of signals to form new signals.
-    - A more powerful version is to use an ordered vector of signals. Using a simple prefix code this allows creation of a powerful morphology.  
+    - A more powerful version is to use an ordered vector of signals. Using a simple prefix code this allows creation of a powerful morphology.\
     - Probably the minimalist option though is to use a rule that allows nested clauses. If the tree allows recursion we get what Humboldt called the infinite use of finite means.
     - Just having a recursive rule though might over-generate and we might require additional means to restrict the grammar by way of selectional restrictions[^1] and subcategorization frames [^2].
 

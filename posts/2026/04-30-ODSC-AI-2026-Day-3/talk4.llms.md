@@ -1,9 +1,5 @@
 ## Beyond the black box - Interpretability of LLMs in Finance
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Hariom Tatsat
   - [Website](https://htatsat.com/)
   - [LinkedIn](https://linkedin.com/in/hariomtatsat)

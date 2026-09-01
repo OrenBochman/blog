@@ -143,7 +143,7 @@ This is most clearly illustrated in:
 - The **Dowery/Courtship scenario** where:
   - The game can be cooperative or competitive.
     - In the competitive case only the fittest agents get a mate.
-    - In the cooperative case all agents get to mate but some will mate more often, or with more desirable mates.  
+    - In the cooperative case all agents get to mate but some will mate more often, or with more desirable mates.\
   - Agent must collect resources (e.g. a bill of goods for a dowery) before they can reproducing from a changing landscape.
   - Only the top n dowries will generate an offspring. (bills of goods slowly perish but the size and diversity of is important).
   - Alternatively only the agent that is the the best at courtship n times can generate an offspring. (this time there are smaller bills of good that quickly perish)
@@ -223,7 +223,7 @@ add
     - adding some mutation - adding mutations to the childrerns signaling system.
     - based on paper by (Nowak and Krakauer)
 
-2.  learning via reinforcement learning  
+2.  learning via reinforcement learning\
 
 3.  spontaneous symmetry breaking scenarios vs planning
 
@@ -245,7 +245,7 @@ add
 
     - receiver can guess N at first and N-1 at second and N-k-1 at kth turn.
 
-    - So there are n+1/2  
+    - So there are n+1/2\
       actions giving 1\*N combinations and only ones with A=T get the payoff. So there is a 1/N chance of getting a reward. So we can expect that the number of steps needed to learn to signal the state T is N.
 
     - Thus planning is faster than random signaling.
@@ -676,14 +676,14 @@ Now it is worthwhile to set down a few definitions.
     - A related example is that we might learn a prefix for two trees. We could generalize this to any number of trees.
     - We could make use of recursion to represent a number system for all number of trees using a few symbols.
     - This recursive rule would expand our signaling system to capture an infinite number of states using a finite number of signals. And what is more interesting we would be able to learn it from a small set of examples.
-    - The point here is that if the states have such rich structures the language that preserves these can potentially be orgenised to in such a way that it can be learned more efficiently then in the tabular case. The idea is that instead of a table we could use a rule perhaps recursive to encode this part of the state. But only if it has such a structure.  
+    - The point here is that if the states have such rich structures the language that preserves these can potentially be orgenised to in such a way that it can be learned more efficiently then in the tabular case. The idea is that instead of a table we could use a rule perhaps recursive to encode this part of the state. But only if it has such a structure.\
     - Finally note that even if there are many such functions we could be able to compose them in a way that the become a single function. This is the idea of compositionality in language and it likely the key for learning to represent arbitrary complex signaling systems.
 2.  Signal - In the complex signaling game the signal can be viewed as
     - as a string of arbitrary length made using a limited alphabet of size \|L\|
     - as a number N in base \|L\| i.e. *N_L*
 3.  Prelinguistic object
     - I noticed that people use this term as a synonym for the state. I want to use it a little differently. I want it to correspond to a sub-state that may be interpreted as a unit of meaning. There may be multiple prelinguistic objects in a state. We may consider these as parts of a picture for example and each part may need servral words to describe it. Or we may refernce a bit in a binary vector.
-    - as noted above the states may have a rich structure, e.g. nouns, verb, inflection, a recursively defined number system. Or a recursively defined system of clauses. The last might even generlise the number system.  
+    - as noted above the states may have a rich structure, e.g. nouns, verb, inflection, a recursively defined number system. Or a recursively defined system of clauses. The last might even generlise the number system.\
     - The prelinguitic objects may be in a list, a tree, a grid a graph or some other data structure. However it seems that we might gravitate towards trees as they are the most common representation for parsing natural languages and more importantly they can be defined using a simple recursive rule.
 4.  Encoder - a function that the agent learns to convert the state into signals it needs to
     1.  serialize the prelinguistic state into a sequence
@@ -750,7 +750,7 @@ The
 
 It was not clear how it
 
-using the ‘blessing of abstraction’ together with probablistic learning / induction vs  
+using the ‘blessing of abstraction’ together with probablistic learning / induction vs\
 the poverty of stimulus and the curse of dimensionality.
 
 #### resources:

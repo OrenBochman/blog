@@ -1,9 +1,5 @@
 ## Introduction to the Math Behind Transformers and LLMs
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - David Hoyle
   - [LinkedIn](https://linkedin.com/in/davidchoyle?originalSubdomain=uk)
   - [slides](https://docs.google.com/presentation/d/1w9VVtjgXcCSlTK2UNa4BQ6FUJDXIRhE2/edit?usp=sharing&ouid=107678147228131583519&rtpof=true&sd=true)

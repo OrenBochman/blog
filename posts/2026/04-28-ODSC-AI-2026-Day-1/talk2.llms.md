@@ -1,9 +1,5 @@
 ## Practical Foundations for Organization-Wide AI Adoption
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Ivan Lourenço Gomes
   - [LinkedIn](https://www.linkedin.com/in/ivan-louren%C3%A7o-gomes-07694956/)
   - Daweb Schools

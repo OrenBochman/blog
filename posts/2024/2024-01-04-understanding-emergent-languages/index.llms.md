@@ -83,7 +83,7 @@ Here are some more questions pn semantics?
     - can we rely on syntax for semantics?
     - if not how do we get a general framework for semantics?
     - To what extents do pre-linguistic structure determine the ability of agents
-    - Will agents become great if they have greatness thrust upon them? i.e. If they get a nice signaling system early on will the be able to extend it or will it wither away[^4]? [^5]  
+    - Will agents become great if they have greatness thrust upon them? i.e. If they get a nice signaling system early on will the be able to extend it or will it wither away[^4]? [^5]\
 
 2.  Are there subset of sequences that are:
 
@@ -91,7 +91,7 @@ Here are some more questions pn semantics?
     - Better suited for communication between agents ? Perhaps exhibiting greater resilience to errors, reducing risk for certain signal, handle saliency, able to compress sequence to make best use of the comms channel?
     - More able to generalize to new or unseen states (moran process for the alphabet)
     - a better match to represent the states.[^6]
-    - easier to interpret/translate/transfer  
+    - easier to interpret/translate/transfer\
 
 3.  Emergent languages may be subject to selection pressure when the Lewis game is composed with some external framing game. What choices are more conducive for agents to lean quickly and communicate effectively using **robust** learning . I.r. algorithms that lead to more stable language whose lexicon, grammar and semantic persist over time?
 
@@ -669,7 +669,6 @@ print("\nAll WFFs up to length 5:")
 print(wff)
 ```
 
-
     Generating WFF (is_well_formed) up to length 5:
 
     Generated sequences:
@@ -740,7 +739,6 @@ wff = gen_all_sequences(brackets='()', connectives='∨¬', props='1ABC', min_le
 print(f"\nAll WFFs up to length {max_length}:")
 print(wff)
 ```
-
 
     Generating WFF (is_well_formed) up to length 5:
 

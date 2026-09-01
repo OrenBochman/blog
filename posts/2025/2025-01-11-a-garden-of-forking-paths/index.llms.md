@@ -22,14 +22,12 @@ library(rethinking)
 
     - CmdStan version: 2.34.1
 
-
     A newer version of CmdStan is available. See ?install_cmdstan() to install it.
     To disable this check set option or environment variable cmdstanr_no_ver_check=TRUE.
 
     Loading required package: posterior
 
     This is posterior version 1.6.0
-
 
     Attaching package: 'posterior'
 
@@ -44,7 +42,6 @@ library(rethinking)
     Loading required package: parallel
 
     rethinking (Version 2.42)
-
 
     Attaching package: 'rethinking'
 

@@ -1,9 +1,5 @@
 ## Harness Engineering: Practical Patterns for Agent-First Software Development
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Ryan Lopopolo
   - [LinkedIn](https://www.linkedin.com/in/ryanlopopolo/)
   - [GitHub](https://github.com/lopopolo)

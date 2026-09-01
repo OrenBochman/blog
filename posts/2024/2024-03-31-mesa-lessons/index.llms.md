@@ -230,7 +230,7 @@ if agents can signal using a pheromone trail they could lay a path from higher l
 
   - after each both sides are reevaluated reducing the price as well and the price drops so that the more needy agent will less willing or able to make all the trades it needs to make to get the the pareto point. And they may now be approximating different pareto point.
 
-- Both agents agent who participate in trade could be better off if allowed to pick  
+- Both agents agent who participate in trade could be better off if allowed to pick\
   their preferred trade partner.
 
 - perhaps in view of this agents should be allowed to refuse unless they get a better deal. This suggest looking at stable marriage alg. where prior to trade the are several rounds in each neighborhood for matching traders.

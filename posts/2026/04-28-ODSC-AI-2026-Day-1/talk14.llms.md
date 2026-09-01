@@ -1,9 +1,5 @@
 ## Meaningful Data Visualization in the Age of AI
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Janet Six
   - [LinkedIn](https://www.linkedin.com/in/janetmsix)
   - Tom Sawyer Software

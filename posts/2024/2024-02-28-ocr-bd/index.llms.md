@@ -20,7 +20,7 @@
 
   - [Segmentation in OCR ^^](https://towardsdatascience.com/segmentation-in-ocr-10de176cf373) - Histogram Projection Method
 
-- Document Scanner app - [Text Segmentation ^^](https://arthurflor23.medium.com/text-segmentation-b32503ef2613) [^1]{.badge .rounded-pill .bg-success}^ [code ^^](https://github.com/arthurflor23/text-segmentation) by [Arthur Flor](https://arthurflor23.medium.com/) some interesting algorithm.
+- Document Scanner app - [Text Segmentation ^^](https://arthurflor23.medium.com/text-segmentation-b32503ef2613) ^(bibliography) [code ^^](https://github.com/arthurflor23/text-segmentation) by [Arthur Flor](https://arthurflor23.medium.com/) some interesting algorithm.
 
 - [Image Filters in Python ^^](https://towardsdatascience.com/image-filters-in-python-26ee938e57d2) [code ^^](https://github.com/m4nv1r/medium_articles/blob/master/Image_Filters_in_Python.ipynb)
 
@@ -54,5 +54,3 @@ BibTeX citation:
 For attribution, please cite this work as:
 
 Bochman, Oren. 2024. “OCR - Brain Dump.” February 25. <https://orenbochman.github.io/posts/2024/2024-02-28-ocr-bd/>.
-
-[^1]: bibliography

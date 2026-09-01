@@ -1,9 +1,5 @@
 ## vLLM with the Transformers Modelling Backend
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Harry Mellor
   - vLLM with the Transformers Modelling Backend
   - [LinkedIn](https://www.linkedin.com/in/harrymellor/)

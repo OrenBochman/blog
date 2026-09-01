@@ -1,5 +1,9 @@
 # Archive
 
+### [All the Good Prompts](posts/2026/06-01-good-prompts/index.llms.md)
+
+Wednesday, June 3, 2026
+
 ### [Harnesses in AI](posts/2026/05-17-harnesses-in-ai-a-deep-dive-tejas-kumar/index.llms.md)
 
 Sunday, May 17, 2026
@@ -167,10 +171,6 @@ Saturday, March 7, 2026
 ### [Smoothing problems](posts/2026/03-08-smoothing-problems/index.llms.md)
 
 Saturday, March 7, 2026
-
-### [Being brave](posts/2026/03-06-being-brave/index.llms.md)
-
-Friday, March 6, 2026
 
 ### [CI - Libs for Python](posts/2026/02-15-CI-Tools/index.llms.md)
 

@@ -1,9 +1,5 @@
 ## Reinforcement Learning for LLM
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Datta Nimmaturi
   - [Homepage](https://datta0.github.io/)
   - [LinkedIn](https://www.linkedin.com/in/datta0/)

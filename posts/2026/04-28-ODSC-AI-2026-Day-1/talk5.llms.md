@@ -1,9 +1,5 @@
 ## From Intelligent to Agentic Applications: Using Model Context Protocol to Support Agentic Behaviors in Your Application
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Kyle Stratis
   - [Homepage](https://kylestratis.com/) - Very interesting!!
   - [LinkedIn](https://www.linkedin.com/in/kylestratis/)

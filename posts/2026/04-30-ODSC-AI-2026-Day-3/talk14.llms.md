@@ -1,9 +1,5 @@
 ## Agentic LLMs in Practice
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Naman Goyal
   - [website](https://namangoyal.com/)
   - [LinkedIn](https://www.linkedin.com/in/goyal-naman/)

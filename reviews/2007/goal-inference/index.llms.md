@@ -32,7 +32,7 @@ So I think that this idea has been handled better in ([Jaques et al. 2019](#ref-
 
 > **NOTE:**
 >
-> [![Goal Inference in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Goal Inference in a nutshell")
+> [![Goal Inference in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Goal Inference in a nutshell")
 >
 > Goal Inference in a nutshell
 >

@@ -6,7 +6,7 @@ I went to the venue via commuting via bus and a long walk in rather inclement we
 
 No one introduced the speaker. But it seems that the speaker was a consultant who was on good terms with the host company. The speaker was pitching a QA product for agents and she was a good speaker - engaging and controlling the room well. But whenever people asked questions one of the C-level people would smugly answer instead of letting the speaker answer.
 
-Like many such meetups there was a lot of talk about agents in production. Although it sounds fascinating, besides the speaker pitching QA product for agent there was nothing new. I don’t expect all meetups to be great.  
+Like many such meetups there was a lot of talk about agents in production. Although it sounds fascinating, besides the speaker pitching QA product for agent there was nothing new. I don’t expect all meetups to be great.\
 Many times mediocre people want to talk about their mediocre projects and it can put your own work in perspective.
 
 ## The talks

@@ -44,10 +44,6 @@ I couldn’t find a recording of this workshop from the conference but here is a
 
 ## Introduction to the Math Behind Transformers and LLMs
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - David Hoyle
   - [LinkedIn](https://linkedin.com/in/davidchoyle?originalSubdomain=uk)
   - [slides](https://docs.google.com/presentation/d/1w9VVtjgXcCSlTK2UNa4BQ6FUJDXIRhE2/edit?usp=sharing&ouid=107678147228131583519&rtpof=true&sd=true)
@@ -154,10 +150,6 @@ Play
 >   - The mathematics is built from familiar components: vectors, matrices, inner products, softmax, probability, and loss minimization.
 
 ## Introduction to Machine Learning: From Theory to Application
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Michael Galarnyk
   - [Website](https://mgalarnyk.github.io/)
@@ -295,10 +287,6 @@ Play
 
 ## A Practical Introduction to Agentic AI
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Sudip Shrestha, Lead AI Engineer at ASI Government
   - [linkedin](https://www.linkedin.com/in/sudipshrestha/)
   - [website](https://www.asigovernment.com/)
@@ -370,10 +358,6 @@ Play
 >   - It is a workflow architecture where a language model uses tools, maintains state, evaluates its own work, and conditionally decides what to do next.
 
 ## Introduction to the Agent2Agent (A2A) Protocol
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Holt Skinner
   - [LinkedIn](https://www.linkedin.com/in/holt/)
@@ -477,10 +461,6 @@ Play
 >   - Its role is to let independently built agents discover each other, describe their capabilities, exchange tasks, return artifacts, and collaborate across framework boundaries.
 
 ## Building Responsible AI Agents with Open Source
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Olivia Buzek
   - [linkedin](https://www.linkedin.com/in/olivia-buzek/)

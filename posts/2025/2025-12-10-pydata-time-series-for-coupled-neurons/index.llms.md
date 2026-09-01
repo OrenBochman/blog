@@ -187,7 +187,7 @@ Some ideas
     4.  in a network are there nodes that act as pain pleasure centers that can be targeted for RL rewards and punishments? This might suggest new architectures for modeling reinforcement learning agents - or at least a new way of implementing the reward/punishment mechanisms in say the OAK architecture recently described by Rich Sutton.
     5.  In a node are there structually placed neurons we might destroy to prevent siezure regimes? A kind of electroshock therapy for epilepsy?
 
-      
+    \
 4.  also the neurons might have several regimes (both individual and collectively) this suggest the use switching mixture markov models.
 5.  I would think a good challenge would be to build poincare maps of the neuron dynamics and use them to classify the different regimes of the neurons. This would then be useful to setup the switching markov model.
 6.  question: Can one add a new chaotic components to the already versatile DLM that is inspired by long term dependencies. It could include some form of fractional differencing or fractional integration.

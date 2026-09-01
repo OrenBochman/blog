@@ -64,7 +64,7 @@ for a known relation we should be able to use it to go either way by adding to o
 
 rank using
 
-\alpha \times probability(Relation) + \beta \times alignment score \gamma \times map score.  
+\alpha \times probability(Relation) + \beta \times alignment score \gamma \times map score.\
 This should have an advantage that this is a fact retrieved by BERT from its memory rather than extracted from a text.
 
 As well as more general features that would allow it both identify them via a context and to capture and contain features corresponding to both the tra still.

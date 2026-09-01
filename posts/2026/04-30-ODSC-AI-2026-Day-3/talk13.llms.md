@@ -1,9 +1,5 @@
 ## The Changing Shape of AI Systems - From Monolithic Training to Continuous Adaptation
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Sudip Roy
   - Adaption
   - adaptive data: creating niche datasets for underserved domains and languages;

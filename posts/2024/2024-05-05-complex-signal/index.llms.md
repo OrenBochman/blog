@@ -1,6 +1,6 @@
 > **NOTE:**
 >
-> [![Emergent Languages In a Nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Emergent Languages In a Nutshell")
+> [![Emergent Languages In a Nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Emergent Languages In a Nutshell")
 >
 > Emergent Languages In a Nutshell
 

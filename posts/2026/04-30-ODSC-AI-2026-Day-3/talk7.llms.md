@@ -1,9 +1,5 @@
 ## The AI Agent Memory Landscape
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - William Lyon
   - Neo4j
   - papers:

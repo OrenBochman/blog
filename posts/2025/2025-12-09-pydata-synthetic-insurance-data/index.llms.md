@@ -4,22 +4,22 @@ Unable to execute JavaScript.
 
 > **TIP:**
 >
-> This study is oriented to a synthetic non-life insurance premium dataset generated using several Generative Models.  
-> As a benchmark, a Conditional Gaussian Mixture Model has been employed.  
-> The validation of the generated data involved several steps: data visualization, comparison with univariate analysis, PCA and UMAP representations between the trained data and the generated samples.  
-> In addition, check the consistency of data produced, the statistical Kolmogorov–Smirnov test and predictive modeling of frequency and severity with Generalized Linear Models (GLMs) exploited by [Tweedie distribution](https://en.wikipedia.org/wiki/Tweedie_distribution) as a measure of the generated data’s quality, followed by the evidence of features importance.  
+> This study is oriented to a synthetic non-life insurance premium dataset generated using several Generative Models.\
+> As a benchmark, a Conditional Gaussian Mixture Model has been employed.\
+> The validation of the generated data involved several steps: data visualization, comparison with univariate analysis, PCA and UMAP representations between the trained data and the generated samples.\
+> In addition, check the consistency of data produced, the statistical Kolmogorov–Smirnov test and predictive modeling of frequency and severity with Generalized Linear Models (GLMs) exploited by [Tweedie distribution](https://en.wikipedia.org/wiki/Tweedie_distribution) as a measure of the generated data’s quality, followed by the evidence of features importance.\
 > For further comparison, advanced Deep Learning architectures have been employed:
 >
 > - Conditional Variational Autoencoders (CVAEs),
 > - CVAEs enhanced with a Transformer Decoder,
 > - a Conditional Diffusion Model, and Large Language Models.
 >
-> The analysis assesses each model’s ability to capture the underlying distributions, preserve complex dependencies, and maintain relationships intrinsic to the premium data.  
+> The analysis assesses each model’s ability to capture the underlying distributions, preserve complex dependencies, and maintain relationships intrinsic to the premium data.\
 > These findings provide insightful directions for enhancing synthetic data generation in insurance, with potential applications in risk modeling, pricing strategies with data scarcity, and regulatory compliance.
 >
-> In classification and regression tasks, generative models aim to learn the joint probability distribution of data.  
-> These models focus on generating data points similar to the training data.  
-> Open insurance datasets are rare because they encode proprietary risk structures of the Company, limiting researchers’ access to comprehensive data for analysis and assessing new approaches.  
+> In classification and regression tasks, generative models aim to learn the joint probability distribution of data.\
+> These models focus on generating data points similar to the training data.\
+> Open insurance datasets are rare because they encode proprietary risk structures of the Company, limiting researchers’ access to comprehensive data for analysis and assessing new approaches.\
 > Generative models enable reproducible experimentation and innovation today. In the talk I explore several generative models used to produce synthetic data.
 
 > **TIP:**

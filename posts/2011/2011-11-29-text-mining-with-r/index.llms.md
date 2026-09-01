@@ -72,7 +72,6 @@ require_install(libs=c('tm','SnowballC','tidytext','dplyr','wordcloud'))
 
     Loading required package: NLP
 
-
     Attaching package: 'dplyr'
 
     The following objects are masked from 'package:stats':

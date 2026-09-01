@@ -1,9 +1,5 @@
 ## Real-Time Event-Time Consistent Analytics Pipelines using Kafka, Flink, and Apache Pinot
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Deep Patel
   - [LinkedIn](https://www.linkedin.com/in/deeppatel710/)
   - Robinhood

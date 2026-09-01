@@ -1,9 +1,5 @@
 ## Tensor Logic The Language of AI
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 Pedro Domingos
 
 [Wikipedia](https://en.wikipedia.org/wiki/Pedro_Domingos)
@@ -112,10 +108,6 @@ many talk about tensor logic with chat GPT.
 - Using sparse attention + Forward/Backward chaining to create hierarchical discourse level summary *state*.
 
 ## Practical Foundations for Organization-Wide AI Adoption
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Ivan Lourenço Gomes
   - [LinkedIn](https://www.linkedin.com/in/ivan-louren%C3%A7o-gomes-07694956/)
@@ -258,10 +250,6 @@ Play
 
 ## vLLM with the Transformers Modelling Backend
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Harry Mellor
   - vLLM with the Transformers Modelling Backend
   - [LinkedIn](https://www.linkedin.com/in/harrymellor/)
@@ -290,10 +278,6 @@ Play
 
 ## The Verifier–Compiler Loop: Turning Human Preferences into Production Agent Judgment
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Ruslan Belkin
   - [LinkedIn](https://www.linkedin.com/in/rbelkin/)
   - Inflection AI
@@ -305,10 +289,6 @@ Play
 > - I cover this in agentic patterns as this is similar to some of my own thinking.
 
 ## From Intelligent to Agentic Applications: Using Model Context Protocol to Support Agentic Behaviors in Your Application
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Kyle Stratis
   - [Homepage](https://kylestratis.com/) - Very interesting!!
@@ -366,10 +346,6 @@ Play
 
 ## The Operational Transformation of Data Architecture
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Andy Petrella
   - [LI](https://www.linkedin.com/in/andypetrella/)
   - [GitHub](https://github.com/andypetrella)
@@ -390,10 +366,6 @@ Play
 > - [databricks DLT](https://databricks.com/product/delta-lake) - a storage layer that brings reliability to data lakes. It provides ACID transactions, scalable metadata handling, and unifies streaming and batch data processing.
 
 ## Harness Engineering: Practical Patterns for Agent-First Software Development
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Ryan Lopopolo
   - [LinkedIn](https://www.linkedin.com/in/ryanlopopolo/)
@@ -546,10 +518,6 @@ Play
 
 ## Real-Time Event-Time Consistent Analytics Pipelines using Kafka, Flink, and Apache Pinot
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Deep Patel
   - [LinkedIn](https://www.linkedin.com/in/deeppatel710/)
   - Robinhood
@@ -656,10 +624,6 @@ Play
 
 ## Using Model Context Protocol with Python: A Getting Started Guide for Data Scientists
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Ryan Day
   - [LinkedIn](https://www.linkedin.com/posts/ryanday1_apis-ai-data-share-7326761077726150656-QfHO/)
   - [CSBS](https://csbs.com/)
@@ -746,10 +710,6 @@ Play
 - This talk was a very practical introduction to the Model Context Protocol (MCP) and how it can be used to give AI agents real agency through structured tool access.
 
 ## Deploying Multimodal AI at the Edge: Engineering Patterns for Real-World Performance
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Achyut Sarma Boggaram
   - [LinkedIn](https://www.linkedin.com/in/achyutsarma//odsc_2026_multi_modal_edge_ml/)
@@ -863,10 +823,6 @@ Play
 > - **Main takeaway:** Deploying machine-learning models on edge systems is an engineering discipline, not just a modeling exercise. A production-ready model must satisfy accuracy, latency, memory, exportability, observability, rollback, and resilience requirements under real-world operating conditions.
 
 ## Architectural Patterns for Building and Governing Production-Grade Multi-Agent Systems
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - [Dr. Ali Arsanjani](https://www.linkedin.com/in/ali-arsanjani/)
 - [blogpost](https://dr-arsanjani.medium.com/the-anatomy-of-agentic-ai-0ae7d243d13c)
@@ -994,10 +950,6 @@ Play
 
 ## Book Author: AI Agents with MCP
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Kyle Stratis
   - [Homepage](https://kylestratis.com/) Very interesting!!
   - [LinkedIn](https://www.linkedin.com/in/kylestratis/)
@@ -1069,10 +1021,6 @@ Play
 >   - The practical challenge in modern agent development is not only making agents useful, but making them secure, observable, evaluable, and maintainable.
 
 ## Building FSI Agents with Claude
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - [Mikaela Grace](https://www.linkedin.com/in/mikaelagrace/)
 - [April Guo](https://www.linkedin.com/in/aprilguo/)
@@ -1201,10 +1149,6 @@ Play
 > - The closing guidance on context management is pragmatic: start with built-in compaction and memory mechanisms, then build custom context management only when evaluations show a clear need.
 
 ## Meaningful Data Visualization in the Age of AI
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Janet Six
   - [LinkedIn](https://www.linkedin.com/in/janetmsix)

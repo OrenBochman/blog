@@ -1,9 +1,5 @@
 ## Deploying Multimodal AI at the Edge: Engineering Patterns for Real-World Performance
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Achyut Sarma Boggaram
   - [LinkedIn](https://www.linkedin.com/in/achyutsarma//odsc_2026_multi_modal_edge_ml/)
   - Torc Robotics

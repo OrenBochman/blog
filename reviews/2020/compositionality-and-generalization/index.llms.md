@@ -23,7 +23,7 @@ Here is the outline of the paper:
 ### Introduction
 
 - Describes a variant of Lewis signaling game used to study the emergence of reference to composite concepts in deep multi-agent simulations.
-- Discusses two specific and intuitive compositionality strategies that capture common compositional structures in natural languages.  
+- Discusses two specific and intuitive compositionality strategies that capture common compositional structures in natural languages.\
 - Introduces two new compositionality measures, positional disentanglement (posdis) and bag-of-symbols disentanglement (bosdis), inspired by work on disentanglement in representation learning.
 
 ### Measurements

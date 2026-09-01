@@ -8,7 +8,7 @@ This academic paper proposes that cooperation among unrelated individuals can ev
 
 > **NOTE:**
 >
-> [![Costly signaling in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "Costly signaling in a nutshell")
+> [![Costly signaling in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "Costly signaling in a nutshell")
 >
 > Costly signaling in a nutshell
 >

@@ -1,9 +1,5 @@
 ## The Operational Transformation of Data Architecture
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Andy Petrella
   - [LI](https://www.linkedin.com/in/andypetrella/)
   - [GitHub](https://github.com/andypetrella)

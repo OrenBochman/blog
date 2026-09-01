@@ -21,7 +21,7 @@ add inputs:
 - cases
 - tenses
 - aspects
-- moods  
+- moods\
 
 export lexicon to CSV
 
@@ -16859,10 +16859,10 @@ adjectives
   - careful (-ful)
   - careless (-less)
 - fast
-  - fastness (-ness)  
+  - fastness (-ness)\
   - fastlike (-like)
   - fasted (-ed)
-  - faster / fastest (comparative/superlative suffixes)  
+  - faster / fastest (comparative/superlative suffixes)\
   - fasten (-en)
   - fasting (-ing)
 - base

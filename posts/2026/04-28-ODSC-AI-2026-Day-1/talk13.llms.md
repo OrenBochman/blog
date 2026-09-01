@@ -1,9 +1,5 @@
 ## Building FSI Agents with Claude
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - [Mikaela Grace](https://www.linkedin.com/in/mikaelagrace/)
 - [April Guo](https://www.linkedin.com/in/aprilguo/)
 - Anthropic

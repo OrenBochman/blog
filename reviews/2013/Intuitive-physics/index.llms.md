@@ -30,7 +30,7 @@ The experiment in this paper seem to be a great addition to the curriculum I had
 
 > **NOTE:**
 >
-> [![intuitive physics in a nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "intuitive physics in a nutshell")
+> [![intuitive physics in a nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "intuitive physics in a nutshell")
 >
 > intuitive physics in a nutshell
 >

@@ -1,9 +1,5 @@
 ## Towards Trustworthy LLMs: Understanding Limits, Advancing Capabilities, Ensuring Safety
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Nouha Dziri
   - [LinkedIn](https://www.linkedin.com/in/nouha-dziri-3587427b//)
   - Cohere Labs
@@ -86,10 +82,6 @@ Play
 
 ## The Art of Clustering: The Good, The Bad and The Beautiful
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Seth Levine
   - [LinkedIn](https://www.linkedin.com/in/sethplevine/)
   - Contentsquare
@@ -166,10 +158,6 @@ Play
 ### Reflection
 
 ## Reinforcement Learning for LLM
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Datta Nimmaturi
   - [Homepage](https://datta0.github.io/)
@@ -282,10 +270,6 @@ Play
 
 ## Beyond the black box - Interpretability of LLMs in Finance
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Hariom Tatsat
   - [Website](https://htatsat.com/)
   - [LinkedIn](https://linkedin.com/in/hariomtatsat)
@@ -374,10 +358,6 @@ Play
 >   - The broader ambition is to make AI systems safer and more production-ready in high-stakes domains by understanding not just what they output, but why their internal representations support those outputs.
 
 ## Outclassing Frontier LLMs at Extracting Information
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Etienne Bernard
   - [LinkedIn](https://www.linkedin.com/in/etiennebcp/)
@@ -508,10 +488,6 @@ Play
 >   - Their main advantages are lower cost, easier private deployment, better task-specific accuracy, and simpler end-to-end workflows.
 
 ## Outclassing Frontier LLMs at Extracting Information
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Etienne Bernard
   - [LinkedIn](https://www.linkedin.com/in/etiennebcp/)
@@ -645,10 +621,6 @@ Play
 
 ## The AI Agent Memory Landscape
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - William Lyon
   - Neo4j
   - papers:
@@ -779,10 +751,6 @@ Play
 
 ## The Data-Resistant Mind-The Psychology Every Data Scientist Needs to Make Their Work Matter by Sebastian Wernicke, Oxera Consult
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Sebastian Wernicke
 - Oxera Consulting LLP
 
@@ -862,10 +830,6 @@ Play
 
 ### Reflection
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - David Talby
   - [LinkedIn](https://www.linkedin.com/in/davidtalby)
 - John Snow Labs
@@ -938,10 +902,6 @@ I think that another issue that I call “non experiential learning”. LLM don�
 So this pattern may be fine for lower stakes use cases. But for medicine you need logic based reasoning and likely humans in the loop. Agentic harasses are unlikely to be able to mitigate the weakness of LLMs to any degree needed by practitioners of medicine anytime soon.
 
 So the guardian is an agent but having an agent monitor may leads to the guardian colluding with the primary agent. It like a lewis signaling game - they only win if they cooperate.
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - David Talby
   - [LinkedIn](https://www.linkedin.com/in/davidtalby)
@@ -1016,10 +976,6 @@ So this pattern may be fine for lower stakes use cases. But for medicine you nee
 
 So the guardian is an agent but having an agent monitor may leads to the guardian colluding with the primary agent. It like a lewis signaling game - they only win if they cooperate.
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - David Talby
   - [LinkedIn](https://www.linkedin.com/in/davidtalby)
 - John Snow Labs
@@ -1092,10 +1048,6 @@ I think that another issue that I call “non experiential learning”. LLM don�
 So this pattern may be fine for lower stakes use cases. But for medicine you need logic based reasoning and likely humans in the loop. Agentic harasses are unlikely to be able to mitigate the weakness of LLMs to any degree needed by practitioners of medicine anytime soon.
 
 So the guardian is an agent but having an agent monitor may leads to the guardian colluding with the primary agent. It like a lewis signaling game - they only win if they cooperate.
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - David Talby
   - [LinkedIn](https://www.linkedin.com/in/davidtalby)
@@ -1171,10 +1123,6 @@ So this pattern may be fine for lower stakes use cases. But for medicine you nee
 So the guardian is an agent but having an agent monitor may leads to the guardian colluding with the primary agent. It like a lewis signaling game - they only win if they cooperate.
 
 ## Agentic AI for Autonomous Root-Cause Analysis in Large-Scale Enterprise Systems
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Nik Kale
 - Cisco Systems
@@ -1308,10 +1256,6 @@ Play
 ### Reflection
 
 ## Building Effective Agents
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Sushant Mehta
   - https://www.linkedin.com/in/sushant-mehta-9a1b4a1/
@@ -1465,10 +1409,6 @@ Play
 
 ## GraphRAG in Healthcare: Enhancing Clinical Reasoning with Knowledge Graphs, GNNs, and Agents
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Giuseppe Futia
 - CSI Piemonte
 - [slides](https://docs.google.com/presentation/d/1ipi1sVaTisg-L-vLalUmf03cUZvA3V1x/edit)
@@ -1570,10 +1510,6 @@ Play
 
 ## The Changing Shape of AI Systems - From Monolithic Training to Continuous Adaptation
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Sudip Roy
   - Adaption
   - adaptive data: creating niche datasets for underserved domains and languages;
@@ -1633,10 +1569,6 @@ Play
 ### Reflection
 
 ## Agentic LLMs in Practice
-
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
 
 - Naman Goyal
   - [website](https://namangoyal.com/)

@@ -258,7 +258,7 @@ Bodo Iceberg Support
 
 `Bodo` provides high-performance data processing in native Python
 
-- True parallel computing with powerful MPI backend  
+- True parallel computing with powerful MPI backend\
 
 - `pandas` drop-in replacement
 

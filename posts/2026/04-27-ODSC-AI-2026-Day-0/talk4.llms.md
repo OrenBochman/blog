@@ -1,9 +1,5 @@
 ## A Practical Introduction to Agentic AI
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Sudip Shrestha, Lead AI Engineer at ASI Government
   - [linkedin](https://www.linkedin.com/in/sudipshrestha/)
   - [website](https://www.asigovernment.com/)

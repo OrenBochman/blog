@@ -1,9 +1,5 @@
 ## Tensor Logic The Language of AI
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 Pedro Domingos
 
 [Wikipedia](https://en.wikipedia.org/wiki/Pedro_Domingos)

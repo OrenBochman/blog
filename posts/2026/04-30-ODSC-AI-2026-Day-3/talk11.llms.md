@@ -1,9 +1,5 @@
 ## Building Effective Agents
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Sushant Mehta
   - https://www.linkedin.com/in/sushant-mehta-9a1b4a1/
   - [LinkedIn]()

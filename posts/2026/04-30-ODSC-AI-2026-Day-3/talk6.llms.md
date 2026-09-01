@@ -1,9 +1,5 @@
 ## Outclassing Frontier LLMs at Extracting Information
 
-Play
-
-![Vimeo](https://f.vimeocdn.com/p/images/crawler_logo.png)
-
 - Etienne Bernard
   - [LinkedIn](https://www.linkedin.com/in/etiennebcp/)
 - [Slides](https://www.dropbox.com/scl/fi/9s5w1dnmrsy6tuzlg5baq/2026_04_ODSC.pptx.pdf?rlkey=gwq6r68mtnnyrkratty3gjp3r&dl=1)

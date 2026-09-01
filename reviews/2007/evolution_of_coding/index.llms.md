@@ -1,6 +1,6 @@
 > **NOTE:**
 >
-> [![The Evolution of Coding In a Nutshell](../../../images/in_the_nut_shell_coach_retouched.jpg)](../../../images/in_the_nut_shell_coach_retouched.jpg "The Evolution of Coding In a Nutshell")
+> [![The Evolution of Coding In a Nutshell](../../../images/in_the_nut_shell_gemeni.png)](../../../images/in_the_nut_shell_gemeni.png "The Evolution of Coding In a Nutshell")
 >
 > The Evolution of Coding In a Nutshell
 >

@@ -2,6 +2,82 @@
 
 ![](./images/calabi_yau_manifold.png)
 
+##### Prediction Bibliography
+
+8 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./images/calabi_yau_manifold.png)
+
+##### S3 with AWS S3 Tools
+
+1 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./images/calabi_yau_manifold.png)
+
+##### S3 with boto3
+
+5 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./images/calabi_yau_manifold.png)
+
+##### S3 with s3cmd
+
+1 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./images/cover.png)
+
+##### lewis game
+
+tikz in Quarto!
+
+8 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./images/calabi_yau_manifold.png)
+
+##### Exercises from the Dynamic Book
+
+7 min
+
+Wednesday, September 2, 2026
+
+|          |                            |
+|----------|----------------------------|
+| Modified | Tuesday, September 8, 2026 |
+
+![](./images/calabi_yau_manifold.png)
+
+##### Composition Driven by Perspective
+
+4 min
+
+Tuesday, September 1, 2026
+
+|          |                            |
+|----------|----------------------------|
+| Modified | Tuesday, September 1, 2026 |
+
+![](./images/calabi_yau_manifold.png)
+
 ##### All the Good Prompts
 
 6 min
@@ -165,8 +241,6 @@ Tuesday, April 28, 2026
 |----------|-----------------------|
 | Modified | Tuesday, May 19, 2026 |
 
-![](./posts/2026/04-28-ODSC-AI-2026-Day-1/t10_hero_robot.png)
-
 ##### Deploying Multimodal AI at the Edge
 
 Engineering Patterns for Real-World Performance
@@ -183,8 +257,6 @@ Tuesday, April 28, 2026
 |----------|-------------------------|
 | Modified | Wednesday, May 20, 2026 |
 
-![](./images/calabi_yau_manifold.png)
-
 ##### From Intelligent to Agentic Applications
 
 Using Model Context Protocol to Support Agentic Behaviors in Your Application
@@ -199,8 +271,6 @@ Tuesday, April 28, 2026
 |----------|-----------------------|
 | Modified | Tuesday, May 19, 2026 |
 
-![](./images/calabi_yau_manifold.png)
-
 ##### Governing Agentic AI
 
 A Blueprint for Safe & Compliant Healthcare Agents in Production
@@ -214,8 +284,6 @@ Tuesday, April 28, 2026
 |          |                       |
 |----------|-----------------------|
 | Modified | Tuesday, May 19, 2026 |
-
-![](./images/calabi_yau_manifold.png)
 
 ##### GraphRAG in Healthcare
 
@@ -232,8 +300,6 @@ Tuesday, April 28, 2026
 |----------|-----------------------|
 | Modified | Tuesday, May 19, 2026 |
 
-![](./images/calabi_yau_manifold.png)
-
 ##### Harness Engineering
 
 Practical Patterns for Agent-First Software Development
@@ -249,8 +315,6 @@ Tuesday, April 28, 2026
 |----------|-----------------------|
 | Modified | Tuesday, May 19, 2026 |
 
-![](./images/calabi_yau_manifold.png)
-
 ##### Kyle Stratis
 
 AI Agents with MCP
@@ -265,8 +329,6 @@ Tuesday, April 28, 2026
 |          |                       |
 |----------|-----------------------|
 | Modified | Tuesday, May 19, 2026 |
-
-![](./images/calabi_yau_manifold.png)
 
 ##### Meaningful Data Visualization
 
@@ -1401,6 +1463,18 @@ Thursday, September 25, 2025
 |----------|------------------------|
 | Modified | Thursday, May 14, 2026 |
 
+##### Research note for the Complex Lewis Signaling Game - Part 1
+
+13 min
+
+A research note for the Complex Lewis Signaling Game - Part 1
+
+Monday, September 22, 2025
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
 ##### FlexAttention: A Flexible Approach to Attention Mechanisms
 
 6 min
@@ -1537,6 +1611,20 @@ Wednesday, April 2, 2025
 |----------|----------------------------|
 | Modified | Monday, September 22, 2025 |
 
+##### RL, Metamorphosis and Memory
+
+Exploring the interplay between reinforcement learning, metamorphosis, and memory retention
+
+2 min
+
+A deep dive into how agents can benefit from retaining knowledge through metamorphosis in reinforcement learning scenarios.
+
+Monday, March 31, 2025
+
+|          |                           |
+|----------|---------------------------|
+| Modified | Thursday, August 28, 2025 |
+
 ##### The roles of Partial pooling and mixed strategies in the Lewis signaling game
 
 a game theoretic perspective
@@ -1550,6 +1638,16 @@ Tuesday, March 11, 2025
 |          |                           |
 |----------|---------------------------|
 | Modified | Thursday, August 28, 2025 |
+
+##### Composition and Interpretation of Games with the Lewis Signaling Game
+
+4 min
+
+Tuesday, January 14, 2025
+
+|          |                         |
+|----------|-------------------------|
+| Modified | Tuesday, March 11, 2025 |
 
 ##### Emergent Languages
 
@@ -1610,6 +1708,16 @@ Monday, January 6, 2025
 |          |                           |
 |----------|---------------------------|
 | Modified | Thursday, August 28, 2025 |
+
+##### Linkage
+
+2 min
+
+Monday, January 6, 2025
+
+|          |                           |
+|----------|---------------------------|
+| Modified | Wednesday, March 12, 2025 |
 
 ##### The Many Path To A Signaling System
 
@@ -1738,6 +1846,30 @@ Thursday, November 28, 2024
 |          |                         |
 |----------|-------------------------|
 | Modified | Wednesday, June 3, 2026 |
+
+##### Egg
+
+2 min
+
+Egg is a framework for training and evaluating emergent communication in multi-agent systems.
+
+Friday, October 11, 2024
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
+##### Egg generator
+
+1 min
+
+Egg is a framework for training and evaluating emergent communication in multi-agent systems.
+
+Friday, October 11, 2024
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
 
 ##### Vitter’s Algorithm
 
@@ -1873,6 +2005,16 @@ Monday, July 1, 2024
 |----------|---------------------------|
 | Modified | Wednesday, March 12, 2025 |
 
+##### Lewis game further musings
+
+6 min
+
+Saturday, June 29, 2024
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
 ##### Mesa & RL
 
 3 min
@@ -1913,6 +2055,18 @@ Thursday, June 13, 2024
 |----------|-------------------------|
 | Modified | Thursday, June 13, 2024 |
 
+##### logic puzzles
+
+2 min
+
+logic puzzles
+
+Wednesday, June 12, 2024
+
+|          |                           |
+|----------|---------------------------|
+| Modified | Wednesday, March 12, 2025 |
+
 ##### More Sugar please
 
 Extending Sugarscape for Curriculum Learning
@@ -1934,6 +2088,18 @@ paper review
 5 min
 
 Tuesday, June 11, 2024
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
+##### Bayesian Agents
+
+11 min
+
+Developing Bayesian agents for game theory
+
+Saturday, June 1, 2024
 
 |          |                        |
 |----------|------------------------|
@@ -1985,6 +2151,18 @@ Sunday, May 5, 2024
 |----------|-------------------------|
 | Modified | Wednesday, June 3, 2026 |
 
+##### Bayesian Gaussian mixture model
+
+tikz in Quarto!
+
+2 min
+
+Thursday, May 2, 2024
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
 ##### Shannon Game
 
 emergent complex communications protocols
@@ -2016,6 +2194,36 @@ Wednesday, May 1, 2024
 |          |                           |
 |----------|---------------------------|
 | Modified | Wednesday, March 12, 2025 |
+
+##### Tailwindcss & Quarto
+
+1 min
+
+Sunday, April 7, 2024
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
+##### Focus
+
+15 min
+
+Wednesday, April 3, 2024
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
+##### Gradio Apps
+
+6 min
+
+Sunday, March 31, 2024
+
+|          |                          |
+|----------|--------------------------|
+| Modified | Thursday, March 13, 2025 |
 
 ##### Mesa
 
@@ -2051,6 +2259,36 @@ Thursday, March 28, 2024
 |----------|------------------------|
 | Modified | Thursday, May 14, 2026 |
 
+##### braindump 03 2024
+
+6 min
+
+Tuesday, March 26, 2024
+
+|          |                         |
+|----------|-------------------------|
+| Modified | Thursday, April 4, 2024 |
+
+##### RL MindMap
+
+3 min
+
+Monday, March 25, 2024
+
+|          |                           |
+|----------|---------------------------|
+| Modified | Wednesday, March 12, 2025 |
+
+##### Sugarscape Ad Astra
+
+15 min
+
+Sunday, March 24, 2024
+
+|          |                           |
+|----------|---------------------------|
+| Modified | Wednesday, March 12, 2025 |
+
 ##### Bayesian Agent
 
 Agent Based Modeling With MESA
@@ -2084,6 +2322,16 @@ Sunday, March 3, 2024
 2 min
 
 Sunday, February 25, 2024
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
+##### Text to IPA
+
+2 min
+
+Thursday, February 22, 2024
 
 |          |                        |
 |----------|------------------------|
@@ -2148,6 +2396,16 @@ Sunday, January 28, 2024
 |          |                              |
 |----------|------------------------------|
 | Modified | Wednesday, February 14, 2024 |
+
+##### Quarto 💖 Bootstrap 😁
+
+2 min
+
+Saturday, January 20, 2024
+
+|          |                           |
+|----------|---------------------------|
+| Modified | Wednesday, March 12, 2025 |
 
 ##### Engineering Reinforcement Learning Algorithms
 
@@ -2267,6 +2525,30 @@ Wednesday, March 8, 2023
 |----------|----------------------|
 | Modified | Friday, May 15, 2026 |
 
+##### Spark & EMR
+
+rough guide
+
+1 min
+
+quick guide to spark and EMR
+
+Wednesday, March 1, 2023
+
+|          |                      |
+|----------|----------------------|
+| Modified | Sunday, June 9, 2024 |
+
+##### braindump
+
+1 min
+
+Wednesday, March 1, 2023
+
+|          |                           |
+|----------|---------------------------|
+| Modified | Monday, February 26, 2024 |
+
 ##### Text2topic - Leverage reviews data for multi-label topics classification in Booking.com
 
 NLP.IL
@@ -2305,6 +2587,32 @@ Wednesday, February 22, 2023
 |----------|-----------------------------|
 | Modified | Thursday, February 22, 2024 |
 
+##### nonlinear time series
+
+handling non uniform time series
+
+1 min
+
+Monday, February 20, 2023
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
+##### Q1 2023 Tasks
+
+learning goals
+
+2 min
+
+Gabante learing challanges
+
+Friday, February 17, 2023
+
+|          |                          |
+|----------|--------------------------|
+| Modified | Thursday, March 23, 2023 |
+
 ##### event generator
 
 6 min
@@ -2330,6 +2638,18 @@ Thursday, September 22, 2022
 |          |                           |
 |----------|---------------------------|
 | Modified | Thursday, August 28, 2025 |
+
+##### Adaptive learning rates
+
+4 min
+
+Robust Regression
+
+Monday, September 12, 2022
+
+|          |                          |
+|----------|--------------------------|
+| Modified | Thursday, March 23, 2023 |
 
 ##### Loss engineering and uncertainty for multi-task learning
 
@@ -2397,6 +2717,28 @@ Thursday, May 5, 2022
 |----------|---------------------------|
 | Modified | Thursday, August 28, 2025 |
 
+##### Multi-armed bandits problem
+
+1 min
+
+The Multi-armed bandits problem
+
+Monday, May 2, 2022
+
+|          |                           |
+|----------|---------------------------|
+| Modified | Monday, February 26, 2024 |
+
+##### environments
+
+3 min
+
+Monday, May 2, 2022
+
+|          |                     |
+|----------|---------------------|
+| Modified | Monday, May 2, 2022 |
+
 ##### PDF extraction hacks
 
 PDF extraction hacks
@@ -2424,6 +2766,16 @@ Thursday, December 30, 2021
 |          |                         |
 |----------|-------------------------|
 | Modified | Wednesday, June 3, 2026 |
+
+##### S3 with AWS S3 Tools
+
+1 min
+
+Sunday, October 10, 2021
+
+|          |                          |
+|----------|--------------------------|
+| Modified | Thursday, March 23, 2023 |
 
 ##### Getting more from your agency ?
 
@@ -2475,6 +2827,18 @@ Friday, September 24, 2021
 |----------|---------------------|
 | Modified | Sunday, May 1, 2022 |
 
+##### Notes from Computer Age Statistical Inference
+
+4 min
+
+Notes from Computer Age Statistical Inference by Bradley Efron & Trevor Hastie
+
+Friday, September 24, 2021
+
+|          |                     |
+|----------|---------------------|
+| Modified | Sunday, May 1, 2022 |
+
 ##### Advertising Models
 
 5 min
@@ -2512,6 +2876,18 @@ Thursday, September 2, 2021
 |          |                     |
 |----------|---------------------|
 | Modified | Sunday, May 1, 2022 |
+
+##### Marketing Research Models
+
+28 min
+
+Marketing Research Models
+
+Sunday, August 29, 2021
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
 
 ##### Python Graphs
 
@@ -2551,6 +2927,18 @@ Sunday, August 29, 2021
 |----------|---------------------|
 | Modified | Sunday, May 1, 2022 |
 
+##### Algorithmic Intuition
+
+3 min
+
+Algorithmic Intuition for Isolation Forest
+
+Friday, August 13, 2021
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
 ##### Hackathon session link dumps & notes
 
 Wikimania 2021 Hackathon
@@ -2582,6 +2970,18 @@ Friday, August 13, 2021
 3 min
 
 Transfer learning in NLP
+
+Friday, August 13, 2021
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
+##### Wikipedia Tea House chatbot
+
+1 min
+
+Wikipedia Tea House chatbot
 
 Friday, August 13, 2021
 
@@ -2635,6 +3035,18 @@ Saturday, May 29, 2021
 |----------|---------------------------|
 | Modified | Monday, February 12, 2024 |
 
+##### Bayesian Betting
+
+8 min
+
+Different Multilevel Models Types
+
+Tuesday, May 18, 2021
+
+|          |                             |
+|----------|-----------------------------|
+| Modified | Saturday, February 24, 2024 |
+
 ##### Multilevel Models
 
 9 min
@@ -2678,6 +3090,28 @@ Wednesday, April 14, 2021
 |          |                           |
 |----------|---------------------------|
 | Modified | Monday, February 12, 2024 |
+
+##### ml workfows
+
+3 min
+
+Wednesday, April 14, 2021
+
+|          |                     |
+|----------|---------------------|
+| Modified | Sunday, May 1, 2022 |
+
+##### Lexical categories and their features
+
+1 min
+
+Lexical categories and their features
+
+Sunday, April 11, 2021
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
 
 ##### Modeling Events
 
@@ -2911,6 +3345,16 @@ Saturday, February 7, 2015
 |----------|------------------------|
 | Modified | Thursday, May 14, 2026 |
 
+##### Optimal bidding
+
+1 min
+
+Saturday, February 7, 2015
+
+|          |                      |
+|----------|----------------------|
+| Modified | Sunday, June 9, 2024 |
+
 ##### SCROLLS - Standardized CompaRison Over Long Language Sequences
 
 NLP IL F2F Meetup at Intuit
@@ -2924,6 +3368,16 @@ Saturday, November 1, 2014
 |          |                      |
 |----------|----------------------|
 | Modified | Friday, May 15, 2026 |
+
+##### Finn-tech meetup
+
+2 min
+
+Monday, October 6, 2014
+
+|          |                           |
+|----------|---------------------------|
+| Modified | Monday, September 9, 2024 |
 
 ##### NLP IL F2F Meetup at Intuit
 
@@ -2962,6 +3416,26 @@ Thursday, November 1, 2012
 |          |                      |
 |----------|----------------------|
 | Modified | Friday, May 15, 2026 |
+
+##### Frames
+
+1 min
+
+Tuesday, November 29, 2011
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
+
+##### R todo list
+
+1 min
+
+Tuesday, November 29, 2011
+
+|          |                        |
+|----------|------------------------|
+| Modified | Thursday, May 14, 2026 |
 
 ##### Text Mining With Python
 
@@ -3012,6 +3486,120 @@ Thursday, August 11, 2011
 |          |                        |
 |----------|------------------------|
 | Modified | Thursday, May 14, 2026 |
+
+![](./reviews/2019/CutMix/cover.jpg)
+
+##### CutMix: Regularization Strategy to Train Strong Classifiers with Localizable Features
+
+paper review
+
+2 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./reviews/2014/MSSG/cover.jpg)
+
+##### Efficient Non-parametric Estimation of Multiple Embeddings per Word in Vector Space
+
+paper review
+
+1 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./images/lit-review-cover.jpg)
+
+##### SELF-ASSEMBLING GAMES
+
+paper review
+
+3 min
+
+teaser for reading this paper
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./reviews/2024/transfusion/cover.jpg)
+
+##### Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model
+
+summary
+
+1 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./reviews/2014/Window-Shopping/cover.jpg)
+
+##### Window-Shopping
+
+2 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./images/lit-review-cover.jpg)
+
+##### title
+
+paper review
+
+2 min
+
+teaser for reading this paper
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./reviews/2017/accurate-large-minibatch-SGD/cover.jpg)
+
+##### 🎲 Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour
+
+paper review
+
+2 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./reviews/2017/decoupled-weight-decay-regularization/cover.jpg)
+
+##### 🏋️‍♂️ Decoupled Weight Decay Regularization🏋️
+
+paper review
+
+2 min
+
+|          |     |
+|----------|-----|
+| Modified |     |
+
+![](./images/lit-review-cover.jpg)
+
+##### Self-Assembling Games
+
+paper review
+
+12 min
+
+Where do games come from ? This paper aims to answer that question.
+
+Friday, July 16, 2027
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
 
 ![](./reviews/2024/q-star/cover.jpg)
 
@@ -3153,8 +3741,6 @@ Monday, March 10, 2025
 |----------|--------------|
 | Modified | Invalid Date |
 
-![](./reviews/2024/LLM2Vec/cover.jpg)
-
 ##### LLM2Vec: Large Language Models Are Secretly Powerful Text Encoders
 
 paper review
@@ -3166,8 +3752,6 @@ Saturday, February 15, 2025
 |          |              |
 |----------|--------------|
 | Modified | Invalid Date |
-
-![](./reviews/2024/mamba-vision/cover.jpg)
 
 ##### MambaVision A Hybrid Mamba-Transformer Vision Backbone
 
@@ -3181,7 +3765,19 @@ Saturday, February 15, 2025
 |----------|--------------|
 | Modified | Invalid Date |
 
-![](./reviews/1998/becoming-a-successful-loser/cover.jpg)
+##### 2BP: 2-Stage Backpropagation
+
+paper review
+
+1 min
+
+This paper presents a novel approach to improve the efficiency of backpropagation in large-scale neural networks by introducing a two-stage process.
+
+Wednesday, February 5, 2025
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
 
 ##### On Learning To Become a Successful Loser
 
@@ -3197,8 +3793,6 @@ Thursday, January 2, 2025
 |----------|--------------|
 | Modified | Invalid Date |
 
-![](./reviews/2020/compositionality-and-generalization/thumbnail.jpg)
-
 ##### Compositionality and Generalization in Emergent Languages
 
 Paper Review
@@ -3210,8 +3804,6 @@ Wednesday, January 1, 2025
 |          |              |
 |----------|--------------|
 | Modified | Invalid Date |
-
-![](./reviews/2018/Lazaridou2018Emergence/cover.jpg)
 
 ##### Emergence of Linguistic Communication from Referential Games with Symbolic and Pixel Input
 
@@ -3227,8 +3819,6 @@ Wednesday, January 1, 2025
 |----------|--------------|
 | Modified | Invalid Date |
 
-![](./reviews/2019/baroni-linguistic-generalization/cover.jpg)
-
 ##### Linguistic generalization and compositionality in modern artificial neural networks
 
 Paper Review
@@ -3243,8 +3833,6 @@ Wednesday, January 1, 2025
 |----------|--------------|
 | Modified | Invalid Date |
 
-![](./reviews/2021/emergent-communication-of-generelization/cover.jpg)
-
 ##### Emergent Communication of Generalizations
 
 paper review
@@ -3257,8 +3845,6 @@ Wednesday, October 9, 2024
 |----------|--------------|
 | Modified | Invalid Date |
 
-![](./reviews/2009/HutteggerSkryms2009/cover.jpg)
-
 ##### Evolutionary dynamics of Lewis signaling games: signaling systems vs. partial pooling
 
 paper review
@@ -3266,6 +3852,18 @@ paper review
 2 min
 
 Tuesday, October 8, 2024
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Simple and accurate dependency parsing using bidirectional LSTM feature representations
+
+paper review
+
+2 min
+
+Wednesday, September 11, 2024
 
 |          |              |
 |----------|--------------|
@@ -3316,6 +3914,18 @@ paper review
 In this post, I review the paper ‘Multi-agent Reinforcement Learning in Sequential Social Dilemmas’ by Leibo et al. (2017), which introduces a new class of social dilemmas…
 
 Monday, June 10, 2024
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Linear Algebraic Structure of Word Senses, with Applications to Polysemy
+
+paper review
+
+2 min
+
+Saturday, June 1, 2024
 
 |          |              |
 |----------|--------------|
@@ -3449,6 +4059,18 @@ Friday, October 22, 2021
 |----------|--------------|
 | Modified | Invalid Date |
 
+##### Notes from Computer Age Statistical Inference
+
+4 min
+
+Notes from Computer Age Statistical Inference by Bradley Efron & Trevor Hastie
+
+Friday, September 24, 2021
+
+|          |                     |
+|----------|---------------------|
+| Modified | Sunday, May 1, 2022 |
+
 ##### Stochastic Gradient Descent - The good parts
 
 14 min
@@ -3456,6 +4078,16 @@ Friday, October 22, 2021
 Stochastic Gradient Descent - The good parts
 
 Sunday, August 29, 2021
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Dependency Parsing using Deep Learning
+
+2 min
+
+Saturday, May 1, 2021
 
 |          |              |
 |----------|--------------|
@@ -3489,6 +4121,56 @@ Sunday, March 21, 2021
 |----------|--------------------------|
 | Modified | Wednesday, April 7, 2021 |
 
+##### PDF with Highlights and Annotations
+
+An example of embedding a PDF with highlights and annotations using JavaScript
+
+2 min
+
+Friday, January 1, 2021
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### A Survey of Cross-lingual Word Embedding Models
+
+paper review
+
+1 min
+
+Sunday, December 20, 2020
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Convolutional Networks with Dense Connectivity
+
+paper review
+
+1 min
+
+Review of the paper ‘Convolutional Networks with Dense Connectivity’ by Gao Huang, Zhuang Liu, Laurens van der Maaten, and Kilian Q. Weinberger
+
+Tuesday, October 1, 2019
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Aggregated Residual Transformations for Deep Neural Networks
+
+paper review
+
+2 min
+
+Monday, June 10, 2019
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
 ##### NIN — Network in Network
 
 paper review
@@ -3496,6 +4178,90 @@ paper review
 6 min
 
 Monday, December 31, 2018
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift
+
+paper review
+
+3 min
+
+Saturday, December 10, 2016
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding
+
+paper review
+
+2 min
+
+Saturday, December 10, 2016
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification
+
+paper review
+
+2 min
+
+Saturday, December 10, 2016
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Distilling the Knowledge in a Neural Network
+
+paper review
+
+2 min
+
+Saturday, December 10, 2016
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Highway Networks
+
+paper review
+
+2 min
+
+Saturday, December 10, 2016
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Inception - Going Deeper with Convolutions
+
+paper review
+
+3 min
+
+Saturday, December 10, 2016
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### Learning both Weights and Connections for Efficient Neural Networks
+
+paper review
+
+2 min
+
+Saturday, December 10, 2016
 
 |          |              |
 |----------|--------------|
@@ -3586,6 +4352,18 @@ paper review
 5 min
 
 Thursday, March 7, 2013
+
+|          |              |
+|----------|--------------|
+| Modified | Invalid Date |
+
+##### The Evolution of Language
+
+paper review
+
+13 min
+
+Wednesday, February 3, 1999
 
 |          |              |
 |----------|--------------|

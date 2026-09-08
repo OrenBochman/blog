@@ -2,6 +2,30 @@
 
 ![](./images/calabi_yau_manifold.png)
 
+##### Exercises from the Dynamic Book
+
+7 min
+
+Wednesday, September 2, 2026
+
+|          |                            |
+|----------|----------------------------|
+| Modified | Tuesday, September 8, 2026 |
+
+![](./images/calabi_yau_manifold.png)
+
+##### Composition Driven by Perspective
+
+4 min
+
+Tuesday, September 1, 2026
+
+|          |                            |
+|----------|----------------------------|
+| Modified | Tuesday, September 8, 2026 |
+
+![](./images/calabi_yau_manifold.png)
+
 ##### All the Good Prompts
 
 6 min
@@ -12,7 +36,7 @@ Wednesday, June 3, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -28,7 +52,7 @@ Sunday, May 17, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -40,7 +64,7 @@ Thursday, April 30, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -56,7 +80,7 @@ Thursday, April 30, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -68,7 +92,7 @@ Wednesday, April 29, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -84,7 +108,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -99,7 +123,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -116,7 +140,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -132,7 +156,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -147,7 +171,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -163,7 +187,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./posts/2026/04-28-ODSC-AI-2026-Day-1/t10_hero_robot.png)
 
@@ -181,7 +205,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -197,7 +221,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -213,7 +237,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -230,7 +254,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./images/calabi_yau_manifold.png)
 
@@ -247,9 +271,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
-
-![](./images/calabi_yau_manifold.png)
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Kyle Stratis
 
@@ -264,9 +286,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
-
-![](./images/calabi_yau_manifold.png)
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Meaningful Data Visualization
 
@@ -282,7 +302,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### ODSC AI 2026
 
@@ -292,7 +312,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Outclassing Frontier LLMs at Extracting Information
 
@@ -304,7 +324,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Practical Foundations for Organization-Wide AI Adoption
 
@@ -316,7 +336,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Real-Time Event-Time Consistent Analytics Pipelines
 
@@ -332,7 +352,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Reinforcement Learning for LLM
 
@@ -346,7 +366,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Tensor Logic
 
@@ -360,7 +380,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### The AI Agent Memory Landscape
 
@@ -372,7 +392,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### The Art of Clustering
 
@@ -386,7 +406,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### The Changing Shape of AI Systems
 
@@ -402,7 +422,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### The Operational Transformation of Data Architecture
 
@@ -418,7 +438,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### The Verifier–Compiler Loop
 
@@ -432,7 +452,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Towards Trustworthy LLMs
 
@@ -448,7 +468,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Towards Trustworthy LLMs
 
@@ -464,7 +484,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Towards Trustworthy LLMs
 
@@ -480,7 +500,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Using Model Context Protocol with Python
 
@@ -495,7 +515,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### vLLM with the Transformers Modelling Backend
 
@@ -507,7 +527,7 @@ Tuesday, April 28, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### A Practical Introduction to Agentic AI
 
@@ -519,7 +539,7 @@ Monday, April 27, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Building Responsible AI Agents
 
@@ -533,7 +553,7 @@ Monday, April 27, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Engineering the Harness
 
@@ -547,7 +567,7 @@ Monday, April 27, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Introduction to Machine Learning
 
@@ -561,7 +581,7 @@ Monday, April 27, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Introduction to the Agent2Agent (A2A) Protocol
 
@@ -573,7 +593,7 @@ Monday, April 27, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Introduction to the Math Behind Transformers and LLMs
 
@@ -587,7 +607,7 @@ Monday, April 27, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### ODSC AI 2026
 
@@ -601,7 +621,7 @@ Monday, April 27, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Mixture problems
 
@@ -615,7 +635,7 @@ Saturday, March 7, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Smoothing problems
 
@@ -627,7 +647,7 @@ Saturday, March 7, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### CI - Libs for Python
 
@@ -647,7 +667,7 @@ Saturday, February 14, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### The Art of Discipline: Mastering Self-Control for a Fulfilling Life
 
@@ -657,7 +677,7 @@ Wednesday, January 21, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### KV Cache Efficiency & Context Platform Engineering
 
@@ -671,7 +691,7 @@ Monday, January 19, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### nvidia Nsight GPU profiling
 
@@ -685,7 +705,7 @@ Monday, January 19, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### RL Agents Last All Summer Long
 
@@ -699,7 +719,7 @@ Wednesday, January 14, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Rise of the agents
 
@@ -713,7 +733,7 @@ Wednesday, January 14, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Three modes of convergence of random variables
 
@@ -727,7 +747,7 @@ Friday, January 9, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Agentic Buzz
 
@@ -741,7 +761,7 @@ Saturday, January 3, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Convoluted Intuitions
 
@@ -755,7 +775,7 @@ Saturday, January 3, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Sick
 
@@ -767,7 +787,7 @@ Thursday, January 1, 2026
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Anthropic’s Claude: Advancing AI with Safety and Scalability
 
@@ -781,7 +801,7 @@ Sunday, December 14, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Beyond Just Prediction
 
@@ -795,7 +815,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Bodo DataFrames
 
@@ -809,7 +829,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Building a Lightweight Feature Store for Electricity Grid Forecasts with Polars
 
@@ -821,7 +841,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Combining Zarr, HDF5, and TIFF into a single data format
 
@@ -835,7 +855,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### GPU Accelerated Zarr
 
@@ -849,7 +869,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### GPU Python for the Real World: Practical Steps to GPU-Accelerated Python with RAPIDS
 
@@ -863,7 +883,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Garbage In: Lawsuit Out
 
@@ -877,7 +897,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### How to Effectively use text embeddings in tree based models
 
@@ -891,7 +911,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Scaling Data Processing for LLMs with NeMo Curator
 
@@ -905,7 +925,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Sparse & Finch
 
@@ -921,7 +941,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### TinyTroupe: Enhancing Marketing Insights through LLM-Powered Multiagent Persona Simulation
 
@@ -935,7 +955,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### When the Meter Maxes Out
 
@@ -949,7 +969,7 @@ Friday, December 12, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Automating ML with PyCaret: Train & Compare Multiple Models to Find the Best Performer
 
@@ -963,7 +983,7 @@ Thursday, December 11, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Enhancing Marketplace Competitiveness
 
@@ -977,7 +997,7 @@ Thursday, December 11, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### How Big are SLMs
 
@@ -991,7 +1011,7 @@ Thursday, December 11, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Decisions Under Uncertainty: A Hands‑On Guide to Bayesian Decision Theory
 
@@ -1005,7 +1025,7 @@ Wednesday, December 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### From Ideas to APIs: Delivering Fast with Modern Python
 
@@ -1017,7 +1037,7 @@ Wednesday, December 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Hands-on with Blosc2: Accelerating Your Python Data Workflows
 
@@ -1031,7 +1051,7 @@ Wednesday, December 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Lessons in Decision Making from the Monty Hall Problem
 
@@ -1043,7 +1063,7 @@ Wednesday, December 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Optimal Variable Binning in Logistic Regression
 
@@ -1057,7 +1077,7 @@ Wednesday, December 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Optimizing AI/ML Workloads: Resource Management and Cost Attribution
 
@@ -1071,7 +1091,7 @@ Wednesday, December 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Realtime Financial Fraud Detection with Modern Python
 
@@ -1085,7 +1105,7 @@ Wednesday, December 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Reviving Survival Analysis: Timeless, Yet Overlooked?
 
@@ -1099,7 +1119,7 @@ Wednesday, December 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Time series analysis for coupled neurons.
 
@@ -1113,7 +1133,7 @@ Wednesday, December 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Using MCP to turn Claude into a Football Opposition Analyst
 
@@ -1127,7 +1147,7 @@ Wednesday, December 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Building LLM-Powered Applications for Data Scientists and Software Engineers
 
@@ -1141,7 +1161,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Designing a Fast, Offline-Capable Reverse Geocoder in Python: An Open Source Alternative to Big Geo APIs
 
@@ -1155,7 +1175,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### From Feature Engineering to Context Engineering for Agents
 
@@ -1169,7 +1189,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Harnessing Generative Models for Synthetic Non-Life Insurance Data
 
@@ -1183,7 +1203,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### I Built a Transformer from Scratch So You Don’t Have To
 
@@ -1197,7 +1217,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### LLMs, Chatbots, and Dashboards: Visualize Your Data with Natural Language
 
@@ -1211,7 +1231,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Lessons learnt in optimizing a large-scale pandas application using Polars, FireDucks and cuDF: Go Smart and Save More!
 
@@ -1225,7 +1245,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Python Meets Excel
 
@@ -1239,7 +1259,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Python Worst Practices - Learn from the Expert
 
@@ -1253,7 +1273,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Scaling Fuzzy Product Matching with BM25: A Comparative Study of Python and Database Solutions
 
@@ -1267,7 +1287,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### The Lifecycle of a Jupyter Environment - From Exploration to Production-Grade Pipelines
 
@@ -1281,7 +1301,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Using Traditional AI and LLMs to Automate Complex and Critical Documents in Healthcare
 
@@ -1295,7 +1315,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### When AI Makes Things Up
 
@@ -1309,7 +1329,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Where Have All the Metrics Gone?
 
@@ -1323,7 +1343,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Why Julia’s GPU-Accelerated ODE Solvers are 20x-100x Faster than Jax and PyTorch
 
@@ -1337,7 +1357,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### projspec: what’s this project anyway?
 
@@ -1351,7 +1371,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### torchTextClassifiers : Modernizing Text classification for French National Statistics
 
@@ -1365,7 +1385,7 @@ Tuesday, December 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Stochastic gradient Descent – a Deep Dive
 
@@ -1375,7 +1395,7 @@ Thursday, October 9, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Updates to the github action
 
@@ -1385,7 +1405,7 @@ Wednesday, October 1, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Vibe coding GPT5 Edition
 
@@ -1399,7 +1419,7 @@ Thursday, September 25, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### FlexAttention: A Flexible Approach to Attention Mechanisms
 
@@ -1409,7 +1429,7 @@ Saturday, September 20, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### FlexAttention: A Flexible Approach to Attention Mechanisms
 
@@ -1419,7 +1439,7 @@ Saturday, September 20, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### FlexAttention: A Flexible Approach to Attention Mechanisms
 
@@ -1429,7 +1449,7 @@ Saturday, September 20, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Probabilitic Modeling with Language Models
 
@@ -1439,7 +1459,7 @@ Sunday, September 14, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Marketing Mix Model
 
@@ -1451,7 +1471,7 @@ Wednesday, September 10, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Allegations of War Crimes and the Palestinian Genocide
 
@@ -1465,7 +1485,7 @@ Sunday, September 7, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### AI a bag of tricks
 
@@ -1479,7 +1499,7 @@ Thursday, September 4, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### ShinyLive ❤️ Mesa Tutorial
 
@@ -1493,7 +1513,7 @@ Tuesday, September 2, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Langtalks Resources \# 43
 
@@ -1507,7 +1527,7 @@ Thursday, April 3, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Base line Morphology Model
 
@@ -1521,7 +1541,7 @@ Wednesday, April 2, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Complex Lewis Signaling - The Research Questions
 
@@ -1549,7 +1569,7 @@ Tuesday, March 11, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Emergent Languages
 
@@ -1563,7 +1583,7 @@ Tuesday, January 14, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Planning in the Complex Lewis Game
 
@@ -1573,7 +1593,7 @@ Tuesday, January 14, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### The Referential Lewis Signaling Game
 
@@ -1585,7 +1605,7 @@ Tuesday, January 14, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### A garden of forking paths
 
@@ -1595,7 +1615,7 @@ Saturday, January 11, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Complex Signals Questions
 
@@ -1609,7 +1629,7 @@ Monday, January 6, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### The Many Path To A Signaling System
 
@@ -1619,7 +1639,7 @@ Sunday, January 5, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Off-Policy Learning
 
@@ -1631,7 +1651,7 @@ Saturday, January 4, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Rethinking Signaling systems via the lens of compositionality
 
@@ -1641,7 +1661,7 @@ Thursday, January 2, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Books, Courses Tools
 
@@ -1651,7 +1671,7 @@ Wednesday, January 1, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Lewis Signaling Game for PettingZoo
 
@@ -1663,7 +1683,7 @@ Wednesday, January 1, 2025
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Villeny pure and simple
 
@@ -1675,7 +1695,7 @@ Thursday, December 12, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Misbehavior of Markets and Scaling in financial prices 1-4
 
@@ -1689,7 +1709,7 @@ Monday, December 2, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Scaling in financial prices 4
 
@@ -1701,7 +1721,7 @@ Sunday, December 1, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Scaling in financial prices 3
 
@@ -1713,7 +1733,7 @@ Saturday, November 30, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Scaling in financial prices 2
 
@@ -1725,7 +1745,7 @@ Friday, November 29, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Scaling in financial prices 1
 
@@ -1737,7 +1757,7 @@ Thursday, November 28, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Vitter’s Algorithm
 
@@ -1751,7 +1771,7 @@ Friday, October 11, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### TL-DR rethinking 💭 topological alignment
 
@@ -1761,7 +1781,7 @@ Tuesday, October 1, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### LLM the good the bad and the ugly
 
@@ -1773,7 +1793,7 @@ Monday, September 30, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### LLM and the missing link
 
@@ -1783,7 +1803,7 @@ Saturday, September 28, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### NLP with RL
 
@@ -1793,7 +1813,7 @@ Friday, September 27, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Deduction Evaluation
 
@@ -1803,7 +1823,7 @@ Thursday, September 26, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Fine-tune llm for Style and Grammar advice.
 
@@ -1817,7 +1837,7 @@ Wednesday, September 25, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Is compositionality overrated? The view from language emergence
 
@@ -1829,7 +1849,7 @@ Sunday, September 1, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Six quick tips to improve modeling
 
@@ -1839,7 +1859,7 @@ Monday, August 26, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Stumpy
 
@@ -1851,7 +1871,7 @@ Thursday, August 8, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### replay buffer questions
 
@@ -1861,7 +1881,7 @@ Tuesday, July 2, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### two ideas on generalization
 
@@ -1871,7 +1891,7 @@ Monday, July 1, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Mesa & RL
 
@@ -1881,7 +1901,7 @@ Tuesday, June 25, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### zero inflated data
 
@@ -1891,7 +1911,7 @@ Sunday, June 23, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### readings in rl
 
@@ -1901,7 +1921,7 @@ Tuesday, June 18, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Hyperparameter Optimization
 
@@ -1911,7 +1931,7 @@ Thursday, June 13, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### More Sugar please
 
@@ -1925,7 +1945,7 @@ Tuesday, June 11, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Risk-constrained Markov decision processes
 
@@ -1937,7 +1957,7 @@ Tuesday, June 11, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Evolutionary Games and Population Dynamics Summary
 
@@ -1947,7 +1967,7 @@ Sunday, May 12, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Roth Erev learning in Lewis signaling games
 
@@ -1957,7 +1977,7 @@ Thursday, May 9, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Signals Experiment
 
@@ -1969,7 +1989,7 @@ Tuesday, May 7, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### ad hoc complex signaling systems
 
@@ -1983,7 +2003,7 @@ Sunday, May 5, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Shannon Game
 
@@ -1995,7 +2015,7 @@ Thursday, May 2, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Urn models using Numpy
 
@@ -2005,7 +2025,7 @@ Thursday, May 2, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### RAD REPL
 
@@ -2015,7 +2035,7 @@ Wednesday, May 1, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Mesa
 
@@ -2029,7 +2049,7 @@ Sunday, March 31, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Sugar Scapes
 
@@ -2039,7 +2059,7 @@ Sunday, March 31, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### OCR building blocks
 
@@ -2049,7 +2069,7 @@ Thursday, March 28, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Bayesian Agent
 
@@ -2063,7 +2083,7 @@ Thursday, March 21, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### A definition by Patrick Henry Winston
 
@@ -2077,7 +2097,7 @@ Sunday, March 3, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### OCR - Brain Dump
 
@@ -2087,7 +2107,7 @@ Sunday, February 25, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Rhetoric NLP Tasks
 
@@ -2097,7 +2117,7 @@ Saturday, February 17, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Lewis Game from a Bayesian Perspective
 
@@ -2111,7 +2131,7 @@ Monday, February 12, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### 😁 Quarto 💖 Mermaid🧜 Mindmaps 🧠
 
@@ -2123,7 +2143,7 @@ Monday, February 12, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### The Great Migration
 
@@ -2137,7 +2157,7 @@ Tuesday, January 30, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Post With Code
 
@@ -2157,7 +2177,7 @@ Wednesday, January 10, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### SuperLearner
 
@@ -2169,7 +2189,7 @@ Wednesday, January 10, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Understanding Emergent Languages
 
@@ -2179,7 +2199,7 @@ Thursday, January 4, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### D3.js in in Quarto Observable
 
@@ -2189,7 +2209,7 @@ Tuesday, January 2, 2024
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### AutoGluon Cheetsheets
 
@@ -2203,7 +2223,7 @@ Wednesday, December 20, 2023
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Bayesian Marketing Science - Solving Marketing’s 3 Biggest Problems
 
@@ -2217,7 +2237,7 @@ Tuesday, June 20, 2023
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Spark Tips: Understanding the Progress Bar
 
@@ -2227,7 +2247,7 @@ Thursday, June 1, 2023
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### MCMC algorithms
 
@@ -2241,7 +2261,7 @@ Saturday, April 22, 2023
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Quarto loves pseudocode
 
@@ -2251,7 +2271,7 @@ Tuesday, April 11, 2023
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Responsible AI Mitigations and Tracker
 
@@ -2265,7 +2285,7 @@ Wednesday, March 8, 2023
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Text2topic - Leverage reviews data for multi-label topics classification in Booking.com
 
@@ -2279,7 +2299,7 @@ Tuesday, February 28, 2023
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Validating NLP data and models with deepchecks
 
@@ -2293,7 +2313,7 @@ Tuesday, February 28, 2023
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Transformations in Linguistic Representation
 
@@ -2303,7 +2323,7 @@ Wednesday, February 22, 2023
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### event generator
 
@@ -2315,7 +2335,7 @@ Thursday, February 16, 2023
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### entropy for uncertainty quantification
 
@@ -2329,7 +2349,7 @@ Thursday, September 22, 2022
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Loss engineering and uncertainty for multi-task learning
 
@@ -2343,7 +2363,7 @@ Monday, September 12, 2022
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Robust Regression
 
@@ -2357,7 +2377,7 @@ Monday, September 12, 2022
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Wikisym 2012
 
@@ -2369,7 +2389,7 @@ Tuesday, July 26, 2022
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Set Up M1 MacBooks for DS & ML
 
@@ -2381,7 +2401,7 @@ Thursday, May 5, 2022
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### command line
 
@@ -2395,7 +2415,7 @@ Thursday, May 5, 2022
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### PDF extraction hacks
 
@@ -2409,7 +2429,7 @@ Sunday, April 10, 2022
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Meme bank
 
@@ -2423,7 +2443,7 @@ Thursday, December 30, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Getting more from your agency ?
 
@@ -2485,7 +2505,7 @@ Tuesday, September 14, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Customer Lifetime Value - Pareto/NBD (BTYD) Model
 
@@ -2499,7 +2519,7 @@ Tuesday, September 14, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Storytelling and other essentials
 
@@ -2537,7 +2557,7 @@ Sunday, August 29, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### What is in a citation?
 
@@ -2563,7 +2583,7 @@ Friday, August 13, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Inlining Citations for Wikipedia articles
 
@@ -2575,7 +2595,7 @@ Friday, August 13, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Transfer learning in NLP
 
@@ -2587,7 +2607,7 @@ Thursday, August 12, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### A type of Witness and an evolving Idiom
 
@@ -2613,7 +2633,7 @@ Thursday, July 1, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### TensorFlow probability
 
@@ -2623,7 +2643,7 @@ Tuesday, June 1, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Ebook Hacks
 
@@ -2633,7 +2653,7 @@ Saturday, May 29, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Multilevel Models
 
@@ -2655,7 +2675,7 @@ Tuesday, April 27, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Automatic Summarization Task
 
@@ -2677,7 +2697,7 @@ Wednesday, April 14, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Modeling Events
 
@@ -2689,7 +2709,7 @@ Friday, April 9, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### 10 Tips To Improve Your Workflow
 
@@ -2701,7 +2721,7 @@ Wednesday, April 7, 2021
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### numpy meltdown
 
@@ -2715,7 +2735,7 @@ Sunday, November 29, 2020
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Deep Learning Intuitions
 
@@ -2727,7 +2747,7 @@ Sunday, October 25, 2020
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### brace expansion
 
@@ -2739,7 +2759,7 @@ Friday, June 12, 2020
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Pandas Productivity Challenge?
 
@@ -2751,7 +2771,7 @@ Wednesday, March 4, 2020
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### How to avoid cross site scripting (XSS) errors
 
@@ -2765,7 +2785,7 @@ Thursday, February 20, 2020
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Docker for data science
 
@@ -2777,7 +2797,7 @@ Sunday, November 24, 2019
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Exploding and vanishing nodes.
 
@@ -2787,7 +2807,7 @@ Wednesday, July 31, 2019
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Lobeformation: A New Architecture for Deep Learning
 
@@ -2801,7 +2821,7 @@ Friday, July 19, 2019
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### text annotation with BRAT
 
@@ -2811,7 +2831,7 @@ Tuesday, January 16, 2018
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### A/B testing cost and risks?
 
@@ -2835,7 +2855,7 @@ Wednesday, December 14, 2016
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### An Overview of Modern Speech Recognition
 
@@ -2849,7 +2869,7 @@ Tuesday, November 1, 2016
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### HotJar Heat Map Analysis - Dr. David Darmanin
 
@@ -2861,7 +2881,7 @@ Wednesday, April 20, 2016
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Efficient Long-Text Understanding with Short-Text Models
 
@@ -2875,7 +2895,7 @@ Sunday, November 1, 2015
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Using Competitive Analysis to Benchmark Your Marketing Efforts Ariel Rosenstein - Similar Web
 
@@ -2887,7 +2907,7 @@ Monday, April 20, 2015
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Using Competitive Analysis to Benchmark Your Marketing Efforts - Ariel Rosenstein - Similar Web
 
@@ -2899,7 +2919,7 @@ Monday, April 20, 2015
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Analytics Checklist
 
@@ -2909,7 +2929,7 @@ Saturday, February 7, 2015
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### SCROLLS - Standardized CompaRison Over Long Language Sequences
 
@@ -2923,7 +2943,7 @@ Saturday, November 1, 2014
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### NLP IL F2F Meetup at Intuit
 
@@ -2937,7 +2957,7 @@ Friday, November 1, 2013
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### life hacks
 
@@ -2947,7 +2967,7 @@ Friday, June 7, 2013
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### NLP IL F2F Meetup at Intuit
 
@@ -2961,7 +2981,7 @@ Thursday, November 1, 2012
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Text Mining With Python
 
@@ -2973,7 +2993,7 @@ Tuesday, November 29, 2011
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Text Mining With R
 
@@ -2985,7 +3005,7 @@ Tuesday, November 29, 2011
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Tidy Text Mining With R
 
@@ -2997,7 +3017,7 @@ Tuesday, November 29, 2011
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ##### Time management Tips
 
@@ -3011,7 +3031,7 @@ Thursday, August 11, 2011
 
 |          |                            |
 |----------|----------------------------|
-| Modified | Tuesday, September 1, 2026 |
+| Modified | Tuesday, September 8, 2026 |
 
 ![](./reviews/2024/q-star/cover.jpg)
 

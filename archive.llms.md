@@ -1,5 +1,13 @@
 # Archive
 
+### [Exercises from the Dynamic Book](posts/2026/09-01-excercises-from-the-dynamic-book/index.llms.md)
+
+Wednesday, September 2, 2026
+
+### [Composition Driven by Perspective](posts/2026/09-01-composition-driven-by-perspective/index.llms.md)
+
+Tuesday, September 1, 2026
+
 ### [All the Good Prompts](posts/2026/06-01-good-prompts/index.llms.md)
 
 Wednesday, June 3, 2026

@@ -1,0 +1,41 @@
+People have criticized Kim Jung Gi, some for being a poor teacher, for relying too much on memory, and for many other shortcomings. Most artists have their shortcomings if we subject their work to sufficient scrutiny. But the critics should focus on strengths and try to emulate them. I wish to acknowledge that his work shows a certain dramatic flair and that other artists who observed his process can capture his ability to stack many figures on a page. This is not unique but a quality that many great draftsmen develop. E.g. [Luca Cambiaso](https://en.wikipedia.org/wiki/Luca_Cambiaso), [Gustav Doré](https://en.wikipedia.org/wiki/Gustave_Dor%C3%A9)
+
+Also, he is able to fill up the page – effectively exploring more space within an illustration without planning it in advance. He explains this in one of his sessions on perspective, cf. [Drawing With Perspective in Mind Art Lesson](https://www.youtube.com/watch?v=g3eI2YvD--k)
+
+As it happens [Gin Jung Gi](https://en.wikipedia.org/wiki/Kim_Jung_Gi) passed away recently and since more people are both criticizing him, imitating his work, and educators are increasingly able to teach lessons on his techniques. I think that to a large extent the magic of his performance drawing lies in his ability to hide the construction lines that most draftsmen relay upon. But in some sense he often hid these lines from himself and so it remained a spontaneous and fluid process for him but not as transparent when he tried to teach others.
+
+Working without aids is not a unique capability - in fact it is one of the signs of a draftsman’s maturity and confidence. But he used many tricks to hide his constructions and as the canvas becomes more dense it is easier for him and harder for the viewer to discern the many underlying structures and plans that he put in. Discerning artist who reproduce his works, rather than simply tracing it may stable upon these hidden structures and learn from them. One such form are his vanishing points and the extent of the lines each is using on the page.
+
+Also Gin Jung Gi had mastered a certain skill set and when others try to emulate his work, like that of other master draftsman,they see multiple dimension of skills at once where in reality one can usually improve only one aspect at a time and through great application and dedication. I think Gin Jung Gi mastered these the hard way and that he started early on in life. He certainly has a good visual memory but nothing like photographic memory. I believe that he developed his skills by doing hard work - i.e. challenging himself consistently to literally face his weakest areas by attempting increasingly difficult challenges in perspective, anatomy, proportions, composition, invention, while exploring a rich visual topics. This relentless practice and constant self-challenge allowed him to internalize complex techniques and develop a fluid, intuitive approach to drawing, and constantly pushing the boundaries of his abilities.
+
+There are countless examples of highly successful artist that have never gone out of their comfort zone and yet achieved remarkable skill and recognition. I think not everything most artist do is going to push them to the next level. Stepping outside your comfort zone is not easy especially when you get better.
+
+Anyhow, it suggests some exercises
+
+## Exercises
+
+1.  stacking many boxes and using these to place the different figures within them.
+2.  subdividing the space into boxes incrementally.
+3.  subdividing space into levels (large flat boxes that might not fit on the page), then further subdividing them as before.
+
+In reality, these exercises are not how one actually draws, but a device that helps to work things out as you get better and likely won’t need them as much.
+
+The two directions one would like to develop might be 1. box merging - a large robot might be in two adjacent boxes in space - why not just one - because we need the other smaller boxes in that space for other subjects. 2. Planning is intimately related to perspective - smaller forms are perceived as further away, and more importantly, closer forms obstruct further ones. This means that we can start with a few subjects and use surrounding space to add more detail. 3. In fact, an important part of composition is asymmetry, where the main form points to a smaller, distant form to one side and perhaps another even smaller one elsewhere. These secondary forms also help clarify the locations of the vanishing points.
+
+## Citation
+
+BibTeX citation:
+
+``` quarto-appendix-bibtex
+@online{bochman2026,
+  author = {Bochman, Oren},
+  title = {Composition {Driven} by {Perspective}},
+  date = {2026-09-01},
+  url = {https://orenbochman.github.io/posts/2026/09-01-composition-driven-by-perspective/},
+  langid = {en}
+}
+```
+
+For attribution, please cite this work as:
+
+Bochman, Oren. 2026. “Composition Driven by Perspective.” September 1. <https://orenbochman.github.io/posts/2026/09-01-composition-driven-by-perspective/>.
